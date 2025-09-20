@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{04FFEE81-B591-4C83-BD54-114328A069D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Domain", "src\EduZasAPI.Domain\EduZasAPI.Domain.csproj", "{8D8EEB23-D0CB-48CA-9804-FFE97E788740}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Application", "src\EduZasAPI.Application\EduZasAPI.Application.csproj", "{AF59EA2A-CEF2-4474-AB88-B34F6A1C2F2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EduZasAPI.Infraestructure", "EduZasAPI.Infraestructure", "{5E9639A2-F46B-4FB5-85D1-8437195182AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.EntityFramework", "src\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.EntityFramework\EduZasAPI.Infraestructure.EntityFramework.csproj", "{16FEA208-8120-49FD-944A-2FD00CEE06EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.MinimalAPI", "src\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.MinimalAPI\EduZasAPI.Infraestructure.MinimalAPI.csproj", "{31D6B226-DD5D-454B-AA72-041EBF67C4B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D8EEB23-D0CB-48CA-9804-FFE97E788740}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D8EEB23-D0CB-48CA-9804-FFE97E788740}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D8EEB23-D0CB-48CA-9804-FFE97E788740}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D8EEB23-D0CB-48CA-9804-FFE97E788740}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF59EA2A-CEF2-4474-AB88-B34F6A1C2F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF59EA2A-CEF2-4474-AB88-B34F6A1C2F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF59EA2A-CEF2-4474-AB88-B34F6A1C2F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF59EA2A-CEF2-4474-AB88-B34F6A1C2F2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16FEA208-8120-49FD-944A-2FD00CEE06EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16FEA208-8120-49FD-944A-2FD00CEE06EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16FEA208-8120-49FD-944A-2FD00CEE06EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16FEA208-8120-49FD-944A-2FD00CEE06EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31D6B226-DD5D-454B-AA72-041EBF67C4B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31D6B226-DD5D-454B-AA72-041EBF67C4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31D6B226-DD5D-454B-AA72-041EBF67C4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31D6B226-DD5D-454B-AA72-041EBF67C4B8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8D8EEB23-D0CB-48CA-9804-FFE97E788740} = {04FFEE81-B591-4C83-BD54-114328A069D6}
+		{AF59EA2A-CEF2-4474-AB88-B34F6A1C2F2B} = {04FFEE81-B591-4C83-BD54-114328A069D6}
+		{5E9639A2-F46B-4FB5-85D1-8437195182AA} = {04FFEE81-B591-4C83-BD54-114328A069D6}
+		{16FEA208-8120-49FD-944A-2FD00CEE06EC} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
+		{31D6B226-DD5D-454B-AA72-041EBF67C4B8} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
+	EndGlobalSection
+EndGlobal
