@@ -64,7 +64,7 @@ public class UserUpdateDTO
     /// o None si no se desea modificar este campo.
     /// Valor por defecto: None.
     /// </value>
-    public Optional<string> MootherLastname { get; set; } = Optional<string>.None();
+    public Optional<string> MotherLastname { get; set; } = Optional<string>.None();
 
     /// <summary>
     /// Obtiene o establece el estado de activación del usuario.

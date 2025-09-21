@@ -3,19 +3,20 @@ namespace EduZasAPI.Infraestructure.Application.Ports.Services.Users;
 using System.Text.RegularExpressions;
 
 using EduZasAPI.Domain.Rules;
-using EduZasAPI.Domain.Entities;
+using EduZasAPI.Application.DTOs.Users;
 using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
 
 using FluentValidation;
 
-public class UserFluentValidator : FluentValidator<User>
+
+public class UserUpdateFluentValidator : FluentValidator<UserUpdateDTO>
 {
-    public UserFluentValidator()
+    public UserUpdateFluentValidator()
     {
         RuleFor(x => x.Id)
           .Cascade(CascadeMode.Stop)
           .GreaterThanOrEqualTo((uint)1)
-          .WithMessage("Debe ser mayor o igual a 1");
+          .WithMessage("Formato inválido");
 
         RuleFor(x => x.FirstName)
           .Cascade(CascadeMode.Stop)

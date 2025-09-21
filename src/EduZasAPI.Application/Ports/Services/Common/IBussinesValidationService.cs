@@ -22,5 +22,5 @@ public interface IBusinessValidationService<T>
     /// Un <see cref="Result{T, E}"/> que contiene <see cref="Unit"/> si los datos son válidos,
     /// o un arreglo de <see cref="FieldErrorDTO"/> con los errores de validación por campo.
     /// </returns>
-    Result<Unit, FieldErrorDTO[]> IsValid(T data);
+    Result<Unit, List<FieldErrorDTO>> IsValid(T data);
 }
