@@ -9,12 +9,12 @@ public enum UserType
     /// Representa un usuario con perfil de estudiante.
     /// </summary>
     STUDENT = 0,
-    
+
     /// <summary>
     /// Representa un usuario con perfil de profesor o docente.
     /// </summary>
     PROFESSOR = 1,
-    
+
     /// <summary>
     /// Representa un usuario con perfil de administrador del sistema.
     /// </summary>

@@ -1,3 +1,5 @@
+namespace EduZasAPI.Application.Ports.Mappers;
+
 /// <summary>
 /// Define una interfaz para transformar o convertir un tipo en otro tipo específico.
 /// </summary>
