@@ -1,5 +1,7 @@
 namespace EduZasAPI.Domain.Enums.Common;
 
+using EduZasAPI.Domain.ValueObjects.Common;
+
 /// <summary>
 /// Enumera los tipos de búsqueda disponibles para cadenas de texto.
 /// </summary>
@@ -17,8 +19,13 @@ public enum StringSearchType
 }
 
 /// <summary>
-/// Proporciona métodos de extensión para el enum <see cref="StringSearchType"/>.
+/// Proporciona métodos de extensión para conversión entre el enum <see cref="StringSearchType"/> y sus representaciones en cadena.
 /// </summary>
+/// <remarks>
+/// Esta clase ofrece funcionalidades para convertir valores del enum <see cref="StringSearchType"/>
+/// a sus equivalentes en cadena de texto y viceversa, utilizando el tipo <see cref="Optional{T}"/>
+/// para manejar de forma segura conversiones inválidas o valores nulos.
+/// </remarks>
 public class StringSearchTypeExtensions
 {
     /// <summary>
@@ -26,47 +33,53 @@ public class StringSearchTypeExtensions
     /// </summary>
     /// <param name="value">Valor del enum a convertir.</param>
     /// <returns>
-    /// Cadena que representa el tipo de búsqueda:
-    /// <list type="bullet">
-    /// <item><description>"equals" para <see cref="StringSearchType.EQ"/></description></item>
-    /// <item><description>"like" para <see cref="StringSearchType.LIKE"/></description></item>
-    /// </list>
+    /// Un <see cref="Optional{T}"/> que contiene la cadena correspondiente al valor del enum si es válido,
+    /// o <see cref="Optional{T}.None"/> si el valor no está mapeado.
     /// </returns>
-    /// <exception cref="InvalidCastException">
-    /// Se lanza cuando se proporciona un valor no definido en el enum <see cref="StringSearchType"/>.
+    /// <exception cref="ArgumentNullException">
+    /// Se lanza cuando el valor del enum proporcionado es nulo.
     /// </exception>
-    public static string ToString(StringSearchType value)
+    /// <example>
+    /// <code>
+    /// var result = StringSearchTypeExtensions.ToString(StringSearchType.EQ);
+    /// // result contiene Optional<string>.Some("equals")
+    /// </code>
+    /// </example>
+    public static Optional<string> ToString(StringSearchType value)
     {
         ArgumentNullException.ThrowIfNull(value);
         return value switch
         {
-            StringSearchType.EQ => "equals",
-            StringSearchType.LIKE => "like",
-            _ => throw new InvalidCastException()
+            StringSearchType.EQ => Optional<string>.Some("equals"),
+            StringSearchType.LIKE => Optional<string>.Some("like"),
+            _ => Optional<string>.None(),
         };
     }
 
     /// <summary>
-    /// Convierte una cadena de texto en su correspondiente valor del enum <see cref="StringSearchType"/>.
+    /// Convierte una cadena de texto a su correspondiente valor del enum <see cref="StringSearchType"/>.
     /// </summary>
-    /// <param name="value">Cadena de texto a convertir. Los valores válidos son: "equals" o "like".</param>
+    /// <param name="value">Cadena de texto a convertir.</param>
     /// <returns>
-    /// El valor del enum <see cref="StringSearchType"/> correspondiente a la cadena proporcionada:
-    /// <list type="bullet">
-    /// <item><description><see cref="StringSearchType.EQ"/> para la cadena "equals"</description></item>
-    /// <item><description><see cref="StringSearchType.LIKE"/> para la cadena "like"</description></item>
-    /// </list>
+    /// Un <see cref="Optional{T}"/> que contiene el valor del enum correspondiente a la cadena si es válida,
+    /// o <see cref="Optional{T}.None"/> si la cadena no coincide con ningún valor del enum.
     /// </returns>
-    /// <exception cref="InvalidCastException">
-    /// Se lanza cuando la cadena proporcionada no coincide con ninguno de los valores esperados ("equals" o "like").
-    /// </exception>
-    public static StringSearchType FromString(string value)
+    /// <remarks>
+    /// Este método es case-sensitive. Solo reconoce "equals" y "like" en minúsculas.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = StringSearchTypeExtensions.FromString("like");
+    /// // result contiene Optional<StringSearchType>.Some(StringSearchType.LIKE)
+    /// </code>
+    /// </example>
+    public static Optional<StringSearchType> FromString(string value)
     {
         return value switch
         {
-            "equals" => StringSearchType.EQ,
-            "like" => StringSearchType.LIKE,
-            _ => throw new InvalidCastException()
+            "equals" => Optional<StringSearchType>.Some(StringSearchType.EQ),
+            "like" => Optional<StringSearchType>.Some(StringSearchType.LIKE),
+            _ => Optional<StringSearchType>.None(),
         };
     }
 }

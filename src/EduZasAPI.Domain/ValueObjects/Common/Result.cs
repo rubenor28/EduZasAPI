@@ -161,6 +161,44 @@ public abstract class Result<T, E>
     public abstract T UnwrapOr(T defaultValue);
 
     /// <summary>
+    /// Ejecuta una acción diferente dependiendo de si el Result es Ok o Err.
+    /// </summary>
+    /// <param name="fnOk">Acción a ejecutar si el Result es Ok, recibiendo el valor contenido.</param>
+    /// <param name="fnErr">Acción a ejecutar si el Result es Err, recibiendo el error contenido.</param>
+    /// <remarks>
+    /// Este método permite manejar ambos casos (éxito y error) de forma declarativa
+    /// sin necesidad de verificar explícitamente el estado del Result.
+    /// </remarks>
+    /// <example>
+    /// resultado.Match(
+    ///     valor => Console.WriteLine($"Éxito: {valor}"),
+    ///     error => Console.WriteLine($"Error: {error}")
+    /// );
+    /// </example>
+    public abstract void Match(Action<T> fnOk, Action<E> fnErr);
+
+    /// <summary>
+    /// Transforma el Result en un valor de tipo U aplicando una función diferente según su estado.
+    /// </summary>
+    /// <typeparam name="U">Tipo del valor resultante de la transformación.</typeparam>
+    /// <param name="fnOk">Función a aplicar si el Result es Ok, recibiendo el valor contenido.</param>
+    /// <param name="fnErr">Función a aplicar si el Result es Err, recibiendo el error contenido.</param>
+    /// <returns>
+    /// El resultado de aplicar la función correspondiente al estado del Result.
+    /// </returns>
+    /// <remarks>
+    /// Este método permite transformar un Result en otro tipo de valor de forma segura,
+    /// manejando explícitamente ambos casos posibles (éxito y error).
+    /// </remarks>
+    /// <example>
+    /// string mensaje = resultado.Match(
+    ///     valor => $"Operación exitosa: {valor}",
+    ///     error => $"Error en la operación: {error}"
+    /// );
+    /// </example>
+    public abstract U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr);
+
+    /// <summary>
     /// Aplica una función al valor contenido si el resultado es Ok.
     /// </summary>
     /// <typeparam name="U">Tipo del nuevo valor resultante.</typeparam>
@@ -243,6 +281,12 @@ public abstract class Result<T, E>
         public override T UnwrapOr(T defaultValue) => _value;
 
         /// <inheritdoc/>
+        public override void Match(Action<T> fnOk, Action<E> fnErr) => fnOk(_value);
+
+        /// <inheritdoc/>
+        public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnOk(_value);
+
+        /// <inheritdoc/>
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Ok(fn(_value));
 
         /// <inheritdoc/>
@@ -277,12 +321,17 @@ public abstract class Result<T, E>
         /// <inheritdoc/>
         public override T Unwrap() => throw new InvalidOperationException($"Tried to Unwrap from Err: {_error}");
 
-
         /// <inheritdoc/>
         public override E UnwrapErr() => _error;
 
         /// <inheritdoc/>
         public override T UnwrapOr(T defaultValue) => defaultValue;
+
+        /// <inheritdoc/>
+        public override void Match(Action<T> fnOk, Action<E> fnErr) => fnErr(_error);
+
+        /// <inheritdoc/>
+        public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnErr(_error);
 
         /// <inheritdoc/>
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Err(_error);
