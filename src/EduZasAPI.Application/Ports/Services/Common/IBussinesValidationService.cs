@@ -8,7 +8,7 @@ namespace EduZasAPI.Application.Ports.Services.Common;
 /// Esta interfaz se utiliza para implementar servicios que validan reglas de negocio,
 /// como validaciones de formato, reglas simples.
 /// </remarks>
-public interface IBussinesValidationService<T>
+public interface IBusinessValidationService<T>
 {
     /// <summary>
     /// Valida si los datos cumplen con las reglas de negocio especificadas.
