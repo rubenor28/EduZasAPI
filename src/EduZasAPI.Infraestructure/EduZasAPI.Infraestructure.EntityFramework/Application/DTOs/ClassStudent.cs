@@ -1,6 +1,6 @@
 ﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
 
-public partial class ClassStudent
+public partial class ClassStudentEF
 {
     public string ClassId { get; set; } = null!;
 
@@ -8,7 +8,7 @@ public partial class ClassStudent
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Class Class { get; set; } = null!;
+    public virtual ClassEF Class { get; set; } = null!;
 
-    public virtual User Student { get; set; } = null!;
+    public virtual UserEF Student { get; set; } = null!;
 }

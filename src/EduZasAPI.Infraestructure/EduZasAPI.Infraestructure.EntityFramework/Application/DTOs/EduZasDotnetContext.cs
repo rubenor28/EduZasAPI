@@ -13,23 +13,23 @@ public partial class EduZasDotnetContext : DbContext
     {
     }
 
-    public virtual DbSet<Class> Classes { get; set; }
+    public virtual DbSet<ClassEF> Classes { get; set; }
 
-    public virtual DbSet<ClassProfessor> ClassProfessors { get; set; }
+    public virtual DbSet<ClassProfessorEF> ClassProfessors { get; set; }
 
-    public virtual DbSet<ClassStudent> ClassStudents { get; set; }
+    public virtual DbSet<ClassStudentEF> ClassStudents { get; set; }
 
-    public virtual DbSet<Notification> Notifications { get; set; }
+    public virtual DbSet<NotificationEF> Notifications { get; set; }
 
-    public virtual DbSet<NotificationPerUser> NotificationPerUsers { get; set; }
+    public virtual DbSet<NotificationPerUserEF> NotificationPerUsers { get; set; }
 
-    public virtual DbSet<Resource> Resources { get; set; }
+    public virtual DbSet<ResourceEF> Resources { get; set; }
 
-    public virtual DbSet<Test> Tests { get; set; }
+    public virtual DbSet<TestEF> Tests { get; set; }
 
-    public virtual DbSet<TestsPerClass> TestsPerClasses { get; set; }
+    public virtual DbSet<TestsPerClassEF> TestsPerClasses { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<UserEF> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -41,7 +41,7 @@ public partial class EduZasDotnetContext : DbContext
             .UseCollation("utf8mb4_unicode_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<Class>(entity =>
+        modelBuilder.Entity<ClassEF>(entity =>
         {
             entity.HasKey(e => e.ClassId).HasName("PRIMARY");
 
@@ -85,10 +85,10 @@ public partial class EduZasDotnetContext : DbContext
             entity.HasMany(d => d.Professors).WithMany(p => p.ClassesNavigation)
                 .UsingEntity<Dictionary<string, object>>(
                     "ResourcesPerClass",
-                    r => r.HasOne<User>().WithMany()
+                    r => r.HasOne<UserEF>().WithMany()
                         .HasForeignKey("ProfessorId")
                         .HasConstraintName("resources_per_class_ibfk_2"),
-                    l => l.HasOne<Class>().WithMany()
+                    l => l.HasOne<ClassEF>().WithMany()
                         .HasForeignKey("ClassId")
                         .HasConstraintName("resources_per_class_ibfk_1"),
                     j =>
@@ -107,7 +107,7 @@ public partial class EduZasDotnetContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<ClassProfessor>(entity =>
+        modelBuilder.Entity<ClassProfessorEF>(entity =>
         {
             entity.HasKey(e => new { e.ClassId, e.ProfessorId })
                 .HasName("PRIMARY")
@@ -137,7 +137,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("class_professors_ibfk_2");
         });
 
-        modelBuilder.Entity<ClassStudent>(entity =>
+        modelBuilder.Entity<ClassStudentEF>(entity =>
         {
             entity.HasKey(e => new { e.ClassId, e.StudentId })
                 .HasName("PRIMARY")
@@ -167,7 +167,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("class_students_ibfk_2");
         });
 
-        modelBuilder.Entity<Notification>(entity =>
+        modelBuilder.Entity<NotificationEF>(entity =>
         {
             entity.HasKey(e => e.NotificationId).HasName("PRIMARY");
 
@@ -198,7 +198,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("notifications_ibfk_1");
         });
 
-        modelBuilder.Entity<NotificationPerUser>(entity =>
+        modelBuilder.Entity<NotificationPerUserEF>(entity =>
         {
             entity.HasKey(e => new { e.NotificationId, e.UserId })
                 .HasName("PRIMARY")
@@ -230,7 +230,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("notification_per_user_ibfk_2");
         });
 
-        modelBuilder.Entity<Resource>(entity =>
+        modelBuilder.Entity<ResourceEF>(entity =>
         {
             entity.HasKey(e => e.ResourceId).HasName("PRIMARY");
 
@@ -260,7 +260,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("resources_ibfk_1");
         });
 
-        modelBuilder.Entity<Test>(entity =>
+        modelBuilder.Entity<TestEF>(entity =>
         {
             entity.HasKey(e => e.TestId).HasName("PRIMARY");
 
@@ -289,7 +289,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("tests_ibfk_1");
         });
 
-        modelBuilder.Entity<TestsPerClass>(entity =>
+        modelBuilder.Entity<TestsPerClassEF>(entity =>
         {
             entity.HasKey(e => new { e.TestId, e.ClassId })
                 .HasName("PRIMARY")
@@ -316,7 +316,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("tests_per_class_ibfk_1");
         });
 
-        modelBuilder.Entity<User>(entity =>
+        modelBuilder.Entity<UserEF>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PRIMARY");
 

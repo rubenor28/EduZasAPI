@@ -1,6 +1,12 @@
 ﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
 
-public partial class User
+using EduZasAPI.Domain.Entities;
+using EduZasAPI.Domain.ValueObjects.Common;
+using EduZasAPI.Domain.Enums.Users;
+
+using EduZasAPI.Application.Ports.Mappers;
+
+public partial class UserEF : IInto<User>
 {
     public ulong UserId { get; set; }
 
@@ -24,17 +30,41 @@ public partial class User
 
     public DateTime ModifiedAt { get; set; }
 
-    public virtual ICollection<ClassProfessor> ClassProfessors { get; set; } = new List<ClassProfessor>();
+    public virtual ICollection<ClassProfessorEF> ClassProfessors { get; set; } = new List<ClassProfessorEF>();
 
-    public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
+    public virtual ICollection<ClassStudentEF> ClassStudents { get; set; } = new List<ClassStudentEF>();
 
-    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
+    public virtual ICollection<ClassEF> Classes { get; set; } = new List<ClassEF>();
 
-    public virtual ICollection<NotificationPerUser> NotificationPerUsers { get; set; } = new List<NotificationPerUser>();
+    public virtual ICollection<NotificationPerUserEF> NotificationPerUsers { get; set; } = new List<NotificationPerUserEF>();
 
-    public virtual ICollection<Resource> Resources { get; set; } = new List<Resource>();
+    public virtual ICollection<ResourceEF> Resources { get; set; } = new List<ResourceEF>();
 
-    public virtual ICollection<Test> Tests { get; set; } = new List<Test>();
+    public virtual ICollection<TestEF> Tests { get; set; } = new List<TestEF>();
 
-    public virtual ICollection<Class> ClassesNavigation { get; set; } = new List<Class>();
+    public virtual ICollection<ClassEF> ClassesNavigation { get; set; } = new List<ClassEF>();
+
+    public User Into()
+    {
+        return new User
+        {
+            Id = UserId,
+            Active = Active ?? false,
+            Email = Email,
+            FirstName = FirstName,
+            MidName = MidName is null ?
+              Optional<string>.None() :
+              Optional<string>.Some(MidName),
+            FatherLastName = FatherLastname,
+            MotherLastname = MotherLastname is null ?
+              Optional<string>.None() :
+              Optional<string>.Some(MotherLastname),
+            Password = Password,
+            CreatedAt = CreatedAt,
+            ModifiedAt = ModifiedAt,
+            Role = 
+              Role.HasValue && Enum.IsDefined(typeof(UserType), (int)Role.Value) ?
+              (UserType)Role.Value : UserType.STUDENT,
+        };
+    }
 }

@@ -1,6 +1,6 @@
 ﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
 
-public partial class Test
+public partial class TestEF
 {
     public ulong TestId { get; set; }
 
@@ -12,7 +12,7 @@ public partial class Test
 
     public ulong ProfessorId { get; set; }
 
-    public virtual User Professor { get; set; } = null!;
+    public virtual UserEF Professor { get; set; } = null!;
 
-    public virtual ICollection<TestsPerClass> TestsPerClasses { get; set; } = new List<TestsPerClass>();
+    public virtual ICollection<TestsPerClassEF> TestsPerClasses { get; set; } = new List<TestsPerClassEF>();
 }
