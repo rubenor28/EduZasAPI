@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Entities.Users;
+namespace EduZasAPI.Domain.Entities;
 
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Domain.Enums.Users;

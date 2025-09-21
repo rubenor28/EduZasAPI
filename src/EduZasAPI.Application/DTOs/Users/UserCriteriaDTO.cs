@@ -2,6 +2,7 @@ namespace EduZasAPI.Application.DTOs.Users;
 
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Domain.Enums.Users;
+using EduZasAPI.Application.DTOs.Common;
 
 /// <summary>
 /// Representa los criterios de búsqueda y filtrado para consultas de usuarios.
@@ -12,7 +13,7 @@ using EduZasAPI.Domain.Enums.Users;
 /// Utiliza <see cref="Optional{T}"/> para indicar qué campos deben ser filtrados
 /// y cuáles deben ser ignorados en la consulta.
 /// </remarks>
-public class UserCriteriaDTO : ICriteria
+public class UserCriteriaDTO : ICriteriaDTO
 {
     /// <summary>
     /// Obtiene o establece el filtro opcional para el estado de activación del usuario.
