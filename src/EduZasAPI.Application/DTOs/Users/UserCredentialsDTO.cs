@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Entities.Users;
+namespace EduZasAPI.Application.DTOs.Users;
 
 /// <summary>
 /// Representa las credenciales de autenticación de un usuario para el proceso de login.
@@ -8,7 +8,7 @@ namespace EduZasAPI.Domain.Entities.Users;
 /// para verificar la identidad de un usuario en el sistema. Ambos campos son
 /// obligatorios para realizar el proceso de autenticación.
 /// </remarks>
-public struct UserCredentials
+public struct UserCredentialsDTO
 {
     /// <summary>
     /// Obtiene o establece la dirección de correo electrónico del usuario.

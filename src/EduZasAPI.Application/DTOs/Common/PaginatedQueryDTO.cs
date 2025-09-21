@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.DTOs.Common;
 
 /// <summary>
 /// Representa el resultado de una consulta paginada con criterios específicos.
@@ -12,7 +12,7 @@ namespace EduZasAPI.Domain.ValueObjects.Common;
 /// </remarks>
 public class PaginatedQuery<T, C>
 where T : notnull
-where C : notnull, ICriteria
+where C : notnull, ICriteriaDTO
 {
     /// <summary>
     /// Obtiene los criterios utilizados para realizar la consulta.

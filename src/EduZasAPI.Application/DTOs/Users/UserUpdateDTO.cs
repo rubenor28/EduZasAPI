@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Entities.Users;
+namespace EduZasAPI.Application.DTOs.Users;
 
 using EduZasAPI.Domain.ValueObjects.Common;
 
@@ -10,7 +10,7 @@ using EduZasAPI.Domain.ValueObjects.Common;
 /// incluyendo datos personales, credenciales y estado. Todos los campos principales
 /// son obligatorios para garantizar la integridad de la actualización.
 /// </remarks>
-public class UserUpdate
+public class UserUpdateDTO
 {
     /// <summary>
     /// Obtiene o establece el identificador único del usuario a actualizar.

@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Entities.Users;
+namespace EduZasAPI.Application.DTOs.Users;
 
 using EduZasAPI.Domain.ValueObjects.Common;
 
@@ -11,7 +11,7 @@ using EduZasAPI.Domain.ValueObjects.Common;
 /// Utiliza campos requeridos (required) para garantizar que la información
 /// esencial esté siempre presente durante la creación del usuario.
 /// </remarks>
-public class NewUser
+public class NewUserDTO
 {
     /// <summary>
     /// Obtiene o establece el primer nombre del usuario.

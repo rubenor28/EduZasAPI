@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Entities.Users;
+namespace EduZasAPI.Application.DTOs.Users;
 
 using EduZasAPI.Domain.Enums.Users;
 
@@ -11,7 +11,7 @@ using EduZasAPI.Domain.Enums.Users;
 /// Utiliza campos requeridos (required) para garantizar que tanto el identificador
 /// como el nuevo rol estén siempre presentes durante la operación de cambio.
 /// </remarks>
-public struct RolChange
+public struct RolChangeDTO
 {
     /// <summary>
     /// Obtiene o establece el identificador único del usuario cuyo rol se desea modificar.

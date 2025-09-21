@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Entities.Users;
+namespace EduZasAPI.Application.DTOs.Users;
 
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Domain.Enums.Users;
@@ -11,7 +11,7 @@ using EduZasAPI.Domain.Enums.Users;
 /// en respuestas API o interfaces públicas. Incluye información básica de identificación
 /// pero está diseñada para evitar exponer datos sensibles o internos del sistema.
 /// </remarks>
-public class PublicUser
+public class PublicUserDTO
 {
     /// <summary>
     /// Obtiene o establece el identificador único del usuario.

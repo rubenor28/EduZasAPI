@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.DTOs.Common;
 
 /// <summary>
 /// Representa un error de validación asociado a un campo específico en una operación.
@@ -9,7 +9,7 @@ namespace EduZasAPI.Domain.ValueObjects.Common;
 /// o procesamiento de solicitudes. Es ideal para devolver errores específicos por campo
 /// en respuestas de API validaciones.
 /// </remarks>
-public struct FieldError
+public struct FieldErrorDTO
 {
     /// <summary>
     /// Obtiene el nombre del campo que generó el error de validación.

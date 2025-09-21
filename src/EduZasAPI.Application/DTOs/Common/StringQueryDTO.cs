@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.DTOs.Common;
 
 using EduZasAPI.Domain.Enums.Common;
 
@@ -11,7 +11,7 @@ using EduZasAPI.Domain.Enums.Common;
 /// donde el mismo texto puede requerir diferentes tratamientos (búsqueda exacta,
 /// búsqueda parcial, etc.).
 /// </remarks>
-public struct StringQuery
+public struct StringQueryDTO
 {
     /// <summary>
     /// Obtiene o establece el texto de la consulta a buscar.

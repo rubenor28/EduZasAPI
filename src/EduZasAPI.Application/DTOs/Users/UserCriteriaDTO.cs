@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Entities.Users;
+namespace EduZasAPI.Application.DTOs.Users;
 
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Domain.Enums.Users;
@@ -12,7 +12,7 @@ using EduZasAPI.Domain.Enums.Users;
 /// Utiliza <see cref="Optional{T}"/> para indicar qué campos deben ser filtrados
 /// y cuáles deben ser ignorados en la consulta.
 /// </remarks>
-public class UserCriteria : ICriteria
+public class UserCriteriaDTO : ICriteria
 {
     /// <summary>
     /// Obtiene o establece el filtro opcional para el estado de activación del usuario.

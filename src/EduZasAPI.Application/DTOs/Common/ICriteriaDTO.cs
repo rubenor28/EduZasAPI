@@ -1,9 +1,9 @@
-namespace EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.DTOs.Common;
 
 /// <summary>
 /// Define la interfaz para los criterios de consulta y paginación.
 /// </summary>
-public abstract class ICriteria
+public abstract class ICriteriaDTO
 {
     /// <summary>
     /// Obtiene el número de página para la paginación de resultados.
