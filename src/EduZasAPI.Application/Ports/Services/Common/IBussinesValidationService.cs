@@ -1,12 +1,16 @@
 namespace EduZasAPI.Application.Ports.Services.Common;
 
+using EduZasAPI.Domain.ValueObjects.Common;
+using EduZasAPI.Application.DTOs.Common;
+
 /// <summary>
 /// Define un contrato para servicios de validación de reglas de negocio.
 /// </summary>
 /// <typeparam name="T">Tipo de los datos a validar.</typeparam>
 /// <remarks>
-/// Esta interfaz se utiliza para implementar servicios que validan reglas de negocio,
-/// como validaciones de formato, reglas simples.
+/// Esta interfaz se utiliza para implementar servicios que validan reglas de negocio
+/// y devuelven un resultado que puede ser exitoso (Unit) o una colección de errores
+/// de validación específicos por campo.
 /// </remarks>
 public interface IBusinessValidationService<T>
 {
@@ -15,7 +19,8 @@ public interface IBusinessValidationService<T>
     /// </summary>
     /// <param name="data">Datos a validar.</param>
     /// <returns>
-    /// true si los datos son válidos según las reglas de negocio, false en caso contrario.
+    /// Un <see cref="Result{T, E}"/> que contiene <see cref="Unit"/> si los datos son válidos,
+    /// o un arreglo de <see cref="FieldErrorDTO"/> con los errores de validación por campo.
     /// </returns>
-    bool IsValid(T data);
+    Result<Unit, FieldErrorDTO[]> IsValid(T data);
 }
