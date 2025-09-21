@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.MinimalAPI", "src\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.MinimalAPI\EduZasAPI.Infraestructure.MinimalAPI.csproj", "{31D6B226-DD5D-454B-AA72-041EBF67C4B8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.FluentValidation", "src\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.FluentValidation\EduZasAPI.Infraestructure.FluentValidation.csproj", "{8396AEFC-0131-4F21-B53F-04ED4C575E7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{31D6B226-DD5D-454B-AA72-041EBF67C4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31D6B226-DD5D-454B-AA72-041EBF67C4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31D6B226-DD5D-454B-AA72-041EBF67C4B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8396AEFC-0131-4F21-B53F-04ED4C575E7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8396AEFC-0131-4F21-B53F-04ED4C575E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8396AEFC-0131-4F21-B53F-04ED4C575E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8396AEFC-0131-4F21-B53F-04ED4C575E7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8D8EEB23-D0CB-48CA-9804-FFE97E788740} = {04FFEE81-B591-4C83-BD54-114328A069D6}
@@ -47,5 +53,6 @@ Global
 		{5E9639A2-F46B-4FB5-85D1-8437195182AA} = {04FFEE81-B591-4C83-BD54-114328A069D6}
 		{16FEA208-8120-49FD-944A-2FD00CEE06EC} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
 		{31D6B226-DD5D-454B-AA72-041EBF67C4B8} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
+		{8396AEFC-0131-4F21-B53F-04ED4C575E7D} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
 	EndGlobalSection
 EndGlobal
