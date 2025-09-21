@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace EduZasAPI.Infraestructure.EntityFramework.Application.DTOs;
+namespace EduZasAPI.Infraestructure.Application.DTOs;
 
 public partial class EduZasDotnetContext : DbContext
 {

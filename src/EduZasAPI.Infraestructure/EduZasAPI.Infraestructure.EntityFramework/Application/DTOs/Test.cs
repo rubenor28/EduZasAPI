@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace EduZasAPI.Infraestructure.EntityFramework.Application.DTOs;
+﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
 
 public partial class Test
 {
