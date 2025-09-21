@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
-namespace EduZasAPI.Infraestructure.EntityFramework;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.DTOs;
 
 public partial class EduZasDotnetContext : DbContext
 {

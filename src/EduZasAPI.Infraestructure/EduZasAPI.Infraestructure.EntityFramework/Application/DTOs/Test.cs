@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EduZasAPI.Infraestructure.EntityFramework;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.DTOs;
 
 public partial class Test
 {
