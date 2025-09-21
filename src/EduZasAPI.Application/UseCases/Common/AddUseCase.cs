@@ -1,29 +1,28 @@
-namespace EduZasAPI.Application.UseCases.Users;
+namespace EduZasAPI.Application.UseCases.Common;
 
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Application.Ports.DAOs;
 using EduZasAPI.Application.Ports.Services.Common;
 using EduZasAPI.Application.DTOs.Common;
-using EduZasAPI.Application.UseCases.Common;
 
 /// <summary>
 /// Caso de uso genérico para agregar una nueva entidad.
 /// </summary>
-/// <typeparam name="T">Tipo de los datos de entrada para la creación.</typeparam>
-/// <typeparam name="U">Tipo de la entidad resultante.</typeparam>
-public class AddUseCase<T, U> : IUseCaseAsync<T, U, List<FieldErrorDTO>>
-    where T : notnull
-    where U : notnull
+/// <typeparam name="NE">Tipo de los datos de entrada para la creación.</typeparam>
+/// <typeparam name="E">Tipo de la entidad resultante.</typeparam>
+public class AddUseCase<NE, E> : IUseCaseAsync<NE, E, List<FieldErrorDTO>>
+    where NE : notnull
+    where E : notnull
 {
-    private readonly ICreatorAsync<U, T> _creator;
-    private readonly IBusinessValidationService<T> _validator;
+    private readonly ICreatorAsync<E, NE> _creator;
+    private readonly IBusinessValidationService<NE> _validator;
 
     /// <summary>
-    /// Inicializa una nueva instancia de <see cref="AddUseCase{T, U}"/>.
+    /// Inicializa una nueva instancia de <see cref="AddUseCase{NE, E}"/>.
     /// </summary>
     /// <param name="creator">Servicio para crear entidades.</param>
     /// <param name="validator">Servicio para validar reglas de negocio.</param>
-    public AddUseCase(ICreatorAsync<U, T> creator, IBusinessValidationService<T> validator)
+    public AddUseCase(ICreatorAsync<E, NE> creator, IBusinessValidationService<NE> validator)
     {
         _creator = creator;
         _validator = validator;
@@ -37,17 +36,17 @@ public class AddUseCase<T, U> : IUseCaseAsync<T, U, List<FieldErrorDTO>>
     /// Resultado que contiene la entidad creada si fue exitosa,
     /// o una lista de errores de validación si falló.
     /// </returns>
-    public async Task<Result<U, List<FieldErrorDTO>>> ExecuteAsync(T request)
+    public async Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(NE request)
     {
         var validation = _validator.IsValid(request);
 
         if (validation.IsErr)
         {
             var errors = validation.UnwrapErr();
-            return Result<U, List<FieldErrorDTO>>.Err(errors);
+            return Result<E, List<FieldErrorDTO>>.Err(errors);
         }
 
         var newRecord = await _creator.AddAsync(request);
-        return Result<U, List<FieldErrorDTO>>.Ok(newRecord);
+        return Result<E, List<FieldErrorDTO>>.Ok(newRecord);
     }
 }
