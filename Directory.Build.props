@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <!-- Generar documentación XML en todos los proyectos hijos -->
+    <!-- Permite usar herramientas como DocFX -->
+    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
+    <!-- Ignorar warning por comentarios faltantes -->
+    <!-- <NoWarn>$(NoWarn);1591</NoWarn> -->
+  </PropertyGroup>
+</Project>
