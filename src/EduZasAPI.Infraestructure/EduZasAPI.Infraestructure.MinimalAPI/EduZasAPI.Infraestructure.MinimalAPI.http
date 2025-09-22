@@ -1,4 +1,4 @@
-@EduZasAPI.Infraestructure.MinimalAPI_HostAddress = http://localhost:5004
+@EduZasAPI.Infraestructure.MinimalAPI_HostAddress = http://localhost:5018
 
 GET {{EduZasAPI.Infraestructure.MinimalAPI_HostAddress}}/weatherforecast/
 Accept: application/json
