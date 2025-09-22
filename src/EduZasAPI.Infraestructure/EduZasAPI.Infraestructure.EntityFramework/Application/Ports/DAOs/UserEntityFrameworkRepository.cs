@@ -42,7 +42,7 @@ public class UserEntityFrameworkRepository :
     public async Task<Optional<User>> FindByEmail(string email)
     {
         var results = await _ctx.Users
-          .OrderBy(u => u.Id)
+          .OrderBy(u => u.UserId)
           .Where(u => u.Email == email)
           .Select(u => u.Into())
           .ToListAsync();

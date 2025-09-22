@@ -54,7 +54,7 @@ where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
 
     public async Task<Optional<E>> GetAsync(I id)
     {
-        var record = await DbSet.FirstOrDefaultAsync(data => data.Id.Equals(id));
+        var record = await DbSet.FindAsync(id);
         if (record is null) return Optional<E>.None();
         return Optional<E>.Some(record.Into());
     }

@@ -20,6 +20,26 @@ public class UserEntityFrameworkRepositoryTest
     private IUserRepositoryAsync _repo;
     private EduZasDotnetContext _ctx;
 
+    private NewUserDTO _defaultNew = new NewUserDTO
+    {
+        Email = "ruben.roman@test.com",
+        Password = "test",
+        FirstName = "Ruben",
+        FatherLastName = "Roman",
+    };
+
+    private User _defaultUser = new User
+    {
+        Id = 1,
+        Email = "ruben.roman@test.com",
+        Password = "test",
+        FirstName = "Ruben",
+        FatherLastName = "Roman",
+        CreatedAt = DateTime.Now,
+        ModifiedAt = DateTime.Now,
+    };
+
+
     public UserEntityFrameworkRepositoryTest()
     {
         var config = new ConfigurationBuilder()
@@ -56,19 +76,36 @@ public class UserEntityFrameworkRepositoryTest
     {
         await DeleteAndInitializeDatabaseAsync();
 
-        var dto = new NewUserDTO
-        {
-            Email = "ruben.roman@test.com",
-            Password = "test",
-            FirstName = "Ruben",
-            FatherLastName = "Roman",
-        };
-
+        var dto = _defaultNew;
         var record = await _repo.AddAsync(dto);
 
         Assert.NotNull(record);
         Assert.Equal(1ul, record.Id);
         Assert.Equal(dto.Email, record.Email);
         Assert.Equal(dto.FirstName, record.FirstName);
+    }
+
+    [Fact]
+    public async Task Delete_Success()
+    {
+        await DeleteAndInitializeDatabaseAsync();
+        await _repo.AddAsync(_defaultNew);
+        var record = await _repo.DeleteAsync(1);
+
+        Assert.True(record.IsSome);
+        Assert.Equal(1ul, record.Unwrap().Id);
+        Assert.Equal(_defaultNew.Email, record.Unwrap().Email);
+    }
+
+    [Fact]
+    public async Task Get_Success()
+    {
+        await DeleteAndInitializeDatabaseAsync();
+        await _repo.AddAsync(_defaultNew);
+        var record = await _repo.GetAsync(1);
+
+        Assert.True(record.IsSome);
+        Assert.Equal(1ul, record.Unwrap().Id);
+        Assert.Equal(_defaultNew.Email, record.Unwrap().Email);
     }
 }

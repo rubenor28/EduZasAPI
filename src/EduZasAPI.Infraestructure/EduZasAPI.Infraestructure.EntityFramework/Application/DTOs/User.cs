@@ -8,9 +8,11 @@ using EduZasAPI.Application.DTOs.Users;
 using EduZasAPI.Application.Ports.Mappers;
 
 public partial class UserEF :
-  IIdentifiable<ulong>, IInto<User>, IFrom<NewUserDTO, UserEF>, IFrom<UserUpdateDTO, UserEF>
+    IIdentifiable<ulong>, IInto<User>, IFrom<NewUserDTO, UserEF>, IFrom<UserUpdateDTO, UserEF>
 {
     public ulong UserId { get; set; }
+
+    public ulong Id => UserId;
 
     public bool? Active { get; set; }
 
@@ -65,8 +67,6 @@ public partial class UserEF :
               (UserType)Role.Value : UserType.STUDENT,
         };
     }
-
-    public ulong Id => UserId;
 
     public static UserEF From(NewUserDTO dto) => new UserEF
     {
