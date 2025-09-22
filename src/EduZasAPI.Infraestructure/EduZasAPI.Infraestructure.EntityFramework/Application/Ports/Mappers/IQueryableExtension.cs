@@ -63,6 +63,28 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
+    /// Aplica un filtro de texto sobre un campo string de la entidad, usando un <see cref="StringQueryDTO"/>.
+    /// </summary>
+    /// <typeparam name="T">Tipo de la entidad en la consulta.</typeparam>
+    /// <param name="source">Fuente de datos a consultar.</param>
+    /// <param name="strQuery">Consulta de texto con el tipo de búsqueda y el valor.</param>
+    /// <param name="selector">Selector de la propiedad string a filtrar.</param>
+    /// <returns>Consulta filtrada según el tipo de búsqueda especificado, o sin cambios si no hay valor.</returns>
+    /// <exception cref="InvalidDataException">Si el tipo de búsqueda no está soportado.</exception>
+    public static IQueryable<T> WhereStringQuery<T>(
+        this IQueryable<T> source,
+        StringQueryDTO strQuery,
+        Expression<Func<T, string?>> selector)
+    {
+        return strQuery.SearchType switch
+        {
+            StringSearchType.EQ => source.Where(BuildEquals(selector, strQuery.Text)),
+            StringSearchType.LIKE => source.Where(BuildLike(selector, strQuery.Text)),
+            _ => throw new InvalidDataException($"Unsupported search type: {strQuery.SearchType}")
+        };
+    }
+
+    /// <summary>
     /// Construye una expresión que compara igualdad exacta entre una propiedad string y un texto dado.
     /// </summary>
     private static Expression<Func<T, bool>> BuildEquals<T>(Expression<Func<T, string?>> selector, string text)

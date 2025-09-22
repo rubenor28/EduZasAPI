@@ -19,6 +19,7 @@ where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
 {
     protected readonly EduZasDotnetContext _ctx;
     protected readonly ulong _pageSize;
+    protected DbSet<TEF> DbSet => _ctx.Set<TEF>();
 
     public EntityFrameworkRepository(EduZasDotnetContext context, ulong pageSize)
     {
@@ -32,7 +33,6 @@ where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
         return (pageNumber - 1) * _pageSize;
     }
 
-    protected DbSet<TEF> DbSet => _ctx.Set<TEF>();
 
 
     public async Task<E> AddAsync(NE data)
