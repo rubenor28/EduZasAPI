@@ -9,55 +9,62 @@ using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
 using FluentValidation;
 
 
+/// <summary>
+/// Validador para la actualización de usuarios (<see cref="UserUpdateDTO"/>).
+/// Aplica reglas de negocio y formato sobre las propiedades actualizables.
+/// </summary>
 public class UserUpdateFluentValidator : FluentValidator<UserUpdateDTO>
 {
+    /// <summary>
+    /// Inicializa las reglas de validación para <see cref="UserUpdateDTO"/>.
+    /// </summary>
     public UserUpdateFluentValidator()
     {
         RuleFor(x => x.Id)
-          .Cascade(CascadeMode.Stop)
-          .GreaterThanOrEqualTo((uint)1)
-          .WithMessage("Formato inválido");
+            .Cascade(CascadeMode.Stop)
+            .GreaterThanOrEqualTo((uint)1)
+            .WithMessage("Formato inválido");
 
         RuleFor(x => x.FirstName)
-          .Cascade(CascadeMode.Stop)
-          .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
-          .Matches(UserRegexs.SimpleName)
-          .WithMessage("Formato inválido");
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .WithMessage("La cadena no puede estar vacía")
+            .Matches(UserRegexs.SimpleName)
+            .WithMessage("Formato inválido");
 
         RuleFor(x => x.FatherLastName)
-          .Cascade(CascadeMode.Stop)
-          .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
-          .Matches(UserRegexs.SimpleName)
-          .WithMessage("Formato inválido");
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .WithMessage("La cadena no puede estar vacía")
+            .Matches(UserRegexs.SimpleName)
+            .WithMessage("Formato inválido");
 
         RuleFor(x => x.Email)
-          .Cascade(CascadeMode.Stop)
-          .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
-          .EmailAddress()
-          .WithMessage("Formato inválido");
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .WithMessage("La cadena no puede estar vacía")
+            .EmailAddress()
+            .WithMessage("Formato inválido");
 
         RuleFor(x => x.Password)
-          .Cascade(CascadeMode.Stop)
-          .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
-          .Matches(UserRegexs.Password)
-          .WithMessage("Formato inválido");
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .WithMessage("La cadena no puede estar vacía")
+            .Matches(UserRegexs.Password)
+            .WithMessage("Formato inválido");
 
         RuleFor(x => x.MidName)
             .Must(opt => opt.Match(
-                  name => Regex.IsMatch(UserRegexs.SimpleName, name) ||
-                          Regex.IsMatch(UserRegexs.CompositeName, name),
-                  () => true
+                name => Regex.IsMatch(UserRegexs.SimpleName, name) ||
+                        Regex.IsMatch(UserRegexs.CompositeName, name),
+                () => true
             )).WithMessage("Formato inválido");
 
         RuleFor(x => x.MotherLastname)
             .Must(opt => opt.Match(
-                  name => Regex.IsMatch(UserRegexs.SimpleName, name) ||
-                          Regex.IsMatch(UserRegexs.CompositeName, name),
-                  () => true
+                name => Regex.IsMatch(UserRegexs.SimpleName, name) ||
+                        Regex.IsMatch(UserRegexs.CompositeName, name),
+                () => true
             )).WithMessage("Formato inválido");
     }
 }

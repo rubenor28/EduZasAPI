@@ -8,8 +8,15 @@ using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
 
 using FluentValidation;
 
+/// <summary>
+/// Validador para la creación de un nuevo usuario,
+/// aplicando reglas específicas a cada propiedad del DTO.
+/// </summary>
 public class NewUserFluentValidator : FluentValidator<NewUserDTO>
 {
+    /// <summary>
+    /// Inicializa las reglas de validación para <see cref="NewUserDTO"/>.
+    /// </summary>
     public NewUserFluentValidator()
     {
         RuleFor(x => x.FirstName)
