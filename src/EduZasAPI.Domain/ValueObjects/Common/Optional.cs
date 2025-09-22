@@ -10,6 +10,44 @@ namespace EduZasAPI.Domain.ValueObjects.Common;
 /// </remarks>
 public abstract class Optional<T> where T : notnull
 {
+
+    /// <summary>
+    /// Instancia única que representa un Optional vacío.
+    /// </summary>
+    private static readonly Optional<T> _none = new NoneOptional();
+
+    /// <summary>
+    /// Convierte un valor de referencia o nullable en un Optional.
+    /// </summary>
+    /// <param name="value">Valor a convertir.</param>
+    /// <returns>
+    /// Un Optional con el valor si no es nulo, o un Optional vacío si es nulo.
+    /// </returns>
+    public static Optional<T> ToOptional(T? value) =>
+        value is null ? None() : Some(value);
+
+    /// <summary>
+    /// Convierte este Optional en un valor nullable.
+    /// </summary>
+    /// <returns>
+    /// El valor contenido si existe; de lo contrario, <c>null</c> si <typeparamref name="T"/> es un tipo referencia
+    /// o el valor por defecto de <typeparamref name="T"/> si es un tipo valor.
+    /// </returns>
+    public T? ToNullable() => IsSome ? Unwrap() : default;
+
+    /// <summary>
+    /// Crea un Optional que contiene el valor especificado.
+    /// </summary>
+    /// <param name="value">Valor a contener en el Optional.</param>
+    /// <returns>Un Optional en estado Some con el valor especificado.</returns>
+    public static Optional<T> Some(T value) => new SomeOptional(value);
+
+    /// <summary>
+    /// Crea un Optional vacío sin valor.
+    /// </summary>
+    /// <returns>Un Optional en estado None.</returns>
+    public static Optional<T> None() => _none;
+
     /// <summary>
     /// Obtiene un valor que indica si el Optional contiene un valor.
     /// </summary>
@@ -117,17 +155,16 @@ public abstract class Optional<T> where T : notnull
     public abstract Optional<T> OrElse(Func<Optional<T>> provider);
 
     /// <summary>
-    /// Crea un Optional que contiene el valor especificado.
+    /// Ejecuta la acción especificada si contiene valor.
     /// </summary>
-    /// <param name="value">Valor a contener en el Optional.</param>
-    /// <returns>Un Optional en estado Some con el valor especificado.</returns>
-    public static Optional<T> Some(T value) => new SomeOptional(value);
+    /// <param name="action">Acción a ejecutar.</param>
+    public abstract void IfSome(Action<T> action);
 
     /// <summary>
-    /// Crea un Optional vacío sin valor.
+    /// Ejecuta la acción especificada no contiene valor.
     /// </summary>
-    /// <returns>Un Optional en estado None.</returns>
-    public static Optional<T> None() => new NoneOptional();
+    /// <param name="action">Acción a ejecutar.</param>
+    public abstract void IfNone(Action action);
 
     /// <summary>
     /// Implementación concreta de Optional para el estado Some con valor.
@@ -173,6 +210,12 @@ public abstract class Optional<T> where T : notnull
 
         /// <inheritdoc/>
         public override Optional<T> OrElse(Func<Optional<T>> provider) => this;
+
+        /// <inheritdoc/>
+        public override void IfSome(Action<T> action) => action(_value);
+
+        /// <inheritdoc/>
+        public override void IfNone(Action action) { }
     }
 
     /// <summary>
@@ -213,5 +256,11 @@ public abstract class Optional<T> where T : notnull
         /// <inheritdoc/>
         public override Optional<T> OrElse(Func<Optional<T>> provider) =>
             provider();
+
+        /// <inheritdoc/>
+        public override void IfSome(Action<T> action) { }
+
+        /// <inheritdoc/>
+        public override void IfNone(Action action) => action();
     }
 }

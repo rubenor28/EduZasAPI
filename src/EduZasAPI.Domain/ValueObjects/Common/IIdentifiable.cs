@@ -16,3 +16,11 @@ public interface IIdentifiable<T> where T : notnull
     /// <value>Identificador único de tipo <typeparamref name="T"/>.</value>
     public T Id { get; }
 }
+
+public static class IdentifiableExtensions
+{
+    public static bool SameId<T, E>(this E left, E right)
+        where T : notnull
+        where E : IIdentifiable<T>
+        => left.Id.Equals(right.Id);
+}
