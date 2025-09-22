@@ -9,11 +9,9 @@ using EduZasAPI.Domain.Entities;
 using EduZasAPI.Domain.ValueObjects.Common;
 
 using EduZasAPI.Application.Ports.DAOs;
-using EduZasAPI.Application.DTOs.Common;
 using EduZasAPI.Application.DTOs.Users;
 
 using EduZasAPI.Infraestructure.Application.DTOs;
-using EduZasAPI.Infraestructure.Application.Ports.DAOs;
 
 public class UserEntityFrameworkRepositoryTest
 {
@@ -28,7 +26,7 @@ public class UserEntityFrameworkRepositoryTest
         FatherLastName = "Roman",
     };
 
-    private User _defaultUser = new User
+    private UserDomain _defaultUser = new UserDomain
     {
         Id = 1,
         Email = "ruben.roman@test.com",
@@ -107,5 +105,34 @@ public class UserEntityFrameworkRepositoryTest
         Assert.True(record.IsSome);
         Assert.Equal(1ul, record.Unwrap().Id);
         Assert.Equal(_defaultNew.Email, record.Unwrap().Email);
+    }
+
+    [Fact]
+    public async Task Update_success()
+    {
+        await DeleteAndInitializeDatabaseAsync();
+        var user = await _repo.AddAsync(_defaultNew);
+
+        var dto = new UserUpdateDTO
+        {
+            Email = user.Email,
+            Password = user.Password,
+            FirstName = user.FirstName,
+            FatherLastName = user.FatherLastName,
+            Id = user.Id,
+
+            Active = false,
+            MidName = Optional<string>.Some("Juan"),
+            MotherLastname = Optional<string>.Some("Juanes"),
+        };
+
+        var updated = await _repo.UpdateAsync(dto);
+
+        Assert.NotNull(updated);
+        Assert.False(updated.Active);
+        Assert.True(updated.MidName.IsSome);
+        Assert.True(updated.MotherLastname.IsSome);
+        Assert.Equal("Juan", updated.MidName.UnwrapOr(""));
+        Assert.Equal("Juanes", updated.MotherLastname.UnwrapOr(""));
     }
 }

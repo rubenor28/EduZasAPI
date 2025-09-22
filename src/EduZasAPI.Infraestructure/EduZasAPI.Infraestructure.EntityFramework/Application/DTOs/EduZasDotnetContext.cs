@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace EduZasAPI.Infraestructure.Application.DTOs;
 
@@ -13,38 +16,40 @@ public partial class EduZasDotnetContext : DbContext
     {
     }
 
-    public virtual DbSet<ClassEF> Classes { get; set; }
+    public virtual DbSet<Class> Classes { get; set; }
 
-    public virtual DbSet<ClassProfessorEF> ClassProfessors { get; set; }
+    public virtual DbSet<ClassProfessor> ClassProfessors { get; set; }
 
-    public virtual DbSet<ClassStudentEF> ClassStudents { get; set; }
+    public virtual DbSet<ClassStudent> ClassStudents { get; set; }
 
-    public virtual DbSet<NotificationEF> Notifications { get; set; }
+    public virtual DbSet<Notification> Notifications { get; set; }
 
-    public virtual DbSet<NotificationPerUserEF> NotificationPerUsers { get; set; }
+    public virtual DbSet<NotificationPerUser> NotificationPerUsers { get; set; }
 
-    public virtual DbSet<ResourceEF> Resources { get; set; }
+    public virtual DbSet<Resource> Resources { get; set; }
 
-    public virtual DbSet<TestEF> Tests { get; set; }
+    public virtual DbSet<Test> Tests { get; set; }
 
-    public virtual DbSet<TestsPerClassEF> TestsPerClasses { get; set; }
+    public virtual DbSet<TestsPerClass> TestsPerClasses { get; set; }
 
-    public virtual DbSet<UserEF> Users { get; set; }
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql( Microsoft.EntityFrameworkCore.ServerVersion.Parse("12.0.2-mariadb"));
+        => optionsBuilder.UseMySql(Microsoft.EntityFrameworkCore.ServerVersion.Parse("12.0.2-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .UseCollation("utf8mb4_unicode_ci")
+            .UseCollation("utf8mb4_uca1400_ai_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<ClassEF>(entity =>
+        modelBuilder.Entity<Class>(entity =>
         {
             entity.HasKey(e => e.ClassId).HasName("PRIMARY");
 
-            entity.ToTable("classes");
+            entity
+                .ToTable("classes")
+                .UseCollation("utf8mb4_unicode_ci");
 
             entity.HasIndex(e => e.OwnerId, "owner_id");
 
@@ -84,10 +89,10 @@ public partial class EduZasDotnetContext : DbContext
             entity.HasMany(d => d.Professors).WithMany(p => p.ClassesNavigation)
                 .UsingEntity<Dictionary<string, object>>(
                     "ResourcesPerClass",
-                    r => r.HasOne<UserEF>().WithMany()
+                    r => r.HasOne<User>().WithMany()
                         .HasForeignKey("ProfessorId")
                         .HasConstraintName("resources_per_class_ibfk_2"),
-                    l => l.HasOne<ClassEF>().WithMany()
+                    l => l.HasOne<Class>().WithMany()
                         .HasForeignKey("ClassId")
                         .HasConstraintName("resources_per_class_ibfk_1"),
                     j =>
@@ -95,8 +100,10 @@ public partial class EduZasDotnetContext : DbContext
                         j.HasKey("ClassId", "ProfessorId")
                             .HasName("PRIMARY")
                             .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("resources_per_class");
-                        j.HasIndex(new[] { "ProfessorId" }, "professor_id");
+                        j
+                            .ToTable("resources_per_class")
+                            .UseCollation("utf8mb4_unicode_ci");
+                        j.HasIndex(new[] { "ProfessorId" }, "professor_id3");
                         j.IndexerProperty<string>("ClassId")
                             .HasMaxLength(20)
                             .HasColumnName("class_id");
@@ -106,13 +113,15 @@ public partial class EduZasDotnetContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<ClassProfessorEF>(entity =>
+        modelBuilder.Entity<ClassProfessor>(entity =>
         {
             entity.HasKey(e => new { e.ClassId, e.ProfessorId })
                 .HasName("PRIMARY")
                 .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
-            entity.ToTable("class_professors");
+            entity
+                .ToTable("class_professors")
+                .UseCollation("utf8mb4_unicode_ci");
 
             entity.HasIndex(e => e.ProfessorId, "professor_id");
 
@@ -136,13 +145,15 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("class_professors_ibfk_2");
         });
 
-        modelBuilder.Entity<ClassStudentEF>(entity =>
+        modelBuilder.Entity<ClassStudent>(entity =>
         {
             entity.HasKey(e => new { e.ClassId, e.StudentId })
                 .HasName("PRIMARY")
                 .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
-            entity.ToTable("class_students");
+            entity
+                .ToTable("class_students")
+                .UseCollation("utf8mb4_unicode_ci");
 
             entity.HasIndex(e => e.StudentId, "student_id");
 
@@ -166,11 +177,13 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("class_students_ibfk_2");
         });
 
-        modelBuilder.Entity<NotificationEF>(entity =>
+        modelBuilder.Entity<Notification>(entity =>
         {
             entity.HasKey(e => e.NotificationId).HasName("PRIMARY");
 
-            entity.ToTable("notifications");
+            entity
+                .ToTable("notifications")
+                .UseCollation("utf8mb4_unicode_ci");
 
             entity.HasIndex(e => e.ClassId, "class_id");
 
@@ -197,13 +210,15 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("notifications_ibfk_1");
         });
 
-        modelBuilder.Entity<NotificationPerUserEF>(entity =>
+        modelBuilder.Entity<NotificationPerUser>(entity =>
         {
             entity.HasKey(e => new { e.NotificationId, e.UserId })
                 .HasName("PRIMARY")
                 .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
-            entity.ToTable("notification_per_user");
+            entity
+                .ToTable("notification_per_user")
+                .UseCollation("utf8mb4_unicode_ci");
 
             entity.HasIndex(e => e.UserId, "user_id");
 
@@ -229,13 +244,15 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("notification_per_user_ibfk_2");
         });
 
-        modelBuilder.Entity<ResourceEF>(entity =>
+        modelBuilder.Entity<Resource>(entity =>
         {
             entity.HasKey(e => e.ResourceId).HasName("PRIMARY");
 
-            entity.ToTable("resources");
+            entity
+                .ToTable("resources")
+                .UseCollation("utf8mb4_unicode_ci");
 
-            entity.HasIndex(e => e.ProfessorId, "professor_id");
+            entity.HasIndex(e => e.ProfessorId, "professor_id1");
 
             entity.Property(e => e.ResourceId)
                 .HasColumnType("bigint(20) unsigned")
@@ -259,13 +276,15 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("resources_ibfk_1");
         });
 
-        modelBuilder.Entity<TestEF>(entity =>
+        modelBuilder.Entity<Test>(entity =>
         {
             entity.HasKey(e => e.TestId).HasName("PRIMARY");
 
-            entity.ToTable("tests");
+            entity
+                .ToTable("tests")
+                .UseCollation("utf8mb4_unicode_ci");
 
-            entity.HasIndex(e => e.ProfessorId, "professor_id");
+            entity.HasIndex(e => e.ProfessorId, "professor_id2");
 
             entity.Property(e => e.TestId)
                 .HasColumnType("bigint(20) unsigned")
@@ -288,15 +307,17 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("tests_ibfk_1");
         });
 
-        modelBuilder.Entity<TestsPerClassEF>(entity =>
+        modelBuilder.Entity<TestsPerClass>(entity =>
         {
             entity.HasKey(e => new { e.TestId, e.ClassId })
                 .HasName("PRIMARY")
                 .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
-            entity.ToTable("tests_per_class");
+            entity
+                .ToTable("tests_per_class")
+                .UseCollation("utf8mb4_unicode_ci");
 
-            entity.HasIndex(e => e.ClassId, "class_id");
+            entity.HasIndex(e => e.ClassId, "class_id1");
 
             entity.Property(e => e.TestId)
                 .HasColumnType("bigint(20) unsigned")
@@ -315,11 +336,13 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("tests_per_class_ibfk_1");
         });
 
-        modelBuilder.Entity<UserEF>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PRIMARY");
 
-            entity.ToTable("users");
+            entity
+                .ToTable("users")
+                .UseCollation("utf8mb4_unicode_ci");
 
             entity.HasIndex(e => e.Email, "email").IsUnique();
 

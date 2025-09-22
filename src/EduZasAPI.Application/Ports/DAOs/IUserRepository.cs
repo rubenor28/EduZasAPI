@@ -12,7 +12,7 @@ using EduZasAPI.Application.DTOs.Users;
 /// para trabajar específicamente con entidades de tipo <see cref="User"/>, usando <see cref="ulong"/>
 /// como identificador y los DTOs específicos para operaciones con usuarios.
 /// </remarks>
-public interface IUserRepositoryAsync : IRepositoryAsync<ulong, User, NewUserDTO, UserUpdateDTO, UserCriteriaDTO>
+public interface IUserRepositoryAsync : IRepositoryAsync<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO>
 {
     /// <summary>
     /// Busca un usuario por su dirección de correo electrónico.
@@ -22,5 +22,5 @@ public interface IUserRepositoryAsync : IRepositoryAsync<ulong, User, NewUserDTO
     /// Una tarea que representa la operación asíncrona. El resultado contiene un <see cref="Optional{T}"/>
     /// con el usuario si fue encontrado, o <see cref="Optional{T}.None"/> si no existe ningún usuario con ese email.
     /// </returns>
-    Task<Optional<User>> FindByEmail(string email);
+    Task<Optional<UserDomain>> FindByEmail(string email);
 }

@@ -1,6 +1,9 @@
-﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class NotificationPerUserEF
+namespace EduZasAPI.Infraestructure.Application.DTOs;
+
+public partial class NotificationPerUser
 {
     public ulong NotificationId { get; set; }
 
@@ -10,7 +13,7 @@ public partial class NotificationPerUserEF
 
     public DateTime ModifiedAt { get; set; }
 
-    public virtual NotificationEF Notification { get; set; } = null!;
+    public virtual Notification Notification { get; set; } = null!;
 
-    public virtual UserEF User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }

@@ -3,7 +3,6 @@ namespace EduZasAPI.Infraestructure.Application.Ports.DAOs;
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Application.DTOs.Common;
 using EduZasAPI.Application.Ports.DAOs;
-using EduZasAPI.Application.Ports.Mappers;
 
 using EduZasAPI.Infraestructure.Application.DTOs;
 
@@ -15,7 +14,7 @@ where E : notnull, IIdentifiable<I>
 where NE : notnull
 where UE : notnull
 where C : notnull, ICriteriaDTO
-where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
+where TEF : class
 {
     protected readonly EduZasDotnetContext _ctx;
     protected readonly ulong _pageSize;
@@ -37,26 +36,32 @@ where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
 
     public async Task<E> AddAsync(NE data)
     {
-        var entity = TEF.From(data);
+        var entity = NewToEF(data);
         await DbSet.AddAsync(entity);
         await _ctx.SaveChangesAsync();
-        return entity.Into();
+        return MapToDomain(entity);
     }
 
 
     public async Task<E> UpdateAsync(UE updateData)
     {
-        var entity = TEF.From(updateData);
-        DbSet.Update(entity);
+        var id = GetId(updateData);
+        var tracked = await DbSet.FindAsync(id);
+
+        if (tracked == null) throw new ArgumentException($"Entity with id {id} not found");
+
+        UpdateProperties(tracked, updateData);
+
+        DbSet.Update(tracked);
         await _ctx.SaveChangesAsync();
-        return entity.Into();
+        return MapToDomain(tracked);
     }
 
     public async Task<Optional<E>> GetAsync(I id)
     {
         var record = await DbSet.FindAsync(id);
         if (record is null) return Optional<E>.None();
-        return Optional<E>.Some(record.Into());
+        return Optional<E>.Some(MapToDomain(record));
     }
 
     public async Task<Optional<E>> DeleteAsync(I id)
@@ -66,17 +71,17 @@ where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
 
         DbSet.Remove(record);
         await _ctx.SaveChangesAsync();
-        return Optional<E>.Some(record.Into());
+        return Optional<E>.Some(MapToDomain(record));
     }
 
     protected async Task<PaginatedQuery<E, C>> ExecuteQuery(IQueryable<TEF> query, C criteria)
     {
         var totalRecords = (ulong)await query.CountAsync();
         var queryResults = await query
-          .OrderBy(data => data.Id)
+          .OrderBy(data => GetId(data))
           .Skip((int)CalcOffset(criteria.Page))
           .Take((int)_pageSize)
-          .Select(data => data.Into())
+          .Select(data => MapToDomain(data))
           .ToListAsync();
 
         ulong totalPages = (ulong)Math.Ceiling((decimal)totalRecords / (decimal)_pageSize);
@@ -92,4 +97,10 @@ where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
 
 
     public abstract Task<PaginatedQuery<E, C>> GetByAsync(C query);
+
+    protected abstract I GetId(TEF entity);
+    protected abstract I GetId(UE entity);
+    protected abstract E MapToDomain(TEF efEntity);
+    protected abstract TEF NewToEF(NE newEntity);
+    protected abstract void UpdateProperties(TEF entity, UE updateProperties);
 }

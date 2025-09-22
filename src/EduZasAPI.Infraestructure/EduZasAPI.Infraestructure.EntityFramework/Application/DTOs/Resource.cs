@@ -1,6 +1,9 @@
-﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class ResourceEF
+namespace EduZasAPI.Infraestructure.Application.DTOs;
+
+public partial class Resource
 {
     public ulong ResourceId { get; set; }
 
@@ -12,5 +15,5 @@ public partial class ResourceEF
 
     public ulong ProfessorId { get; set; }
 
-    public virtual UserEF Professor { get; set; } = null!;
+    public virtual User Professor { get; set; } = null!;
 }

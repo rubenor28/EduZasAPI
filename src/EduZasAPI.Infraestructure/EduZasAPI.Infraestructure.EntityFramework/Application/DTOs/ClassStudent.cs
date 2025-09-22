@@ -1,6 +1,9 @@
-﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class ClassStudentEF
+namespace EduZasAPI.Infraestructure.Application.DTOs;
+
+public partial class ClassStudent
 {
     public string ClassId { get; set; } = null!;
 
@@ -8,7 +11,7 @@ public partial class ClassStudentEF
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual ClassEF Class { get; set; } = null!;
+    public virtual Class Class { get; set; } = null!;
 
-    public virtual UserEF Student { get; set; } = null!;
+    public virtual User Student { get; set; } = null!;
 }

@@ -1,6 +1,9 @@
-﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class ClassEF
+namespace EduZasAPI.Infraestructure.Application.DTOs;
+
+public partial class Class
 {
     public string ClassId { get; set; } = null!;
 
@@ -18,15 +21,15 @@ public partial class ClassEF
 
     public DateTime ModifiedAt { get; set; }
 
-    public virtual ICollection<ClassProfessorEF> ClassProfessors { get; set; } = new List<ClassProfessorEF>();
+    public virtual ICollection<ClassProfessor> ClassProfessors { get; set; } = new List<ClassProfessor>();
 
-    public virtual ICollection<ClassStudentEF> ClassStudents { get; set; } = new List<ClassStudentEF>();
+    public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
 
-    public virtual ICollection<NotificationEF> Notifications { get; set; } = new List<NotificationEF>();
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
-    public virtual UserEF Owner { get; set; } = null!;
+    public virtual User Owner { get; set; } = null!;
 
-    public virtual ICollection<TestsPerClassEF> TestsPerClasses { get; set; } = new List<TestsPerClassEF>();
+    public virtual ICollection<TestsPerClass> TestsPerClasses { get; set; } = new List<TestsPerClass>();
 
-    public virtual ICollection<UserEF> Professors { get; set; } = new List<UserEF>();
+    public virtual ICollection<User> Professors { get; set; } = new List<User>();
 }

@@ -12,7 +12,7 @@ using EduZasAPI.Domain.Enums.Users;
 /// estado, rol y metadatos de auditoría. Utiliza campos requeridos para garantizar
 /// la integridad de los datos esenciales.
 /// </remarks>
-public class User : IIdentifiable<ulong>
+public class UserDomain : IIdentifiable<ulong>
 {
     /// <summary>
     /// Obtiene o establece el identificador único del usuario.

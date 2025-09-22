@@ -8,7 +8,7 @@ using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
 
 using FluentValidation;
 
-public class UserFluentValidator : FluentValidator<User>
+public class UserFluentValidator : FluentValidator<UserDomain>
 {
     public UserFluentValidator()
     {
