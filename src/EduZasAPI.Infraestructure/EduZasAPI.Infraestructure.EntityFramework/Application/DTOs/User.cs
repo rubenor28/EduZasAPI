@@ -1,12 +1,14 @@
-﻿namespace EduZasAPI.Infraestructure.Application.DTOs;
+namespace EduZasAPI.Infraestructure.Application.DTOs;
 
 using EduZasAPI.Domain.Entities;
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Domain.Enums.Users;
 
+using EduZasAPI.Application.DTOs.Users;
 using EduZasAPI.Application.Ports.Mappers;
 
-public partial class UserEF : IInto<User>
+public partial class UserEF :
+  IIdentifiable<ulong>, IInto<User>, IFrom<NewUserDTO, UserEF>, IFrom<UserUpdateDTO, UserEF>
 {
     public ulong UserId { get; set; }
 
@@ -52,19 +54,39 @@ public partial class UserEF : IInto<User>
             Active = Active ?? false,
             Email = Email,
             FirstName = FirstName,
-            MidName = MidName is null ?
-              Optional<string>.None() :
-              Optional<string>.Some(MidName),
+            MidName = Optional<string>.ToOptional(MidName),
             FatherLastName = FatherLastname,
-            MotherLastname = MotherLastname is null ?
-              Optional<string>.None() :
-              Optional<string>.Some(MotherLastname),
+            MotherLastname = Optional<string>.ToOptional(MotherLastname),
             Password = Password,
             CreatedAt = CreatedAt,
             ModifiedAt = ModifiedAt,
-            Role = 
+            Role =
               Role.HasValue && Enum.IsDefined(typeof(UserType), (int)Role.Value) ?
               (UserType)Role.Value : UserType.STUDENT,
         };
     }
+
+    public ulong Id => UserId;
+
+    public static UserEF From(NewUserDTO dto) => new UserEF
+    {
+        Email = dto.Email,
+        FirstName = dto.FirstName,
+        MidName = dto.MidName.ToNullable(),
+        FatherLastname = dto.FatherLastName,
+        MotherLastname = dto.MotherLastname.ToNullable(),
+        Password = dto.Password,
+    };
+
+    public static UserEF From(UserUpdateDTO dto) => new UserEF
+    {
+        UserId = dto.Id,
+        FirstName = dto.FirstName,
+        FatherLastname = dto.FatherLastName,
+        Email = dto.Email,
+        Password = dto.Password,
+        MidName = dto.MidName.ToNullable(),
+        MotherLastname = dto.MotherLastname.ToNullable(),
+        Active = dto.Active
+    };
 }
