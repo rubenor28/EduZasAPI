@@ -1,4 +1,4 @@
-﻿namespace EduZasAPI.Infraestructure.EntityFramework.Tests;
+﻿namespace EduZasAPI.Tests.Infraestructure;
 
 public class UnitTest1
 {
