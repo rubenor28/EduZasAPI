@@ -23,7 +23,7 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// o None si no se desea filtrar por este campo.
     /// </value>
     public Optional<bool> Active { get; set; } = Optional<bool>.None();
-    
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para el tipo o rol del usuario.
     /// </summary>
@@ -32,7 +32,7 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// o None si no se desea filtrar por este campo.
     /// </value>
     public Optional<UserType> Role { get; set; } = Optional<UserType>.None();
-    
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para el primer nombre del usuario.
     /// </summary>
@@ -40,8 +40,8 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// Optional que contiene el primer nombre para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> FirstName { get; set; } = Optional<string>.None();
-    
+    public Optional<StringQueryDTO> FirstName { get; set; } = Optional<StringQueryDTO>.None();
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para el segundo nombre del usuario.
     /// </summary>
@@ -49,8 +49,8 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// Optional que contiene el segundo nombre para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> MidName { get; set; } = Optional<string>.None();
-    
+    public Optional<StringQueryDTO> MidName { get; set; } = Optional<StringQueryDTO>.None();
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido paterno del usuario.
     /// </summary>
@@ -58,8 +58,8 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// Optional que contiene el apellido paterno para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> FatherLastName { get; set; } = Optional<string>.None();
-    
+    public Optional<StringQueryDTO> FatherLastName { get; set; } = Optional<StringQueryDTO>.None();
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido materno del usuario.
     /// </summary>
@@ -67,8 +67,8 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// Optional que contiene el apellido materno para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> MootherLastname { get; set; } = Optional<string>.None();
-    
+    public Optional<StringQueryDTO> MotherLastname { get; set; } = Optional<StringQueryDTO>.None();
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para el email del usuario.
     /// </summary>
@@ -76,8 +76,8 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// Optional que contiene el email para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> Email { get; set; } = Optional<string>.None();
-    
+    public Optional<StringQueryDTO> Email { get; set; } = Optional<StringQueryDTO>.None();
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para la contraseña del usuario.
     /// </summary>
@@ -85,8 +85,8 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// Optional que contiene la contraseña para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> Password { get; set; } = Optional<string>.None();
-    
+    public Optional<StringQueryDTO> Password { get; set; } = Optional<StringQueryDTO>.None();
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de creación del usuario.
     /// </summary>
@@ -95,7 +95,7 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// o None si no se desea filtrar por este campo.
     /// </value>
     public Optional<DateTime> CreatedAt { get; set; } = Optional<DateTime>.None();
-    
+
     /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de modificación del usuario.
     /// </summary>

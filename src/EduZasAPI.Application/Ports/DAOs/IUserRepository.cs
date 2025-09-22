@@ -22,5 +22,5 @@ public interface IUserRepositoryAsync : IRepositoryAsync<ulong, User, NewUserDTO
     /// Una tarea que representa la operación asíncrona. El resultado contiene un <see cref="Optional{T}"/>
     /// con el usuario si fue encontrado, o <see cref="Optional{T}.None"/> si no existe ningún usuario con ese email.
     /// </returns>
-    public Task<Optional<User>> FindByEmail(string email);
+    Task<Optional<User>> FindByEmail(string email);
 }
