@@ -4,7 +4,6 @@ using EduZasAPI.Domain.Entities;
 using EduZasAPI.Domain.Enums.Users;
 using EduZasAPI.Domain.ValueObjects.Common;
 
-using EduZasAPI.Application.DTOs.Common;
 using EduZasAPI.Application.DTOs.Users;
 using EduZasAPI.Application.Ports.DAOs;
 
@@ -20,7 +19,12 @@ public class UserEntityFrameworkRepository :
 
     public UserEntityFrameworkRepository(EduZasDotnetContext context, ulong pageSize) : base(context, pageSize) { }
 
-    public override async Task<PaginatedQuery<UserDomain, UserCriteriaDTO>> GetByAsync(UserCriteriaDTO criteria)
+
+    protected override ulong GetId(User entity) => entity.UserId;
+
+    protected override ulong GetId(UserUpdateDTO entity) => entity.Id;
+
+    protected override IQueryable<User> QueryFromCriteria(UserCriteriaDTO criteria)
     {
         var query = _ctx.Users.AsNoTracking().AsQueryable();
 
@@ -36,8 +40,7 @@ public class UserEntityFrameworkRepository :
         query = query.WhereStringQuery(criteria.MotherLastname, u => u.MotherLastname);
         query = query.WhereStringQuery(criteria.Email, u => u.Email);
 
-        return await ExecuteQuery(query, criteria);
-
+        return query;
     }
 
     public async Task<Optional<UserDomain>> FindByEmail(string email)
@@ -56,9 +59,6 @@ public class UserEntityFrameworkRepository :
         };
     }
 
-    protected override ulong GetId(User entity) => entity.UserId;
-
-    protected override ulong GetId(UserUpdateDTO entity) => entity.Id;
 
     protected override UserDomain MapToDomain(User efEntity) => new UserDomain
     {
