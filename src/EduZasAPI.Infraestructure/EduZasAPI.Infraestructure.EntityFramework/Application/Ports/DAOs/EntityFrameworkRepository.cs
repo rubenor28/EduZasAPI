@@ -59,13 +59,14 @@ where TEF : class, IIdentifiable<I>, IInto<E>, IFrom<NE, TEF>, IFrom<UE, TEF>
         return Optional<E>.Some(record.Into());
     }
 
-    public abstract Task<Optional<E>> DeleteAsync(I id)
+    public async Task<Optional<E>> DeleteAsync(I id)
     {
-      var record = await DbSet.FindAsync(id);
-      if(record is null) return Optional<E>.None();
+        var record = await DbSet.FindAsync(id);
+        if (record is null) return Optional<E>.None();
 
-      DbSet.Remove(record);
-      await _ctx.SaveChanges();
+        DbSet.Remove(record);
+        await _ctx.SaveChangesAsync();
+        return Optional<E>.Some(record.Into());
     }
 
     protected async Task<PaginatedQuery<E, C>> ExecuteQuery(IQueryable<TEF> query, C criteria)
