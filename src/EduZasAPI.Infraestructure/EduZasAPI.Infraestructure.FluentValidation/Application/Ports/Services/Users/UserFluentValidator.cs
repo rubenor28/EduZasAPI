@@ -21,7 +21,7 @@ public class UserFluentValidator : FluentValidator<UserDomain>
     {
         RuleFor(x => x.Id)
             .Cascade(CascadeMode.Stop)
-            .GreaterThanOrEqualTo((uint)1)
+            .Must(x => x >= 1)
             .WithMessage("Debe ser mayor o igual a 1");
 
         RuleFor(x => x.FirstName)

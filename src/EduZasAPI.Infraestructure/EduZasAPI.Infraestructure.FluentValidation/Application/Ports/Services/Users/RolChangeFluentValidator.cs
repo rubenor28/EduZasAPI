@@ -17,7 +17,7 @@ public class RolChangeFluentValidator : FluentValidator<RolChangeDTO>
     public RolChangeFluentValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThanOrEqualTo((uint)1)
+            .Must(x => x >= 1)
             .WithMessage("Formato inválido");
     }
 }

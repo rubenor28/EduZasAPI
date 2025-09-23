@@ -22,7 +22,7 @@ public class UserUpdateFluentValidator : FluentValidator<UserUpdateDTO>
     {
         RuleFor(x => x.Id)
             .Cascade(CascadeMode.Stop)
-            .GreaterThanOrEqualTo((uint)1)
+            .Must(x => x >= 1)
             .WithMessage("Formato inválido");
 
         RuleFor(x => x.FirstName)
