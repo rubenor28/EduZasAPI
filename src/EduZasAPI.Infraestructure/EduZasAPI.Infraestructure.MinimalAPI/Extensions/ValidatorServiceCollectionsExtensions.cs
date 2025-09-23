@@ -1,7 +1,9 @@
 using EduZasAPI.Application.Ports.Services.Common;
 using EduZasAPI.Domain.Entities;
 using EduZasAPI.Application.DTOs.Users;
+
 using EduZasAPI.Infraestructure.Application.Ports.Services.Users;
+using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
 
 namespace EduZasAPI.Infraestructure.Extensions;
 
@@ -18,6 +20,9 @@ public static class ValidatorServiceCollectionExtensions
     public static IServiceCollection AddValidators(
         this IServiceCollection services)
     {
+
+        services.AddTransient<IBusinessValidationService<ulong>, ULongFluentValidator>();
+
         // User validators
         services.AddTransient<IBusinessValidationService<UserDomain>, UserFluentValidator>();
         services.AddTransient<IBusinessValidationService<NewUserDTO>, NewUserFluentValidator>();
