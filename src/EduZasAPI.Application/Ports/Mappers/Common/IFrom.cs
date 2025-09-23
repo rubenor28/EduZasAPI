@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.Ports.Mappers;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Define un contrato para transformar una instancia de un tipo fuente en un tipo destino.

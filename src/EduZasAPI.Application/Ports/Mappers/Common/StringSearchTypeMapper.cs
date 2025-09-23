@@ -1,7 +1,6 @@
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Domain.Enums.Common;
+using EduZasAPI.Domain.Common;
 
-namespace EduZasAPI.Application.Ports.Mappers;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Métodos de extensión para mapear valores de <see cref="StringSearchType"/> a representaciones

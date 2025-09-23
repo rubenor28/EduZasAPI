@@ -1,6 +1,6 @@
-namespace EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Domain.Users;
 
-using EduZasAPI.Domain.Enums.Users;
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Representa una solicitud de cambio de rol para un usuario existente.

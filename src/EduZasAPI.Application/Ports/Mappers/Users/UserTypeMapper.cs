@@ -1,7 +1,7 @@
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Domain.Enums.Users;
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Domain.Users;
 
-namespace EduZasAPI.Application.Ports.Mappers;
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Métodos de extensión para mapear valores de <see cref="UserType"/> a representaciones

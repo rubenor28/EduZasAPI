@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Define la interfaz para los criterios de consulta y paginación.

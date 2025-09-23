@@ -1,6 +1,6 @@
-namespace EduZasAPI.Application.Ports.DAOs;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Interfaz genérica para leer o recuperar entidades de un repositorio por su identificador.

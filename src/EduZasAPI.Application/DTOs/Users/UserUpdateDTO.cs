@@ -1,6 +1,6 @@
-namespace EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Representa los datos para actualizar la información de un usuario existente en el sistema.

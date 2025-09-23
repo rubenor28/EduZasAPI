@@ -1,7 +1,6 @@
-namespace EduZasAPI.Application.Ports.Services.Common;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Define un contrato para servicios de validación de reglas de negocio.

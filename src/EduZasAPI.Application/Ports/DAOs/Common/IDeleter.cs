@@ -1,6 +1,6 @@
-namespace EduZasAPI.Application.Ports.DAOs;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Interfaz genérica para eliminar entidades de un repositorio o DAO.

@@ -1,6 +1,6 @@
-namespace EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Representa los datos requeridos para crear un nuevo usuario en el sistema.

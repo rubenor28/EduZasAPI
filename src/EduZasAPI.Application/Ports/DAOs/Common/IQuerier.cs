@@ -1,6 +1,4 @@
-namespace EduZasAPI.Application.Ports.DAOs;
-
-using EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Interfaz genérica para consultar entidades de un repositorio usando criterios de filtrado.

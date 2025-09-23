@@ -1,6 +1,6 @@
-namespace EduZasAPI.Application.UseCases.Common;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Define un contrato para casos de uso asíncronos que producen una respuesta

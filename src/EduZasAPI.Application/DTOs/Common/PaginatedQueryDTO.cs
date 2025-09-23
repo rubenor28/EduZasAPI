@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Representa el resultado de una consulta paginada con criterios específicos.

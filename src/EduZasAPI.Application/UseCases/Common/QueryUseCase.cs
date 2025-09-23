@@ -1,7 +1,4 @@
-namespace EduZasAPI.Application.UseCases.Common;
-
-using EduZasAPI.Application.Ports.DAOs;
-using EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Caso de uso genérico para la ejecución de consultas paginadas 

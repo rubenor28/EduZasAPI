@@ -1,7 +1,6 @@
-namespace EduZasAPI.Application.Ports.DAOs;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Application.DTOs.Common;
-using EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Interfaz genérica que agrupa operaciones CRUD y de consulta para un repositorio asincrónico.

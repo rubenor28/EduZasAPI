@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.DTOs.Users;
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Representa las credenciales de autenticación de un usuario para el proceso de login.

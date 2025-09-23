@@ -1,8 +1,9 @@
-namespace EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Domain.Users;
 
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Domain.Enums.Users;
-using EduZasAPI.Application.DTOs.Common;
+using EduZasAPI.Application.Common;
+
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Representa los criterios de búsqueda y filtrado para consultas de usuarios.

@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.Ports.DAOs;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Interfaz genérica para actualizar entidades en un repositorio o DAO.

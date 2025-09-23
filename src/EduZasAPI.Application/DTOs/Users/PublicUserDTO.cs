@@ -1,7 +1,7 @@
-namespace EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Domain.Users;
 
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Domain.Enums.Users;
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Representa la información pública de un usuario para ser expuesta externamente.

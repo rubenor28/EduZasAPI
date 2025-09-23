@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Representa un error de validación asociado a un campo específico en una operación.

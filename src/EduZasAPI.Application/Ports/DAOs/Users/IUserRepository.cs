@@ -1,8 +1,9 @@
-namespace EduZasAPI.Application.Ports.DAOs;
+using EduZasAPI.Domain.Users;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.Entities;
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Application.Common;
+
+namespace EduZasAPI.Application.Users;
 
 /// <summary>
 /// Define un repositorio específico para operaciones asíncronas con entidades de usuario.

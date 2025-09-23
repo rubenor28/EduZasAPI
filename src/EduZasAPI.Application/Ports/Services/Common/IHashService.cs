@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.Ports.Services.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Define un contrato para servicios de hashing de cadenas de texto.

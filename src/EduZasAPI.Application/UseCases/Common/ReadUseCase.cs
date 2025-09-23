@@ -1,9 +1,6 @@
-namespace EduZasAPI.Application.UseCases.Common;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Application.Ports.DAOs;
-using EduZasAPI.Application.Ports.Services.Common;
-using EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Caso de uso genérico para la lectura de una entidad por su identificador.
