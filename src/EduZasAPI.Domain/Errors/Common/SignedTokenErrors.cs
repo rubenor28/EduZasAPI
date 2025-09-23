@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Errors.Common;
+namespace EduZasAPI.Domain.Common;
 
 /// <summary>
 /// Enumera los tipos de errores que pueden ocurrir durante la validación de tokens firmados.

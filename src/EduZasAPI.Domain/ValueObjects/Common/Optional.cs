@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Domain.Common;
 
 /// <summary>
 /// Métodos de fábrica para crear instancias de <see cref="Optional{T}"/>.

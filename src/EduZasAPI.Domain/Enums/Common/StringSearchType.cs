@@ -1,6 +1,4 @@
-namespace EduZasAPI.Domain.Enums.Common;
-
-using EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Domain.Common;
 
 /// <summary>
 /// Enumera los tipos de búsqueda disponibles para cadenas de texto.

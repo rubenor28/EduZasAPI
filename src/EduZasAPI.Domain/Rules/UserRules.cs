@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Rules;
+namespace EduZasAPI.Domain.Users;
 
 /// <summary>
 /// Contiene expresiones regulares utilizadas para validar propiedades de usuarios.

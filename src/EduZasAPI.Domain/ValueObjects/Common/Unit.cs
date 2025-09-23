@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Domain.Common;
 
 /// <summary>
 /// Representa un tipo que tiene un único valor, utilizado para situaciones donde se necesita

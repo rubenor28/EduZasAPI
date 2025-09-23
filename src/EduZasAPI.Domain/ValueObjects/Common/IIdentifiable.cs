@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.ValueObjects.Common;
+namespace EduZasAPI.Domain.Common;
 
 /// <summary>
 /// Define una interfaz para entidades que poseen un identificador único de tipo específico.

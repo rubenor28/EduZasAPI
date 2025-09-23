@@ -1,4 +1,4 @@
-namespace EduZasAPI.Domain.Enums.Users;
+namespace EduZasAPI.Domain.Users;
 
 /// <summary>
 /// Enumera los tipos de roles o perfiles de usuario disponibles en el sistema.

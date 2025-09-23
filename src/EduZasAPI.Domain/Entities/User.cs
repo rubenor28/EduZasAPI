@@ -1,7 +1,6 @@
-namespace EduZasAPI.Domain.Entities;
+using EduZasAPI.Domain.Common;
 
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Domain.Enums.Users;
+namespace EduZasAPI.Domain.Users;
 
 /// <summary>
 /// Representa un usuario completo del sistema con toda su información y metadatos.
