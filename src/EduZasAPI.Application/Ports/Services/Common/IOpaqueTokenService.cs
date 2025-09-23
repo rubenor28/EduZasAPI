@@ -1,4 +1,4 @@
-namespace EduZasAPI.Application.Ports.Services.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Define un contrato para servicios de generación de tokens opacos sin parámetros.

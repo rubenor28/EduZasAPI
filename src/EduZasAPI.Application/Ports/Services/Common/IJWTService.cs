@@ -1,6 +1,6 @@
 using EduZasAPI.Domain.Common;
 
-namespace EduZasAPI.Application.Ports.Services.Common;
+namespace EduZasAPI.Application.Common;
 
 /// <summary>
 /// Define un contrato para servicios de generación y validación de tokens JWT (JSON Web Tokens).
