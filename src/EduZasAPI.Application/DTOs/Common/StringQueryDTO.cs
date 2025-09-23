@@ -1,6 +1,6 @@
-namespace EduZasAPI.Application.DTOs.Common;
-
 using EduZasAPI.Domain.Enums.Common;
+
+namespace EduZasAPI.Application.DTOs.Common;
 
 /// <summary>
 /// Representa una consulta de texto con un tipo específico de búsqueda a aplicar.
