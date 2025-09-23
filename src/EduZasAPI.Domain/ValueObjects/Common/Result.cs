@@ -1,6 +1,41 @@
 namespace EduZasAPI.Domain.ValueObjects.Common;
 
 /// <summary>
+/// Métodos de fábrica para crear instancias de <see cref="Result{T, E}"/>.
+/// </summary>
+public static class Result
+{
+    /// <summary>
+    /// Crea un resultado exitoso que contiene un valor.
+    /// </summary>
+    /// <typeparam name="T">Tipo del valor.</typeparam>
+    /// <param name="value">Valor a encapsular.</param>
+    /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
+    public static Result<T, Unit> Ok<T>(T value) where T : notnull
+        => Result<T, Unit>.Ok(value);
+
+    /// <summary>
+    /// Crea un resultado exitoso que contiene un valor.
+    /// </summary>
+    /// <typeparam name="T">Tipo del valor.</typeparam>
+    /// <typeparam name="E">Tipo del error.</typeparam>
+    /// <param name="value">Valor a encapsular.</param>
+    /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
+    public static Result<T, E> Ok<T, E>(T value) where T : notnull where E : notnull
+        => Result<T, E>.Ok(value);
+
+    /// <summary>
+    /// Crea un resultado fallido que contiene un error.
+    /// </summary>
+    /// <typeparam name="T">Tipo del valor.</typeparam>
+    /// <typeparam name="E">Tipo del error.</typeparam>
+    /// <param name="error">Error a encapsular.</param>
+    /// <returns>Un resultado fallido con el error proporcionado.</returns>
+    public static Result<T, E> Err<T, E>(E error) where T : notnull where E : notnull
+        => Result<T, E>.Err(error);
+}
+
+/// <summary>
 /// Representa un resultado que puede ser exitoso (Ok) con un valor de tipo T
 /// o un error (Err) con un valor de tipo E.
 /// </summary>
@@ -128,6 +163,18 @@ public abstract class Result<T, E>
     public abstract Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) where F : notnull;
 
     /// <summary>
+    /// Ejecuta una acción si el resultado es exitoso.
+    /// </summary>
+    /// <param name="action">Acción a ejecutar con el valor exitoso.</param>
+    public abstract void IfOk(Action<T> action);
+
+    /// <summary>
+    /// Ejecuta una acción si el resultado contiene un error.
+    /// </summary>
+    /// <param name="action">Acción a ejecutar con el valor de error.</param>
+    public abstract void IfErr(Action<E> action);
+
+    /// <summary>
     /// Crea un resultado exitoso (Ok) con el valor especificado.
     /// </summary>
     /// <param name="value">Valor a contener en el resultado exitoso.</param>
@@ -186,6 +233,12 @@ public abstract class Result<T, E>
 
         /// <inheritdoc/>
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => Result<T, F>.Ok(_value);
+
+        /// <inheritdoc/>
+        public override void IfOk(Action<T> action) => action(_value);
+
+        /// <inheritdoc/>
+        public override void IfErr(Action<E> action) { }
     }
 
     /// <summary>
@@ -233,5 +286,11 @@ public abstract class Result<T, E>
 
         /// <inheritdoc/>
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => fn(_error);
+
+        /// <inheritdoc/>
+        public override void IfOk(Action<T> action) { }
+
+        /// <inheritdoc/>
+        public override void IfErr(Action<E> action) => action(_error);
     }
 }

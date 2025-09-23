@@ -1,6 +1,54 @@
 namespace EduZasAPI.Domain.ValueObjects.Common;
 
 /// <summary>
+/// Métodos de fábrica para crear instancias de <see cref="Optional{T}"/>.
+/// </summary>
+public static class Optional
+{
+    /// <summary>
+    /// Crea un valor opcional que contiene un valor.
+    /// </summary>
+    /// <typeparam name="T">Tipo del valor.</typeparam>
+    /// <param name="value">Valor a encapsular.</param>
+    /// <returns>Un <see cref="Optional{T}"/> que contiene el valor proporcionado.</returns>
+    public static Optional<T> Some<T>(T value) where T : notnull
+        => Optional<T>.Some(value);
+
+    /// <summary>
+    /// Crea un valor opcional vacío (sin valor).
+    /// </summary>
+    /// <typeparam name="T">Tipo del valor esperado.</typeparam>
+    /// <returns>Un <see cref="Optional{T}"/> sin valor.</returns>
+    public static Optional<T> None<T>() where T : notnull
+        => Optional<T>.None();
+
+    /// <summary>
+    /// Convierte un valor anulable de tipo estructurado (<see cref="Nullable{T}"/>) 
+    /// en una instancia de <see cref="Optional{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">Tipo del valor estructurado.</typeparam>
+    /// <param name="value">Valor anulable a convertir.</param>
+    /// <returns>
+    /// Un <see cref="Optional{T}"/> con el valor si <paramref name="value"/> tiene contenido,
+    /// o <see cref="Optional{T}.None"/> si es nulo.
+    /// </returns>
+    public static Optional<T> ToOptional<T>(this T? value) where T : struct
+        => value.HasValue ? Optional<T>.Some(value.Value) : Optional<T>.None();
+
+    /// <summary>
+    /// Convierte una referencia de objeto posiblemente nula en una instancia de <see cref="Optional{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">Tipo de la clase de referencia.</typeparam>
+    /// <param name="value">Instancia a convertir.</param>
+    /// <returns>
+    /// Un <see cref="Optional{T}"/> con el valor si <paramref name="value"/> no es nulo,
+    /// o <see cref="Optional{T}.None"/> si es nulo.
+    /// </returns>
+    public static Optional<T> ToOptional<T>(this T? value) where T : class
+        => value is null ? Optional<T>.None() : Optional<T>.Some(value);
+}
+
+/// <summary>
 /// Representa un valor opcional que puede contener un valor de tipo T o no contener ningún valor.
 /// </summary>
 /// <typeparam name="T">Tipo del valor contenido. Debe ser un tipo no nulo.</typeparam>
@@ -15,16 +63,6 @@ public abstract class Optional<T> where T : notnull
     /// Instancia única que representa un Optional vacío.
     /// </summary>
     private static readonly Optional<T> _none = new NoneOptional();
-
-    /// <summary>
-    /// Convierte un valor de referencia o nullable en un Optional.
-    /// </summary>
-    /// <param name="value">Valor a convertir.</param>
-    /// <returns>
-    /// Un Optional con el valor si no es nulo, o un Optional vacío si es nulo.
-    /// </returns>
-    public static Optional<T> ToOptional(T? value) =>
-        value is null ? None() : Some(value);
 
     /// <summary>
     /// Convierte este Optional en un valor nullable.
