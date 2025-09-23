@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Tests;
 
-namespace EduZasAPI.Infraestructure.Application.DTOs;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.TestsPerClass;
 
-public partial class TestsPerClass
+public partial class TestPerClass
 {
     public ulong TestId { get; set; }
 

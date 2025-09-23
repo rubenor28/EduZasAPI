@@ -1,11 +1,12 @@
-using EduZasAPI.Application.Ports.Services.Common;
-using EduZasAPI.Domain.Entities;
-using EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Domain.Users;
 
-using EduZasAPI.Infraestructure.Application.Ports.Services.Users;
-using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
+using EduZasAPI.Application.Common;
+using EduZasAPI.Application.Users;
 
-namespace EduZasAPI.Infraestructure.Extensions;
+using EduZasAPI.Infraestructure.FluentValidation.Application.Common;
+using EduZasAPI.Infraestructure.FluentValidation.Application.Users;
+
+namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
 /// Métodos de extensión para registrar validadores en el contenedor de dependencias.

@@ -1,12 +1,10 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.Services.Users;
-
+using EduZasAPI.Domain.Users;
+using EduZasAPI.Application.Users;
+using EduZasAPI.Infraestructure.FluentValidation.Application.Common;
 using System.Text.RegularExpressions;
-
-using EduZasAPI.Domain.Rules;
-using EduZasAPI.Application.DTOs.Users;
-using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
-
 using FluentValidation;
+
+namespace EduZasAPI.Infraestructure.FluentValidation.Application.Users;
 
 /// <summary>
 /// Validador para la creación de un nuevo usuario,

@@ -1,12 +1,9 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.Services.Users;
-
+using EduZasAPI.Domain.Users;
+using EduZasAPI.Infraestructure.FluentValidation.Application.Common;
+using FluentValidation;
 using System.Text.RegularExpressions;
 
-using EduZasAPI.Domain.Rules;
-using EduZasAPI.Domain.Entities;
-using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
-
-using FluentValidation;
+namespace EduZasAPI.Infraestructure.FluentValidation.Application.Users;
 
 /// <summary>
 /// Validador para la entidad de dominio <see cref="UserDomain"/>.

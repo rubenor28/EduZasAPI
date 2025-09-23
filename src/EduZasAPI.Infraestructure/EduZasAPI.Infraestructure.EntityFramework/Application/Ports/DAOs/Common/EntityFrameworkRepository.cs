@@ -1,12 +1,8 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.DAOs;
-
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Application.DTOs.Common;
-using EduZasAPI.Application.Ports.DAOs;
-
-using EduZasAPI.Infraestructure.Application.DTOs;
-
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Application.Common;
 using Microsoft.EntityFrameworkCore;
+
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 
 /// <summary>
 /// Implementación base abstracta de un repositorio utilizando Entity Framework Core.

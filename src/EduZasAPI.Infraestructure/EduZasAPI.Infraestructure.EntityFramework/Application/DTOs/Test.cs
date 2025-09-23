@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
+using EduZasAPI.Infraestructure.EntityFramework.Application.TestsPerClass;
 
-namespace EduZasAPI.Infraestructure.Application.DTOs;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Tests;
 
 public partial class Test
 {
@@ -17,5 +17,5 @@ public partial class Test
 
     public virtual User Professor { get; set; } = null!;
 
-    public virtual ICollection<TestsPerClass> TestsPerClasses { get; set; } = new List<TestsPerClass>();
+    public virtual ICollection<TestPerClass> TestsPerClasses { get; set; } = new List<TestPerClass>();
 }

@@ -1,12 +1,12 @@
-using EduZasAPI.Domain.Entities;
-using EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Domain.Users;
 
-using EduZasAPI.Application.Ports.DAOs;
+using EduZasAPI.Application.Users;
+using EduZasAPI.Application.Common;
 
-using EduZasAPI.Infraestructure.Application.Ports.DAOs;
-using EduZasAPI.Infraestructure.Application.DTOs;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
-namespace EduZasAPI.Infraestructure.Extensions;
+namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
 /// Métodos de extensión para registrar los repositorios en el contenedor de dependencias.

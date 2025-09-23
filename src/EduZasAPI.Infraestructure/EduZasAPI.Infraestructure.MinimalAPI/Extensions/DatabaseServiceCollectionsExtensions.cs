@@ -1,7 +1,7 @@
-using EduZasAPI.Infraestructure.Application.DTOs;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace EduZasAPI.Infraestructure.Extensions;
+namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
 /// Métodos de extensión para registrar los servicios de base de datos en el contenedor de dependencias.

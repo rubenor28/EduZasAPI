@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
-namespace EduZasAPI.Infraestructure.Application.DTOs;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.ClassStudents;
 
 public partial class ClassStudent
 {

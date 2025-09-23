@@ -1,10 +1,9 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.Services.Users;
-
-using EduZasAPI.Application.DTOs.Users;
-using EduZasAPI.Infraestructure.Application.Ports.Services.Common;
+using EduZasAPI.Application.Users;
+using EduZasAPI.Infraestructure.FluentValidation.Application.Common;
 
 using FluentValidation;
 
+namespace EduZasAPI.Infraestructure.FluentValidation.Application.Users;
 /// <summary>
 /// Validador para el cambio de rol de usuario,
 /// aplicando reglas específicas sobre el identificador del rol.

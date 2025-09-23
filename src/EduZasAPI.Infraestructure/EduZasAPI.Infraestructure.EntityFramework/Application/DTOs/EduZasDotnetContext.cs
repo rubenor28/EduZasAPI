@@ -1,9 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace EduZasAPI.Infraestructure.Application.DTOs;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
+using EduZasAPI.Infraestructure.EntityFramework.Application.ClassProfessors;
+using EduZasAPI.Infraestructure.EntityFramework.Application.ClassStudents;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Notifications;
+using EduZasAPI.Infraestructure.EntityFramework.Application.NotificationsPerUser;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Resources;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Tests;
+using EduZasAPI.Infraestructure.EntityFramework.Application.TestsPerClass;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
+
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 
 public partial class EduZasDotnetContext : DbContext
 {
@@ -30,7 +37,7 @@ public partial class EduZasDotnetContext : DbContext
 
     public virtual DbSet<Test> Tests { get; set; }
 
-    public virtual DbSet<TestsPerClass> TestsPerClasses { get; set; }
+    public virtual DbSet<TestPerClass> TestsPerClasses { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -307,7 +314,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("tests_ibfk_1");
         });
 
-        modelBuilder.Entity<TestsPerClass>(entity =>
+        modelBuilder.Entity<TestPerClass>(entity =>
         {
             entity.HasKey(e => new { e.TestId, e.ClassId })
                 .HasName("PRIMARY")

@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using EduZasAPI.Infraestructure.EntityFramework.Application.Notifications;
+using EduZasAPI.Infraestructure.EntityFramework.Application.ClassStudents;
+using EduZasAPI.Infraestructure.EntityFramework.Application.ClassProfessors;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
+using EduZasAPI.Infraestructure.EntityFramework.Application.TestsPerClass;
 
-namespace EduZasAPI.Infraestructure.Application.DTOs;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
 
 public partial class Class
 {
@@ -29,7 +32,7 @@ public partial class Class
 
     public virtual User Owner { get; set; } = null!;
 
-    public virtual ICollection<TestsPerClass> TestsPerClasses { get; set; } = new List<TestsPerClass>();
+    public virtual ICollection<TestPerClass> TestsPerClasses { get; set; } = new List<TestPerClass>();
 
     public virtual ICollection<User> Professors { get; set; } = new List<User>();
 }

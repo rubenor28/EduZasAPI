@@ -1,9 +1,8 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.Services.Common;
-
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Application.DTOs.Common;
-using EduZasAPI.Application.Ports.Services.Common;
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Application.Common;
 using FluentValidation;
+
+namespace EduZasAPI.Infraestructure.FluentValidation.Application.Common;
 
 /// <summary>
 /// Clase base abstracta para validadores que usan FluentValidation

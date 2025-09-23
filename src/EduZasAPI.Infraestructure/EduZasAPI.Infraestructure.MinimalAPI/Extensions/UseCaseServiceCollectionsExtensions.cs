@@ -1,9 +1,8 @@
-using EduZasAPI.Domain.Entities;
+using EduZasAPI.Domain.Users;
+using EduZasAPI.Application.Common;
+using EduZasAPI.Application.Users;
 
-using EduZasAPI.Application.UseCases.Common;
-using EduZasAPI.Application.DTOs.Users;
-
-namespace EduZasAPI.Infraestructure.Extensions;
+namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
 /// Métodos de extensión para registrar los casos de uso en el contenedor de dependencias.

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
-namespace EduZasAPI.Infraestructure.Application.DTOs;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Resources;
 
 public partial class Resource
 {

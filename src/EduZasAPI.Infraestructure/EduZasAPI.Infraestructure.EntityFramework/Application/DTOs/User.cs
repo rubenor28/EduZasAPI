@@ -1,7 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
+using EduZasAPI.Infraestructure.EntityFramework.Application.ClassProfessors;
+using EduZasAPI.Infraestructure.EntityFramework.Application.ClassStudents;
+using EduZasAPI.Infraestructure.EntityFramework.Application.NotificationsPerUser;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Resources;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Tests;
 
-namespace EduZasAPI.Infraestructure.Application.DTOs;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
 public partial class User
 {

@@ -1,4 +1,4 @@
-namespace EduZasAPI.Infraestructure.Extensions;
+namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
 /// Métodos de extensión para registrar servicios de infraestructura en el contenedor de dependencias.

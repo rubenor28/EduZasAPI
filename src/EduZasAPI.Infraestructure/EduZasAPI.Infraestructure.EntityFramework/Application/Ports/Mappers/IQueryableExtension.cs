@@ -1,13 +1,9 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.Mappers;
-
-using System;
-using System.Linq;
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Application.Common;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-using EduZasAPI.Domain.ValueObjects.Common;
-using EduZasAPI.Domain.Enums.Common;
-using EduZasAPI.Application.DTOs.Common;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 
 /// <summary>
 /// Métodos de extensión para construir consultas dinámicas sobre <see cref="IQueryable{T}"/>.

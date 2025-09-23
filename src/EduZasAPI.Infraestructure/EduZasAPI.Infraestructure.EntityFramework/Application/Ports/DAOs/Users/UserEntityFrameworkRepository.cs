@@ -1,16 +1,10 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.DAOs;
-
-using EduZasAPI.Domain.Entities;
-using EduZasAPI.Domain.Enums.Users;
-using EduZasAPI.Domain.ValueObjects.Common;
-
-using EduZasAPI.Application.DTOs.Users;
-using EduZasAPI.Application.Ports.DAOs;
-
-using EduZasAPI.Infraestructure.Application.DTOs;
-using EduZasAPI.Infraestructure.Application.Ports.Mappers;
-
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Domain.Users;
+using EduZasAPI.Application.Users;
 using Microsoft.EntityFrameworkCore;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
+
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
 public class UserEntityFrameworkRepository :
   EntityFrameworkRepository<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO, User>,
