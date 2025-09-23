@@ -1,22 +1,20 @@
-namespace EduZasAPI.Application.Ports.Mappers;
-
 using EduZasAPI.Domain.ValueObjects.Common;
 using EduZasAPI.Domain.Enums.Common;
 
+namespace EduZasAPI.Application.Ports.Mappers;
+
 /// <summary>
-/// Métodos de extensión para mapear entre <see cref="StringSearchType"/>,
-/// cadenas de texto y valores numéricos.
+/// Métodos de extensión para mapear valores de <see cref="StringSearchType"/> a representaciones
+/// en <see cref="string"/> o <see cref="int"/> y viceversa.
 /// </summary>
-public static class StringSearchTypeExtensions
+public static class StringSearchMapper
 {
     /// <summary>
-    /// Convierte un valor de <see cref="StringSearchType"/> en su representación textual.
+    /// Convierte un <see cref="StringSearchType"/> a su representación en string.
     /// </summary>
-    /// <param name="value">Valor del enumerado a convertir.</param>
-    /// <returns>
-    /// Una cadena equivalente si existe mapeo, o vacío si no hay una representación definida.
-    /// </returns>
-    public static Optional<string> ToString(StringSearchType value)
+    /// <param name="value">Valor de <see cref="StringSearchType"/>.</param>
+    /// <returns>Un <see cref="Optional{String}"/> con el valor correspondiente, o vacío si no es válido.</returns>
+    public static Optional<string> ToString(this StringSearchType value)
     {
         ArgumentNullException.ThrowIfNull(value);
         return value switch
@@ -28,27 +26,42 @@ public static class StringSearchTypeExtensions
     }
 
     /// <summary>
-    /// Convierte una cadena en su valor correspondiente de <see cref="StringSearchType"/>.
+    /// Convierte un <see cref="StringSearchType"/> a su representación en entero.
     /// </summary>
-    /// <param name="value">Cadena a convertir.</param>
-    /// <returns>
-    /// Un <see cref="Optional{StringSearchType}"/> con el valor del enumerado
-    /// si la cadena es válida, o vacío en caso contrario.
-    /// </returns>
-    public static Optional<StringSearchType> FromString(string value)
+    /// <param name="value">Valor de <see cref="StringSearchType"/>.</param>
+    /// <returns>Un <see cref="Optional{Int32}"/> con el valor correspondiente, o vacío si no es válido.</returns>
+    public static Optional<int> ToInt(this StringSearchType value)
     {
+        ArgumentNullException.ThrowIfNull(value);
         return value switch
         {
-            "equals" => Optional<StringSearchType>.Some(StringSearchType.EQ),
-            "like" => Optional<StringSearchType>.Some(StringSearchType.LIKE),
-            _ => Optional<StringSearchType>.None(),
+            StringSearchType.EQ => Optional<int>.Some(0),
+            StringSearchType.LIKE => Optional<int>.Some(1),
+            _ => Optional<int>.None(),
         };
     }
 
     /// <summary>
-    /// Convierte un valor de <see cref="StringSearchType"/> a su representación numérica sin signo.
+    /// Convierte un string a su <see cref="StringSearchType"/> correspondiente.
     /// </summary>
-    /// <param name="value">Valor del enumerado.</param>
-    /// <returns>Valor numérico equivalente.</returns>
-    public static uint ToUInt(this StringSearchType value) => (uint)value;
+    /// <param name="value">Valor en string a convertir.</param>
+    /// <returns>Un <see cref="Optional{StringSearchType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
+    public static Optional<StringSearchType> FromString(string value) => value switch
+    {
+        "equals" => Optional<StringSearchType>.Some(StringSearchType.EQ),
+        "like" => Optional<StringSearchType>.Some(StringSearchType.LIKE),
+        _ => Optional<StringSearchType>.None(),
+    };
+
+    /// <summary>
+    /// Convierte un entero a su <see cref="StringSearchType"/> correspondiente.
+    /// </summary>
+    /// <param name="value">Valor entero a convertir.</param>
+    /// <returns>Un <see cref="Optional{StringSearchType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
+    public static Optional<StringSearchType> FromInt(int value) => value switch
+    {
+        0 => Optional<StringSearchType>.Some(StringSearchType.EQ),
+        1 => Optional<StringSearchType>.Some(StringSearchType.LIKE),
+        _ => Optional<StringSearchType>.None(),
+    };
 }
