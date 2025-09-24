@@ -199,10 +199,13 @@ public class UserEntityFrameworkRepositoryTest
             fatherLastname: "JOHNSON"
         );
 
-        await _repo.AddAsync(u1);
+        var u1Created = await _repo.AddAsync(u1);
         await _repo.AddAsync(u2);
         await _repo.AddAsync(u3);
         await _repo.AddAsync(u4);
+
+        u1Created.Active = false;
+        await _repo.UpdateAsync(CreateUpdate(u1Created));
     }
 
     public static IEnumerable<object?[]> SearchCases()
@@ -248,7 +251,7 @@ public class UserEntityFrameworkRepositoryTest
                 2,
         };
 
-        // 5) Active true + FirstName LIKE "ALI" => 2
+        // 5) Active true + FirstName LIKE "ALI" => 1
         yield return new object?[]
         {
                 new UserCriteriaDTO
@@ -260,7 +263,7 @@ public class UserEntityFrameworkRepositoryTest
                         Text = "ALI"
                     })
                 },
-                2,
+                1,
         };
 
         // 6) Non-matching criteria => 0
@@ -282,6 +285,9 @@ public class UserEntityFrameworkRepositoryTest
     [MemberData(nameof(SearchCases))]
     public async Task Search_ByCriteria_ReturnsExpected(UserCriteriaDTO criteria, int expectedCount)
     {
+        await DeleteAndInitializeDatabaseAsync();
+        await SeedUsersAsync();
+
         var page = await _repo.GetByAsync(criteria);
         var actual = page.Results.Count;
 
