@@ -39,11 +39,12 @@ public class UserEntityFrameworkRepository :
 
     public async Task<Optional<UserDomain>> FindByEmail(string email)
     {
-        var results = await _ctx.Users
+        var rawResults = await _ctx.Users
           .OrderBy(u => u.UserId)
-          .Where(u => u.Email == email)
-          .Select(u => MapToDomain(u))
+          .Where(u => u.Email.Equals(email))
           .ToListAsync();
+
+        var results = rawResults.Select(MapToDomain).ToList();
 
         return results.Count switch
         {
