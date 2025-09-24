@@ -1,3 +1,4 @@
+using EduZasAPI.Domain.Common;
 using EduZasAPI.Domain.Users;
 
 using EduZasAPI.Application.Users;
@@ -23,42 +24,37 @@ public static class UserRoutes
     public async static Task<IResult> AddUser(
         NewUserMAPI newUser,
         IUserRepositoryAsync repo,
-        IBusinessValidationService<NewUserDTO> validator)
+        AddUseCase<NewUserDTO, UserDomain> useCase)
     {
         try
         {
             var newUsr = NewUserMAPIMapper.ToDomain(newUser);
+            var validation = await useCase.ExecuteAsync(
+                request: newUsr,
+                extraValidationAsync: async _ =>
+                {
+                    var errs = new List<FieldErrorDTO>();
+                    var repeatedEmail = await repo.FindByEmail(newUsr.Email);
 
-            var validation = validator.IsValid(newUsr);
+                    if (repeatedEmail.IsSome)
+                    {
+                        var error = new FieldErrorDTO { Field = "email", Message = "Email ya registrado" };
+                        errs.Add(error);
+                        return Result.Err(errs);
+                    }
+
+                    return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+                }
+            );
 
             if (validation.IsErr)
             {
                 var errs = validation.UnwrapErr();
-                return Results.BadRequest(new FieldErrorResponse
-                {
-                    Message = "Formato inválido",
-                    Errors = errs
-                });
+                var response = new FieldErrorResponse { Message = "Formato inválido", Errors = errs };
+                return Results.BadRequest(response);
             }
 
-            var repeatedEmail = await repo.FindByEmail(newUsr.Email);
-            if (repeatedEmail.IsSome)
-            {
-                var errs = new List<FieldErrorDTO>();
-                errs.Add(new FieldErrorDTO
-                {
-                    Field = "email",
-                    Message = "Email ya registrado",
-                });
-
-                return Results.BadRequest(new FieldErrorResponse
-                {
-                    Message = "Formato inválido",
-                    Errors = errs
-                });
-            }
-
-            var newRecord = await repo.AddAsync(newUsr);
+            var newRecord = validation.Unwrap();
             return Results.BadRequest(new WithDataResponse<PublicUserMAPI>
             {
                 Message = "Usuario registrado",
