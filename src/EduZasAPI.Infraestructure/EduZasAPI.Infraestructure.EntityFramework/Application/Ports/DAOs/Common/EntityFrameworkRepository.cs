@@ -116,11 +116,9 @@ where TEF : class
     {
         var query = QueryFromCriteria(criteria);
         var totalRecords = (ulong)await query.CountAsync();
-        var queryResults = await query
-          .OrderBy(data => GetId(data))
+        var rawResults = await query
           .Skip((int)CalcOffset(criteria.Page))
           .Take((int)_pageSize)
-          .Select(data => MapToDomain(data))
           .ToListAsync();
 
         ulong totalPages = (ulong)Math.Ceiling((decimal)totalRecords / (decimal)_pageSize);
@@ -130,7 +128,7 @@ where TEF : class
             Page = criteria.Page,
             TotalPages = totalPages,
             Criteria = criteria,
-            Results = queryResults
+            Results = rawResults.Select(MapToDomain).ToList()
         };
     }
 
