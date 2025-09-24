@@ -1,17 +1,16 @@
-namespace EduZasAPI.Infraestructure.Application.Ports.DAOs;
-
-using Xunit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
-using EduZasAPI.Domain.Entities;
-using EduZasAPI.Domain.ValueObjects.Common;
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Domain.Users;
 
-using EduZasAPI.Application.Ports.DAOs;
-using EduZasAPI.Application.DTOs.Users;
+using EduZasAPI.Application.Users;
 
-using EduZasAPI.Infraestructure.Application.DTOs;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
+
+namespace EduZasAPI.Test.Infraestructure.Application.Ports.DAOs;
 
 public class UserEntityFrameworkRepositoryTest
 {

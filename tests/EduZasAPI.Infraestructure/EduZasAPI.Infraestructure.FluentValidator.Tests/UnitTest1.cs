@@ -1,4 +1,4 @@
-﻿namespace EduZasAPI.Tests.Infraestructure;
+﻿namespace EduZasAPI.Infraestructure.FluentValidator.Tests;
 
 public class UnitTest1
 {

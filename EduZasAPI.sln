@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EduZasAPI.Infraestructure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.EntityFramework.Tests", "tests\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.EntityFramework.Tests\EduZasAPI.Infraestructure.EntityFramework.Tests.csproj", "{0A06C28A-8299-4123-9B56-A0024653CD10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.FluentValidator.Tests", "tests\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.FluentValidator.Tests\EduZasAPI.Infraestructure.FluentValidator.Tests.csproj", "{2B6DB252-3DB5-4456-907D-4AA611C7456A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{0A06C28A-8299-4123-9B56-A0024653CD10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A06C28A-8299-4123-9B56-A0024653CD10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A06C28A-8299-4123-9B56-A0024653CD10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B6DB252-3DB5-4456-907D-4AA611C7456A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B6DB252-3DB5-4456-907D-4AA611C7456A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B6DB252-3DB5-4456-907D-4AA611C7456A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B6DB252-3DB5-4456-907D-4AA611C7456A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8D8EEB23-D0CB-48CA-9804-FFE97E788740} = {04FFEE81-B591-4C83-BD54-114328A069D6}
@@ -66,6 +72,7 @@ Global
 		{8396AEFC-0131-4F21-B53F-04ED4C575E7D} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
 		{D59D4B0B-384C-4DAF-81AA-3641FC91BE79} = {97AF6ABA-EA9A-410E-AA60-08C24572BEA0}
 		{0A06C28A-8299-4123-9B56-A0024653CD10} = {D59D4B0B-384C-4DAF-81AA-3641FC91BE79}
+		{2B6DB252-3DB5-4456-907D-4AA611C7456A} = {D59D4B0B-384C-4DAF-81AA-3641FC91BE79}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionWorkingFolder = {31D6B226-DD5D-454B-AA72-041EBF67C4B8}
