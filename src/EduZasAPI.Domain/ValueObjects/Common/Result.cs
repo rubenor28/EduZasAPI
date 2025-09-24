@@ -15,6 +15,15 @@ public static class Result
         => Result<T, Unit>.Ok(value);
 
     /// <summary>
+    /// Crea un resultado fallido que contiene un error.
+    /// </summary>
+    /// <typeparam name="E">Tipo del error.</typeparam>
+    /// <param name="error">Error a encapsular.</param>
+    /// <returns>Un resultado fallido con el error proporcionado.</returns>
+    public static Result<Unit, E> Err<E>(E error) where E : notnull
+        => Result<Unit, E>.Err(error);
+
+    /// <summary>
     /// Crea un resultado exitoso que contiene un valor.
     /// </summary>
     /// <typeparam name="T">Tipo del valor.</typeparam>
