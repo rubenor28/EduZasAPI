@@ -13,11 +13,23 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
 namespace EduZasAPI.Test.Infraestructure.Application.Ports.DAOs;
 
+/// <summary>
+/// Contiene tests de integración para <see cref="UserEntityFrameworkRepository"/> 
+/// que validan las operaciones CRUD y de búsqueda de usuarios en la base de datos.
+/// </summary>
+/// <remarks>
+/// Esta clase de tests utiliza una base de datos real configurada para testing
+/// y sigue el patrón Arrange-Act-Assert para estructuración clara de los tests.
+/// </remarks>
 public class UserEntityFrameworkRepositoryTest
 {
     private IUserRepositoryAsync _repo;
     private EduZasDotnetContext _ctx;
 
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase de tests configurando 
+    /// el contenedor de dependencias y la conexión a la base de datos de testing.
+    /// </summary>
     public UserEntityFrameworkRepositoryTest()
     {
         var config = new ConfigurationBuilder()
@@ -43,12 +55,20 @@ public class UserEntityFrameworkRepositoryTest
         _ctx = sp.GetRequiredService<EduZasDotnetContext>();
     }
 
+    /// <summary>
+    /// Elimina y recrea la base de datos para asegurar un estado limpio antes de cada test.
+    /// </summary>
     private async Task DeleteAndInitializeDatabaseAsync()
     {
         await _ctx.Database.EnsureDeletedAsync();
         await _ctx.Database.EnsureCreatedAsync();
     }
 
+    /// <summary>
+    /// Genera una dirección de email única para testing.
+    /// </summary>
+    /// <param name="hint">Texto opcional para incluir en el email.</param>
+    /// <returns>Una dirección de email única en el dominio t.test.</returns>
     private static string CreateSafeEmail(string hint = "")
     {
         var id = (hint + Guid.NewGuid().ToString("N")).Replace("-", "");
@@ -56,6 +76,16 @@ public class UserEntityFrameworkRepositoryTest
         return $"{local}@t.test";
     }
 
+    /// <summary>
+    /// Crea un DTO para nuevo usuario con valores por defecto opcionales.
+    /// </summary>
+    /// <param name="email">Email del usuario (opcional).</param>
+    /// <param name="password">Contraseña del usuario (opcional).</param>
+    /// <param name="firstName">Primer nombre del usuario (opcional).</param>
+    /// <param name="fatherLastname">Apellido paterno del usuario (opcional).</param>
+    /// <param name="midName">Segundo nombre del usuario (opcional).</param>
+    /// <param name="motherLastname">Apellido materno del usuario (opcional).</param>
+    /// <returns>Instancia de <see cref="NewUserDTO"/> configurada.</returns>
     private NewUserDTO CreateNew(
         string? email = null,
         string? password = null,
@@ -72,6 +102,11 @@ public class UserEntityFrameworkRepositoryTest
             MotherLastname = motherLastname ?? Optional<string>.Some("Perez")
         };
 
+    /// <summary>
+    /// Crea un DTO de actualización a partir de un usuario de dominio existente.
+    /// </summary>
+    /// <param name="u">Usuario de dominio desde el cual copiar los datos.</param>
+    /// <returns>Instancia de <see cref="UserUpdateDTO"/> con los datos del usuario.</returns>
     private UserUpdateDTO CreateUpdate(UserDomain u) => new UserUpdateDTO
     {
         Id = u.Id,
@@ -84,6 +119,9 @@ public class UserEntityFrameworkRepositoryTest
         MotherLastname = u.MotherLastname
     };
 
+    /// <summary>
+    /// Verifica que se pueda agregar un nuevo usuario correctamente.
+    /// </summary>
     [Fact]
     public async Task Add_Success()
     {
@@ -98,6 +136,9 @@ public class UserEntityFrameworkRepositoryTest
         Assert.Equal(dto.FirstName, record.FirstName);
     }
 
+    /// <summary>
+    /// Verifica que no se puedan agregar usuarios con emails duplicados.
+    /// </summary>
     [Fact]
     public async Task Add_RepeatedEmail()
     {
@@ -123,6 +164,9 @@ public class UserEntityFrameworkRepositoryTest
         }
     }
 
+    /// <summary>
+    /// Verifica que se pueda eliminar un usuario existente correctamente.
+    /// </summary>
     [Fact]
     public async Task Delete_Success()
     {
@@ -137,6 +181,9 @@ public class UserEntityFrameworkRepositoryTest
         Assert.Equal(dto.Email, record.Unwrap().Email);
     }
 
+    /// <summary>
+    /// Verifica que se pueda obtener un usuario por su identificador.
+    /// </summary>
     [Fact]
     public async Task Get_Success()
     {
@@ -152,6 +199,9 @@ public class UserEntityFrameworkRepositoryTest
         Assert.Equal(dto.Email, record.Unwrap().Email);
     }
 
+    /// <summary>
+    /// Verifica que se pueda actualizar correctamente la información de un usuario existente.
+    /// </summary>
     [Fact]
     public async Task Update_success()
     {
@@ -173,6 +223,9 @@ public class UserEntityFrameworkRepositoryTest
         Assert.False(updated.Active);
     }
 
+    /// <summary>
+    /// Inserta datos de prueba en la base de datos para tests de búsqueda.
+    /// </summary>
     private async Task SeedUsersAsync()
     {
         var u1 = CreateNew(
@@ -208,6 +261,10 @@ public class UserEntityFrameworkRepositoryTest
         await _repo.UpdateAsync(CreateUpdate(u1Created));
     }
 
+    /// <summary>
+    /// Proporciona casos de prueba para las búsquedas con diferentes criterios.
+    /// </summary>
+    /// <returns>Colección de objetos que representan los casos de prueba.</returns>
     public static IEnumerable<object?[]> SearchCases()
     {
         yield return new object?[]
@@ -281,6 +338,11 @@ public class UserEntityFrameworkRepositoryTest
         };
     }
 
+    /// <summary>
+    /// Verifica que las búsquedas con diferentes criterios devuelvan el número esperado de resultados.
+    /// </summary>
+    /// <param name="criteria">Criterios de búsqueda a aplicar.</param>
+    /// <param name="expectedCount">Número esperado de resultados.</param>
     [Theory]
     [MemberData(nameof(SearchCases))]
     public async Task Search_ByCriteria_ReturnsExpected(UserCriteriaDTO criteria, int expectedCount)
