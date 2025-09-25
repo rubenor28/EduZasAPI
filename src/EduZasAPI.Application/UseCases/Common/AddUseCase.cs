@@ -34,6 +34,14 @@ public class AddUseCase<NE, E>
     /// Función opcional para formatear o transformar los datos de entrada antes de las validaciones.
     /// Si no se proporciona, los datos se utilizan sin modificaciones.
     /// </param>
+    /// <param name="preValidationFormat">
+    /// Función opcional para ejecutar formateos previo a validar.
+    /// Debe devolver un <see cref="NE"/>.
+    /// </param>
+    /// <param name="postValidationFormat">
+    /// Función opcional para ejecutar formateos posterior a validar.
+    /// Debe devolver un <see cref="NE"/>.
+    /// </param>
     /// <param name="extraValidation">
     /// Función opcional para ejecutar validaciones sincrónicas adicionales sobre los datos formateados.
     /// Debe devolver un <see cref="Result{T, E}"/> indicando éxito o errores de validación.
@@ -48,11 +56,12 @@ public class AddUseCase<NE, E>
     /// </returns>
     public async Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(
         NE request,
-        Func<NE, NE>? formatData = null,
+        Func<NE, NE>? preValidationFormat = null,
+        Func<NE, NE>? postValidationFormat = null,
         Func<NE, Result<Unit, List<FieldErrorDTO>>>? extraValidation = null,
         Func<NE, Task<Result<Unit, List<FieldErrorDTO>>>>? extraValidationAsync = null)
     {
-        var formatted = (formatData ?? (x => x))(request);
+        var formatted = (preValidationFormat ?? (x => x))(request);
 
         var validation = _validator.IsValid(formatted);
         if (validation.IsErr)
@@ -72,6 +81,7 @@ public class AddUseCase<NE, E>
                 return Result<E, List<FieldErrorDTO>>.Err(asyncCheck.UnwrapErr());
         }
 
+        formatted = (postValidationFormat ?? (x => x))(formatted);
         var newRecord = await _creator.AddAsync(formatted);
         return Result<E, List<FieldErrorDTO>>.Ok(newRecord);
     }
