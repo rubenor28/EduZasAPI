@@ -15,7 +15,6 @@ public static class StringSearchMapper
     /// <returns>Un <see cref="Optional{String}"/> con el valor correspondiente, o vacío si no es válido.</returns>
     public static Optional<string> ToString(this StringSearchType value)
     {
-        ArgumentNullException.ThrowIfNull(value);
         return value switch
         {
             StringSearchType.EQ => Optional<string>.Some("equals"),
@@ -31,7 +30,6 @@ public static class StringSearchMapper
     /// <returns>Un <see cref="Optional{Int32}"/> con el valor correspondiente, o vacío si no es válido.</returns>
     public static Optional<int> ToInt(this StringSearchType value)
     {
-        ArgumentNullException.ThrowIfNull(value);
         return value switch
         {
             StringSearchType.EQ => Optional<int>.Some(0),

@@ -16,7 +16,6 @@ public static class UserTypeMapper
     /// <returns>Un <see cref="Optional{String}"/> con el valor correspondiente, o vacío si no es válido.</returns>
     public static Optional<string> ToString(this UserType value)
     {
-        ArgumentNullException.ThrowIfNull(value);
         return value switch
         {
             UserType.STUDENT => Optional<string>.Some("student"),
@@ -33,7 +32,6 @@ public static class UserTypeMapper
     /// <returns>Un <see cref="Optional{Int32}"/> con el valor correspondiente, o vacío si no es válido.</returns>
     public static Optional<int> ToInt(this UserType value)
     {
-        ArgumentNullException.ThrowIfNull(value);
         return value switch
         {
             UserType.STUDENT => Optional<int>.Some(0),
