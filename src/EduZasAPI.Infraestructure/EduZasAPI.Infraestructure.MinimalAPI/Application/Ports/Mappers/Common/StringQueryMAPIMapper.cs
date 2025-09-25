@@ -44,7 +44,7 @@ public static class StringQueryMAPIMapper
             return Result<Optional<StringQueryDTO>, Unit>.Err(Unit.Value);
 
         var result = source?.ToDomain();
-        return Result.Ok(result.Match(
+        return Result.Ok(result!.Match(
           ok => Optional.Some(ok),
           err => Optional<StringQueryDTO>.None()
         ));
