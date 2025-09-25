@@ -1,6 +1,5 @@
 using EduZasAPI.Application.Common;
 using EduZasAPI.Infraestructure.Bcrypt.Application.Common;
-using EduZasAPI.Infraestructure.IdentityModel.Application.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 

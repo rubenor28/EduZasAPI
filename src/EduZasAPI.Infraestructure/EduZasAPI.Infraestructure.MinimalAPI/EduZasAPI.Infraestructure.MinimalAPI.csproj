@@ -20,7 +20,6 @@
     <ProjectReference Include="..\..\EduZasAPI.Application\EduZasAPI.Application.csproj" />
     <ProjectReference Include="..\..\EduZasAPI.Domain\EduZasAPI.Domain.csproj" />
     <ProjectReference Include="..\EduZasAPI.Infraestructure.BCrypt\EduZasAPI.Infraestructure.BCrypt.csproj" />
-    <ProjectReference Include="..\EduZasAPI.Infraestructure.IdentityModel\EduZasAPI.Infraestructure.IdentityModel.csproj" />
   </ItemGroup>
 
 </Project>
