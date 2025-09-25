@@ -1,5 +1,7 @@
 *
 !/.gitignore
+!/src
+!/tests
 !/run.sh
 !/EduZasAPI.sln
 !/Directory.Build.props
