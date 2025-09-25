@@ -1,3 +1,6 @@
+using EduZasAPI.Application.Common;
+using EduZasAPI.Infraestructure.Bcrypt.Application.Common;
+
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
@@ -33,6 +36,7 @@ public static class ServiceCollectionExtensions
     /// <returns>La colección de servicios con los servicios adicionales registrados.</returns>
     private static IServiceCollection AddOtherInfrastructureServices(this IServiceCollection services)
     {
+        services.AddTransient<IHashService, BCryptHasher>();
         return services;
     }
 }

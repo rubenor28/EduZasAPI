@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +19,7 @@
     <ProjectReference Include="..\EduZasAPI.Infraestructure.FluentValidation\EduZasAPI.Infraestructure.FluentValidation.csproj" />
     <ProjectReference Include="..\..\EduZasAPI.Application\EduZasAPI.Application.csproj" />
     <ProjectReference Include="..\..\EduZasAPI.Domain\EduZasAPI.Domain.csproj" />
+    <ProjectReference Include="..\EduZasAPI.Infraestructure.BCrypt\EduZasAPI.Infraestructure.BCrypt.csproj" />
   </ItemGroup>
 
 </Project>

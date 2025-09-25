@@ -24,6 +24,7 @@ public static class UserRoutes
     public async static Task<IResult> AddUser(
         NewUserMAPI newUser,
         IUserRepositoryAsync repo,
+        IHashService hasher,
         AddUseCase<NewUserDTO, UserDomain> useCase)
     {
         try
@@ -44,6 +45,11 @@ public static class UserRoutes
                     }
 
                     return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+                },
+                postValidationFormat: u =>
+                {
+                    u.Password = hasher.Hash(u.Password);
+                    return u;
                 }
             );
 
