@@ -21,37 +21,12 @@ public static class UserRoutes
         return group;
     }
 
-    public async static Task<IResult> AddUser(
-        NewUserMAPI newUser,
-        IUserRepositoryAsync repo,
-        IHashService hasher,
-        AddUseCase<NewUserDTO, UserDomain> useCase)
+    public async static Task<IResult> AddUser(NewUserMAPI newUser, AddUserUseCase useCase)
     {
         try
         {
             var newUsr = NewUserMAPIMapper.ToDomain(newUser);
-            var validation = await useCase.ExecuteAsync(
-                request: newUsr,
-                extraValidationAsync: async _ =>
-                {
-                    var errs = new List<FieldErrorDTO>();
-                    var repeatedEmail = await repo.FindByEmail(newUsr.Email);
-
-                    if (repeatedEmail.IsSome)
-                    {
-                        var error = new FieldErrorDTO { Field = "email", Message = "Email ya registrado" };
-                        errs.Add(error);
-                        return Result.Err(errs);
-                    }
-
-                    return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
-                },
-                postValidationFormat: u =>
-                {
-                    u.Password = hasher.Hash(u.Password);
-                    return u;
-                }
-            );
+            var validation = await useCase.ExecuteAsync(newUsr);
 
             if (validation.IsErr)
             {

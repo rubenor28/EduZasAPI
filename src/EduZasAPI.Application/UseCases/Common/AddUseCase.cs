@@ -3,22 +3,33 @@ using EduZasAPI.Domain.Common;
 namespace EduZasAPI.Application.Common;
 
 /// <summary>
-/// Caso de uso genérico para agregar una nueva entidad al sistema.
+/// Caso de uso base para la adición de nuevas entidades con validación extensible.
 /// </summary>
-/// <typeparam name="NE">Tipo de los datos de entrada requeridos para la creación.</typeparam>
-/// <typeparam name="E">Tipo de la entidad resultante.</typeparam>
-public class AddUseCase<NE, E>
+/// <typeparam name="NE">Tipo del DTO para nueva entidad. Debe ser no nulo.</typeparam>
+/// <typeparam name="E">Tipo de la entidad resultante. Debe ser no nulo.</typeparam>
+/// <remarks>
+/// Esta clase proporciona una implementación base para casos de uso que crean nuevas entidades,
+/// incluyendo validación en múltiples etapas, formato de datos y extensibilidad mediante hooks.
+/// </remarks>
+public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>>>
     where NE : notnull
     where E : notnull
 {
-    private readonly ICreatorAsync<E, NE> _creator;
-    private readonly IBusinessValidationService<NE> _validator;
+    /// <summary>
+    /// Creador responsable de persistir la nueva entidad.
+    /// </summary>
+    protected readonly ICreatorAsync<E, NE> _creator;
+
+    /// <summary>
+    /// Validador de reglas de negocio para la entidad.
+    /// </summary>
+    protected readonly IBusinessValidationService<NE> _validator;
 
     /// <summary>
     /// Inicializa una nueva instancia de la clase <see cref="AddUseCase{NE, E}"/>.
     /// </summary>
-    /// <param name="creator">Servicio responsable de crear y persistir entidades.</param>
-    /// <param name="validator">Servicio para validar las reglas de negocio sobre los datos de entrada.</param>
+    /// <param name="creator">Implementación del creador de entidades.</param>
+    /// <param name="validator">Implementación del validador de reglas de negocio.</param>
     public AddUseCase(ICreatorAsync<E, NE> creator, IBusinessValidationService<NE> validator)
     {
         _creator = creator;
@@ -26,63 +37,75 @@ public class AddUseCase<NE, E>
     }
 
     /// <summary>
-    /// Ejecuta el proceso de creación de una nueva entidad, aplicando validaciones
-    /// y transformaciones opcionales a los datos de entrada.
+    /// Ejecuta el proceso completo de creación de una nueva entidad.
     /// </summary>
-    /// <param name="request">Datos de entrada para crear la entidad.</param>
-    /// <param name="formatData">
-    /// Función opcional para formatear o transformar los datos de entrada antes de las validaciones.
-    /// Si no se proporciona, los datos se utilizan sin modificaciones.
-    /// </param>
-    /// <param name="preValidationFormat">
-    /// Función opcional para ejecutar formateos previo a validar.
-    /// Debe devolver un <see cref="NE"/>.
-    /// </param>
-    /// <param name="postValidationFormat">
-    /// Función opcional para ejecutar formateos posterior a validar.
-    /// Debe devolver un <see cref="NE"/>.
-    /// </param>
-    /// <param name="extraValidation">
-    /// Función opcional para ejecutar validaciones sincrónicas adicionales sobre los datos formateados.
-    /// Debe devolver un <see cref="Result{T, E}"/> indicando éxito o errores de validación.
-    /// </param>
-    /// <param name="extraValidationAsync">
-    /// Función opcional para ejecutar validaciones asincrónicas adicionales sobre los datos formateados.
-    /// Debe devolver un <see cref="Result{T, E}"/> indicando éxito o errores de validación.
-    /// </param>
+    /// <param name="request">DTO con los datos para crear la nueva entidad.</param>
     /// <returns>
-    /// Un <see cref="Result{T, E}"/> que contiene la entidad creada en caso de éxito,
-    /// o una lista de <see cref="FieldErrorDTO"/> con los errores encontrados durante las validaciones.
+    /// Una tarea que representa la operación asíncrona. El resultado contiene la entidad creada
+    /// o una lista de errores de validación si el proceso falla.
     /// </returns>
-    public async Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(
-        NE request,
-        Func<NE, NE>? preValidationFormat = null,
-        Func<NE, NE>? postValidationFormat = null,
-        Func<NE, Result<Unit, List<FieldErrorDTO>>>? extraValidation = null,
-        Func<NE, Task<Result<Unit, List<FieldErrorDTO>>>>? extraValidationAsync = null)
+    public async Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(NE request)
     {
-        var formatted = (preValidationFormat ?? (x => x))(request);
+        var formatted = PreValidationFormat(request);
 
         var validation = _validator.IsValid(formatted);
         if (validation.IsErr)
             return Result<E, List<FieldErrorDTO>>.Err(validation.UnwrapErr());
 
-        if (extraValidation is not null)
-        {
-            var syncCheck = extraValidation(formatted);
-            if (syncCheck.IsErr)
-                return Result<E, List<FieldErrorDTO>>.Err(syncCheck.UnwrapErr());
-        }
+        var syncCheck = ExtraValidation(formatted);
+        if (syncCheck.IsErr)
+            return Result<E, List<FieldErrorDTO>>.Err(syncCheck.UnwrapErr());
 
-        if (extraValidationAsync is not null)
-        {
-            var asyncCheck = await extraValidationAsync(formatted);
-            if (asyncCheck.IsErr)
-                return Result<E, List<FieldErrorDTO>>.Err(asyncCheck.UnwrapErr());
-        }
+        var asyncCheck = await ExtraValidationAsync(formatted);
+        if (asyncCheck.IsErr)
+            return Result<E, List<FieldErrorDTO>>.Err(asyncCheck.UnwrapErr());
 
-        formatted = (postValidationFormat ?? (x => x))(formatted);
+        formatted = PostValidationFormat(formatted);
         var newRecord = await _creator.AddAsync(formatted);
         return Result<E, List<FieldErrorDTO>>.Ok(newRecord);
     }
+
+    /// <summary>
+    /// Aplica formato a los datos antes de la validación principal.
+    /// </summary>
+    /// <param name="value">Datos a formatear.</param>
+    /// <returns>Datos formateados.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para aplicar transformaciones iniciales a los datos.
+    /// </remarks>
+    protected virtual NE PreValidationFormat(NE value) => value;
+
+    /// <summary>
+    /// Aplica formato a los datos después de todas las validaciones.
+    /// </summary>
+    /// <param name="value">Datos a formatear.</param>
+    /// <returns>Datos formateados.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para aplicar transformaciones finales a los datos,
+    /// como el hashing de contraseñas antes de la persistencia.
+    /// </remarks>
+    protected virtual NE PostValidationFormat(NE value) => value;
+
+    /// <summary>
+    /// Realiza validaciones adicionales síncronas.
+    /// </summary>
+    /// <param name="value">Datos a validar.</param>
+    /// <returns>Resultado de la validación.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
+    /// </remarks>
+    protected virtual Result<Unit, List<FieldErrorDTO>> ExtraValidation(NE value) =>
+        Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+
+    /// <summary>
+    /// Realiza validaciones adicionales asíncronas.
+    /// </summary>
+    /// <param name="value">Datos a validar.</param>
+    /// <returns>Tarea que representa la validación asíncrona.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
+    /// como verificaciones en base de datos o llamadas a servicios externos.
+    /// </remarks>
+    protected virtual Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(NE value) =>
+        Task.FromResult(Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value));
 }

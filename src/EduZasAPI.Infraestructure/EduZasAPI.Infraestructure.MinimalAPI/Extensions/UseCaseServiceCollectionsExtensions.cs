@@ -18,11 +18,12 @@ public static class UseCaseServiceCollectionExtensions
         this IServiceCollection services)
     {
         // User use cases
-        services.AddTransient<AddUseCase<NewUserDTO, UserDomain>>();
-        services.AddTransient<DeleteUseCase<ulong, UserDomain>>();
-        services.AddTransient<ReadUseCase<ulong, UserDomain>>();
-        services.AddTransient<UpdateUseCase<UserUpdateDTO, UserDomain>>();
-        services.AddTransient<QueryUseCase<UserCriteriaDTO, UserDomain>>();
+        services.AddScoped<AddUserUseCase>(sp => new AddUserUseCase(
+              sp.GetRequiredService<IHashService>(),
+              sp.GetRequiredService<ICreatorAsync<UserDomain, NewUserDTO>>(),
+              sp.GetRequiredService<IBusinessValidationService<NewUserDTO>>(),
+              sp.GetRequiredService<IQuerierAsync<UserDomain, UserCriteriaDTO>>()
+        ));
 
         return services;
     }
