@@ -18,7 +18,7 @@ public static class UseCaseServiceCollectionExtensions
         this IServiceCollection services)
     {
         // User use cases
-        services.AddScoped<AddUserUseCase>(sp => new AddUserUseCase(
+        services.AddTransient<AddUserUseCase>(sp => new AddUserUseCase(
               sp.GetRequiredService<IHashService>(),
               sp.GetRequiredService<ICreatorAsync<UserDomain, NewUserDTO>>(),
               sp.GetRequiredService<IBusinessValidationService<NewUserDTO>>(),

@@ -1,5 +1,7 @@
+using EduZasAPI.Domain.Auth;
 using EduZasAPI.Application.Common;
 using EduZasAPI.Infraestructure.Bcrypt.Application.Common;
+using EduZasAPI.Infraestructure.IdentityModel.Application.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
@@ -33,10 +35,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration cfg)
     {
-        var jwtSettings = cfg.GetSection("JwtSettings").Get<JwtSettings>();
-        ArgumentNullException.ThrowIfNull(jwtSettings, "JwtSettings section must be defined on appsettings.json");
-        services.AddSingleton<JwtSettings>(jwtSettings);
-
+        services.Configure<JwtSettings>(cfg.GetSection("JwtSettings"));
         return services;
     }
 
@@ -47,7 +46,8 @@ public static class ServiceCollectionExtensions
     /// <returns>La colección de servicios con los servicios adicionales registrados.</returns>
     private static IServiceCollection AddOtherInfrastructureServices(this IServiceCollection services)
     {
-        services.AddTransient<IHashService, BCryptHasher>();
+        services.AddScoped<ISignedTokenService, JwtService>();
+        services.AddScoped<IHashService, BCryptHasher>();
         return services;
     }
 }

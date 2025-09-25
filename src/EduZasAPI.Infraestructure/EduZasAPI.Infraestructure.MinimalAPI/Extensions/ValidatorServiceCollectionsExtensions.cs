@@ -22,14 +22,14 @@ public static class ValidatorServiceCollectionExtensions
         this IServiceCollection services)
     {
 
-        services.AddTransient<IBusinessValidationService<ulong>, ULongFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<ulong>, ULongFluentValidator>();
 
         // User validators
-        services.AddTransient<IBusinessValidationService<UserDomain>, UserFluentValidator>();
-        services.AddTransient<IBusinessValidationService<NewUserDTO>, NewUserFluentValidator>();
-        services.AddTransient<IBusinessValidationService<UserUpdateDTO>, UserUpdateFluentValidator>();
-        services.AddTransient<IBusinessValidationService<UserCredentialsDTO>, UserCredentialsFluentValidator>();
-        services.AddTransient<IBusinessValidationService<RolChangeDTO>, RolChangeFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<UserDomain>, UserFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<NewUserDTO>, NewUserFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<UserUpdateDTO>, UserUpdateFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<UserCredentialsDTO>, UserCredentialsFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<RolChangeDTO>, RolChangeFluentValidator>();
 
         return services;
     }
