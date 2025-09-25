@@ -29,6 +29,17 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    private static IServiceCollection AddSettings(
+        this IServiceCollection services,
+        IConfiguration cfg)
+    {
+        var jwtSettings = cfg.GetSection("JwtSettings").Get<JwtSettings>();
+        ArgumentNullException.ThrowIfNull(jwtSettings, "JwtSettings section must be defined on appsettings.json");
+        services.AddSingleton<JwtSettings>(jwtSettings);
+
+        return services;
+    }
+
     /// <summary>
     /// Registra servicios adicionales de infraestructura que no pertenecen a categorías específicas.
     /// </summary>
