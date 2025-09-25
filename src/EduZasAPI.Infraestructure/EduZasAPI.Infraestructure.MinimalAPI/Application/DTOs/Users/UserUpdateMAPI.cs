@@ -1,4 +1,4 @@
-namespace EduZasAPI.Infraestructure.Application.DTOs.Users;
+namespace EduZasAPI.Infraestructure.MinimalAPI.Application.Users;
 
 /// <summary>
 /// Representa los datos para actualizar la información de un usuario existente en el sistema.
