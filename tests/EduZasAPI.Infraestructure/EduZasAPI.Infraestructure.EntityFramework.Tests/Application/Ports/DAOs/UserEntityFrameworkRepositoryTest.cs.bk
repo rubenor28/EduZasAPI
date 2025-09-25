@@ -23,7 +23,7 @@ namespace EduZasAPI.Test.Infraestructure.Application.Ports.DAOs;
 /// </remarks>
 public class UserEntityFrameworkRepositoryTest
 {
-    private IUserRepositoryAsync _repo;
+    private IRepositoryAsync<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO> _repo;
     private EduZasDotnetContext _ctx;
 
     /// <summary>
@@ -39,11 +39,10 @@ public class UserEntityFrameworkRepositoryTest
         var connStr = config.GetConnectionString("TestConnection");
 
         var s = new ServiceCollection();
-        s.AddTransient<IUserRepositoryAsync>(prv =>
+        s.AddTransient<IRepositoryAsync<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO>>(prv =>
         {
             var ctx = prv.GetRequiredService<EduZasDotnetContext>();
-            ulong pageSize = 10;
-            return new UserEntityFrameworkRepository(ctx, pageSize);
+            return new UserEntityFrameworkRepository(ctx, 10);
         });
 
         s.AddDbContext<EduZasDotnetContext>(opts =>
@@ -51,7 +50,7 @@ public class UserEntityFrameworkRepositoryTest
 
         var sp = s.BuildServiceProvider();
 
-        _repo = sp.GetRequiredService<IUserRepositoryAsync>();
+        _repo = sp.GetRequiredService<IRepositoryAsync<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO>>();
         _ctx = sp.GetRequiredService<EduZasDotnetContext>();
     }
 
