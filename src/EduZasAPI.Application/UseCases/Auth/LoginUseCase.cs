@@ -12,10 +12,9 @@ namespace EduZasAPI.Application.Auth;
 /// Esta clase implementa la lógica de login, verificando las credenciales del usuario
 /// contra la base de datos y generando un token de autenticación en caso de éxito.
 /// </remarks>
-public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<string, FieldErrorDTO>>
+public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<Unit, FieldErrorDTO>>
 {
     private IHashService _hasher;
-    private ISignedTokenService _tokenService;
     private IQuerierAsync<UserDomain, UserCriteriaDTO> _querier;
 
     /// <summary>
@@ -26,12 +25,10 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<string, Fie
     /// <param name="querier">Consultor para buscar usuarios en la base de datos.</param>
     public LoginUseCase(
         IHashService hasher,
-        ISignedTokenService tokenService,
         IQuerierAsync<UserDomain, UserCriteriaDTO> querier)
     {
         _hasher = hasher;
         _querier = querier;
-        _tokenService = tokenService;
     }
 
     /// <summary>
@@ -53,7 +50,7 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<string, Fie
     /// 3. Compara la contraseña proporcionada con el hash almacenado
     /// 4. Genera un token de autenticación si las credenciales son correctas
     /// </remarks>
-    public async Task<Result<string, FieldErrorDTO>> ExecuteAsync(UserCredentialsDTO credentials)
+    public async Task<Result<Unit, FieldErrorDTO>> ExecuteAsync(UserCredentialsDTO credentials)
     {
         var emailSearch = new StringQueryDTO
         {
@@ -72,7 +69,7 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<string, Fie
             throw new InvalidDataException($"Repeated email {credentials.Email} stored");
 
         if (results == 0)
-            return Result<string, FieldErrorDTO>
+            return Result<Unit, FieldErrorDTO>
               .Err(new FieldErrorDTO
               {
                   Field = "email",
@@ -83,16 +80,14 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<string, Fie
         var pwdMatch = _hasher.Matches(credentials.Password, usr.Password);
 
         if (!pwdMatch)
-            return Result<string, FieldErrorDTO>
+            return Result<Unit, FieldErrorDTO>
               .Err(new FieldErrorDTO
               {
                   Field = "password",
                   Message = "Contraseña incorrecta"
               });
 
-        var token = _tokenService.Generate(usr);
-
-        return Result<string, FieldErrorDTO>
-          .Ok(token);
+        return Result<Unit, FieldErrorDTO>
+          .Ok(Unit.Value);
     }
 }
