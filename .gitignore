@@ -2,7 +2,9 @@
 !/.gitignore
 
 # Carpetas y contenido
+!/src/
 !/src/**
+!/tests/
 !/tests/**
 
 # Archivos
