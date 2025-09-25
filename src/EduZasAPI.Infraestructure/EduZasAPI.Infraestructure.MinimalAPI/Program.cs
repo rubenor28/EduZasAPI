@@ -1,5 +1,6 @@
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Users;
+using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,5 +21,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapUserRoutes();
+app.MapAuthRoutes();
 
 app.Run();

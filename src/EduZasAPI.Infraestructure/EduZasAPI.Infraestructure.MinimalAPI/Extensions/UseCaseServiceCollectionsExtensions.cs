@@ -1,6 +1,6 @@
 using EduZasAPI.Domain.Users;
-using EduZasAPI.Application.Common;
 using EduZasAPI.Application.Users;
+using EduZasAPI.Application.Auth;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
@@ -18,12 +18,8 @@ public static class UseCaseServiceCollectionExtensions
         this IServiceCollection services)
     {
         // User use cases
-        services.AddTransient<AddUserUseCase>(sp => new AddUserUseCase(
-              sp.GetRequiredService<IHashService>(),
-              sp.GetRequiredService<ICreatorAsync<UserDomain, NewUserDTO>>(),
-              sp.GetRequiredService<IBusinessValidationService<NewUserDTO>>(),
-              sp.GetRequiredService<IQuerierAsync<UserDomain, UserCriteriaDTO>>()
-        ));
+        services.AddTransient<AddUserUseCase>();
+        services.AddTransient<LoginUseCase>();
 
         return services;
     }

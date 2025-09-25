@@ -30,8 +30,6 @@ public static class RepositoryServiceCollectionExtensions
         });
 
         // Mapear las interfaces hacia la misma instancia concreta
-        services.AddScoped<IUserRepositoryAsync>(sp => sp.GetRequiredService<UserEntityFrameworkRepository>());
-
         services.AddScoped<ICreatorAsync<UserDomain, NewUserDTO>>(sp => sp.GetRequiredService<UserEntityFrameworkRepository>());
         services.AddScoped<IUpdaterAsync<UserDomain, UserUpdateDTO>>(sp => sp.GetRequiredService<UserEntityFrameworkRepository>());
         services.AddScoped<IReaderAsync<ulong, UserDomain>>(sp => sp.GetRequiredService<UserEntityFrameworkRepository>());

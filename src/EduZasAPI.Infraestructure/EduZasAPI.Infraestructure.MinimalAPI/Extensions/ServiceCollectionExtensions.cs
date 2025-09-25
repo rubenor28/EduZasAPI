@@ -1,4 +1,3 @@
-using EduZasAPI.Domain.Auth;
 using EduZasAPI.Application.Common;
 using EduZasAPI.Infraestructure.Bcrypt.Application.Common;
 using EduZasAPI.Infraestructure.IdentityModel.Application.Common;
@@ -22,6 +21,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services
+            .AddSettings(configuration)
             .AddDatabaseServices(configuration)
             .AddRepositories()
             .AddValidators()
@@ -35,7 +35,6 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration cfg)
     {
-        services.Configure<JwtSettings>(cfg.GetSection("JwtSettings"));
         return services;
     }
 
@@ -46,8 +45,8 @@ public static class ServiceCollectionExtensions
     /// <returns>La colección de servicios con los servicios adicionales registrados.</returns>
     private static IServiceCollection AddOtherInfrastructureServices(this IServiceCollection services)
     {
-        services.AddScoped<ISignedTokenService, JwtService>();
         services.AddScoped<IHashService, BCryptHasher>();
+        services.AddSingleton<RoutesUtils>();
         return services;
     }
 }

@@ -3,24 +3,33 @@ using EduZasAPI.Application.Users;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Users;
 
+using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
+
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Users;
 
 public static class UserRoutes
 {
     public static RouteGroupBuilder MapUserRoutes(this WebApplication app)
     {
-        var group = app.MapGroup("/users")
+        var group = app
+          .MapGroup("/users")
           .WithTags("Usuarios");
 
-        group.MapPost("/", AddUser);
+        group
+          .MapPost("/", AddUser)
+          .WithName("Agregar usuario");
 
         return group;
     }
 
-    public async static Task<IResult> AddUser(NewUserMAPI newUser, AddUserUseCase useCase)
+    public async static Task<IResult> AddUser(
+        NewUserMAPI newUser,
+        AddUserUseCase useCase,
+        RoutesUtils utils)
     {
-        try
+        return await utils.HandleResponseAsync(async () =>
         {
+
             var newUsr = NewUserMAPIMapper.ToDomain(newUser);
             var validation = await useCase.ExecuteAsync(newUsr);
 
@@ -32,19 +41,9 @@ public static class UserRoutes
             }
 
             var newRecord = validation.Unwrap();
-            return Results.BadRequest(new WithDataResponse<PublicUserMAPI>
-            {
-                Message = "Usuario registrado",
-                Data = newRecord.FromDomain()
-            });
-        }
-        catch (System.Exception ex)
-        {
-            Console.WriteLine(ex.StackTrace);
-            return Results.InternalServerError(new MessageResponse
-            {
-                Message = "Internal server error",
-            });
-        }
+
+            var publicUser = PublicUserMAPIMapper.FromDomain(newRecord);
+            return Results.Created($"/users/{publicUser.Id}", publicUser);
+        });
     }
 }

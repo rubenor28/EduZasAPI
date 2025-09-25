@@ -7,8 +7,7 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
 public class UserEntityFrameworkRepository :
-  EntityFrameworkRepository<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO, User>,
-  IUserRepositoryAsync
+  EntityFrameworkRepository<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO, User>
 {
 
     public UserEntityFrameworkRepository(EduZasDotnetContext context, ulong pageSize) : base(context, pageSize) { }
@@ -36,24 +35,6 @@ public class UserEntityFrameworkRepository :
 
         return query;
     }
-
-    public async Task<Optional<UserDomain>> FindByEmail(string email)
-    {
-        var rawResults = await _ctx.Users
-          .OrderBy(u => u.UserId)
-          .Where(u => u.Email.Equals(email))
-          .ToListAsync();
-
-        var results = rawResults.Select(MapToDomain).ToList();
-
-        return results.Count switch
-        {
-            0 => Optional<UserDomain>.None(),
-            1 => Optional<UserDomain>.Some(results[0]),
-            _ => throw new InvalidDataException($"Repeated email: {email}"),
-        };
-    }
-
 
     protected override UserDomain MapToDomain(User efEntity) => new UserDomain
     {
