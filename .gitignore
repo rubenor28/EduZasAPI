@@ -1,7 +1,11 @@
 *
 !/.gitignore
-!/src
-!/tests
+
+# Carpetas y contenido
+!/src/**
+!/tests/**
+
+# Archivos
 !/run.sh
 !/EduZasAPI.sln
 !/Directory.Build.props
