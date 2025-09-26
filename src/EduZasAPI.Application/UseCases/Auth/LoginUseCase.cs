@@ -12,7 +12,7 @@ namespace EduZasAPI.Application.Auth;
 /// Esta clase implementa la lógica de login, verificando las credenciales del usuario
 /// contra la base de datos y generando un token de autenticación en caso de éxito.
 /// </remarks>
-public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<Unit, FieldErrorDTO>>
+public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<UserDomain, FieldErrorDTO>>
 {
     private IHashService _hasher;
     private IQuerierAsync<UserDomain, UserCriteriaDTO> _querier;
@@ -50,7 +50,7 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<Unit, Field
     /// 3. Compara la contraseña proporcionada con el hash almacenado
     /// 4. Genera un token de autenticación si las credenciales son correctas
     /// </remarks>
-    public async Task<Result<Unit, FieldErrorDTO>> ExecuteAsync(UserCredentialsDTO credentials)
+    public async Task<Result<UserDomain, FieldErrorDTO>> ExecuteAsync(UserCredentialsDTO credentials)
     {
         var emailSearch = new StringQueryDTO
         {
@@ -60,6 +60,7 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<Unit, Field
 
         var userSearch = await _querier.GetByAsync(new UserCriteriaDTO
         {
+            Active = Optional<bool>.Some(true),
             Email = Optional<StringQueryDTO>.Some(emailSearch)
         });
 
@@ -69,7 +70,7 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<Unit, Field
             throw new InvalidDataException($"Repeated email {credentials.Email} stored");
 
         if (results == 0)
-            return Result<Unit, FieldErrorDTO>
+            return Result<UserDomain, FieldErrorDTO>
               .Err(new FieldErrorDTO
               {
                   Field = "email",
@@ -80,14 +81,14 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<Unit, Field
         var pwdMatch = _hasher.Matches(credentials.Password, usr.Password);
 
         if (!pwdMatch)
-            return Result<Unit, FieldErrorDTO>
+            return Result<UserDomain, FieldErrorDTO>
               .Err(new FieldErrorDTO
               {
                   Field = "password",
                   Message = "Contraseña incorrecta"
               });
 
-        return Result<Unit, FieldErrorDTO>
-          .Ok(Unit.Value);
+        return Result<UserDomain, FieldErrorDTO>
+          .Ok(usr);
     }
 }

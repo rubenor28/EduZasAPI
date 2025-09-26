@@ -2,7 +2,7 @@ using EduZasAPI.Domain.Users;
 
 namespace EduZasAPI.Application.Users;
 
-public static class UserUpdateDTOMapper
+public static class UserDomainMapper
 {
     public static UserUpdateDTO ToUserUpdateDTO(this UserDomain source) => new UserUpdateDTO
     {
@@ -14,5 +14,16 @@ public static class UserUpdateDTOMapper
         FatherLastName = source.FatherLastName,
         Password = source.Password,
         MotherLastname = source.MotherLastname,
+    };
+
+    public static PublicUserDTO ToPublicUserDTO(this UserDomain source) => new PublicUserDTO
+    {
+        Id = source.Id,
+        Email = source.Email,
+        Role = source.Role,
+        FirstName = source.FirstName,
+        MidName = source.MidName,
+        FatherLastName = source.FatherLastName,
+        MotherLastname = source.MotherLastname
     };
 }
