@@ -51,9 +51,9 @@ public static class AuthRoutes
                 return Results.BadRequest(response);
             }
 
-            var token = validation.Unwrap();
+            var user = validation.Unwrap();
 
-            return Results.Ok();
+            return Results.Ok(user.ToPublicUserDTO());
         });
     }
 }
