@@ -1,5 +1,6 @@
 using EduZasAPI.Application.Common;
 using EduZasAPI.Infraestructure.Bcrypt.Application.Common;
+using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
@@ -30,10 +31,22 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    ///  Registra configuraciones ya sea definidas en codigo o provenientes del 
+    ///  appsettings.json de uso general
+    /// </summary>
+    /// <param name="services">La colección de servicios donde se registrarán las dependencias.</param>
+    /// <param name="cfg">Configuración de la aplicación usada para inicializar servicios.</param>
+    /// <returns></returns>
     private static IServiceCollection AddSettings(
         this IServiceCollection services,
         IConfiguration cfg)
     {
+        var jwtSettings = cfg.GetSection("JwtSettings").Get<JwtSettings>();
+        ArgumentNullException.ThrowIfNull(jwtSettings, "JwtSettings must be defined on appsettings.json");
+        services.AddSingleton<JwtSettings>(jwtSettings);
+        services.AddScoped<JwtService>();
+
         return services;
     }
 

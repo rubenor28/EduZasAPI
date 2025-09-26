@@ -32,7 +32,10 @@ public static class AuthRoutes
     public async static Task<IResult> Login(
         UserCredentialsDTO credentials,
         LoginUseCase useCase,
-        RoutesUtils utils)
+        RoutesUtils utils,
+        JwtSettings jwtSettings,
+        JwtService jwtService,
+        HttpContext httpContext)
     {
         return await utils.HandleResponseAsync(async () =>
         {
@@ -52,7 +55,21 @@ public static class AuthRoutes
             }
 
             var user = validation.Unwrap();
+            var token = jwtService.Generate(new AuthPayload
+            {
+                Id = user.Id,
+                Role = user.Role,
+            });
 
+            var cookieOpts = new CookieOptions
+            {
+                HttpOnly = true,
+                // Secure = isProduction
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(jwtSettings.ExpiresMinutes)
+            };
+
+            httpContext.Response.Cookies.Append("AuthToken", token, cookieOpts);
             return Results.Ok(user.ToPublicUserDTO());
         });
     }
