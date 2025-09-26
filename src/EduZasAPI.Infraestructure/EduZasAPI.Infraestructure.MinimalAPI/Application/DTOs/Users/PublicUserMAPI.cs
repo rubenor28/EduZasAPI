@@ -25,16 +25,19 @@ public class PublicUserMAPI
     public required string FirstName { get; set; }
 
     /// <summary>
+    /// Obtiene o establece el segundo nombre del usuario (opcional).
+    /// </summary>
+    /// <value>
+    /// Optional que contiene el segundo nombre si está presente,
+    /// o null si no se proporciona. Valor por defecto: null.
+    /// </value>
+    public string? MidName { get; set; } = null;
+
+    /// <summary>
     /// Obtiene o establece el apellido paterno del usuario.
     /// </summary>
     /// <value>Apellido paterno del usuario. Campo obligatorio.</value>
     public required string FatherLastName { get; set; }
-
-    /// <summary>
-    /// Obtiene o establece la dirección de correo electrónico del usuario.
-    /// </summary>
-    /// <value>Email del usuario. Campo obligatorio.</value>
-    public required string Email { get; set; }
 
     /// <summary>
     /// Obtiene o establece el apellido materno del usuario (opcional).
@@ -46,13 +49,10 @@ public class PublicUserMAPI
     public string? MotherLastname { get; set; } = null;
 
     /// <summary>
-    /// Obtiene o establece el segundo nombre del usuario (opcional).
+    /// Obtiene o establece la dirección de correo electrónico del usuario.
     /// </summary>
-    /// <value>
-    /// Optional que contiene el segundo nombre si está presente,
-    /// o null si no se proporciona. Valor por defecto: null.
-    /// </value>
-    public string? MidName { get; set; } = null;
+    /// <value>Email del usuario. Campo obligatorio.</value>
+    public required string Email { get; set; }
 
     /// <summary>
     /// Obtiene o establece el tipo o rol del usuario dentro del sistema.

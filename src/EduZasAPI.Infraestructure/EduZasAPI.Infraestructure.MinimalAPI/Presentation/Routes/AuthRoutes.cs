@@ -2,6 +2,7 @@ using EduZasAPI.Application.Common;
 using EduZasAPI.Application.Users;
 using EduZasAPI.Application.Auth;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
+using EduZasAPI.Infraestructure.MinimalAPI.Application.Users;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Auth;
@@ -61,6 +62,7 @@ public static class AuthRoutes
                 Role = user.Role,
             });
 
+            // TODO: Config para flag de is production
             var cookieOpts = new CookieOptions
             {
                 HttpOnly = true,
@@ -70,7 +72,9 @@ public static class AuthRoutes
             };
 
             httpContext.Response.Cookies.Append("AuthToken", token, cookieOpts);
-            return Results.Ok(user.ToPublicUserDTO());
+
+            var publicUser = PublicUserMAPIMapper.FromDomain(user.ToPublicUserDTO());
+            return Results.Ok(publicUser);
         });
     }
 }
