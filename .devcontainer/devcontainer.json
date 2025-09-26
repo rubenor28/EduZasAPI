@@ -1,0 +1,18 @@
+{
+  "name": "EduZas API .NET 9.0",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [5018],
+  "postCreateCommand": "dotnet build",
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "usernamehw.errorlens",
+        "eamodio.gitlens"
+      ]
+    }
+  }
+}

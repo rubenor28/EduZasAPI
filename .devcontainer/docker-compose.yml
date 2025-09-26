@@ -1,0 +1,38 @@
+services:
+  dev:
+    container_name: dotnet-dev
+    build: .
+    volumes:
+      - ../:/workspace
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+    depends_on:
+      - mariadb-dev
+      - mariadb-test
+
+  mariadb-dev:
+    container_name: edu-zas-mariadb-dev
+    image: mariadb:10.4.3
+    environment:
+      - MYSQL_ROOT_PASSWORD=cisco-class
+      - MYSQL_USER=dr-cisco
+      - MYSQL_PASSWORD=cisco-class
+      - MYSQL_DATABASE=EDU_ZAS
+    volumes:
+      - ./data/mariadb-dev:/var/lib/mysql:Z
+    ports:
+      - "3307:3306"
+
+  mariadb-test:
+    container_name: edu-zas-mariadb-test
+    image: mariadb:10.4.3
+    environment:
+      - MYSQL_ROOT_PASSWORD=cisco-class
+      - MYSQL_USER=dr-cisco
+      - MYSQL_PASSWORD=cisco-class
+      - MYSQL_DATABASE=EDU_ZAS_TEST
+    volumes:
+      - ./data/mariadb-test:/var/lib/mysql:Z
+    ports:
+      - "3308:3306"
