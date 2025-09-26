@@ -6,8 +6,20 @@ using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Application.Users;
 
+/// <summary>
+/// Métodos de extensión para mapear criterios de búsqueda de usuario desde la capa MAPI
+/// hacia el objeto de dominio <see cref="UserCriteriaDTO"/>.
+/// </summary>
 public static class UserCriteriaMAPIMapper
 {
+    /// <summary>
+    /// Convierte un objeto <see cref="UserCriteriaMAPI"/> en un <see cref="UserCriteriaDTO"/> de dominio.
+    /// </summary>
+    /// <param name="source">Instancia de <see cref="UserCriteriaMAPI"/> a mapear.</param>
+    /// <returns>
+    /// Un <see cref="Result{T, E}"/> que contiene el <see cref="UserCriteriaDTO"/> si la conversión
+    /// fue exitosa, o una lista de <see cref="FieldErrorDTO"/> si se encontraron errores de formato.
+    /// </returns>
     public static Result<UserCriteriaDTO, List<FieldErrorDTO>> ToDomain(this UserCriteriaMAPI source)
     {
         var role = Optional<UserType>.None();

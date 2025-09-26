@@ -8,10 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Agregar dependencias del proyecto de Extensions/
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
 
+// Activar rutas protegidas y políticas establecidas
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -23,6 +25,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Endpoints API
 app.MapUserRoutes();
 app.MapAuthRoutes();
 
