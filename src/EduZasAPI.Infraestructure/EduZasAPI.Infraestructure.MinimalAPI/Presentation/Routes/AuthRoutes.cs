@@ -28,6 +28,18 @@ public static class AuthRoutes
           .WithName("Cerrar sesión")
           .RequireAuthorization();
 
+        group
+          .MapGet("/1", () => Results.Ok("Hola estudiante"))
+          .RequireAuthorization("RequireAuthenticated");
+
+        group
+          .MapGet("/2", () => Results.Ok("Hola profesor"))
+          .RequireAuthorization("ProfessorOrAdmin");
+
+        group
+          .MapGet("/3", () => Results.Ok("Hola Admin"))
+          .RequireAuthorization("AdminOnly");
+
         return group;
     }
 
