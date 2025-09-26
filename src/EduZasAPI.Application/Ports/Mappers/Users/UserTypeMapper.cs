@@ -10,22 +10,6 @@ namespace EduZasAPI.Application.Users;
 public static class UserTypeMapper
 {
     /// <summary>
-    /// Convierte un <see cref="UserType"/> a su representación en string.
-    /// </summary>
-    /// <param name="value">Valor de <see cref="UserType"/>.</param>
-    /// <returns>Un <see cref="Optional{String}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<string> ToString(this UserType value)
-    {
-        return value switch
-        {
-            UserType.STUDENT => Optional<string>.Some("student"),
-            UserType.PROFESSOR => Optional<string>.Some("professor"),
-            UserType.ADMIN => Optional<string>.Some("admin"),
-            _ => Optional<string>.None(),
-        };
-    }
-
-    /// <summary>
     /// Convierte un <see cref="UserType"/> a su representación en entero.
     /// </summary>
     /// <param name="value">Valor de <see cref="UserType"/>.</param>
@@ -48,9 +32,9 @@ public static class UserTypeMapper
     /// <returns>Un <see cref="Optional{UserType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
     public static Optional<UserType> FromString(string value) => value switch
     {
-        "student" => Optional<UserType>.Some(UserType.STUDENT),
-        "professor" => Optional<UserType>.Some(UserType.PROFESSOR),
-        "admin" => Optional<UserType>.Some(UserType.ADMIN),
+        "STUDENT" => Optional<UserType>.Some(UserType.STUDENT),
+        "PROFESSOR" => Optional<UserType>.Some(UserType.PROFESSOR),
+        "ADMIN" => Optional<UserType>.Some(UserType.ADMIN),
         _ => Optional<UserType>.None(),
     };
 

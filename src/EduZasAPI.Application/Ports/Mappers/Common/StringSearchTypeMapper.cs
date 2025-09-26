@@ -9,21 +9,6 @@ namespace EduZasAPI.Application.Common;
 public static class StringSearchMapper
 {
     /// <summary>
-    /// Convierte un <see cref="StringSearchType"/> a su representación en string.
-    /// </summary>
-    /// <param name="value">Valor de <see cref="StringSearchType"/>.</param>
-    /// <returns>Un <see cref="Optional{String}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<string> ToString(this StringSearchType value)
-    {
-        return value switch
-        {
-            StringSearchType.EQ => Optional<string>.Some("equals"),
-            StringSearchType.LIKE => Optional<string>.Some("like"),
-            _ => Optional<string>.None(),
-        };
-    }
-
-    /// <summary>
     /// Convierte un <see cref="StringSearchType"/> a su representación en entero.
     /// </summary>
     /// <param name="value">Valor de <see cref="StringSearchType"/>.</param>
@@ -45,8 +30,8 @@ public static class StringSearchMapper
     /// <returns>Un <see cref="Optional{StringSearchType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
     public static Optional<StringSearchType> FromString(string value) => value switch
     {
-        "equals" => Optional<StringSearchType>.Some(StringSearchType.EQ),
-        "like" => Optional<StringSearchType>.Some(StringSearchType.LIKE),
+        "EQUALS" => Optional<StringSearchType>.Some(StringSearchType.EQ),
+        "LIKE" => Optional<StringSearchType>.Some(StringSearchType.LIKE),
         _ => Optional<StringSearchType>.None(),
     };
 
