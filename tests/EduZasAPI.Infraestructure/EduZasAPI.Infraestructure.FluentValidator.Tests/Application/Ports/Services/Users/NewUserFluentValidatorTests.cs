@@ -29,8 +29,6 @@ public class NewUserFluentValidatorTests
 
         var result = _validator.IsValid(newUser);
 
-        Console.WriteLine(result.IsOk);
-        Console.WriteLine(result.IsOk);
         Assert.True(result.IsOk, "Expected validation to succeed for a valid user.");
     }
 
