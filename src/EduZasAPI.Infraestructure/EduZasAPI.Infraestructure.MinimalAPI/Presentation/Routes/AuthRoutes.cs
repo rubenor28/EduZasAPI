@@ -24,8 +24,9 @@ public static class AuthRoutes
           .WithName("Verificar autenticado");
 
         group
-          .MapDelete("/", () => { })
-          .WithName("Cerrar sesión");
+          .MapDelete("/", () => Results.Ok("Acceso a ruta protegida"))
+          .WithName("Cerrar sesión")
+          .RequireAuthorization();
 
         return group;
     }
@@ -36,7 +37,8 @@ public static class AuthRoutes
         RoutesUtils utils,
         JwtSettings jwtSettings,
         JwtService jwtService,
-        HttpContext httpContext)
+        HttpContext httpContext,
+        IWebHostEnvironment env)
     {
         return await utils.HandleResponseAsync(async () =>
         {
@@ -44,11 +46,14 @@ public static class AuthRoutes
 
             if (validation.IsErr)
             {
-                var errList = new List<FieldErrorDTO>();
-                var error = validation.UnwrapErr();
+                var errList = new List<FieldErrorDTO>()
+                {
+                  validation.UnwrapErr()
+                };
+
                 var response = new FieldErrorResponse
                 {
-                    Message = "Formato inválido",
+                    Message = "Error al iniciar sesión",
                     Errors = errList
                 };
 
@@ -62,12 +67,12 @@ public static class AuthRoutes
                 Role = user.Role,
             });
 
-            // TODO: Config para flag de is production
             var cookieOpts = new CookieOptions
             {
                 HttpOnly = true,
-                // Secure = isProduction
-                SameSite = SameSiteMode.Strict,
+                Secure = env.IsProduction(),
+                SameSite = env.IsProduction() ? SameSiteMode.Strict : SameSiteMode.Lax,
+                Path = "/",
                 Expires = DateTimeOffset.UtcNow.AddMinutes(jwtSettings.ExpiresMinutes)
             };
 

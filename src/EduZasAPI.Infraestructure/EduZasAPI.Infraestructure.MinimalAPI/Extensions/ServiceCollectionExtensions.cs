@@ -2,6 +2,10 @@ using EduZasAPI.Application.Common;
 using EduZasAPI.Infraestructure.Bcrypt.Application.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
@@ -46,6 +50,38 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(jwtSettings, "JwtSettings must be defined on appsettings.json");
         services.AddSingleton<JwtSettings>(jwtSettings);
         services.AddScoped<JwtService>();
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+          .AddJwtBearer(opts =>
+          {
+              opts.TokenValidationParameters = new TokenValidationParameters
+              {
+                  ValidateIssuer = false,
+                  ValidateAudience = false,
+                  ValidAudience = null,
+                  ValidIssuer = null,
+                  ValidateLifetime = true,
+                  ValidateIssuerSigningKey = true,
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+              };
+
+              opts.Events = new JwtBearerEvents
+              {
+                  OnMessageReceived = context =>
+                  {
+                      if (context.Request.Cookies.TryGetValue("AuthToken", out var token))
+                      {
+                          context.Token = token;
+                      }
+                      return Task.CompletedTask;
+                  }
+              };
+          });
+
+        services.AddAuthorizationBuilder()
+          .AddPolicy("RequireAuthenticated", policy => policy.RequireAuthenticatedUser());
+
+        services.AddAuthorization();
 
         return services;
     }
