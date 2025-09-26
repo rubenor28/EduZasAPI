@@ -23,6 +23,16 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EduZasAPI V1");
+        c.RoutePrefix = "swagger";
+    });
+}
+
 app.UseHttpsRedirection();
 
 // Endpoints API

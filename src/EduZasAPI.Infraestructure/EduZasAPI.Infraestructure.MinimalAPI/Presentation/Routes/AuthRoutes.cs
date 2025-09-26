@@ -26,24 +26,28 @@ public static class AuthRoutes
           .MapGroup("/auth")
           .WithTags("Autenticacion");
 
-        group
-          .MapPost("/sign-in", AddUser)
-          .WithName("Registar usuario");
+        group.MapPost("/sign-in", AddUser)
+            .WithName("Registrar usuario")
+            .Produces<PublicUserMAPI>(StatusCodes.Status201Created)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
 
-        group
-          .MapPost("/login", Login)
-          .WithName("Iniciar sesión");
+        group.MapPost("/login", Login)
+            .WithName("Iniciar sesión")
+            .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
 
-        group
-          .MapDelete("/logout", Logout)
-          .WithName("Cerrar sesión")
-          .RequireAuthorization("RequireAuthenticated");
+        group.MapDelete("/logout", Logout)
+            .WithName("Cerrar sesión")
+            .RequireAuthorization("RequireAuthenticated")
+            .Produces(StatusCodes.Status200OK);
 
-        group
-          .MapGet("/me", UserData)
-          .WithName("Verificar autenticado")
-          .RequireAuthorization("RequireAuthenticated")
-          .AddEndpointFilter<UserIdFilter>();
+        group.MapGet("/me", UserData)
+            .WithName("Verificar autenticado")
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<UserIdFilter>()
+            .Produces<WithDataResponse<PublicUserMAPI>>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         return group;
     }

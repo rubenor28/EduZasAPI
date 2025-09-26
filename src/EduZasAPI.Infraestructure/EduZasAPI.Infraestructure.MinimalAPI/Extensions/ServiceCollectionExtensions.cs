@@ -25,12 +25,13 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services
-            .AddSettings(configuration)
+            .AddAuthSettings(configuration)
             .AddDatabaseServices(configuration)
             .AddRepositories()
             .AddValidators()
             .AddUseCases()
-            .AddOtherInfrastructureServices();
+            .AddOtherInfrastructureServices()
+            .AddSwaggerServices();
 
         return services;
     }
@@ -42,7 +43,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">La colección de servicios donde se registrarán las dependencias.</param>
     /// <param name="cfg">Configuración de la aplicación usada para inicializar servicios.</param>
     /// <returns></returns>
-    private static IServiceCollection AddSettings(
+    private static IServiceCollection AddAuthSettings(
         this IServiceCollection services,
         IConfiguration cfg)
     {
@@ -84,6 +85,22 @@ public static class ServiceCollectionExtensions
           .AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
 
         services.AddAuthorization();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            {
+                Title = "EduZasAPI",
+                Version = "v1",
+                Description = "Documentación de la API generada desde el código"
+            });
+        });
 
         return services;
     }
