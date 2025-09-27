@@ -8,10 +8,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Agregar dependencias del proyecto de Extensions/
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
+app.UseCors("AllowAll");
 
 // Activar rutas protegidas y políticas establecidas
 app.UseAuthentication();
