@@ -46,7 +46,7 @@ public class NewUserFluentValidatorTests
         var result = _validator.IsValid(newUser);
 
         Assert.True(result.IsErr, "Expected validation to fail when FirstName is empty.");
-        Assert.Contains(result.UnwrapErr(), e => e.Field == "FirstName");
+        Assert.Contains(result.UnwrapErr(), e => e.Field == "firstName");
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class NewUserFluentValidatorTests
         var result = _validator.IsValid(newUser);
 
         Assert.True(result.IsErr, "Expected validation to fail with invalid email.");
-        Assert.Contains(result.UnwrapErr(), e => e.Field == "Email");
+        Assert.Contains(result.UnwrapErr(), e => e.Field == "email");
     }
 
     [Fact]
