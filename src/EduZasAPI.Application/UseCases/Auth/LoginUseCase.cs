@@ -12,10 +12,11 @@ namespace EduZasAPI.Application.Auth;
 /// Esta clase implementa la lógica de login, verificando las credenciales del usuario
 /// contra la base de datos y generando un token de autenticación en caso de éxito.
 /// </remarks>
-public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<UserDomain, FieldErrorDTO>>
+public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<UserDomain, List<FieldErrorDTO>>>
 {
     private IHashService _hasher;
     private IQuerierAsync<UserDomain, UserCriteriaDTO> _querier;
+    private IBusinessValidationService<UserCredentialsDTO> _validator;
 
     /// <summary>
     /// Inicializa una nueva instancia de la clase <see cref="LoginUseCase"/>.
@@ -25,10 +26,12 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<UserDomain,
     /// <param name="querier">Consultor para buscar usuarios en la base de datos.</param>
     public LoginUseCase(
         IHashService hasher,
-        IQuerierAsync<UserDomain, UserCriteriaDTO> querier)
+        IQuerierAsync<UserDomain, UserCriteriaDTO> querier,
+        IBusinessValidationService<UserCredentialsDTO> validator)
     {
         _hasher = hasher;
         _querier = querier;
+        _validator = validator;
     }
 
     /// <summary>
@@ -50,8 +53,13 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<UserDomain,
     /// 3. Compara la contraseña proporcionada con el hash almacenado
     /// 4. Genera un token de autenticación si las credenciales son correctas
     /// </remarks>
-    public async Task<Result<UserDomain, FieldErrorDTO>> ExecuteAsync(UserCredentialsDTO credentials)
+    public async Task<Result<UserDomain, List<FieldErrorDTO>>> ExecuteAsync(UserCredentialsDTO credentials)
     {
+
+        var validation = _validator.IsValid(credentials);
+        if (validation.IsErr)
+            return Result<UserDomain, List<FieldErrorDTO>>.Err(validation.UnwrapErr());
+
         var emailSearch = new StringQueryDTO
         {
             Text = credentials.Email,
@@ -70,25 +78,27 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<UserDomain,
             throw new InvalidDataException($"Repeated email {credentials.Email} stored");
 
         if (results == 0)
-            return Result<UserDomain, FieldErrorDTO>
-              .Err(new FieldErrorDTO
-              {
-                  Field = "email",
-                  Message = "Email no encontrado",
-              });
+        {
+            var errors = new List<FieldErrorDTO>()
+            {
+              new FieldErrorDTO{Field = "email",Message = "Email no encontrado"}
+            };
+
+            return Result<UserDomain, List<FieldErrorDTO>>.Err(errors);
+        }
 
         var usr = userSearch.Results[0];
         var pwdMatch = _hasher.Matches(credentials.Password, usr.Password);
 
         if (!pwdMatch)
-            return Result<UserDomain, FieldErrorDTO>
-              .Err(new FieldErrorDTO
-              {
-                  Field = "password",
-                  Message = "Contraseña incorrecta"
-              });
+        {
+            var errors = new List<FieldErrorDTO>(){
+              new FieldErrorDTO{Field = "password",Message = "Contraseña incorrecta"}
+            };
 
-        return Result<UserDomain, FieldErrorDTO>
-          .Ok(usr);
+            return Result<UserDomain, List<FieldErrorDTO>>.Err(errors);
+        }
+
+        return Result<UserDomain, List<FieldErrorDTO>>.Ok(usr);
     }
 }

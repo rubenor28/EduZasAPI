@@ -1,8 +1,9 @@
 using EduZasAPI.Domain.Common;
 using EduZasAPI.Domain.Users;
 using EduZasAPI.Application.Common;
+using EduZasAPI.Application.Users;
 
-namespace EduZasAPI.Application.Users;
+namespace EduZasAPI.Application.Auth;
 
 /// <summary>
 /// Caso de uso específico para la adición de nuevos usuarios al sistema.
@@ -82,6 +83,22 @@ public class AddUserUseCase : AddUseCase<NewUserDTO, UserDomain>
 
         return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
     }
+
+    protected override NewUserDTO PreValidationFormat(NewUserDTO value) => new NewUserDTO
+    {
+        FirstName = value.FirstName.ToUpperInvariant(),
+        FatherLastName = value.FatherLastName.ToUpperInvariant(),
+        MidName = value.MidName
+          .Match<Optional<string>>(
+            name => name.ToUpperInvariant().ToOptional(),
+            () => Optional<string>.None()),
+        MotherLastname = value.MotherLastname
+          .Match<Optional<string>>(
+            name => name.ToUpperInvariant().ToOptional(),
+            () => Optional<string>.None()),
+        Email = value.Email,
+        Password = value.Password
+    };
 
     /// <summary>
     /// Aplica formato final a los datos del usuario antes de la persistencia.
