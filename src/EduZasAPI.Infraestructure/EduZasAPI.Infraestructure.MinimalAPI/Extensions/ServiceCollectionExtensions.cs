@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services
+            .AddCorsConfig(configuration)
             .AddAuthSettings(configuration)
             .AddDatabaseServices(configuration)
             .AddRepositories()
@@ -102,6 +103,23 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        return services;
+    }
+
+    public static IServiceCollection AddCorsConfig(this IServiceCollection services, IConfiguration cfg)
+    {
+        var frontend = cfg.GetValue<string>("ServerOptions:FrontEndURL");
+        ArgumentNullException.ThrowIfNull(frontend, "FrontEndURL must be defined on appsettings.json");
+        services.AddCors(opt =>
+        {
+            opt.AddPolicy("AllowFrontend", policy =>
+            {
+                policy.WithOrigins(frontend)
+                .AllowCredentials()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+            });
+        });
         return services;
     }
 

@@ -26,10 +26,14 @@ public abstract class FluentValidator<T> : AbstractValidator<T>, IBusinessValida
         if (validation.IsValid)
             return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
 
-        var errors = validation.Errors.Select(error => new FieldErrorDTO
+        var errors = validation.Errors.Select(error =>
         {
-            Field = error.PropertyName,
-            Message = error.ErrorMessage,
+            var field = char.ToLower(error.PropertyName[0]) + error.PropertyName.Substring(1);
+            return new FieldErrorDTO
+            {
+                Field = field,
+                Message = error.ErrorMessage,
+            };
         }).ToList();
 
         return Result<Unit, List<FieldErrorDTO>>.Err(errors);
