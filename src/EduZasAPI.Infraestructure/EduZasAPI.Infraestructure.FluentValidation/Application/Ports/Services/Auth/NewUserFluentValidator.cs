@@ -4,7 +4,7 @@ using EduZasAPI.Infraestructure.FluentValidation.Application.Common;
 using System.Text.RegularExpressions;
 using FluentValidation;
 
-namespace EduZasAPI.Infraestructure.FluentValidation.Application.Users;
+namespace EduZasAPI.Infraestructure.FluentValidation.Application.Auth;
 
 /// <summary>
 /// Validador para la creación de un nuevo usuario,
@@ -20,28 +20,28 @@ public class NewUserFluentValidator : FluentValidator<NewUserDTO>
         RuleFor(x => x.FirstName)
           .Cascade(CascadeMode.Stop)
           .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
+          .WithMessage("Campo requerido")
           .Matches(UserRegexs.SimpleName)
           .WithMessage("Formato inválido");
 
         RuleFor(x => x.FatherLastName)
           .Cascade(CascadeMode.Stop)
           .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
+          .WithMessage("Campo requerido")
           .Matches(UserRegexs.SimpleName)
           .WithMessage("Formato inválido");
 
         RuleFor(x => x.Email)
           .Cascade(CascadeMode.Stop)
           .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
+          .WithMessage("Campo requerido")
           .EmailAddress()
           .WithMessage("Formato inválido");
 
         RuleFor(x => x.Password)
           .Cascade(CascadeMode.Stop)
           .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
+          .WithMessage("Campo requerido")
           .Matches(UserRegexs.Password)
           .WithMessage("Formato inválido");
 

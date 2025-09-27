@@ -17,7 +17,7 @@ public static class UseCaseServiceCollectionExtensions
     public static IServiceCollection AddUseCases(
         this IServiceCollection services)
     {
-        // User use cases
+        // Auth use cases
         services.AddTransient<AddUserUseCase>();
         services.AddTransient<LoginUseCase>();
 

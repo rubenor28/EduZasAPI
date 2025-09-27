@@ -110,15 +110,10 @@ public static class AuthRoutes
 
             if (validation.IsErr)
             {
-                var errList = new List<FieldErrorDTO>()
-                {
-                  validation.UnwrapErr()
-                };
-
                 var response = new FieldErrorResponse
                 {
                     Message = "Error al iniciar sesión",
-                    Errors = errList
+                    Errors = validation.UnwrapErr()
                 };
 
                 return Results.BadRequest(response);

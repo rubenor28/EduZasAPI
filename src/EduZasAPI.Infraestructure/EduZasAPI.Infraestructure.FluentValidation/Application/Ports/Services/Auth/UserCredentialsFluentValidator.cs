@@ -3,7 +3,7 @@ using EduZasAPI.Infraestructure.FluentValidation.Application.Common;
 
 using FluentValidation;
 
-namespace EduZasAPI.Infraestructure.FluentValidation.Application.Users;
+namespace EduZasAPI.Infraestructure.FluentValidation.Application.Auth;
 
 public class UserCredentialsFluentValidator : FluentValidator<UserCredentialsDTO>
 {
@@ -12,12 +12,12 @@ public class UserCredentialsFluentValidator : FluentValidator<UserCredentialsDTO
         RuleFor(x => x.Email)
           .Cascade(CascadeMode.Stop)
           .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía")
+          .WithMessage("Campo requerido")
           .EmailAddress()
           .WithMessage("Formato inválido");
 
         RuleFor(x => x.Password)
           .NotEmpty()
-          .WithMessage("La cadena no puede estar vacía");
+          .WithMessage("Campo requerido");
     }
 }

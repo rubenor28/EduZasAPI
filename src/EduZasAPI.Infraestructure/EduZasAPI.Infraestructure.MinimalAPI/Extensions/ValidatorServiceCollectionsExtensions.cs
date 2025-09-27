@@ -4,6 +4,7 @@ using EduZasAPI.Application.Common;
 using EduZasAPI.Application.Users;
 
 using EduZasAPI.Infraestructure.FluentValidation.Application.Common;
+using EduZasAPI.Infraestructure.FluentValidation.Application.Auth;
 using EduZasAPI.Infraestructure.FluentValidation.Application.Users;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
@@ -24,9 +25,12 @@ public static class ValidatorServiceCollectionExtensions
 
         services.AddSingleton<IBusinessValidationService<ulong>, ULongFluentValidator>();
 
+        // Auth validators
+        services.AddSingleton<IBusinessValidationService<UserCredentialsDTO>, UserCredentialsFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<NewUserDTO>, NewUserFluentValidator>();
+
         // User validators
         services.AddSingleton<IBusinessValidationService<UserDomain>, UserFluentValidator>();
-        services.AddSingleton<IBusinessValidationService<NewUserDTO>, NewUserFluentValidator>();
         services.AddSingleton<IBusinessValidationService<UserUpdateDTO>, UserUpdateFluentValidator>();
         services.AddSingleton<IBusinessValidationService<UserCredentialsDTO>, UserCredentialsFluentValidator>();
         services.AddSingleton<IBusinessValidationService<RolChangeDTO>, RolChangeFluentValidator>();
