@@ -14,9 +14,9 @@ public partial class Class
 
     public string ClassName { get; set; } = null!;
 
-    public string Subject { get; set; } = null!;
+    public string? Subject { get; set; } = null!;
 
-    public string Section { get; set; } = null!;
+    public string? Section { get; set; } = null!;
 
     public ulong OwnerId { get; set; }
 
