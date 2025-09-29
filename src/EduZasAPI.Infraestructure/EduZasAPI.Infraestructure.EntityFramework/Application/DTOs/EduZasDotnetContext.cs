@@ -10,17 +10,43 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Tests;
 using EduZasAPI.Infraestructure.EntityFramework.Application.TestsPerClass;
 using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
+using Microsoft.Extensions.Configuration;
+using DotNetEnv;
+
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 
 public partial class EduZasDotnetContext : DbContext
 {
+    private readonly IConfiguration _cfg;
+
     public EduZasDotnetContext()
     {
+        var environment = Environment.GetEnvironmentVariable("ServerOptions__Environment");
+        if (environment != "Production")
+        {
+            var solutionRoot = Directory.GetCurrentDirectory();
+            var envPath = Path.Combine(solutionRoot, "..", "..", "..", ".env");
+            Env.Load(envPath);
+        }
+
+        _cfg = new ConfigurationBuilder()
+          .AddEnvironmentVariables()
+          .Build();
     }
 
     public EduZasDotnetContext(DbContextOptions<EduZasDotnetContext> options)
         : base(options)
     {
+        var environment = Environment.GetEnvironmentVariable("ServerOptions__Environment");
+        if (environment != "Production")
+        {
+            var solutionRoot = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..");
+            Env.Load(solutionRoot);
+        }
+
+        _cfg = new ConfigurationBuilder()
+          .AddEnvironmentVariables()
+          .Build();
     }
 
     public virtual DbSet<Class> Classes { get; set; }
@@ -42,7 +68,9 @@ public partial class EduZasDotnetContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(Microsoft.EntityFrameworkCore.ServerVersion.Parse("12.0.2-mariadb"));
+        => optionsBuilder.UseMySql(
+            _cfg.GetConnectionString("DefaultConnection"),
+            Microsoft.EntityFrameworkCore.ServerVersion.Parse("12.0.2-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

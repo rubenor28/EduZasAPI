@@ -2,7 +2,18 @@ using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Users;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Auth;
 
-var builder = WebApplication.CreateBuilder(args);
+using DotNetEnv;
+
+var environment = Environment.GetEnvironmentVariable("ServerOptions__Environment");
+if (environment != "Production")
+{
+    var solutionRoot = Directory.GetCurrentDirectory();
+    var envPath = Path.Combine(solutionRoot, "..", "..", "..", ".env");
+    Env.Load(envPath);
+}
+
+var builder = WebApplication.CreateBuilder();
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

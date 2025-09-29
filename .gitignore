@@ -14,3 +14,4 @@
 !/EduZasAPI.sln
 !/Directory.Build.props
 !/README.md
+!/.env.example
