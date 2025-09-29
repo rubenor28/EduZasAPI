@@ -64,7 +64,8 @@ git clone https://github.com/tu-usuario/EduZasAPI.git
 2. Instalar .NET 9.0 SDK desde [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/9.0)
 
 3. Configurar la base de datos. Dentro de `EduZasAPI.Infraestructure.MinimalAPI` existen ejemplos tanto
-   para producción como desarrollo, y algunos test también requiren un `appsettings.json`
+   para producción como desarrollo, y algunos test también requiren las variables de entorno definidas
+   en el `.env.example` en un archivo `.env`
 
 ## Despliegue
 

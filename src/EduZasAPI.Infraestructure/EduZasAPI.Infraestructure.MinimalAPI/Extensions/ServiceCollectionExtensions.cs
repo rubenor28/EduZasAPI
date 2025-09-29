@@ -108,8 +108,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddCorsConfig(this IServiceCollection services, IConfiguration cfg)
     {
-        var frontend = cfg.GetValue<string>("ServerOptions:FrontEndURL");
-        ArgumentNullException.ThrowIfNull(frontend, "FrontEndURL must be defined on appsettings.json");
+        var frontend = cfg.GetValue<string>("ServerOptions:FrontEndUrl");
+        ArgumentNullException.ThrowIfNull(frontend, "FrontEndUrl must be defined on .env file");
         services.AddCors(opt =>
         {
             opt.AddPolicy("AllowFrontend", policy =>
