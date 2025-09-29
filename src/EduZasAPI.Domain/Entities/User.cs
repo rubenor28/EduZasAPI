@@ -11,7 +11,7 @@ namespace EduZasAPI.Domain.Users;
 /// estado, rol y metadatos de auditoría. Utiliza campos requeridos para garantizar
 /// la integridad de los datos esenciales.
 /// </remarks>
-public class UserDomain : IIdentifiable<ulong>
+public class UserDomain : IIdentifiable<ulong>, ISoftDeletable
 {
     /// <summary>
     /// Obtiene o establece el identificador único del usuario.
@@ -62,7 +62,7 @@ public class UserDomain : IIdentifiable<ulong>
     /// true si el usuario está activo; false si está inactivo.
     /// Valor por defecto: true.
     /// </value>
-    public bool Active { get; set; } = true;
+    public bool? Active { get; set; } = true;
 
     /// <summary>
     /// Obtiene o establece el tipo o rol del usuario dentro del sistema.
