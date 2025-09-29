@@ -16,37 +16,37 @@ public class Class : IIdentifiable<string>
     /// </summary>
     /// <value>Identificador único de la clase. Se corresponde con <see cref="IIdentifiable{T}.Id"/>.</value>
     public required string Id { get; set; }
-    
+
     /// <summary>
     /// Obtiene o establece un valor que indica si la clase está activa.
     /// </summary>
     public required bool Active { get; set; }
-    
+
     /// <summary>
     /// Obtiene o establece el nombre de la clase.
     /// </summary>
     public required string ClassName { get; set; }
-    
+
     /// <summary>
     /// Obtiene o establece la materia a la que pertenece la clase.
     /// </summary>
-    public required string Subject { get; set; }
-    
+    public required Optional<string> Subject { get; set; }
+
     /// <summary>
     /// Obtiene o establece la sección o grupo de la clase.
     /// </summary>
-    public required string Section { get; set; }
-    
+    public required Optional<string> Section { get; set; }
+
     /// <summary>
     /// Obtiene o establece el identificador del propietario o creador de la clase.
     /// </summary>
     public required ulong OwnerId { get; set; }
-    
+
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la clase.
     /// </summary>
     public required DateTime CreatedAt { get; set; }
-    
+
     /// <summary>
     /// Obtiene o establece la fecha y hora de la última modificación de la clase.
     /// </summary>
