@@ -5,9 +5,11 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.NotificationsPerUser
 using EduZasAPI.Infraestructure.EntityFramework.Application.Resources;
 using EduZasAPI.Infraestructure.EntityFramework.Application.Tests;
 
+using EduZasAPI.Infraestructure.EntityFramework.Domain.Common;
+
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
-public partial class User
+public partial class User : ISoftDeletableEF
 {
     public ulong UserId { get; set; }
 

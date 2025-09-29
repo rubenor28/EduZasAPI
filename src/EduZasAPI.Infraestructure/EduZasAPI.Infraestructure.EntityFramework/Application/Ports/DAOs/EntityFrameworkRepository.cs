@@ -2,6 +2,8 @@ using EduZasAPI.Domain.Common;
 using EduZasAPI.Application.Common;
 using Microsoft.EntityFrameworkCore;
 
+using EduZasAPI.Infraestructure.EntityFramework.Domain.Common;
+
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 
 /// <summary>
@@ -106,7 +108,15 @@ where TEF : class
         var record = await DbSet.FindAsync(id);
         if (record is null) return Optional<E>.None();
 
-        DbSet.Remove(record);
+        if (record is ISoftDeletableEF softDeletable)
+        {
+            softDeletable.Active = false;
+        }
+        else
+        {
+            DbSet.Remove(record);
+        }
+
         await _ctx.SaveChangesAsync();
         return Optional<E>.Some(MapToDomain(record));
     }

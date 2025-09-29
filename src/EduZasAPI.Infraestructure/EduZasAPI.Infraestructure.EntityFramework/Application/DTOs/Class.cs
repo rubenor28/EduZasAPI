@@ -4,9 +4,11 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.ClassProfessors;
 using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 using EduZasAPI.Infraestructure.EntityFramework.Application.TestsPerClass;
 
+using EduZasAPI.Infraestructure.EntityFramework.Domain.Common;
+
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
 
-public partial class Class
+public partial class Class : ISoftDeletableEF
 {
     public string ClassId { get; set; } = null!;
 
