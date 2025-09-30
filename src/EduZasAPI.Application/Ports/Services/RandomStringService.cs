@@ -71,7 +71,7 @@ public class RandomStringGeneratorService :
 
         var allowedChars = opts is not null &&
                            opts.AllowedChars is not null ?
-                           opts.AllowedChars.ToCharArray() :
+                           opts.AllowedChars :
                            _chars;
 
         for (uint i = 0; i < length; i++)
