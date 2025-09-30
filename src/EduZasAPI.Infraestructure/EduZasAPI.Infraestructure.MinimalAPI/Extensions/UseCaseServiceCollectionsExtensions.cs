@@ -1,5 +1,4 @@
 using EduZasAPI.Domain.Users;
-using EduZasAPI.Application.Users;
 using EduZasAPI.Application.Auth;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
