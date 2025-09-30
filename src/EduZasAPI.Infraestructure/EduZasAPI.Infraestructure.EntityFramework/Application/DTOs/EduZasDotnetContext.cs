@@ -89,7 +89,7 @@ public partial class EduZasDotnetContext : DbContext
             entity.HasIndex(e => e.OwnerId, "owner_id");
 
             entity.Property(e => e.ClassId)
-                .HasMaxLength(20)
+                .HasMaxLength(15)
                 .HasColumnName("class_id");
             entity.Property(e => e.Active)
                 .IsRequired()
