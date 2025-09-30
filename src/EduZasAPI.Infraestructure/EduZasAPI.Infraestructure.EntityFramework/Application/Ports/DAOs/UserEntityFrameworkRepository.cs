@@ -17,24 +17,19 @@ public class UserEntityFrameworkRepository :
 
     protected override ulong GetId(UserUpdateDTO entity) => entity.Id;
 
-    protected override IQueryable<User> QueryFromCriteria(UserCriteriaDTO criteria)
-    {
-        var query = _ctx.Users.AsNoTracking().AsQueryable();
-
-        query = query.WhereOptional(criteria.Active, v => u => u.Active == v);
-        query = query.WhereOptional(criteria.Role, r => u => u.Role == (uint)r);
-
-        query = query.WhereOptional(criteria.CreatedAt, d => u => u.CreatedAt == d);
-        query = query.WhereOptional(criteria.ModifiedAt, d => u => u.ModifiedAt == d);
-
-        query = query.WhereStringQuery(criteria.FirstName, u => u.FirstName);
-        query = query.WhereStringQuery(criteria.MidName, u => u.MidName);
-        query = query.WhereStringQuery(criteria.FatherLastName, u => u.FatherLastname);
-        query = query.WhereStringQuery(criteria.MotherLastname, u => u.MotherLastname);
-        query = query.WhereStringQuery(criteria.Email, u => u.Email);
-
-        return query;
-    }
+    protected override IQueryable<User> QueryFromCriteria(UserCriteriaDTO c) =>
+        _ctx.Users.AsNoTracking().AsQueryable()
+        .WhereOptional(c.Active, v => u => u.Active == v)
+        .WhereOptional(c.Role, r => u => u.Role == (uint)r)
+        .WhereOptional(c.CreatedAt, d => u => u.CreatedAt == d)
+        .WhereOptional(c.ModifiedAt, d => u => u.ModifiedAt == d)
+        .WhereStringQuery(c.FirstName, u => u.FirstName)
+        .WhereStringQuery(c.MidName, u => u.MidName)
+        .WhereStringQuery(c.FatherLastName, u => u.FatherLastname)
+        .WhereStringQuery(c.MotherLastname, u => u.MotherLastname)
+        .WhereStringQuery(c.Email, u => u.Email)
+        .WhereOptional(c.EnrolledInClass, cId => u => u.ClassStudents.Any(cs => cs.ClassId == cId))
+        .WhereOptional(c.TeachingInClass, cId => u => u.ClassProfessors.Any(cpf => cpf.ClassId == cId));
 
     protected override UserDomain MapToDomain(User efEntity) => new UserDomain
     {

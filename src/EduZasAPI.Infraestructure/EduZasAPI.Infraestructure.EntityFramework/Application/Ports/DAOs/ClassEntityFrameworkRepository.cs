@@ -44,11 +44,13 @@ public class ClassEntityFrameworkRepository :
     };
 
     protected override IQueryable<Class> QueryFromCriteria(ClassCriteriaDTO cr) =>
-      _ctx.Classes
-      .AsNoTracking().AsQueryable()
-      .WhereStringQuery(cr.Subject, c => c.Subject)
-      .WhereStringQuery(cr.Section, c => c.Section)
-      .WhereStringQuery(cr.ClassName, c => c.ClassName)
-      .WhereOptional(cr.OwnerId, id => c => c.OwnerId == id)
-      .WhereOptional(cr.Active, activity => c => c.Active == activity);
+        _ctx.Classes
+        .AsNoTracking().AsQueryable()
+        .WhereStringQuery(cr.Subject, c => c.Subject)
+        .WhereStringQuery(cr.Section, c => c.Section)
+        .WhereStringQuery(cr.ClassName, c => c.ClassName)
+        .WhereOptional(cr.OwnerId, id => c => c.OwnerId == id)
+        .WhereOptional(cr.Active, activity => c => c.Active == activity)
+        .WhereOptional(cr.WithStudent, stId => c => c.ClassStudents.Any(cs => cs.StudentId == stId))
+        .WhereOptional(cr.WithProfessor, pfId => c => c.ClassProfessors.Any(cpf => cpf.ProfessorId == pfId));
 }
