@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Infraestructure.BCrypt", "src\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.BCrypt\EduZasAPI.Infraestructure.BCrypt.csproj", "{72767AB1-2E51-4D71-8ACA-AA8AAA1C714E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.InterfaceAdapters", "src\EduZasAPI.InterfaceAdapters\EduZasAPI.InterfaceAdapters.csproj", "{8534D4E9-5948-4F99-B2BB-632EEF7C9BBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{72767AB1-2E51-4D71-8ACA-AA8AAA1C714E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72767AB1-2E51-4D71-8ACA-AA8AAA1C714E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72767AB1-2E51-4D71-8ACA-AA8AAA1C714E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8534D4E9-5948-4F99-B2BB-632EEF7C9BBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8534D4E9-5948-4F99-B2BB-632EEF7C9BBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8534D4E9-5948-4F99-B2BB-632EEF7C9BBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8534D4E9-5948-4F99-B2BB-632EEF7C9BBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8D8EEB23-D0CB-48CA-9804-FFE97E788740} = {04FFEE81-B591-4C83-BD54-114328A069D6}
@@ -61,6 +67,7 @@ Global
 		{31D6B226-DD5D-454B-AA72-041EBF67C4B8} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
 		{8396AEFC-0131-4F21-B53F-04ED4C575E7D} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
 		{72767AB1-2E51-4D71-8ACA-AA8AAA1C714E} = {5E9639A2-F46B-4FB5-85D1-8437195182AA}
+		{8534D4E9-5948-4F99-B2BB-632EEF7C9BBD} = {04FFEE81-B591-4C83-BD54-114328A069D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionWorkingFolder = {31D6B226-DD5D-454B-AA72-041EBF67C4B8}

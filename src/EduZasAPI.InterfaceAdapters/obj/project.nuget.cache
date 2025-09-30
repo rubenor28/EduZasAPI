@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "MGjRDKqEKK8=",
+  "success": true,
+  "projectFilePath": "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.InterfaceAdapters/EduZasAPI.InterfaceAdapters.csproj",
+  "expectedPackageFiles": [
+    "/home/rubenor/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.9/microsoft.aspnetcore.app.ref.9.0.9.nupkg.sha512"
+  ],
+  "logs": []
+}

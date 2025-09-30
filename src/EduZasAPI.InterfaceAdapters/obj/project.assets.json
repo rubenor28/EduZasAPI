@@ -1,0 +1,123 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0": {
+      "EduZasAPI.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "EduZasAPI.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/EduZasAPI.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/EduZasAPI.Application.dll": {}
+        }
+      },
+      "EduZasAPI.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/EduZasAPI.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/EduZasAPI.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "EduZasAPI.Application/1.0.0": {
+      "type": "project",
+      "path": "../EduZasAPI.Application/EduZasAPI.Application.csproj",
+      "msbuildProject": "../EduZasAPI.Application/EduZasAPI.Application.csproj"
+    },
+    "EduZasAPI.Domain/1.0.0": {
+      "type": "project",
+      "path": "../EduZasAPI.Domain/EduZasAPI.Domain.csproj",
+      "msbuildProject": "../EduZasAPI.Domain/EduZasAPI.Domain.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0": [
+      "EduZasAPI.Application >= 1.0.0",
+      "EduZasAPI.Domain >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/home/rubenor/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.InterfaceAdapters/EduZasAPI.InterfaceAdapters.csproj",
+      "projectName": "EduZasAPI.InterfaceAdapters",
+      "projectPath": "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.InterfaceAdapters/EduZasAPI.InterfaceAdapters.csproj",
+      "packagesPath": "/home/rubenor/.nuget/packages/",
+      "outputPath": "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.InterfaceAdapters/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/rubenor/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "projectReferences": {
+            "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.Application/EduZasAPI.Application.csproj": {
+              "projectPath": "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.Application/EduZasAPI.Application.csproj"
+            },
+            "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.Domain/EduZasAPI.Domain.csproj": {
+              "projectPath": "/home/rubenor/workspace/EduZas/EduZasAPI/src/EduZasAPI.Domain/EduZasAPI.Domain.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.100"
+    },
+    "frameworks": {
+      "net9.0": {
+        "targetAlias": "net9.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[9.0.9, 9.0.9]"
+          }
+        ],
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.110/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
