@@ -5,7 +5,7 @@ namespace EduZasAPI.Application.Classes;
 /// <summary>
 /// Representa los datos que pueden exponserse la información en el sistema.
 /// </summary>
-public class PublicClass
+public class PublicClassDTO
 {
     /// <summary>
     /// Obtiene o establece el identificador único de la clase a actualizar.

@@ -23,14 +23,14 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     /// <summary>
     /// Validador de reglas de negocio para la entidad.
     /// </summary>
-    protected readonly IBusinessValidationService<NE> _validator;
+    protected readonly IBusinessValidationService<NE>? _validator;
 
     /// <summary>
     /// Inicializa una nueva instancia de la clase <see cref="AddUseCase{NE, E}"/>.
     /// </summary>
     /// <param name="creator">Implementación del creador de entidades.</param>
     /// <param name="validator">Implementación del validador de reglas de negocio.</param>
-    public AddUseCase(ICreatorAsync<E, NE> creator, IBusinessValidationService<NE> validator)
+    public AddUseCase(ICreatorAsync<E, NE> creator, IBusinessValidationService<NE>? validator = null)
     {
         _creator = creator;
         _validator = validator;
@@ -44,13 +44,16 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     /// Una tarea que representa la operación asíncrona. El resultado contiene la entidad creada
     /// o una lista de errores de validación si el proceso falla.
     /// </returns>
-    public async Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(NE request)
+    public async virtual Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(NE request)
     {
         var formatted = PreValidationFormat(request);
 
-        var validation = _validator.IsValid(formatted);
-        if (validation.IsErr)
-            return Result<E, List<FieldErrorDTO>>.Err(validation.UnwrapErr());
+        if (_validator is not null)
+        {
+            var validation = _validator.IsValid(formatted);
+            if (validation.IsErr)
+                return Result<E, List<FieldErrorDTO>>.Err(validation.UnwrapErr());
+        }
 
         var syncCheck = ExtraValidation(formatted);
         if (syncCheck.IsErr)
@@ -61,6 +64,7 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
             return Result<E, List<FieldErrorDTO>>.Err(asyncCheck.UnwrapErr());
 
         formatted = PostValidationFormat(formatted);
+        formatted = await PostValidationFormatAsync(request);
         var newRecord = await _creator.AddAsync(formatted);
         return Result<E, List<FieldErrorDTO>>.Ok(newRecord);
     }
@@ -74,6 +78,17 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     /// Este método puede ser sobrescrito para aplicar transformaciones iniciales a los datos.
     /// </remarks>
     protected virtual NE PreValidationFormat(NE value) => value;
+
+    /// <summary>
+    /// Aplica formato a los datos despues de la validación principal de forma
+    /// asíncrona.
+    /// </summary>
+    /// <param name="value">Datos a formatear.</param>
+    /// <returns>Datos formateados.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para aplicar transformaciones iniciales a los datos.
+    /// </remarks>
+    protected virtual Task<NE> PostValidationFormatAsync(NE value) => Task.FromResult(value);
 
     /// <summary>
     /// Aplica formato a los datos después de todas las validaciones.

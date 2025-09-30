@@ -105,4 +105,22 @@ public class UserCriteriaDTO : ICriteriaDTO
     /// o None si no se desea filtrar por este campo.
     /// </value>
     public Optional<DateTime> ModifiedAt { get; set; } = Optional<DateTime>.None();
+
+    /// <summary>
+    /// Obtiene o establece el filtro opcional para usuarios inscritos en una clase específica.
+    /// </summary>
+    /// <value>
+    /// Optional que contiene el ID de la clase para filtrar usuarios inscritos,
+    /// o None si no se desea filtrar por este campo.
+    /// </value>
+    public Optional<string> EnrolledInClass { get; set; } = Optional<string>.None();
+
+    /// <summary>
+    /// Obtiene o establece el filtro opcional para usuarios que enseñan en una clase específica.
+    /// </summary>
+    /// <value>
+    /// Optional que contiene el ID de la clase para filtrar usuarios que enseñan,
+    /// o None si no se desea filtrar por este campo.
+    /// </value>
+    public Optional<string> TeachingInClass { get; set; } = Optional<string>.None();
 }
