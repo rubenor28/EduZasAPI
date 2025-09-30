@@ -61,7 +61,6 @@ public class UserEntityFrameworkRepository :
         FatherLastname = newEntity.FatherLastName,
         MotherLastname = newEntity.MotherLastname.ToNullable(),
         Password = newEntity.Password,
-        Active = true,
     };
 
     protected override void UpdateProperties(User entity, UserUpdateDTO updatedProps)
