@@ -10,7 +10,12 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
     protected const int maxTries = 20;
     protected IRandomStringGeneratorService _idGenerator;
     protected IReaderAsync<string, ClassDomain> _reader;
-    protected RandomStringGeneratorArgs _cfg;
+
+    protected RandomStringGeneratorArgs _cfg = new RandomStringGeneratorArgs
+    {
+        MaxStrLenght = 15,
+        AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray()
+    };
 
     public AddClassUseCase(
       ICreatorAsync<ClassDomain, NewClassDTO> creator,
@@ -21,11 +26,6 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
     {
         _reader = reader;
         _idGenerator = idGenerator;
-        _cfg = new RandomStringGeneratorArgs
-        {
-            MaxStrLenght = 20,
-            AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray()
-        };
     }
 
     /// <inheritdoc/>
