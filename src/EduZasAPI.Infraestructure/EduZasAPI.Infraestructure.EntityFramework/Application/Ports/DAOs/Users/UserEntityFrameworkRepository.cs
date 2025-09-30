@@ -7,16 +7,18 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
 public class UserEntityFrameworkRepository :
-  EntityFrameworkRepository<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO, User>
+  SimpleKeyEFRepository<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO, User>
 {
 
     public UserEntityFrameworkRepository(EduZasDotnetContext context, ulong pageSize) : base(context, pageSize) { }
 
-
+    /// <inheritdoc/>
     protected override ulong GetId(User entity) => entity.UserId;
 
+    /// <inheritdoc/>
     protected override ulong GetId(UserUpdateDTO entity) => entity.Id;
 
+    /// <inheritdoc/>
     protected override IQueryable<User> QueryFromCriteria(UserCriteriaDTO c) =>
         _ctx.Users.AsNoTracking().AsQueryable()
         .WhereOptional(c.Active, v => u => u.Active == v)
@@ -31,6 +33,7 @@ public class UserEntityFrameworkRepository :
         .WhereOptional(c.EnrolledInClass, cId => u => u.ClassStudents.Any(cs => cs.ClassId == cId))
         .WhereOptional(c.TeachingInClass, cId => u => u.ClassProfessors.Any(cpf => cpf.ClassId == cId));
 
+    /// <inheritdoc/>
     protected override UserDomain MapToDomain(User efEntity) => new UserDomain
     {
         Id = efEntity.UserId,
@@ -48,6 +51,7 @@ public class UserEntityFrameworkRepository :
               (UserType)efEntity.Role.Value : UserType.STUDENT,
     };
 
+    /// <inheritdoc/>
     protected override User NewToEF(NewUserDTO newEntity) => new User
     {
         Email = newEntity.Email,
@@ -58,6 +62,7 @@ public class UserEntityFrameworkRepository :
         Password = newEntity.Password,
     };
 
+    /// <inheritdoc/>
     protected override void UpdateProperties(User entity, UserUpdateDTO updatedProps)
     {
         entity.UserId = updatedProps.Id;

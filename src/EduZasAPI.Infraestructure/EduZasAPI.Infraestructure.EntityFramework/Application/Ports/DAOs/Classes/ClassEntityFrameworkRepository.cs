@@ -7,12 +7,17 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
 
 public class ClassEntityFrameworkRepository :
-  EntityFrameworkRepository<string, ClassDomain, NewClassDTO, ClassUpdateDTO, ClassCriteriaDTO, Class>
+  SimpleKeyEFRepository<string, ClassDomain, NewClassDTO, ClassUpdateDTO, ClassCriteriaDTO, Class>
 {
     public ClassEntityFrameworkRepository(EduZasDotnetContext ctx, ulong pageSize) : base(ctx, pageSize) { }
 
+    /// <inheritdoc/>
     protected override string GetId(Class c) => c.ClassId;
+
+    /// <inheritdoc/>
     protected override string GetId(ClassUpdateDTO c) => c.Id;
+
+    /// <inheritdoc/>
     protected override Class NewToEF(NewClassDTO nc) => new Class
     {
         ClassId = nc.Id,
@@ -22,6 +27,7 @@ public class ClassEntityFrameworkRepository :
         Subject = nc.Subject.ToNullable()
     };
 
+    /// <inheritdoc/>
     protected override void UpdateProperties(Class c, ClassUpdateDTO cu)
     {
         c.ClassId = cu.Id;
@@ -31,6 +37,7 @@ public class ClassEntityFrameworkRepository :
         c.Section = cu.Section.ToNullable();
     }
 
+    /// <inheritdoc/>
     protected override ClassDomain MapToDomain(Class ef) => new ClassDomain
     {
         Id = ef.ClassId,
@@ -43,6 +50,7 @@ public class ClassEntityFrameworkRepository :
         ModifiedAt = ef.ModifiedAt
     };
 
+    /// <inheritdoc/>
     protected override IQueryable<Class> QueryFromCriteria(ClassCriteriaDTO cr) =>
         _ctx.Classes
         .AsNoTracking().AsQueryable()

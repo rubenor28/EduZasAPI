@@ -1,0 +1,1 @@
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
