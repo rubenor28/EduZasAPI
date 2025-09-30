@@ -29,8 +29,8 @@ public class QueryUseCase<C, E> : IUseCaseAsync<C, PaginatedQuery<E, C>>
     /// Una consulta paginada de tipo <see cref="PaginatedQuery{E, C}"/> 
     /// con los resultados correspondientes.
     /// </returns>
-    public async Task<PaginatedQuery<E, C>> ExecuteAsync(C criteria)
+    public Task<PaginatedQuery<E, C>> ExecuteAsync(C criteria)
     {
-        return await _querier.GetByAsync(criteria);
+        return _querier.GetByAsync(criteria);
     }
 }
