@@ -18,5 +18,5 @@ public interface ISoftDeletable
     /// Cuando una entidad se marca como inactiva (Active = false), se considera
     /// eliminada lógicamente y normalmente será excluida de las consultas regulares.
     /// </remarks>
-    bool? Active { get; set; }
+    bool Active { get; set; }
 }

@@ -9,7 +9,7 @@ namespace EduZasAPI.Domain.Classes;
 /// Esta clase implementa la interfaz <see cref="IIdentifiable{T}"/> para garantizar que cada
 /// instancia tenga un identificador único.
 /// </remarks>
-public class Class : IIdentifiable<string>, ISoftDeletable
+public class ClassDomain : IIdentifiable<string>, ISoftDeletable
 {
     /// <summary>
     /// Obtiene o establece el identificador único de la clase.

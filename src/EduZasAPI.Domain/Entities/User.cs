@@ -62,7 +62,7 @@ public class UserDomain : IIdentifiable<ulong>, ISoftDeletable
     /// true si el usuario está activo; false si está inactivo.
     /// Valor por defecto: true.
     /// </value>
-    public bool? Active { get; set; } = true;
+    public bool Active { get; set; } = true;
 
     /// <summary>
     /// Obtiene o establece el tipo o rol del usuario dentro del sistema.
