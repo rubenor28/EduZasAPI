@@ -1,11 +1,13 @@
+using EduZasAPI.Application.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
+
 namespace EduZasAPI.Infraestructure.MinimalAPI.Application.Classes;
 
 /// <summary>
 /// Representa los criterios de búsqueda y filtrado para consultas de clases
 /// de Minimal API.
 /// </summary>
-public class ClassCriteriaMAPI
+public class ClassCriteriaMAPI : ICriteriaDTO
 {
     /// <summary>
     /// Obtiene o establece el filtro opcional para el estado de activación de la clase.
