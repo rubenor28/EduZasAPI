@@ -25,13 +25,13 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services
+            .AddOtherInfrastructureServices()
             .AddCorsConfig(configuration)
             .AddAuthSettings(configuration)
             .AddDatabaseServices(configuration)
             .AddRepositories(configuration)
             .AddValidators()
             .AddUseCases()
-            .AddOtherInfrastructureServices()
             .AddSwaggerServices();
 
         return services;
@@ -132,6 +132,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IHashService, BCryptHasher>();
         services.AddSingleton<RoutesUtils>();
+        services.AddSingleton<IRandomStringGeneratorService, RandomStringGeneratorService>(sp =>
+            new RandomStringGeneratorService("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 15));
+
         return services;
     }
 }

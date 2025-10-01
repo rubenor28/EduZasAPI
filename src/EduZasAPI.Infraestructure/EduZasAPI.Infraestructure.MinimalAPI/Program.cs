@@ -1,6 +1,7 @@
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Users;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Auth;
+using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Classes;
 
 using DotNetEnv;
 
@@ -50,6 +51,7 @@ app.UseHttpsRedirection();
 // Endpoints API
 app.MapUserRoutes();
 app.MapAuthRoutes();
+app.MapClassRoutes();
 
 
 app.Run();

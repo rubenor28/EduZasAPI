@@ -43,11 +43,11 @@ public static class ClassMAPIMapper
         Subject = source.Subject.ToOptional()
     };
 
-    public static NewClassDTO ToDomain(this NewClassMAPI source) => new NewClassDTO
+    public static NewClassDTO ToDomain(this NewClassMAPI source, ulong ownerId) => new NewClassDTO
     {
-        Id = source.Id,
+        Id = string.Empty,
         ClassName = source.ClassName,
-        OwnerId = source.OwnerId,
+        OwnerId = ownerId,
         Subject = source.ClassName.ToOptional(),
         Section = source.Section.ToOptional(),
     };
@@ -80,7 +80,7 @@ public static class ClassMAPIMapper
         UserId = source.StudentId.ToOptional(),
     };
 
-    public static PublicClassMAPI FromDomain(this PublicClassDTO source) => new PublicClassMAPI
+    public static PublicClassMAPI FromDomain(this ClassDomain source) => new PublicClassMAPI
     {
         Id = source.Id,
         Active = source.Active,

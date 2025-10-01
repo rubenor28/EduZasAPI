@@ -1,5 +1,6 @@
 using EduZasAPI.Domain.Users;
 using EduZasAPI.Application.Auth;
+using EduZasAPI.Application.Classes;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
@@ -19,6 +20,9 @@ public static class UseCaseServiceCollectionExtensions
         // Auth use cases
         services.AddTransient<AddUserUseCase>();
         services.AddTransient<LoginUseCase>();
+
+        // Class use cases
+        services.AddTransient<AddClassUseCase>();
 
         return services;
     }

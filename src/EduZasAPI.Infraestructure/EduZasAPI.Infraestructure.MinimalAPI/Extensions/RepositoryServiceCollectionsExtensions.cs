@@ -37,6 +37,7 @@ public static class RepositoryServiceCollectionExtensions
         services.AddScoped<IDeleterAsync<ulong, UserDomain>>(sp => sp.GetRequiredService<UserEntityFrameworkRepository>());
         services.AddScoped<IQuerierAsync<UserDomain, UserCriteriaDTO>>(sp => sp.GetRequiredService<UserEntityFrameworkRepository>());
 
+        // Clases
         services.AddScoped<ClassEntityFrameworkRepository>(sp => new ClassEntityFrameworkRepository(
           sp.GetRequiredService<EduZasDotnetContext>(), pageSize));
 
@@ -45,6 +46,15 @@ public static class RepositoryServiceCollectionExtensions
         services.AddScoped<IReaderAsync<string, ClassDomain>>(sp => sp.GetRequiredService<ClassEntityFrameworkRepository>());
         services.AddScoped<IDeleterAsync<string, ClassDomain>>(sp => sp.GetRequiredService<ClassEntityFrameworkRepository>());
         services.AddScoped<IQuerierAsync<ClassDomain, ClassCriteriaDTO>>(sp => sp.GetRequiredService<ClassEntityFrameworkRepository>());
+
+        services.AddScoped<ProfessorPerClassEntityFrameworkRepository>(sp => new ProfessorPerClassEntityFrameworkRepository(
+            sp.GetRequiredService<EduZasDotnetContext>(), pageSize));
+
+        services.AddScoped<ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO>>(sp => sp.GetRequiredService<ProfessorPerClassEntityFrameworkRepository>());
+        services.AddScoped<IUpdaterAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO>>(sp => sp.GetRequiredService<ProfessorPerClassEntityFrameworkRepository>());
+        services.AddScoped<IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO>>(sp => sp.GetRequiredService<ProfessorPerClassEntityFrameworkRepository>());
+        services.AddScoped<IDeleterAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO>>(sp => sp.GetRequiredService<ProfessorPerClassEntityFrameworkRepository>());
+        services.AddScoped<IQuerierAsync<ProfessorClassRelationDTO, ProfessorClassRelationCriteriaDTO>>(sp => sp.GetRequiredService<ProfessorPerClassEntityFrameworkRepository>());
 
         return services;
     }

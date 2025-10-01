@@ -6,19 +6,9 @@ namespace EduZasAPI.Infraestructure.MinimalAPI.Application.Classes;
 public class NewClassMAPI
 {
     /// <summary>
-    /// Obtiene o establece el identificador único de la clase.
-    /// </summary>
-    public required string Id { get; set; }
-
-    /// <summary>
     /// Obtiene o establece el nombre de la clase.
     /// </summary>
     public required string ClassName { get; set; }
-
-    /// <summary>
-    /// Obtiene o establece el identificador del propietario o profesor de la clase.
-    /// </summary>
-    public required ulong OwnerId { get; set; }
 
     /// <summary>
     /// Obtiene o establece la materia o asignatura de la clase (opcional).

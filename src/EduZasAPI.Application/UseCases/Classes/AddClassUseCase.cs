@@ -32,15 +32,6 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
 
     protected ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO> _professorRelationCreator;
 
-    /// <summary>
-    /// Configuración para la generación de cadenas aleatorias.
-    /// </summary>
-    protected RandomStringGeneratorArgs _cfg = new RandomStringGeneratorArgs
-    {
-        MaxStrLenght = 15,
-        AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray()
-    };
-
     protected List<UserType> _allowedRoles = new List<UserType>() { UserType.PROFESSOR, UserType.ADMIN };
 
     /// <summary>
