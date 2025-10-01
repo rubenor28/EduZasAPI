@@ -30,8 +30,6 @@ public partial class Class : ISoftDeletableEF
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
-    public virtual User Owner { get; set; } = null!;
-
     public virtual ICollection<TestPerClass> TestsPerClasses { get; set; } = new List<TestPerClass>();
 
     public virtual ICollection<User> Professors { get; set; } = new List<User>();

@@ -37,8 +37,6 @@ public partial class User : ISoftDeletableEF
 
     public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
 
-    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
-
     public virtual ICollection<NotificationPerUser> NotificationPerUsers { get; set; } = new List<NotificationPerUser>();
 
     public virtual ICollection<Resource> Resources { get; set; } = new List<Resource>();
