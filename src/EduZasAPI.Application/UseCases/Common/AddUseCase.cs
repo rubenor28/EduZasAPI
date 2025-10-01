@@ -66,6 +66,10 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(request);
         var newRecord = await _creator.AddAsync(formatted);
+
+        ExtraTask(formatted, newRecord);
+        await ExtraTaskAsync(formatted, newRecord);
+
         return Result<E, List<FieldErrorDTO>>.Ok(newRecord);
     }
 
@@ -80,13 +84,12 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     protected virtual NE PreValidationFormat(NE value) => value;
 
     /// <summary>
-    /// Aplica formato a los datos despues de la validación principal de forma
-    /// asíncrona.
+    /// Aplica formato a los datos después de la validación principal de forma asíncrona.
     /// </summary>
     /// <param name="value">Datos a formatear.</param>
     /// <returns>Datos formateados.</returns>
     /// <remarks>
-    /// Este método puede ser sobrescrito para aplicar transformaciones iniciales a los datos.
+    /// Este método puede ser sobrescrito para aplicar transformaciones que requieren operaciones asíncronas.
     /// </remarks>
     protected virtual Task<NE> PostValidationFormatAsync(NE value) => Task.FromResult(value);
 
@@ -123,4 +126,25 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     /// </remarks>
     protected virtual Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(NE value) =>
         Task.FromResult(Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value));
+
+    /// <summary>
+    /// Ejecuta tareas adicionales síncronas después de crear la entidad.
+    /// </summary>
+    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="createdEntity">Entidad creada en el sistema.</param>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
+    /// </remarks>
+    protected virtual void ExtraTask(NE newEntity, E createdEntity) { }
+
+    /// <summary>
+    /// Ejecuta tareas adicionales asíncronas después de crear la entidad.
+    /// </summary>
+    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="createdEntity">Entidad creada en el sistema.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
+    /// </remarks>
+    protected virtual Task ExtraTaskAsync(NE newEntity, E createdEntity) => Task.FromResult(Unit.Value);
 }

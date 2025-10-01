@@ -30,6 +30,8 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
     /// </summary>
     protected IReaderAsync<ulong, UserDomain> _usrReader;
 
+    protected ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO> _professorRelationCreator;
+
     /// <summary>
     /// Configuración para la generación de cadenas aleatorias.
     /// </summary>
@@ -38,6 +40,8 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
         MaxStrLenght = 15,
         AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray()
     };
+
+    protected List<UserType> _allowedRoles = new List<UserType>() { UserType.PROFESSOR, UserType.ADMIN };
 
     /// <summary>
     /// Inicializa una nueva instancia de la clase <see cref="AddClassUseCase"/>.
@@ -52,12 +56,40 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
       IBusinessValidationService<NewClassDTO> validator,
       IReaderAsync<ulong, UserDomain> userReader,
       IReaderAsync<string, ClassDomain> reader,
-      IRandomStringGeneratorService idGenerator
+      IRandomStringGeneratorService idGenerator,
+      ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO> professorRelationCreator
     ) : base(creator, validator)
     {
         _reader = reader;
         _usrReader = userReader;
         _idGenerator = idGenerator;
+        _professorRelationCreator = professorRelationCreator;
+    }
+
+    protected async override Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(NewClassDTO value)
+    {
+        var errors = new List<FieldErrorDTO>();
+        var usrSearch = await _usrReader.GetAsync(value.OwnerId);
+
+        usrSearch.IfNone(() => errors.Add(new FieldErrorDTO
+        {
+            Field = "ownerId",
+            Message = "No se encontró el usuario"
+        }));
+
+        usrSearch.IfSome(usr =>
+        {
+            if (!_allowedRoles.Contains(usr.Role))
+                errors.Add(new FieldErrorDTO
+                {
+                    Field = "ownerId",
+                    Message = "No tiene los permisos apropiados"
+                });
+        });
+
+        if (errors.Count > 0) return Result.Err(errors);
+
+        return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
     }
 
     /// <summary>
@@ -86,5 +118,20 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
         }
 
         throw new InvalidOperationException($"No se pudo generar un identificador único después de {maxIdGenerationTries} intentos. Es posible que se hayan agotado las combinaciones disponibles.");
+    }
+
+    /// <summary>
+    /// Crea la relación profesor - clase asignando por defecto al 
+    /// al profesor como dueño
+    /// </summary>
+    /// <param name="newEntity">DTO con el ID del profesor</param>
+    /// <param name="createdEntity">Clase creada con ID generado </param>
+    protected async override Task ExtraTaskAsync(NewClassDTO newEntity, ClassDomain createdEntity)
+    {
+        await _professorRelationCreator.AddAsync(new ProfessorClassRelationDTO
+        {
+            Id = new ClassUserRelationIdDTO { UserId = newEntity.OwnerId, ClassId = createdEntity.Id },
+            IsOwner = true
+        });
     }
 }
