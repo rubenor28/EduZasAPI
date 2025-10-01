@@ -59,12 +59,12 @@ public static class AuthRoutes
     /// <param name="useCase">Caso de uso para registrar al usuario.</param>
     /// <param name="utils">Utilidad para manejar respuestas y excepciones.</param>
     /// <returns>Un <see cref="IResult"/> con el resultado de la operación.</returns>
-    public async static Task<IResult> AddUser(
+    public static Task<IResult> AddUser(
         NewUserMAPI newUser,
         AddUserUseCase useCase,
         RoutesUtils utils)
     {
-        return await utils.HandleResponseAsync(async () =>
+        return utils.HandleResponseAsync(async () =>
         {
             var newUsr = NewUserMAPIMapper.ToDomain(newUser);
             var validation = await useCase.ExecuteAsync(newUsr);
