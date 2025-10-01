@@ -88,6 +88,7 @@ public class LoginUseCase : IUseCaseAsync<UserCredentialsDTO, Result<UserDomain,
         }
 
         var usr = userSearch.Results[0];
+
         var pwdMatch = _hasher.Matches(credentials.Password, usr.Password);
 
         if (!pwdMatch)

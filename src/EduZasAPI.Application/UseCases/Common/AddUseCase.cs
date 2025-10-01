@@ -64,7 +64,7 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
             return Result<E, List<FieldErrorDTO>>.Err(asyncCheck.UnwrapErr());
 
         formatted = PostValidationFormat(formatted);
-        formatted = await PostValidationFormatAsync(request);
+        formatted = await PostValidationFormatAsync(formatted);
         var newRecord = await _creator.AddAsync(formatted);
 
         ExtraTask(formatted, newRecord);
