@@ -66,7 +66,7 @@ public static class AuthRoutes
     {
         return utils.HandleResponseAsync(async () =>
         {
-            var newUsr = NewUserMAPIMapper.ToDomain(newUser);
+            var newUsr = UserMAPIMapper.ToDomain(newUser);
             var validation = await useCase.ExecuteAsync(newUsr);
 
             if (validation.IsErr)
@@ -77,7 +77,7 @@ public static class AuthRoutes
             }
 
             var newRecord = validation.Unwrap();
-            var publicUser = PublicUserMAPIMapper.FromDomain(newRecord);
+            var publicUser = UserMAPIMapper.FromDomain(newRecord);
 
             return Results.Created($"/users/{publicUser.Id}", publicUser);
         });
@@ -138,7 +138,7 @@ public static class AuthRoutes
 
             httpContext.Response.Cookies.Append("AuthToken", token, cookieOpts);
 
-            var publicUser = PublicUserMAPIMapper.FromDomain(user.ToPublicUserDTO());
+            var publicUser = UserMAPIMapper.FromDomain(user.ToPublicUserDTO());
             return Results.Ok(publicUser);
         });
     }
@@ -172,7 +172,7 @@ public static class AuthRoutes
 
         if (usrSearch.IsNone) return Results.Problem("Error al procesar al usuario");
 
-        var usr = PublicUserMAPIMapper.FromDomain(usrSearch.Unwrap());
+        var usr = UserMAPIMapper.FromDomain(usrSearch.Unwrap());
 
         return Results.Ok(new WithDataResponse<PublicUserMAPI>
         {
