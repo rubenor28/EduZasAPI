@@ -38,11 +38,6 @@ public class ClassDomain : IIdentifiable<string>, ISoftDeletable
     public required Optional<string> Section { get; set; }
 
     /// <summary>
-    /// Obtiene o establece el identificador del propietario o creador de la clase.
-    /// </summary>
-    public required ulong OwnerId { get; set; }
-
-    /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la clase.
     /// </summary>
     public required DateTime CreatedAt { get; set; }

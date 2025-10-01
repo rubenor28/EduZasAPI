@@ -9,6 +9,8 @@ public partial class ClassProfessor
 
     public ulong ProfessorId { get; set; }
 
+    public bool? IsOwner {get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public virtual Class Class { get; set; } = null!;

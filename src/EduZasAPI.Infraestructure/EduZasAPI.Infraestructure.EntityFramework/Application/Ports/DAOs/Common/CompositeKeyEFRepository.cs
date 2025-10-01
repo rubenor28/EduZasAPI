@@ -17,12 +17,11 @@ where TEF : class
     public async Task<E> UpdateAsync(E updateData)
     {
         var id = GetId(updateData);
-        var tracked = await GetTrackedById(id);
+        var tracked = await GetByIdTracked(id);
         if (tracked == null) throw new ArgumentException($"Entity with id {id} not found");
 
         UpdateProperties(tracked, updateData);
 
-        DbSet.Update(tracked);
         await _ctx.SaveChangesAsync();
         return MapToDomain(tracked);
     }
@@ -30,7 +29,7 @@ where TEF : class
     /// <inheritdoc/>
     public async Task<Optional<E>> GetAsync(I id)
     {
-        var record = await GetTrackedById(id);
+        var record = await GetById(id);
         if (record is null) return Optional<E>.None();
         return Optional<E>.Some(MapToDomain(record));
     }
@@ -38,7 +37,7 @@ where TEF : class
     /// <inheritdoc/>
     public async Task<Optional<E>> DeleteAsync(I id)
     {
-        var record = await GetTrackedById(id);
+        var record = await GetByIdTracked(id);
         if (record is null) return Optional<E>.None();
 
         DbSet.Remove(record);
@@ -48,9 +47,9 @@ where TEF : class
 
     protected abstract I GetId(E entity);
 
-    protected abstract TEF NewRelationEntityToEF(E newEntity);
+    protected abstract Task<TEF?> GetById(I id);
 
-    protected abstract Task<TEF> GetTrackedById(I id);
+    protected abstract Task<TEF?> GetByIdTracked(I id);
 
     protected abstract void UpdateProperties(TEF entity, E updateProperties);
 

@@ -86,8 +86,6 @@ public partial class EduZasDotnetContext : DbContext
                 .ToTable("classes")
                 .UseCollation("utf8mb4_unicode_ci");
 
-            entity.HasIndex(e => e.OwnerId, "owner_id");
-
             entity.Property(e => e.ClassId)
                 .HasMaxLength(15)
                 .HasColumnName("class_id");
@@ -107,19 +105,12 @@ public partial class EduZasDotnetContext : DbContext
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime")
                 .HasColumnName("modified_at");
-            entity.Property(e => e.OwnerId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("owner_id");
             entity.Property(e => e.Section)
                 .HasMaxLength(100)
                 .HasColumnName("section");
             entity.Property(e => e.Subject)
                 .HasMaxLength(100)
                 .HasColumnName("subject");
-
-            entity.HasOne(d => d.Owner).WithMany(p => p.Classes)
-                .HasForeignKey(d => d.OwnerId)
-                .HasConstraintName("classes_ibfk_1");
 
             entity.HasMany(d => d.Professors).WithMany(p => p.ClassesNavigation)
                 .UsingEntity<Dictionary<string, object>>(
@@ -166,6 +157,10 @@ public partial class EduZasDotnetContext : DbContext
             entity.Property(e => e.ProfessorId)
                 .HasColumnType("bigint(20) unsigned")
                 .HasColumnName("professor_id");
+            entity.Property(e => e.IsOwner)
+                .IsRequired()
+                .HasDefaultValue(false)
+                .HasColumnName("is_owner");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime")

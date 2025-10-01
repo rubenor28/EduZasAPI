@@ -22,7 +22,6 @@ public class ClassEntityFrameworkRepository :
     {
         ClassId = nc.Id,
         ClassName = nc.ClassName,
-        OwnerId = nc.OwnerId,
         Section = nc.Section.ToNullable(),
         Subject = nc.Subject.ToNullable()
     };
@@ -45,7 +44,6 @@ public class ClassEntityFrameworkRepository :
         ClassName = ef.ClassName,
         Subject = ef.Subject.ToOptional(),
         Section = ef.Section.ToOptional(),
-        OwnerId = ef.OwnerId,
         CreatedAt = ef.CreatedAt,
         ModifiedAt = ef.ModifiedAt
     };
@@ -57,7 +55,6 @@ public class ClassEntityFrameworkRepository :
         .WhereStringQuery(cr.Subject, c => c.Subject)
         .WhereStringQuery(cr.Section, c => c.Section)
         .WhereStringQuery(cr.ClassName, c => c.ClassName)
-        .WhereOptional(cr.OwnerId, id => c => c.OwnerId == id)
         .WhereOptional(cr.Active, activity => c => c.Active == activity)
         .WhereOptional(cr.WithStudent, stId => c => c.ClassStudents.Any(cs => cs.StudentId == stId))
         .WhereOptional(cr.WithProfessor, pfId => c => c.ClassProfessors.Any(cpf => cpf.ProfessorId == pfId));

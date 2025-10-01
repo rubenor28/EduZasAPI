@@ -26,9 +26,4 @@ public class NewClassDTO
     /// Obtiene o establece la sección o grupo de la clase (opcional).
     /// </summary>
     public required Optional<string> Section { get; set; }
-
-    /// <summary>
-    /// Obtiene o establece el identificador del propietario o profesor de la clase.
-    /// </summary>
-    public required ulong OwnerId { get; set; }
 }

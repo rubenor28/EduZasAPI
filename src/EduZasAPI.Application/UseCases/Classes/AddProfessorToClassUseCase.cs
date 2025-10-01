@@ -62,8 +62,8 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
     protected async override Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(
         ProfessorClassRelationDTO value)
     {
-        var usrSearchTask = _usrReader.GetAsync(value.ProfessorId);
-        var classSearchTask = _classReader.GetAsync(value.ClassId);
+        var usrSearchTask = _usrReader.GetAsync(value.Id.UserId);
+        var classSearchTask = _classReader.GetAsync(value.Id.ClassId);
         var errors = new List<FieldErrorDTO>();
 
         if ((await classSearchTask).IsNone)

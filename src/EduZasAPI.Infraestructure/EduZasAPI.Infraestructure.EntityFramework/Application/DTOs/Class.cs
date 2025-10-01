@@ -20,8 +20,6 @@ public partial class Class : ISoftDeletableEF
 
     public string? Section { get; set; } = null!;
 
-    public ulong OwnerId { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public DateTime ModifiedAt { get; set; }
