@@ -11,7 +11,7 @@ API para gestión del sistema educativo EduZas
 
 ### Opción 2: Manual
 
-- **MySQL** ≥ 5.7.9 GA o **MariaDB** ≥ 10.4.3
+- **MariaDB** ≥ 12.0.2
 - **.NET 9.0 SDK**
 - **ASP.NET Core 9.0**
 
