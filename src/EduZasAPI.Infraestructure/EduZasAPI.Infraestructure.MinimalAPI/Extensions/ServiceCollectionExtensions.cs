@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
             .AddCorsConfig(configuration)
             .AddAuthSettings(configuration)
             .AddDatabaseServices(configuration)
-            .AddRepositories()
+            .AddRepositories(configuration)
             .AddValidators()
             .AddUseCases()
             .AddOtherInfrastructureServices()
