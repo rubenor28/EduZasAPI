@@ -5,8 +5,9 @@ WORKDIR /home/build
 
 # Copia el archivo de solución y restaura las dependencias de todos los proyectos
 COPY EduZasAPI.sln .
-COPY src/EduZasAPI.Application/EduZasAPI.Application.csproj src/EduZasAPI.Application/
 COPY src/EduZasAPI.Domain/EduZasAPI.Domain.csproj src/EduZasAPI.Domain/
+COPY src/EduZasAPI.Application/EduZasAPI.Application.csproj src/EduZasAPI.Application/
+COPY src/EduZasAPI.InterfaceAdapters/EduZasAPI.InterfaceAdapters.csproj src/EduZasAPI.InterfaceAdapters/
 COPY src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.BCrypt/EduZasAPI.Infraestructure.BCrypt.csproj src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.BCrypt/
 COPY src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.EntityFramework/EduZasAPI.Infraestructure.EntityFramework.csproj src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.EntityFramework/
 COPY src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.FluentValidation/EduZasAPI.Infraestructure.FluentValidation.csproj src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.FluentValidation/
