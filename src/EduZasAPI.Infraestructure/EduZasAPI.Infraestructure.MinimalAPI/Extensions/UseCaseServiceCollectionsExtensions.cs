@@ -1,4 +1,6 @@
 using EduZasAPI.Domain.Users;
+using EduZasAPI.Domain.Classes;
+using EduZasAPI.Application.Common;
 using EduZasAPI.Application.Auth;
 using EduZasAPI.Application.Classes;
 
@@ -23,6 +25,7 @@ public static class UseCaseServiceCollectionExtensions
 
         // Class use cases
         services.AddTransient<AddClassUseCase>();
+        services.AddTransient<QueryUseCase<ClassCriteriaDTO, ClassDomain>>();
 
         return services;
     }

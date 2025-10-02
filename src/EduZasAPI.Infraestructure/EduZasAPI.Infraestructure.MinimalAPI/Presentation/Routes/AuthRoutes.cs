@@ -163,12 +163,10 @@ public static class AuthRoutes
         return Results.Ok();
     }
 
-    public static async Task<IResult> UserData(HttpContext ctx, IReaderAsync<ulong, UserDomain> reader)
+    public static async Task<IResult> UserData(HttpContext ctx, RoutesUtils utils, IReaderAsync<ulong, UserDomain> reader)
     {
-        var userId = (string?)ctx.Items["UserId"];
-        if (userId is null) return Results.Problem("Error al procesar el usuario");
-
-        var usrSearch = await reader.GetAsync(ulong.Parse(userId));
+        var userId = utils.GetIdFromContext(ctx);
+        var usrSearch = await reader.GetAsync(userId);
 
         if (usrSearch.IsNone) return Results.Problem("Error al procesar al usuario");
 
