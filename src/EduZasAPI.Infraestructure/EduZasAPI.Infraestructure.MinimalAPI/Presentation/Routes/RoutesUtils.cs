@@ -53,4 +53,11 @@ public class RoutesUtils
             return Task.FromResult(Results.InternalServerError());
         }
     }
+
+    public ulong GetIdFromContext(HttpContext ctx)
+    {
+        var userId = (string?)ctx.Items["UserId"];
+        if (userId is null) throw new InvalidDataException("Error al procesar el usuario");
+        return ulong.Parse(userId);
+    }
 }
