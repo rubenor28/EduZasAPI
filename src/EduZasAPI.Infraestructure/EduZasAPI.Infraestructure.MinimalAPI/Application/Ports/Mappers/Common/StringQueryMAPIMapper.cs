@@ -20,7 +20,7 @@ public static class StringQueryMAPIMapper
     {
         var type = StringSearchMapper.FromString(source.SearchType);
 
-        if (type.IsNone)
+        if (type.IsErr)
             return Result<StringQueryDTO, Unit>.Err(Unit.Value);
 
         return Result.Ok(new StringQueryDTO
@@ -28,6 +28,20 @@ public static class StringQueryMAPIMapper
             SearchType = type.Unwrap(),
             Text = source.Text
         });
+    }
+
+    public static StringQueryMAPI FromDomain(this StringQueryDTO source) => new StringQueryMAPI
+    {
+        SearchType = source.SearchType.ToString(),
+        Text = source.Text
+    };
+
+    public static StringQueryMAPI? FromDomain(this Optional<StringQueryDTO> source)
+    {
+        if (source.IsNone) return null;
+
+        var value = source.Unwrap();
+        return value.FromDomain();
     }
 
     /// <summary>
@@ -38,16 +52,16 @@ public static class StringQueryMAPIMapper
     /// Un <see cref="Result{T, E}"/> que contiene un <see cref="Optional{StringQueryDTO}"/> si la conversión es exitosa,
     /// o un error <see cref="Unit"/> si la instancia es nula.
     /// </returns>
-    public static Result<Optional<StringQueryDTO>, Unit> ToOptionalDomain(this StringQueryMAPI? source)
+    public static Result<Optional<StringQueryDTO>, Unit> ToOptional(this StringQueryMAPI? source)
     {
-        if (source is null)
-            return Result<Optional<StringQueryDTO>, Unit>.Err(Unit.Value);
+        if (source is null) return Result.Ok(Optional<StringQueryDTO>.None());
 
         var result = source?.ToDomain();
-        return Result.Ok(result!.Match(
-          ok => Optional.Some(ok),
-          err => Optional<StringQueryDTO>.None()
-        ));
+        if (result!.IsErr) return Result<Optional<StringQueryDTO>, Unit>.Err(Unit.Value);
+
+
+        var value = result.Unwrap();
+        return Result.Ok(Optional.Some(value));
     }
 
 
@@ -65,8 +79,14 @@ public static class StringQueryMAPIMapper
         Optional<StringQueryDTO> resultRef,
         List<FieldErrorDTO> errListRef)
     {
+        if (value is null)
+        {
+            resultRef = Optional<StringQueryDTO>.None();
+            return;
+        }
+
         StringQueryMAPIMapper
-          .ToOptionalDomain(value)
+          .ToOptional(value)
           .Match(
             strQuery => resultRef = strQuery,
             _ => errListRef.Add(new FieldErrorDTO

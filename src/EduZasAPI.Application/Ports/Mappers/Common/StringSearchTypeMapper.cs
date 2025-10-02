@@ -12,14 +12,14 @@ public static class StringSearchMapper
     /// Convierte un <see cref="StringSearchType"/> a su representación en entero.
     /// </summary>
     /// <param name="value">Valor de <see cref="StringSearchType"/>.</param>
-    /// <returns>Un <see cref="Optional{Int32}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<int> ToInt(this StringSearchType value)
+    /// <returns>Un <see cref="Result{Int32, Unit}"/> con el valor correspondiente, o error si no es válido.</returns>
+    public static Result<int, Unit> ToInt(this StringSearchType value)
     {
         return value switch
         {
-            StringSearchType.EQ => Optional<int>.Some(0),
-            StringSearchType.LIKE => Optional<int>.Some(1),
-            _ => Optional<int>.None(),
+            StringSearchType.EQ => Result.Ok(0),
+            StringSearchType.LIKE => Result.Ok(1),
+            _ => Result<int, Unit>.Err(Unit.Value),
         };
     }
 
@@ -28,11 +28,11 @@ public static class StringSearchMapper
     /// </summary>
     /// <param name="value">Valor en string a convertir.</param>
     /// <returns>Un <see cref="Optional{StringSearchType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<StringSearchType> FromString(string value) => value switch
+    public static Result<StringSearchType, Unit> FromString(string value) => value switch
     {
-        "EQUALS" => Optional<StringSearchType>.Some(StringSearchType.EQ),
-        "LIKE" => Optional<StringSearchType>.Some(StringSearchType.LIKE),
-        _ => Optional<StringSearchType>.None(),
+        "EQUALS" => Result.Ok(StringSearchType.EQ),
+        "LIKE" => Result.Ok(StringSearchType.LIKE),
+        _ => Result<StringSearchType, Unit>.Err(Unit.Value),
     };
 
     /// <summary>
@@ -40,10 +40,10 @@ public static class StringSearchMapper
     /// </summary>
     /// <param name="value">Valor entero a convertir.</param>
     /// <returns>Un <see cref="Optional{StringSearchType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<StringSearchType> FromInt(int value) => value switch
+    public static Result<StringSearchType, Unit> FromInt(int value) => value switch
     {
-        0 => Optional<StringSearchType>.Some(StringSearchType.EQ),
-        1 => Optional<StringSearchType>.Some(StringSearchType.LIKE),
-        _ => Optional<StringSearchType>.None(),
+        0 => Result.Ok(StringSearchType.EQ),
+        1 => Result.Ok(StringSearchType.LIKE),
+        _ => Result<StringSearchType, Unit>.Err(Unit.Value),
     };
 }
