@@ -1,3 +1,7 @@
+using EduZasAPI.Domain.Common;
+using EduZasAPI.Application.Common;
+using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
+
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 /// <summary>
@@ -59,5 +63,17 @@ public class RoutesUtils
         var userId = (string?)ctx.Items["UserId"];
         if (userId is null) throw new InvalidDataException("Error al procesar el usuario");
         return ulong.Parse(userId);
+    }
+
+    public IResult FieldErrorToBadRequest(List<FieldErrorDTO> errors)
+    {
+        var response = new FieldErrorResponse { Message = "Formato inválido", Errors = errors };
+        return Results.BadRequest(response);
+    }
+
+    public IResult FieldErrorToBadRequest<T>(Result<T, List<FieldErrorDTO>> validation) where T : notnull
+    {
+        var errors = validation.UnwrapErr();
+        return FieldErrorToBadRequest(errors);
     }
 }

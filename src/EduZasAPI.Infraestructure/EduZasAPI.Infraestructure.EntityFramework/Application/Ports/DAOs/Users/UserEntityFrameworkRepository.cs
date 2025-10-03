@@ -31,7 +31,8 @@ public class UserEntityFrameworkRepository :
         .WhereStringQuery(c.MotherLastname, u => u.MotherLastname)
         .WhereStringQuery(c.Email, u => u.Email)
         .WhereOptional(c.EnrolledInClass, cId => u => u.ClassStudents.Any(cs => cs.ClassId == cId))
-        .WhereOptional(c.TeachingInClass, cId => u => u.ClassProfessors.Any(cpf => cpf.ClassId == cId));
+        .WhereOptional(c.TeachingInClass, cId => u => u.ClassProfessors.Any(cpf => cpf.ClassId == cId))
+        .OrderBy(u => u.UserId);
 
     /// <inheritdoc/>
     protected override UserDomain MapToDomain(User efEntity) => new UserDomain

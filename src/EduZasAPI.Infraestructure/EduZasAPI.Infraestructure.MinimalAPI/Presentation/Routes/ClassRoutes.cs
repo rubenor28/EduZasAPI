@@ -17,12 +17,23 @@ public static class ClassRoutes
         app.MapPost("/classes", AddClass)
           .WithName("Crear clases")
           .RequireAuthorization("ProfessorOrAdmin")
-          .AddEndpointFilter<UserIdFilter>();
+          .AddEndpointFilter<UserIdFilter>()
+          .Produces<PublicClassMAPI>(StatusCodes.Status201Created)
+          .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
 
-        app.MapPost("/classes/me", ProfessorClasses)
+        app.MapPost("/classes/assigned", ProfessorClasses)
           .WithName("Obtener clases por profesor")
           .RequireAuthorization("ProfessorOrAdmin")
-          .AddEndpointFilter<UserIdFilter>();
+          .AddEndpointFilter<UserIdFilter>()
+          .Produces<PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+          .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
+
+        app.MapPost("/classes/enrolled", EnrolledClasses)
+          .WithName("Obtener clases inscritas")
+          .RequireAuthorization("RequireAuthenticated")
+          .AddEndpointFilter<UserIdFilter>()
+          .Produces<PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+          .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
 
         return group;
     }
@@ -36,16 +47,10 @@ public static class ClassRoutes
         return utils.HandleResponseAsync(async () =>
         {
             var userId = utils.GetIdFromContext(ctx);
-
             var newC = ClassMAPIMapper.ToDomain(newClass, userId);
-            var validation = await useCase.ExecuteAsync(newC);
 
-            if (validation.IsErr)
-            {
-                var errs = validation.UnwrapErr();
-                var response = new FieldErrorResponse { Message = "Formato inválido", Errors = errs };
-                return Results.BadRequest(response);
-            }
+            var validation = await useCase.ExecuteAsync(newC);
+            if (validation.IsErr) return utils.FieldErrorToBadRequest(validation);
 
             var newRecord = validation.Unwrap();
             var publicRecord = ClassMAPIMapper.FromDomain(newRecord);
@@ -66,12 +71,26 @@ public static class ClassRoutes
             criteria.WithProfessor = userId;
 
             var validation = criteria.ToDomain();
-            if (validation.IsErr)
-            {
-                var errs = validation.UnwrapErr();
-                var response = new FieldErrorResponse { Message = "Formato inválido", Errors = errs };
-                return Results.BadRequest(response);
-            }
+            if (validation.IsErr) return utils.FieldErrorToBadRequest(validation);
+
+            var result = await useCase.ExecuteAsync(validation.Unwrap());
+            return Results.Ok(result.FromDomain());
+        });
+    }
+
+    public static Task<IResult> EnrolledClasses(
+        ClassCriteriaMAPI criteria,
+        HttpContext ctx,
+        RoutesUtils utils,
+        QueryUseCase<ClassCriteriaDTO, ClassDomain> useCase)
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var userId = utils.GetIdFromContext(ctx);
+            criteria.WithStudent = userId;
+
+            var validation = criteria.ToDomain();
+            if (validation.IsErr) return utils.FieldErrorToBadRequest(validation);
 
             var result = await useCase.ExecuteAsync(validation.Unwrap());
             return Results.Ok(result.FromDomain());
