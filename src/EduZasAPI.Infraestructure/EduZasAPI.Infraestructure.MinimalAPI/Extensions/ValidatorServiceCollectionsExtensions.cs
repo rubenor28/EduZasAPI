@@ -39,6 +39,7 @@ public static class ValidatorServiceCollectionExtensions
 
         // Class validators 
         services.AddSingleton<IBusinessValidationService<NewClassDTO>, NewClassFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<ClassUpdateDTO>, ClassUpdateFluentValidator>();
 
         return services;
     }
