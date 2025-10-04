@@ -66,13 +66,14 @@ public static class ClassMAPIMapper
     /// </summary>
     /// <param name="source">Instancia de <see cref="ClassUpdateMAPI"/> a convertir.</param>
     /// <returns>Un <see cref="ClassUpdateDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ClassUpdateDTO ToDomain(this ClassUpdateMAPI source) => new ClassUpdateDTO
+    public static ClassUpdateDTO ToDomain(this ClassUpdateMAPI source, ulong professorId) => new ClassUpdateDTO
     {
         Id = source.Id,
         Active = source.Active,
         ClassName = source.ClassName,
         Section = source.Section.ToOptional(),
-        Subject = source.Subject.ToOptional()
+        Subject = source.Subject.ToOptional(),
+        Professor = professorId
     };
 
     /// <summary>
