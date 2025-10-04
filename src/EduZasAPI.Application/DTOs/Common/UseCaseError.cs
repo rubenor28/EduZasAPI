@@ -16,6 +16,7 @@ public class UseCaseError
     /// Instancia única y privada del error de tipo Unauthorized para ser reutilizada (Patrón Singleton).
     /// </summary>
     private static readonly Unauthorized _unauthorized = new();
+    private static readonly NotFound _notFound = new();
 
     /// <summary>
     /// Crea un error que representa una validación de entrada de datos fallida.
@@ -29,6 +30,11 @@ public class UseCaseError
     /// </summary>
     /// <returns>La instancia singleton del error de tipo <see cref="Unauthorized"/>.</returns>
     public static UseCaseErrorImpl UnauthorizedError() => _unauthorized;
+
+    /// <summary>
+    /// Devuelve una instancia única del error de tipo <see cref="NotFound"/>
+    /// </summary>
+    public static UseCaseErrorImpl NotFound() => _notFound;
 }
 
 /// <summary>
@@ -41,3 +47,8 @@ public record Input(List<FieldErrorDTO> errors) : UseCaseErrorImpl;
 /// Representa un error ocurrido porque el usuario no tiene los permisos necesarios para realizar una operación.
 /// </summary>
 public record Unauthorized() : UseCaseErrorImpl;
+
+/// <summary>
+/// Representa un error ocurrido cuando no se encuentra un recurso.
+/// </summary>
+public record NotFound() : UseCaseErrorImpl;

@@ -26,7 +26,7 @@ public class ClassUpdateDTO
     /// <summary>
     /// Profesor que ejecuta la acción de actualización
     /// </summary>
-    public required ulong Professor { get; set; }
+    public required ulong UserId { get; set; }
 
     /// <summary>
     /// Obtiene o establece la materia o asignatura de la clase (opcional).

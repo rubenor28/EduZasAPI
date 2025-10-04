@@ -1,4 +1,5 @@
 using EduZasAPI.Domain.Common;
+using EduZasAPI.Domain.Users;
 using EduZasAPI.Domain.Classes;
 using EduZasAPI.Application.Common;
 
@@ -10,6 +11,8 @@ namespace EduZasAPI.Application.Classes;
 public class UpdateClassUseCase : UpdateUseCase<ClassUpdateDTO, ClassDomain>
 {
     private readonly IQuerierAsync<ProfessorClassRelationDTO, ProfessorClassRelationCriteriaDTO> _professorClassQuerier;
+    private readonly IReaderAsync<string, ClassDomain> _classReader;
+    private readonly IReaderAsync<ulong, UserDomain> _userReader;
 
     /// <summary>
     /// Inicializa una nueva instancia de la clase <see cref="UpdateClassUseCase"/>.
@@ -20,10 +23,14 @@ public class UpdateClassUseCase : UpdateUseCase<ClassUpdateDTO, ClassDomain>
     public UpdateClassUseCase(
         IUpdaterAsync<ClassDomain, ClassUpdateDTO> updater,
         IBusinessValidationService<ClassUpdateDTO> validator,
+        IReaderAsync<string, ClassDomain> classReader,
+        IReaderAsync<ulong, UserDomain> userReader,
         IQuerierAsync<ProfessorClassRelationDTO, ProfessorClassRelationCriteriaDTO> professorClassQuerier) :
       base(updater, validator)
     {
         _professorClassQuerier = professorClassQuerier;
+        _classReader = classReader;
+        _userReader = userReader;
     }
 
     /// <summary>
@@ -33,15 +40,27 @@ public class UpdateClassUseCase : UpdateUseCase<ClassUpdateDTO, ClassDomain>
     /// <returns>Un resultado que indica si la validación fue exitosa o no.</returns>
     protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(ClassUpdateDTO value)
     {
-        var result = await _professorClassQuerier.GetByAsync(new ProfessorClassRelationCriteriaDTO
-        {
-            Page = 1,
-            UserId = Optional<ulong>.Some(value.Professor),
-            ClassId = value.Id.ToOptional(),
-        });
+        var classToUpdate = await _classReader.GetAsync(value.Id);
+        if (classToUpdate.IsNone)
+            return Result.Err(UseCaseError.NotFound());
 
-        if (result.Results.Count == 0 || !result.Results[0].IsOwner)
-            return Result.Err(UseCaseError.UnauthorizedError());
+        var userSearch = await _userReader.GetAsync(value.UserId);
+        if (userSearch.IsNone) return Result.Err(UseCaseError.NotFound());
+
+        var user = userSearch.Unwrap();
+
+        if (user.Role != UserType.ADMIN)
+        {
+            var result = await _professorClassQuerier.GetByAsync(new ProfessorClassRelationCriteriaDTO
+            {
+                Page = 1,
+                UserId = Optional<ulong>.Some(value.UserId),
+                ClassId = value.Id.ToOptional(),
+            });
+
+            if (result.Results.Count == 0 || !result.Results[0].IsOwner)
+                return Result.Err(UseCaseError.UnauthorizedError());
+        }
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }
