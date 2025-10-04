@@ -21,6 +21,14 @@ public static class ClassRoutes
           .Produces<PublicClassMAPI>(StatusCodes.Status201Created)
           .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
 
+        app.MapPut("/classes", UpdateClass)
+          .WithName("Actualizar clases")
+          .RequireAuthorization("ProfessorOrAdmin")
+          .AddEndpointFilter<UserIdFilter>()
+          .Produces<PublicClassMAPI>(StatusCodes.Status200OK)
+          .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+          .Produces(StatusCodes.Status403Forbidden);
+
         app.MapPost("/classes/assigned", ProfessorClasses)
           .WithName("Obtener clases por profesor")
           .RequireAuthorization("ProfessorOrAdmin")
@@ -50,7 +58,8 @@ public static class ClassRoutes
             var newC = ClassMAPIMapper.ToDomain(newClass, userId);
 
             var validation = await useCase.ExecuteAsync(newC);
-            if (validation.IsErr) return utils.FieldErrorToBadRequest(validation);
+            if (validation.IsErr)
+                return validation.UnwrapErr().FromDomain();
 
             var newRecord = validation.Unwrap();
             var publicRecord = ClassMAPIMapper.FromDomain(newRecord);
@@ -59,6 +68,9 @@ public static class ClassRoutes
         });
     }
 
+    // TODO: Buscar por qué me agrega active: false en el criterio
+    // que indica como respuesta a pesar de no colocar ese criterio
+    // en la búsqueda
     public static Task<IResult> ProfessorClasses(
         ClassCriteriaMAPI criteria,
         HttpContext ctx,
@@ -94,6 +106,27 @@ public static class ClassRoutes
 
             var result = await useCase.ExecuteAsync(validation.Unwrap());
             return Results.Ok(result.FromDomain());
+        });
+    }
+
+    public static Task<IResult> UpdateClass(
+      ClassUpdateMAPI data,
+      HttpContext ctx,
+      RoutesUtils utils,
+      UpdateClassUseCase useCase)
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var professorId = utils.GetIdFromContext(ctx);
+            var classUpdate = ClassMAPIMapper.ToDomain(data, professorId);
+            var validation = await useCase.ExecuteAsync(classUpdate);
+
+            if (validation.IsErr)
+                return validation.UnwrapErr().FromDomain();
+
+            var updated = validation.Unwrap();
+            return Results.Ok(updated.FromDomain());
+
         });
     }
 }

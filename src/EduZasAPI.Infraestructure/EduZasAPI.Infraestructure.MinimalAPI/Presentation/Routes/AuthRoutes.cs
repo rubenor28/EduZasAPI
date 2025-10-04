@@ -70,11 +70,8 @@ public static class AuthRoutes
             var validation = await useCase.ExecuteAsync(newUsr);
 
             if (validation.IsErr)
-            {
-                var errs = validation.UnwrapErr();
-                var response = new FieldErrorResponse { Message = "Formato inválido", Errors = errs };
-                return Results.BadRequest(response);
-            }
+                return validation.UnwrapErr().FromDomain();
+
 
             var newRecord = validation.Unwrap();
             var publicUser = UserMAPIMapper.FromDomain(newRecord);
