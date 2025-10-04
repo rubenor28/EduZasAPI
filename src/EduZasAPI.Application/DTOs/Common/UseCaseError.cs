@@ -3,6 +3,7 @@ namespace EduZasAPI.Application.Common;
 /// <summary>
 /// Representa el tipo base abstracto para un error de un caso de uso.
 /// Sirve como contrato común para los diferentes tipos de errores que una operación puede devolver.
+/// Las variantes se instancian mediante las fábricas estáticas en <see cref="UseCaseError"/>
 /// </summary>
 public abstract record UseCaseErrorImpl;
 

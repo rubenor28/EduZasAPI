@@ -11,7 +11,7 @@ namespace EduZasAPI.Application.Common;
 /// Esta clase proporciona una implementación base para casos de uso que crean nuevas entidades,
 /// incluyendo validación en múltiples etapas, formato de datos y extensibilidad mediante hooks.
 /// </remarks>
-public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>>>
+public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, UseCaseErrorImpl>>
     where NE : notnull
     where E : notnull
 {
@@ -44,7 +44,7 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     /// Una tarea que representa la operación asíncrona. El resultado contiene la entidad creada
     /// o una lista de errores de validación si el proceso falla.
     /// </returns>
-    public async virtual Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(NE request)
+    public async virtual Task<Result<E, UseCaseErrorImpl>> ExecuteAsync(NE request)
     {
         var formatted = PreValidationFormat(request);
 
@@ -52,16 +52,19 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
         {
             var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
-                return Result<E, List<FieldErrorDTO>>.Err(validation.UnwrapErr());
+            {
+                var err = UseCaseError.InputError(validation.UnwrapErr());
+                return Result<E, UseCaseErrorImpl>.Err(err);
+            }
         }
 
         var syncCheck = ExtraValidation(formatted);
         if (syncCheck.IsErr)
-            return Result<E, List<FieldErrorDTO>>.Err(syncCheck.UnwrapErr());
+            return Result<E, UseCaseErrorImpl>.Err(syncCheck.UnwrapErr());
 
         var asyncCheck = await ExtraValidationAsync(formatted);
         if (asyncCheck.IsErr)
-            return Result<E, List<FieldErrorDTO>>.Err(asyncCheck.UnwrapErr());
+            return Result<E, UseCaseErrorImpl>.Err(asyncCheck.UnwrapErr());
 
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(formatted);
@@ -70,7 +73,7 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
         ExtraTask(formatted, newRecord);
         await ExtraTaskAsync(formatted, newRecord);
 
-        return Result<E, List<FieldErrorDTO>>.Ok(newRecord);
+        return Result<E, UseCaseErrorImpl>.Ok(newRecord);
     }
 
     /// <summary>
@@ -112,8 +115,8 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     /// <remarks>
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
     /// </remarks>
-    protected virtual Result<Unit, List<FieldErrorDTO>> ExtraValidation(NE value) =>
-        Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+    protected virtual Result<Unit, UseCaseErrorImpl> ExtraValidation(NE value) =>
+        Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
 
     /// <summary>
     /// Realiza validaciones adicionales asíncronas.
@@ -124,8 +127,8 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, List<FieldErrorDTO>
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
     /// como verificaciones en base de datos o llamadas a servicios externos.
     /// </remarks>
-    protected virtual Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(NE value) =>
-        Task.FromResult(Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value));
+    protected virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(NE value) =>
+        Task.FromResult(Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value));
 
     /// <summary>
     /// Ejecuta tareas adicionales síncronas después de crear la entidad.

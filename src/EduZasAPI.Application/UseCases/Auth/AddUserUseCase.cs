@@ -58,7 +58,7 @@ public class AddUserUseCase : AddUseCase<NewUserDTO, UserDomain>
     /// Si encuentra exactamente un usuario con el mismo email, retorna un error de validación.
     /// Si encuentra más de uno, lanza una excepción indicando inconsistencia en los datos.
     /// </remarks>
-    protected override async Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(NewUserDTO usr)
+    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(NewUserDTO usr)
     {
         var errs = new List<FieldErrorDTO>();
 
@@ -78,10 +78,10 @@ public class AddUserUseCase : AddUseCase<NewUserDTO, UserDomain>
         {
             var error = new FieldErrorDTO { Field = "email", Message = "Email ya registrado" };
             errs.Add(error);
-            return Result.Err(errs);
+            return Result.Err(UseCaseError.InputError(errs));
         }
 
-        return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+        return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }
 
     protected override NewUserDTO PreValidationFormat(NewUserDTO value) => new NewUserDTO

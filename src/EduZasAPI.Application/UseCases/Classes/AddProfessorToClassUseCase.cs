@@ -10,7 +10,7 @@ namespace EduZasAPI.Application.Classes;
 /// que el usuario posea los permisos requeridos (Professor o Administrador).
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, Result<Unit, List<FieldErrorDTO>>>
+public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, ProfessorClassRelationDTO>
 {
     /// <summary>
     /// Lector asincrónico para acceder a los datos de dominio del usuario (<see cref="UserDomain"/>)
@@ -42,7 +42,7 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
     public AddProfessorToClassUseCase(
         IReaderAsync<ulong, UserDomain> userReader,
         IReaderAsync<string, ClassDomain> classReader,
-        ICreatorAsync<Result<Unit, List<FieldErrorDTO>>, ProfessorClassRelationDTO> creator) : base(creator)
+        ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO> creator) : base(creator)
     {
         _usrReader = userReader;
         _classReader = classReader;
@@ -59,7 +59,7 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
     /// Un <see cref="Result{TSuccess, TFailure}"/> que indica si la validación fue exitosa 
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
-    protected async override Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(
+    protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
         ProfessorClassRelationDTO value)
     {
         var usrSearchTask = _usrReader.GetAsync(value.Id.UserId);
@@ -76,7 +76,7 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
         }
 
         var usrSearch = await usrSearchTask;
-        
+
         usrSearch.IfSome(usr =>
         {
             if (!_admitedRoles.Contains(usr.Role))
@@ -95,8 +95,8 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
             Message = "Usuario no encontrado"
         }));
 
-        if (errors.Count > 0) return Result.Err(errors);
+        if (errors.Count > 0) return Result.Err(UseCaseError.InputError(errors));
 
-        return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+        return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }
 }

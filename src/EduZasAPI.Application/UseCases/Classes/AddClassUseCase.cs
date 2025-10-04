@@ -57,7 +57,7 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
         _professorRelationCreator = professorRelationCreator;
     }
 
-    protected async override Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(NewClassDTO value)
+    protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(NewClassDTO value)
     {
         var errors = new List<FieldErrorDTO>();
         var usrSearch = await _usrReader.GetAsync(value.OwnerId);
@@ -78,9 +78,9 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
                 });
         });
 
-        if (errors.Count > 0) return Result.Err(errors);
+        if (errors.Count > 0) return Result.Err(UseCaseError.InputError(errors));
 
-        return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+        return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }
 
     /// <summary>

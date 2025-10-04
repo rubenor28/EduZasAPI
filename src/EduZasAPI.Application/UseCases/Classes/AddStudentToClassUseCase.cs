@@ -9,7 +9,7 @@ namespace EduZasAPI.Application.Classes;
 /// Implementa el caso de uso para añadir un usuario a una clase.
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class AddStudentToClassUseCase : AddUseCase<StudentClassRelationDTO,StudentClassRelationDTO>
+public class AddStudentToClassUseCase : AddUseCase<StudentClassRelationDTO, StudentClassRelationDTO>
 {
     /// <summary>
     /// Lector asincrónico para acceder a los datos de dominio del usuario (<see cref="UserDomain"/>)
@@ -42,7 +42,7 @@ public class AddStudentToClassUseCase : AddUseCase<StudentClassRelationDTO,Stude
     /// Un <see cref="Result{TSuccess, TFailure}"/> que indica si la validación fue exitosa 
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
-    protected async override Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(
+    protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
         StudentClassRelationDTO value)
     {
         var usrSearchTask = _usrReader.GetAsync(value.Id.UserId);
@@ -66,8 +66,9 @@ public class AddStudentToClassUseCase : AddUseCase<StudentClassRelationDTO,Stude
             Message = "Usuario no encontrado"
         }));
 
-        if (errors.Count > 0) return Result.Err(errors);
+        if (errors.Count > 0)
+            return Result.Err(UseCaseError.InputError(errors));
 
-        return Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+        return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }
 }

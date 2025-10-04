@@ -1,4 +1,5 @@
 using EduZasAPI.Domain.Common;
+using EduZasAPI.Application.Common;
 
 namespace EduZasAPI.Application.Common;
 
@@ -46,7 +47,7 @@ public class UpdateUseCase<UE, E>
     /// Un <see cref="Result{T, E}"/> que contiene la entidad actualizada en caso de éxito,
     /// o una lista de <see cref="FieldErrorDTO"/> si las validaciones fallan.
     /// </returns>
-    public async Task<Result<E, List<FieldErrorDTO>>> ExecuteAsync(UE request)
+    public async Task<Result<E, UseCaseErrorImpl>> ExecuteAsync(UE request)
     {
         var formatted = PreValidationFormat(request);
 
@@ -54,16 +55,21 @@ public class UpdateUseCase<UE, E>
         {
             var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
-                return Result<E, List<FieldErrorDTO>>.Err(validation.UnwrapErr());
+            {
+                var err = UseCaseError.InputError(validation.UnwrapErr());
+                return Result<E, UseCaseErrorImpl>.Err(err);
+            }
         }
 
         var syncCheck = ExtraValidation(formatted);
         if (syncCheck.IsErr)
-            return Result<E, List<FieldErrorDTO>>.Err(syncCheck.UnwrapErr());
+            return Result<E, UseCaseErrorImpl>.Err(syncCheck.UnwrapErr());
+
 
         var asyncCheck = await ExtraValidationAsync(formatted);
         if (asyncCheck.IsErr)
-            return Result<E, List<FieldErrorDTO>>.Err(asyncCheck.UnwrapErr());
+            return Result<E, UseCaseErrorImpl>.Err(asyncCheck.UnwrapErr());
+
 
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(formatted);
@@ -72,7 +78,7 @@ public class UpdateUseCase<UE, E>
         ExtraTask(formatted, updatedRecord);
         await ExtraTaskAsync(formatted, updatedRecord);
 
-        return Result<E, List<FieldErrorDTO>>.Ok(updatedRecord);
+        return Result<E, UseCaseErrorImpl>.Ok(updatedRecord);
     }
 
     /// <summary>
@@ -114,8 +120,8 @@ public class UpdateUseCase<UE, E>
     /// <remarks>
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
     /// </remarks>
-    protected virtual Result<Unit, List<FieldErrorDTO>> ExtraValidation(UE value) =>
-        Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value);
+    protected virtual Result<Unit, UseCaseErrorImpl> ExtraValidation(UE value) =>
+        Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
 
     /// <summary>
     /// Realiza validaciones adicionales asíncronas.
@@ -126,8 +132,8 @@ public class UpdateUseCase<UE, E>
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
     /// como verificaciones en base de datos o llamadas a servicios externos.
     /// </remarks>
-    protected virtual Task<Result<Unit, List<FieldErrorDTO>>> ExtraValidationAsync(UE value) =>
-        Task.FromResult(Result<Unit, List<FieldErrorDTO>>.Ok(Unit.Value));
+    protected virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(UE value) =>
+        Task.FromResult(Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value));
 
     /// <summary>
     /// Ejecuta tareas adicionales síncronas después de actualizar la entidad.
