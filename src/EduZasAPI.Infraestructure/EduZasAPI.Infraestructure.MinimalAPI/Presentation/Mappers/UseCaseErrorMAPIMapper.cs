@@ -22,7 +22,8 @@ public static class UseCaseErrorMAPIMapper
                 Message = "Formato inválido",
                 Errors = errs.errors
             }),
-            Unauthorized errs => Results.Forbid(),
+            Unauthorized => Results.Forbid(),
+            NotFound => Results.NotFound(),
             _ => throw new InvalidOperationException()
         };
     }

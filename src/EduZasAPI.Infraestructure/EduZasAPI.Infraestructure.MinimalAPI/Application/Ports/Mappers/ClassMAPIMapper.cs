@@ -33,6 +33,7 @@ public static class ClassMAPIMapper
         if (errs.Count > 0)
             return Result.Err<ClassCriteriaDTO, List<FieldErrorDTO>>(errs);
 
+
         return Result.Ok<ClassCriteriaDTO, List<FieldErrorDTO>>(new ClassCriteriaDTO
         {
             Page = source.Page,
@@ -53,7 +54,7 @@ public static class ClassMAPIMapper
     public static ClassCriteriaMAPI FromDomain(this ClassCriteriaDTO source) => new ClassCriteriaMAPI
     {
         Page = source.Page,
-        Active = source.Active.ToNullable(),
+        Active = source.Active.IsSome ? source.Active.Unwrap() : null,
         WithProfessor = source.WithProfessor.ToNullable(),
         WithStudent = source.WithStudent.ToNullable(),
         ClassName = source.ClassName.FromDomain(),
@@ -66,14 +67,14 @@ public static class ClassMAPIMapper
     /// </summary>
     /// <param name="source">Instancia de <see cref="ClassUpdateMAPI"/> a convertir.</param>
     /// <returns>Un <see cref="ClassUpdateDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ClassUpdateDTO ToDomain(this ClassUpdateMAPI source, ulong professorId) => new ClassUpdateDTO
+    public static ClassUpdateDTO ToDomain(this ClassUpdateMAPI source, ulong userId) => new ClassUpdateDTO
     {
         Id = source.Id,
         Active = source.Active,
         ClassName = source.ClassName,
         Section = source.Section.ToOptional(),
         Subject = source.Subject.ToOptional(),
-        Professor = professorId
+        UserId = userId
     };
 
     /// <summary>
