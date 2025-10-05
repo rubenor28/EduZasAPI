@@ -42,6 +42,7 @@ public class ClassEntityFrameworkRepository :
         Id = ef.ClassId,
         Active = ef.Active ?? false,
         ClassName = ef.ClassName,
+        Color = ef.Color ?? "#007bff",
         Subject = ef.Subject.ToOptional(),
         Section = ef.Section.ToOptional(),
         CreatedAt = ef.CreatedAt,

@@ -111,6 +111,10 @@ public partial class EduZasDotnetContext : DbContext
             entity.Property(e => e.Subject)
                 .HasMaxLength(100)
                 .HasColumnName("subject");
+            entity.Property(e => e.Color)
+                .HasMaxLength(7)
+                .HasColumnName("color")
+                .HasDefaultValueSql("'#007bff'");
 
             entity.HasMany(d => d.Professors).WithMany(p => p.ClassesNavigation)
                 .UsingEntity<Dictionary<string, object>>(
@@ -193,6 +197,10 @@ public partial class EduZasDotnetContext : DbContext
             entity.Property(e => e.StudentId)
                 .HasColumnType("bigint(20) unsigned")
                 .HasColumnName("student_id");
+            entity.Property(e => e.Hidden)
+                .IsRequired()
+                .HasColumnName("hidden")
+                .HasDefaultValue(false);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime")

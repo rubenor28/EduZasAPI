@@ -72,6 +72,7 @@ public static class ClassMAPIMapper
         Id = source.Id,
         Active = source.Active,
         ClassName = source.ClassName,
+        Color = source.Color,
         Section = source.Section.ToOptional(),
         Subject = source.Subject.ToOptional(),
         UserId = userId
@@ -87,6 +88,7 @@ public static class ClassMAPIMapper
     {
         Id = string.Empty,
         ClassName = source.ClassName,
+        Color = source.Color,
         OwnerId = ownerId,
         Subject = source.ClassName.ToOptional(),
         Section = source.Section.ToOptional(),
@@ -114,7 +116,8 @@ public static class ClassMAPIMapper
     /// <returns>Un <see cref="StudentClassRelationDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
     public static StudentClassRelationDTO ToDomain(this StudentClassRelationMAPI source) => new StudentClassRelationDTO
     {
-        Id = new ClassUserRelationIdDTO { UserId = source.StudentId, ClassId = source.ClassId }
+        Id = new ClassUserRelationIdDTO { UserId = source.StudentId, ClassId = source.ClassId },
+        Hidden = source.Hidden
     };
 
     /// <summary>
@@ -162,6 +165,7 @@ public static class ClassMAPIMapper
         Id = source.Id,
         Active = source.Active,
         ClassName = source.ClassName,
+        Color = source.Color,
         Subject = source.Subject.ToNullable(),
         Section = source.Section.ToNullable()
     };

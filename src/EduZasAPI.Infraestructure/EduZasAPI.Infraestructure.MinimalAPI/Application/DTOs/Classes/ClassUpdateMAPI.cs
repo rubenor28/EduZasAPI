@@ -29,4 +29,9 @@ public class ClassUpdateMAPI
     /// Obtiene o establece la sección o grupo de la clase (opcional).
     /// </summary>
     public string? Section { get; set; }
+
+    /// <summary>
+    /// Obtiene o establece el color de la clase en formato hexadecimal.
+    /// </summary>
+    public required string Color { get; set; }
 }

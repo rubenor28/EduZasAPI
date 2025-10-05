@@ -16,6 +16,8 @@ public partial class Class : ISoftDeletableEF
 
     public string ClassName { get; set; } = null!;
 
+    public string? Color { get; set; } = null!;
+
     public string? Subject { get; set; } = null!;
 
     public string? Section { get; set; } = null!;

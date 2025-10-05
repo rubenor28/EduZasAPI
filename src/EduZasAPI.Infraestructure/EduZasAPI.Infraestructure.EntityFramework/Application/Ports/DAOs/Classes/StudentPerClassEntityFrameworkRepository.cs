@@ -12,7 +12,8 @@ public class StudentPerClassEntityFrameworkRepository :
 
     protected override StudentClassRelationDTO MapToDomain(ClassStudent efEntity) => new StudentClassRelationDTO
     {
-        Id = new ClassUserRelationIdDTO { ClassId = efEntity.ClassId, UserId = efEntity.StudentId }
+        Id = new ClassUserRelationIdDTO { ClassId = efEntity.ClassId, UserId = efEntity.StudentId },
+        Hidden = efEntity.Hidden
     };
 
     protected override ClassStudent NewToEF(StudentClassRelationDTO r) => new ClassStudent

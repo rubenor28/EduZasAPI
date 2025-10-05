@@ -5,4 +5,5 @@ public class PublicClassMAPI
     public required string ClassName { get; set; }
     public string? Subject { get; set; }
     public string? Section { get; set; }
+    public required string Color { get; set; }
 }
