@@ -5,4 +5,5 @@ namespace EduZasAPI.Application.Classes;
 public class StudentClassRelationDTO : IIdentifiable<ClassUserRelationIdDTO>
 {
     public required ClassUserRelationIdDTO Id { get; set; }
+    public required bool Hidden {get; set;}
 }

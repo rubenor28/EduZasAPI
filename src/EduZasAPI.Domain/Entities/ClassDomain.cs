@@ -28,6 +28,11 @@ public class ClassDomain : IIdentifiable<string>, ISoftDeletable
     public required string ClassName { get; set; }
 
     /// <summary>
+    /// Color de la carta en la UI.
+    /// </summary>
+    public required string Color { get; set; }
+
+    /// <summary>
     /// Obtiene o establece la materia a la que pertenece la clase.
     /// </summary>
     public required Optional<string> Subject { get; set; }

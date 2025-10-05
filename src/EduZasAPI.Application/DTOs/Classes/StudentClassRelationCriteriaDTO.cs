@@ -17,4 +17,6 @@ public class StudentClassRelationCriteriaDTO : ICriteriaDTO
     /// Obtiene o establece el filtro opcional para el identificador de la clase en la relación.
     /// </summary>
     public Optional<string> ClassId { get; set; } = Optional<string>.None();
+
+    public Optional<bool> Hidden { get; set; } = Optional<bool>.None();
 }

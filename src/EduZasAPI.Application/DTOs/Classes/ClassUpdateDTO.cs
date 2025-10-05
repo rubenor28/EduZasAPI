@@ -22,6 +22,10 @@ public class ClassUpdateDTO
     /// </summary>
     public required string ClassName { get; set; }
 
+    /// <summary>
+    /// Color de la carta en la UI
+    /// </summary>
+    public required string Color { get; set; }
 
     /// <summary>
     /// Profesor que ejecuta la acción de actualización

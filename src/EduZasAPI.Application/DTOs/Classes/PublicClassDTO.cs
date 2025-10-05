@@ -21,6 +21,11 @@ public class PublicClassDTO
     /// Obtiene o establece el nombre de la clase.
     /// </summary>
     public required string ClassName { get; set; }
+
+    /// <summary>
+    /// Color de la carta en la UI
+    /// </summary>
+    public required string Color { get; set; }
     
     /// <summary>
     /// Obtiene o establece la materia o asignatura de la clase (opcional).
