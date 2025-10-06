@@ -90,7 +90,7 @@ public static class ClassMAPIMapper
         ClassName = source.ClassName,
         Color = source.Color,
         OwnerId = ownerId,
-        Subject = source.ClassName.ToOptional(),
+        Subject = source.Subject.ToOptional(),
         Section = source.Section.ToOptional(),
     };
 

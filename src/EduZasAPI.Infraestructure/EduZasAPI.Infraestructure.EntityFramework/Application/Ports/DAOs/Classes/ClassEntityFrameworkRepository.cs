@@ -22,6 +22,7 @@ public class ClassEntityFrameworkRepository :
     {
         ClassId = nc.Id,
         ClassName = nc.ClassName,
+        Color = nc.Color,
         Section = nc.Section.ToNullable(),
         Subject = nc.Subject.ToNullable()
     };
@@ -32,6 +33,7 @@ public class ClassEntityFrameworkRepository :
         c.ClassId = cu.Id;
         c.ClassName = cu.ClassName;
         c.Active = cu.Active;
+        c.Color = cu.Color;
         c.Subject = cu.Subject.ToNullable();
         c.Section = cu.Section.ToNullable();
     }
