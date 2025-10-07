@@ -71,7 +71,7 @@ public abstract class Optional<T> where T : notnull
     /// El valor contenido si existe; de lo contrario, <c>null</c> si <typeparamref name="T"/> es un tipo referencia
     /// o el valor por defecto de <typeparamref name="T"/> si es un tipo valor.
     /// </returns>
-    public T? ToNullable() => IsSome ? Unwrap() : default;
+    public T? ToNullable() => IsSome ? Unwrap() : default(T?);
 
     /// <summary>
     /// Crea un Optional que contiene el valor especificado.
