@@ -56,7 +56,7 @@ public static class ClassMAPIMapper
         Page = source.Page,
         Active = source.Active.IsSome ? source.Active.Unwrap() : null,
         WithProfessor = source.WithProfessor.ToNullable(),
-        WithStudent = source.WithStudent.ToNullable(),
+        WithStudent = source.WithStudent.IsSome ? source.WithStudent.Unwrap() : null,
         ClassName = source.ClassName.FromDomain(),
         Section = source.Section.FromDomain(),
         Subject = source.Subject.FromDomain(),
