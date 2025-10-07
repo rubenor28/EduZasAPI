@@ -16,8 +16,7 @@ public interface IDeleterAsync<I, E>
     /// </summary>
     /// <param name="id">Identificador de la entidad a eliminar.</param>
     /// <returns>
-    /// Un <see cref="Optional{E}"/> que contiene la entidad eliminada si existía,
-    /// o vacío si no se encontró.
+    /// La entidad eliminada
     /// </returns>
-    Task<Optional<E>> DeleteAsync(I id);
+    Task<E> DeleteAsync(I id);
 }
