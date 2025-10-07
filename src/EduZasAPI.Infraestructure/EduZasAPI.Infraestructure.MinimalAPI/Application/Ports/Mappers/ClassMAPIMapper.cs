@@ -26,9 +26,9 @@ public static class ClassMAPIMapper
         var section = Optional<StringQueryDTO>.None();
 
         var errs = new List<FieldErrorDTO>();
-        StringQueryMAPIMapper.ParseStringQuery(source.ClassName, "className", className, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.Subject, "subject", subject, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.Section, "section", section, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.ClassName, "className", ref className, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.Subject, "subject", ref subject, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.Section, "section", ref section, errs);
 
         if (errs.Count > 0)
             return Result.Err<ClassCriteriaDTO, List<FieldErrorDTO>>(errs);

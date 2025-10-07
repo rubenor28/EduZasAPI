@@ -103,12 +103,12 @@ public static class UserMAPIMapper
         var password = Optional<StringQueryDTO>.None();
 
         var errs = new List<FieldErrorDTO>();
-        StringQueryMAPIMapper.ParseStringQuery(source.FirstName, "firstName", firstName, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.MidName, "midName", midName, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.FatherLastName, "fatherLastName", fatherLastName, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.MotherLastname, "motherLastname", motherLastname, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.Email, "email", email, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.Password, "password", password, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.FirstName, "firstName", ref firstName, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.MidName, "midName", ref midName, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.FatherLastName, "fatherLastName", ref fatherLastName, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.MotherLastname, "motherLastname", ref motherLastname, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.Email, "email", ref email, errs);
+        StringQueryMAPIMapper.ParseStringQuery(source.Password, "password", ref password, errs);
 
         if (errs.Count > 0)
             return Result.Err<UserCriteriaDTO, List<FieldErrorDTO>>(errs);

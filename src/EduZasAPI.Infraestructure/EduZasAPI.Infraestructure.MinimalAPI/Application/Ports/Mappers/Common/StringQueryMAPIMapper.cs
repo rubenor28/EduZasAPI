@@ -76,7 +76,7 @@ public static class StringQueryMAPIMapper
     public static void ParseStringQuery(
         StringQueryMAPI? value,
         string fieldName,
-        Optional<StringQueryDTO> resultRef,
+        ref Optional<StringQueryDTO> resultRef,
         List<FieldErrorDTO> errListRef)
     {
         if (value is null)
@@ -85,16 +85,20 @@ public static class StringQueryMAPIMapper
             return;
         }
 
-        StringQueryMAPIMapper
-          .ToOptional(value)
-          .Match(
-            strQuery => resultRef = strQuery,
-            _ => errListRef.Add(new FieldErrorDTO
+        var optParse = value.ToOptional();
+
+        if (optParse.IsErr)
+        {
+            errListRef.Add(new FieldErrorDTO
             {
                 Field = fieldName,
                 Message = "Format invalid"
-            })
-          );
+            });
+
+            return;
+        }
+
+        resultRef = optParse.Unwrap();
     }
 
     /// <summary>
@@ -108,18 +112,21 @@ public static class StringQueryMAPIMapper
     public static void ParseStringQuery(
         StringQueryMAPI value,
         string fieldName,
-        StringQueryDTO resultRef,
+        ref StringQueryDTO resultRef,
         List<FieldErrorDTO> errListRef)
     {
-        StringQueryMAPIMapper
-          .ToDomain(value)
-          .Match(
-            strQuery => resultRef = strQuery,
-            _ => errListRef.Add(new FieldErrorDTO
+        var optParse = value.ToDomain();
+
+        if (optParse.IsErr)
+        {
+            errListRef.Add(new FieldErrorDTO
             {
                 Field = fieldName,
                 Message = "Format invalid"
-            })
-          );
+            });
+            return;
+        }
+
+        resultRef = optParse.Unwrap();
     }
 }
