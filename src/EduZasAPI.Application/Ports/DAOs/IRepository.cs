@@ -9,12 +9,14 @@ namespace EduZasAPI.Application.Common;
 /// <typeparam name="E">Tipo de la entidad que será gestionada, debe implementar <see cref="IIdentifiable{I}"/>.</typeparam>
 /// <typeparam name="NE">Tipo de los datos necesarios para crear la entidad.</typeparam>
 /// <typeparam name="UE">Tipo de los datos necesarios para actualizar la entidad.</typeparam>
+/// <typeparam name="UE">Tipo de los datos necesarios para eliminar la entidad.</typeparam>
 /// <typeparam name="C">Tipo de criterios de consulta, debe implementar <see cref="ICriteriaDTO"/>.</typeparam>
-public interface IRepositoryAsync<I, E, NE, UE, C>
+public interface IRepositoryAsync<I, E, NE, UE, DE, C>
     : ICreatorAsync<E, NE>, IUpdaterAsync<E, UE>, IReaderAsync<I, E>, IDeleterAsync<I, E>, IQuerierAsync<E, C>
     where I : notnull
     where E : notnull, IIdentifiable<I>
     where NE : notnull
     where UE : notnull
+    where DE : notnull, IIdentifiable<I>
     where C : notnull, ICriteriaDTO
 { }

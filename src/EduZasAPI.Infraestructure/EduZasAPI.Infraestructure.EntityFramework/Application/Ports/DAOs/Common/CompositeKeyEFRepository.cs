@@ -4,7 +4,7 @@ using EduZasAPI.Application.Common;
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 
 public abstract class CompositeKeyEFRepository<I, E, C, TEF> :
-  EntityFrameworkRepository<E, E, C, TEF>, IRepositoryAsync<I, E, E, E, C>
+  EntityFrameworkRepository<E, E, C, TEF>, IRepositoryAsync<I, E, E, E, E, C>
 where I : notnull
 where E : notnull, IIdentifiable<I>
 where C : notnull, ICriteriaDTO
@@ -35,14 +35,14 @@ where TEF : class
     }
 
     /// <inheritdoc/>
-    public async Task<Optional<E>> DeleteAsync(I id)
+    public async Task<E> DeleteAsync(I id)
     {
         var record = await GetByIdTracked(id);
-        if (record is null) return Optional<E>.None();
+        if (record is null) throw new ArgumentException("Record do not exists");
 
         DbSet.Remove(record);
         await _ctx.SaveChangesAsync();
-        return Optional<E>.Some(MapToDomain(record));
+        return MapToDomain(record);
     }
 
     protected abstract I GetId(E entity);

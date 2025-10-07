@@ -7,7 +7,7 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
 
 public class ClassEntityFrameworkRepository :
-  SimpleKeyEFRepository<string, ClassDomain, NewClassDTO, ClassUpdateDTO, ClassCriteriaDTO, Class>
+  SimpleKeyEFRepository<string, ClassDomain, NewClassDTO, ClassUpdateDTO,DeleteClassDTO, ClassCriteriaDTO,  Class>
 {
     public ClassEntityFrameworkRepository(EduZasDotnetContext ctx, ulong pageSize) : base(ctx, pageSize) { }
 

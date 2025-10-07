@@ -7,7 +7,7 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
 public class UserEntityFrameworkRepository :
-  SimpleKeyEFRepository<ulong, UserDomain, NewUserDTO, UserUpdateDTO, UserCriteriaDTO, User>
+  SimpleKeyEFRepository<ulong, UserDomain, NewUserDTO, UserUpdateDTO, DeleteUserDTO, UserCriteriaDTO, User>
 {
 
     public UserEntityFrameworkRepository(EduZasDotnetContext context, ulong pageSize) : base(context, pageSize) { }

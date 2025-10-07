@@ -13,11 +13,12 @@ namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 /// <typeparam name="UE">Tipo del DTO para actualizar entidades. Debe ser no nulo.</typeparam>
 /// <typeparam name="C">Tipo de los criterios de búsqueda. Debe ser no nulo e implementar <see cref="ICriteriaDTO"/>.</typeparam>
 /// <typeparam name="TEF">Tipo de la entidad de Entity Framework.</typeparam>
-public abstract class SimpleKeyEFRepository<I, E, NE, UE, C, TEF> : EntityFrameworkRepository<NE, E, C, TEF>, IRepositoryAsync<I, E, NE, UE, C>
+public abstract class SimpleKeyEFRepository<I, E, NE, UE, DE, C, TEF> : EntityFrameworkRepository<NE, E, C, TEF>, IRepositoryAsync<I, E, NE, UE, DE, C>
 where I : notnull
 where E : notnull, IIdentifiable<I>
 where NE : notnull
 where UE : notnull
+where DE : notnull, IIdentifiable<I>
 where C : notnull, ICriteriaDTO
 where TEF : class
 {
@@ -65,10 +66,10 @@ where TEF : class
     /// </summary>
     /// <param name="id">Identificador de la entidad a eliminar.</param>
     /// <returns>Una tarea que representa la operación asíncrona. El resultado contiene un Optional con la entidad eliminada si existía.</returns>
-    public async Task<Optional<E>> DeleteAsync(I id)
+    public async Task<E> DeleteAsync(I id)
     {
         var record = await DbSet.FindAsync(id);
-        if (record is null) return Optional<E>.None();
+        if (record is null) throw new ArgumentException("Record do not exists");
 
         if (record is ISoftDeletableEF softDeletable)
         {
@@ -80,7 +81,7 @@ where TEF : class
         }
 
         await _ctx.SaveChangesAsync();
-        return Optional<E>.Some(MapToDomain(record));
+        return MapToDomain(record);
     }
 
     /// <summary>
