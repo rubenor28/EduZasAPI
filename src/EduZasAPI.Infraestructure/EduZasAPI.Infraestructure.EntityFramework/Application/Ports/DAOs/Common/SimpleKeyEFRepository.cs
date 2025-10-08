@@ -1,6 +1,5 @@
 using EduZasAPI.Domain.Common;
 using EduZasAPI.Application.Common;
-using EduZasAPI.Infraestructure.EntityFramework.Domain.Common;
 
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 
@@ -71,14 +70,7 @@ where TEF : class
         var record = await DbSet.FindAsync(id);
         if (record is null) throw new ArgumentException("Record do not exists");
 
-        if (record is ISoftDeletableEF softDeletable)
-        {
-            softDeletable.Active = false;
-        }
-        else
-        {
-            DbSet.Remove(record);
-        }
+        DbSet.Remove(record);
 
         await _ctx.SaveChangesAsync();
         return MapToDomain(record);

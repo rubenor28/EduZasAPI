@@ -1,5 +1,7 @@
 using EduZasAPI.Domain.Common;
+using EduZasAPI.Domain.Users;
 using EduZasAPI.Application.Common;
+using EduZasAPI.Application.Users;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
@@ -63,6 +65,25 @@ public class RoutesUtils
         var userId = (string?)ctx.Items["UserId"];
         if (userId is null) throw new InvalidDataException("Error al procesar el usuario");
         return ulong.Parse(userId);
+    }
+
+    public Executor GetExecutorFromContext(HttpContext ctx)
+    {
+        var userId = (string?)ctx.Items["UserId"];
+        var userRole = (string?)ctx.Items["UserRole"];
+
+        if (userId is null) throw new InvalidDataException("Error al procesar el Executor");
+        if (userRole is null) throw new InvalidDataException("Error al procesar el Executor");
+
+        var roleParse = UserTypeMapper.FromString(userRole);
+
+        if (roleParse.IsNone) throw new InvalidDataException("Error al procesar el Executor");
+
+        return new Executor
+        {
+            Id = ulong.Parse(userId),
+            Role = roleParse.Unwrap()
+        };
     }
 
     public IResult FieldErrorToBadRequest(List<FieldErrorDTO> errors)

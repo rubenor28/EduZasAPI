@@ -21,7 +21,7 @@ public class DeleteUseCase<I, DE, E> : IUseCaseAsync<DE, E, UseCaseErrorImpl>
     /// </summary>
     /// <param name="deleter">El servicio para eliminar la entidad de forma asíncrona.</param>
     /// <param name="validator">El servicio de validación de negocio (opcional).</param>
-    public DeleteUseCase(IDeleterAsync<I, E> deleter, IBusinessValidationService<DE> validator)
+    public DeleteUseCase(IDeleterAsync<I, E> deleter, IBusinessValidationService<DE>? validator = null)
     {
         _deleter = deleter;
         _validator = validator;

@@ -27,6 +27,7 @@ public static class UseCaseServiceCollectionExtensions
         services.AddTransient<AddClassUseCase>();
         services.AddTransient<QueryUseCase<ClassCriteriaDTO, ClassDomain>>();
         services.AddTransient<UpdateClassUseCase>();
+        services.AddTransient<DeleteClassUseCase>();
 
         return services;
     }

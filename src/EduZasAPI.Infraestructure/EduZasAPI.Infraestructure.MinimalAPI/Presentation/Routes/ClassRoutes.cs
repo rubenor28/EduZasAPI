@@ -85,8 +85,13 @@ public static class ClassRoutes
               return op;
           });
 
+        app.MapDelete("/classes/{id}", DeleteClass)
+          .RequireAuthorization("ProfessorOrAdmin")
+          .AddEndpointFilter<ExecutorFilter>();
+
         return group;
     }
+
 
     public static Task<IResult> AddClass(
         NewClassMAPI newClass,
@@ -169,6 +174,29 @@ public static class ClassRoutes
             var updated = validation.Unwrap();
             return Results.Ok(updated.FromDomain());
 
+        });
+    }
+
+    public static Task<IResult> DeleteClass(
+      string id,
+      HttpContext ctx,
+      RoutesUtils utils,
+      DeleteClassUseCase useCase)
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var executor = utils.GetExecutorFromContext(ctx);
+            var validation = await useCase.ExecuteAsync(new DeleteClassDTO
+            {
+                Id = id,
+                Executor = executor
+            });
+
+            if (validation.IsErr)
+                return validation.UnwrapErr().FromDomain();
+
+            var deleted = validation.Unwrap();
+            return Results.Ok(deleted.FromDomain());
         });
     }
 }
