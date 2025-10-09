@@ -87,7 +87,21 @@ public static class ClassRoutes
 
         app.MapDelete("/classes/{id}", DeleteClass)
           .RequireAuthorization("ProfessorOrAdmin")
-          .AddEndpointFilter<ExecutorFilter>();
+          .AddEndpointFilter<ExecutorFilter>()
+          .Produces(StatusCodes.Status401Unauthorized)
+          .Produces(StatusCodes.Status403Forbidden)
+          .Produces<PublicClassMAPI>(StatusCodes.Status200OK)
+          .Produces(StatusCodes.Status404NotFound)
+          .WithOpenApi(op =>
+          {
+              op.Summary = "Eliminar clases";
+              op.Description = "Eliminar una clase mediante su ID";
+              op.Responses["200"].Description = "Si la eliminación fue exitosa";
+              op.Responses["404"].Description = "Si no se encontró una clase con ese ID";
+              op.Responses["401"].Description = "Si el usuario no está autenticado";
+              op.Responses["403"].Description = "Si el usuario tiene los permisos para eliminar la clase";
+              return op;
+          });
 
         return group;
     }
@@ -127,7 +141,7 @@ public static class ClassRoutes
         return utils.HandleResponseAsync(async () =>
         {
             var userId = utils.GetIdFromContext(ctx);
-            criteria.WithProfessor = userId;
+            criteria.WithProfessor = new WithProfessorMAPI { Id = userId };
 
             var validation = criteria.ToDomain();
             if (validation.IsErr) return utils.FieldErrorToBadRequest(validation);
@@ -146,7 +160,7 @@ public static class ClassRoutes
         return utils.HandleResponseAsync(async () =>
         {
             var userId = utils.GetIdFromContext(ctx);
-            criteria.WithStudent = userId;
+            criteria.WithStudent = new WithStudentMAPI { Id = userId };
 
             var validation = criteria.ToDomain();
             if (validation.IsErr) return utils.FieldErrorToBadRequest(validation);

@@ -7,7 +7,7 @@ using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
 
 public class ClassEntityFrameworkRepository :
-  SimpleKeyEFRepository<string, ClassDomain, NewClassDTO, ClassUpdateDTO,DeleteClassDTO, ClassCriteriaDTO,  Class>
+  SimpleKeyEFRepository<string, ClassDomain, NewClassDTO, ClassUpdateDTO, DeleteClassDTO, ClassCriteriaDTO, Class>
 {
     public ClassEntityFrameworkRepository(EduZasDotnetContext ctx, ulong pageSize) : base(ctx, pageSize) { }
 
@@ -54,11 +54,21 @@ public class ClassEntityFrameworkRepository :
     /// <inheritdoc/>
     protected override IQueryable<Class> QueryFromCriteria(ClassCriteriaDTO cr) =>
         _ctx.Classes
-        .AsNoTracking().AsQueryable()
+        .AsNoTracking()
         .WhereStringQuery(cr.Subject, c => c.Subject)
         .WhereStringQuery(cr.Section, c => c.Section)
         .WhereStringQuery(cr.ClassName, c => c.ClassName)
         .WhereOptional(cr.Active, activity => c => c.Active == activity)
-        .WhereOptional(cr.WithStudent, stId => c => c.ClassStudents.Any(cs => cs.StudentId == stId))
-        .WhereOptional(cr.WithProfessor, pfId => c => c.ClassProfessors.Any(cpf => cpf.ProfessorId == pfId));
+        .WhereOptional(cr.WithProfessor, professor => c =>
+            c.ClassProfessors.Any(pl =>
+                pl.ProfessorId == professor.Id &&
+                (professor.IsOwner.IsNone || pl.IsOwner == professor.IsOwner.Unwrap())
+            )
+        )
+        .WhereOptional(cr.WithStudent, student => c =>
+            c.ClassStudents.Any(sl =>
+                sl.StudentId == student.Id &&
+                (student.Hidden.IsNone || sl.Hidden == student.Hidden.Unwrap())
+            )
+        );
 }

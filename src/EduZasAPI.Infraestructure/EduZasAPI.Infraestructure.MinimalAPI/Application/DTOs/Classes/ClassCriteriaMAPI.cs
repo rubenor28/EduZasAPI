@@ -3,6 +3,18 @@ using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Application.Classes;
 
+public record class WithProfessorMAPI
+{
+    public required ulong Id { get; set; }
+    public bool? IsOwner { get; set; } = null;
+}
+
+public record class WithStudentMAPI
+{
+    public required ulong Id { get; set; }
+    public bool? Hidden { get; set; } = null;
+}
+
 /// <summary>
 /// Representa los criterios de búsqueda y filtrado para consultas de clases
 /// de Minimal API.
@@ -32,10 +44,10 @@ public class ClassCriteriaMAPI : ICriteriaDTO
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen asignado un profesor específico.
     /// </summary>
-    public ulong? WithProfessor { get; set; }
+    public WithProfessorMAPI? WithProfessor { get; set; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen inscrito un estudiante específico.
     /// </summary>
-    public ulong? WithStudent { get; set; }
+    public WithStudentMAPI? WithStudent { get; set; }
 }

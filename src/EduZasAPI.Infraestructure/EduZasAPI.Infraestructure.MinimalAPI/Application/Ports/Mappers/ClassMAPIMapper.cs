@@ -24,6 +24,39 @@ public static class ClassMAPIMapper
         var className = Optional<StringQueryDTO>.None();
         var subject = Optional<StringQueryDTO>.None();
         var section = Optional<StringQueryDTO>.None();
+        var withStudentOpt = Optional<WithStudent>.None();
+        var withProfessorOpt = Optional<WithProfessor>.None();
+
+        var withStudent = source.WithStudent;
+        var withProfessor = source.WithProfessor;
+
+        if (withStudent is not null)
+        {
+            var hidden = withStudent.Hidden is null ?
+              Optional<bool>.None() :
+              Optional<bool>.Some((bool)withStudent.Hidden);
+
+            withStudentOpt = Optional<WithStudent>.Some(new WithStudent
+            {
+                Id = withStudent.Id,
+                Hidden = hidden
+            });
+
+        }
+
+        if (withProfessor is not null)
+        {
+            var isOwner = withProfessor.IsOwner is null ?
+              Optional<bool>.None() :
+              Optional<bool>.Some((bool)withProfessor.IsOwner);
+
+            withProfessorOpt = Optional<WithProfessor>.Some(new WithProfessor
+            {
+                Id = withProfessor.Id,
+                IsOwner = isOwner
+            });
+
+        }
 
         var errs = new List<FieldErrorDTO>();
         StringQueryMAPIMapper.ParseStringQuery(source.ClassName, "className", ref className, errs);
@@ -38,8 +71,8 @@ public static class ClassMAPIMapper
         {
             Page = source.Page,
             Active = source.Active.ToOptional(),
-            WithStudent = source.WithStudent.ToOptional(),
-            WithProfessor = source.WithProfessor.ToOptional(),
+            WithStudent = withStudentOpt,
+            WithProfessor = withProfessorOpt,
             Subject = subject,
             ClassName = className,
             Section = section
@@ -51,16 +84,35 @@ public static class ClassMAPIMapper
     /// </summary>
     /// <param name="source">Instancia de <see cref="ClassCriteriaDTO"/> a convertir.</param>
     /// <returns>Un <see cref="ClassCriteriaMAPI"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ClassCriteriaMAPI FromDomain(this ClassCriteriaDTO source) => new ClassCriteriaMAPI
+    public static ClassCriteriaMAPI FromDomain(this ClassCriteriaDTO source)
     {
-        Page = source.Page,
-        Active = source.Active.IsSome ? source.Active.Unwrap() : null,
-        WithProfessor = source.WithProfessor.ToNullable(),
-        WithStudent = source.WithStudent.IsSome ? source.WithStudent.Unwrap() : null,
-        ClassName = source.ClassName.FromDomain(),
-        Section = source.Section.FromDomain(),
-        Subject = source.Subject.FromDomain(),
-    };
+        WithProfessorMAPI? withProfessor = null;
+        WithStudentMAPI? withStudent = null;
+
+        source.WithProfessor.IfSome(wp =>
+        {
+            withProfessor = new WithProfessorMAPI { Id = wp.Id };
+            wp.IsOwner.IfSome(o => withProfessor.IsOwner = o);
+        });
+
+        source.WithStudent.IfSome(ws =>
+        {
+            withStudent = new WithStudentMAPI { Id = ws.Id };
+            ws.Hidden.IfSome(h => withStudent.Hidden = h);
+        });
+
+
+        return new ClassCriteriaMAPI
+        {
+            Page = source.Page,
+            Active = source.Active.IsSome ? source.Active.Unwrap() : null,
+            WithProfessor = withProfessor,
+            WithStudent = withStudent,
+            ClassName = source.ClassName.FromDomain(),
+            Section = source.Section.FromDomain(),
+            Subject = source.Subject.FromDomain(),
+        };
+    }
 
     /// <summary>
     /// Convierte una instancia de <see cref="ClassUpdateMAPI"/> en un <see cref="ClassUpdateDTO"/> de dominio.
