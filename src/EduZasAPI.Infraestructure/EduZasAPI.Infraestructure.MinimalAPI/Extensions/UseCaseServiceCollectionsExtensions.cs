@@ -29,6 +29,9 @@ public static class UseCaseServiceCollectionExtensions
         services.AddTransient<UpdateClassUseCase>();
         services.AddTransient<DeleteClassUseCase>();
 
+        services.AddTransient<EnrollClassUseCase>();
+        services.AddTransient<UnEnrollClassUseCase>();
+
         return services;
     }
 }

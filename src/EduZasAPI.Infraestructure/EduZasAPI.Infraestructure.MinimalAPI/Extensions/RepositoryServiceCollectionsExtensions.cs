@@ -56,6 +56,15 @@ public static class RepositoryServiceCollectionExtensions
         services.AddScoped<IDeleterAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO>>(sp => sp.GetRequiredService<ProfessorPerClassEntityFrameworkRepository>());
         services.AddScoped<IQuerierAsync<ProfessorClassRelationDTO, ProfessorClassRelationCriteriaDTO>>(sp => sp.GetRequiredService<ProfessorPerClassEntityFrameworkRepository>());
 
+        services.AddScoped<StudentPerClassEntityFrameworkRepository>(sp => new StudentPerClassEntityFrameworkRepository(
+            sp.GetRequiredService<EduZasDotnetContext>(), pageSize));
+
+        services.AddScoped<ICreatorAsync<StudentClassRelationDTO, StudentClassRelationDTO>>(sp => sp.GetRequiredService<StudentPerClassEntityFrameworkRepository>());
+        services.AddScoped<IUpdaterAsync<StudentClassRelationDTO, StudentClassRelationDTO>>(sp => sp.GetRequiredService<StudentPerClassEntityFrameworkRepository>());
+        services.AddScoped<IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO>>(sp => sp.GetRequiredService<StudentPerClassEntityFrameworkRepository>());
+        services.AddScoped<IDeleterAsync<ClassUserRelationIdDTO, StudentClassRelationDTO>>(sp => sp.GetRequiredService<StudentPerClassEntityFrameworkRepository>());
+        services.AddScoped<IQuerierAsync<StudentClassRelationDTO, StudentClassRelationCriteriaDTO>>(sp => sp.GetRequiredService<StudentPerClassEntityFrameworkRepository>());
+
         return services;
     }
 }
