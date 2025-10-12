@@ -6,11 +6,10 @@ using EduZasAPI.Application.Common;
 namespace EduZasAPI.Application.Classes;
 
 /// <summary>
-/// Implementa el caso de uso para añadir un usuario a una clase, validando
-/// que el usuario posea los permisos requeridos (Professor o Administrador).
+/// Implementa el caso de uso para añadir un usuario a una clase.
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, ProfessorClassRelationDTO>
+public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentClassRelationDTO>
 {
     /// <summary>
     /// Lector asincrónico para acceder a los datos de dominio del usuario (<see cref="UserDomain"/>)
@@ -24,34 +23,28 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
     /// </summary>
     protected IReaderAsync<string, ClassDomain> _classReader;
 
-    /// <summary>
-    /// Lista de roles de usuario permitidos para ser añadidos a la clase.
-    /// Solo se admiten <see cref="UserType.PROFESSOR"/> y <see cref="UserType.ADMIN"/>.
-    /// </summary>
-    protected readonly List<UserType> _admitedRoles = new List<UserType>() {
-      UserType.PROFESSOR,
-      UserType.ADMIN
-    };
+    protected IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> _professorReader;
 
-    /// <summary>
-    /// Inicializa una nueva instancia de la clase <see cref="AddProfessorToClassUseCase"/>.
-    /// </summary>
-    /// <param name="userReader">Servicio para la lectura asincrónica de usuarios.</param>
-    /// <param name="classReader">Servicio para la lectura asincrónica de clases.</param>
-    /// <param name="creator">Servicio para la creación de la relación UserToClass, pasado a la base.</param>
-    public AddProfessorToClassUseCase(
+    public EnrollClassUseCase(
         IReaderAsync<ulong, UserDomain> userReader,
         IReaderAsync<string, ClassDomain> classReader,
-        ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO> creator) : base(creator)
+        IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorReader,
+        ICreatorAsync<StudentClassRelationDTO, StudentClassRelationDTO> creator) : base(creator)
     {
         _usrReader = userReader;
         _classReader = classReader;
+        _professorReader = professorReader;
     }
+
+    protected override StudentClassRelationDTO PostValidationFormat(StudentClassRelationDTO value) => new StudentClassRelationDTO
+    {
+        Id = value.Id,
+        Hidden = true
+    };
 
     /// <summary>
     /// Realiza validaciones asincrónicas antes de proceder con la adición de la relación.
-    /// Las validaciones incluyen la existencia de la clase, la existencia del usuario,
-    /// y la verificación de que el usuario tenga un rol permitido.
+    /// Las validaciones incluyen la existencia de la clase y la existencia del usuario.
     /// Las búsquedas de usuario y clase se ejecutan de forma concurrente.
     /// </summary>
     /// <param name="value">El DTO que contiene el ID de usuario y el ID de clase.</param>
@@ -60,10 +53,16 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
     protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
-        ProfessorClassRelationDTO value)
+        StudentClassRelationDTO value)
     {
         var usrSearchTask = _usrReader.GetAsync(value.Id.UserId);
         var classSearchTask = _classReader.GetAsync(value.Id.ClassId);
+        var userIsProfessorTask = _professorReader.GetAsync(new ClassUserRelationIdDTO
+        {
+            ClassId = value.Id.ClassId,
+            UserId = value.Id.UserId
+        });
+
         var errors = new List<FieldErrorDTO>();
 
         if ((await classSearchTask).IsNone)
@@ -77,25 +76,21 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
 
         var usrSearch = await usrSearchTask;
 
-        usrSearch.IfSome(usr =>
-        {
-            if (!_admitedRoles.Contains(usr.Role))
-            {
-                errors.Add(new FieldErrorDTO
-                {
-                    Field = "userId",
-                    Message = "Permisos inadecuados"
-                });
-            }
-        });
-
         usrSearch.IfNone(() => errors.Add(new FieldErrorDTO
         {
             Field = "userId",
             Message = "Usuario no encontrado"
         }));
 
-        if (errors.Count > 0) return Result.Err(UseCaseError.InputError(errors));
+        var userIsProfessorSearch = await userIsProfessorTask;
+        userIsProfessorSearch.IfSome(_ => errors.Add(new FieldErrorDTO
+        {
+            Field = "userId",
+            Message = "El usuario ya es profesor de la clase"
+        }));
+
+        if (errors.Count > 0)
+            return Result.Err(UseCaseError.InputError(errors));
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }
