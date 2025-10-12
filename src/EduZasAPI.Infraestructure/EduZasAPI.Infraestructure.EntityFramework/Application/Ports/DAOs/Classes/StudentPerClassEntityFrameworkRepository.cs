@@ -1,6 +1,6 @@
 using EduZasAPI.Application.Classes;
-using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 using EduZasAPI.Infraestructure.EntityFramework.Application.ClassStudents;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
@@ -35,7 +35,7 @@ public class StudentPerClassEntityFrameworkRepository :
         .AsQueryable()
         .Where(cs => cs.StudentId == id.UserId)
         .Where(cs => cs.ClassId == id.ClassId)
-        .FirstAsync();
+        .FirstOrDefaultAsync();
 
     protected async override Task<ClassStudent?> GetByIdTracked(ClassUserRelationIdDTO id) =>
         await _ctx.ClassStudents
@@ -43,7 +43,7 @@ public class StudentPerClassEntityFrameworkRepository :
         .AsQueryable()
         .Where(cs => cs.StudentId == id.UserId)
         .Where(cs => cs.ClassId == id.ClassId)
-        .FirstAsync();
+        .FirstOrDefaultAsync();
 
     protected override void UpdateProperties(ClassStudent entity, StudentClassRelationDTO uProps)
     {
