@@ -23,16 +23,20 @@ public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentCla
     /// </summary>
     protected IReaderAsync<string, ClassDomain> _classReader;
 
+    protected IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> _studentReader;
+
     protected IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> _professorReader;
 
     public EnrollClassUseCase(
         IReaderAsync<ulong, UserDomain> userReader,
         IReaderAsync<string, ClassDomain> classReader,
+        IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> studentReader,
         IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorReader,
         ICreatorAsync<StudentClassRelationDTO, StudentClassRelationDTO> creator) : base(creator)
     {
         _usrReader = userReader;
         _classReader = classReader;
+        _studentReader = studentReader;
         _professorReader = professorReader;
     }
 
@@ -55,6 +59,13 @@ public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentCla
     protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
         StudentClassRelationDTO value)
     {
+        var relationSearch = await _studentReader.GetAsync(value.Id);
+
+        if (relationSearch.IsSome)
+            return Result.Err(UseCaseError.InputError(new List<FieldErrorDTO> {
+                new FieldErrorDTO { Field = "userId, classId", Message = "El usuario ya se encuentra inscrito a esta clase" }
+          }));
+
         var errors = new List<FieldErrorDTO>();
 
         var classSearch = await _classReader.GetAsync(value.Id.ClassId);
@@ -74,11 +85,7 @@ public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentCla
             Message = "Usuario no encontrado"
         }));
 
-        var userIsProfessorSearch = await _professorReader.GetAsync(new ClassUserRelationIdDTO
-        {
-            ClassId = value.Id.ClassId,
-            UserId = value.Id.UserId
-        });
+        var userIsProfessorSearch = await _professorReader.GetAsync(value.Id);
         userIsProfessorSearch.IfSome(_ => errors.Add(new FieldErrorDTO
         {
             Field = "userId",
