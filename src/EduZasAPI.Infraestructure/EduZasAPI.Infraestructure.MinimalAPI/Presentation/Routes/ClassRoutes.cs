@@ -103,6 +103,14 @@ public static class ClassRoutes
               return op;
           });
 
+        app.MapPost("/classes/enroll", EnrollClass)
+          .RequireAuthorization("RequireAuthenticated")
+          .AddEndpointFilter<UserIdFilter>();
+
+        app.MapDelete("/classes/enroll/{classId}", UnenrollClass)
+          .RequireAuthorization("RequireAuthenticated")
+          .AddEndpointFilter<ExecutorFilter>();
+
         return group;
     }
 
@@ -211,6 +219,52 @@ public static class ClassRoutes
 
             var deleted = validation.Unwrap();
             return Results.Ok(deleted.FromDomain());
+        });
+    }
+
+    public static Task<IResult> EnrollClass(
+      string classId,
+      HttpContext ctx,
+      RoutesUtils utils,
+      EnrollClassUseCase useCase)
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var userId = utils.GetIdFromContext(ctx);
+            var validation = await useCase.ExecuteAsync(new StudentClassRelationDTO
+            {
+                Id = new ClassUserRelationIdDTO { ClassId = classId, UserId = userId },
+                Hidden = false
+            });
+
+            if (validation.IsErr)
+                return validation.UnwrapErr().FromDomain();
+
+            var created = validation.Unwrap();
+            return Results.Created();
+        });
+    }
+
+    public static Task<IResult> UnenrollClass(
+      string classId,
+      HttpContext ctx,
+      RoutesUtils utils,
+      UnEnrollClassUseCase useCase)
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var executor = utils.GetExecutorFromContext(ctx);
+            var validation = await useCase.ExecuteAsync(new UnenrollClassDTO
+            {
+                Id = new ClassUserRelationIdDTO { ClassId = classId, UserId = executor.Id },
+                Executor = executor
+            });
+
+            if (validation.IsErr)
+                return validation.UnwrapErr().FromDomain();
+
+            var created = validation.Unwrap();
+            return Results.Created();
         });
     }
 }
