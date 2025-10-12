@@ -46,17 +46,17 @@ public class RoutesUtils
     /// Una tarea que produce el resultado de la acción de la ruta si la ejecución es exitosa,
     /// o un <see cref="Results.InternalServerError"/> encapsulado en una tarea si ocurre una excepción.
     /// </returns>
-    public Task<IResult> HandleResponseAsync(Func<Task<IResult>> routeAction)
+    public async Task<IResult> HandleResponseAsync(Func<Task<IResult>> routeAction)
     {
         try
         {
-            return routeAction();
+            return await routeAction();
         }
         catch (System.Exception e)
         {
             Console.WriteLine($"Error: {e.Message}");
             Console.WriteLine(e.StackTrace);
-            return Task.FromResult(Results.InternalServerError());
+            return Results.InternalServerError();
         }
     }
 
