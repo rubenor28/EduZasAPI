@@ -105,11 +105,35 @@ public static class ClassRoutes
 
         app.MapPost("/classes/enroll", EnrollClass)
           .RequireAuthorization("RequireAuthenticated")
-          .AddEndpointFilter<UserIdFilter>();
+          .AddEndpointFilter<UserIdFilter>()
+          .Produces(StatusCodes.Status401Unauthorized)
+          .Produces(StatusCodes.Status403Forbidden)
+          .Produces(StatusCodes.Status201Created)
+          .WithOpenApi(op =>
+          {
+              op.Summary = "Inscribirse a una clase";
+              op.Description = "Inscribe al usuario que realiza la solicitud a una clase";
+              op.Responses["201"].Description = "Si la inscripción fue exitosa";
+              op.Responses["401"].Description = "Si el usuario no está autenticado";
+              return op;
+          });
 
         app.MapDelete("/classes/enroll/{classId}", UnenrollClass)
           .RequireAuthorization("RequireAuthenticated")
-          .AddEndpointFilter<ExecutorFilter>();
+          .AddEndpointFilter<ExecutorFilter>()
+          .Produces(StatusCodes.Status401Unauthorized)
+          .Produces(StatusCodes.Status403Forbidden)
+          .Produces(StatusCodes.Status404NotFound)
+          .Produces(StatusCodes.Status200OK)
+          .WithOpenApi(op =>
+          {
+              op.Summary = "Abandonar una clase";
+              op.Description = "El usuario que realiza la solicitud abandona una clase";
+              op.Responses["200"].Description = "Si la opreación fue exitosa";
+              op.Responses["401"].Description = "Si el usuario no está autenticado";
+              op.Responses["404"].Description = "Si el usuario no está inscrito a la clase en cuestión";
+              return op;
+          });
 
         return group;
     }
@@ -223,7 +247,7 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> EnrollClass(
-      string classId,
+      EnrollClassMAPI data,
       HttpContext ctx,
       RoutesUtils utils,
       EnrollClassUseCase useCase)
@@ -233,7 +257,7 @@ public static class ClassRoutes
             var userId = utils.GetIdFromContext(ctx);
             var validation = await useCase.ExecuteAsync(new StudentClassRelationDTO
             {
-                Id = new ClassUserRelationIdDTO { ClassId = classId, UserId = userId },
+                Id = new ClassUserRelationIdDTO { ClassId = data.ClassId, UserId = userId },
                 Hidden = false
             });
 
@@ -264,7 +288,7 @@ public static class ClassRoutes
                 return validation.UnwrapErr().FromDomain();
 
             var created = validation.Unwrap();
-            return Results.Created();
+            return Results.Ok();
         });
     }
 }
