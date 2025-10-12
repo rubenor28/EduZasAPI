@@ -273,7 +273,7 @@ public static class ClassRoutes
       string classId,
       HttpContext ctx,
       RoutesUtils utils,
-      UnEnrollClassUseCase useCase)
+      UnenrollClassUseCase useCase)
     {
         return utils.HandleResponseAsync(async () =>
         {
