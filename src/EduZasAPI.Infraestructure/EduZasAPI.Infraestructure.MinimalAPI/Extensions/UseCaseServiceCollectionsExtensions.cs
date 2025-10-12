@@ -30,7 +30,7 @@ public static class UseCaseServiceCollectionExtensions
         services.AddTransient<DeleteClassUseCase>();
 
         services.AddTransient<EnrollClassUseCase>();
-        services.AddTransient<UnEnrollClassUseCase>();
+        services.AddTransient<UnenrollClassUseCase>();
 
         return services;
     }
