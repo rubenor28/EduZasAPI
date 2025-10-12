@@ -1,8 +1,8 @@
-using EduZasAPI.Domain.Classes;
-using EduZasAPI.Application.Common;
 using EduZasAPI.Application.Classes;
-using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
+using EduZasAPI.Application.Common;
+using EduZasAPI.Domain.Classes;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Classes;
+using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Classes;
@@ -50,6 +50,24 @@ public static class ClassRoutes
               return op;
           });
 
+        app.MapDelete("/classes/{id}", DeleteClass)
+          .RequireAuthorization("ProfessorOrAdmin")
+          .AddEndpointFilter<ExecutorFilter>()
+          .Produces(StatusCodes.Status401Unauthorized)
+          .Produces(StatusCodes.Status403Forbidden)
+          .Produces<PublicClassMAPI>(StatusCodes.Status200OK)
+          .Produces(StatusCodes.Status404NotFound)
+          .WithOpenApi(op =>
+          {
+              op.Summary = "Eliminar clases";
+              op.Description = "Eliminar una clase mediante su ID";
+              op.Responses["200"].Description = "Si la eliminación fue exitosa";
+              op.Responses["404"].Description = "Si no se encontró una clase con ese ID";
+              op.Responses["401"].Description = "Si el usuario no está autenticado";
+              op.Responses["403"].Description = "Si el usuario tiene los permisos para eliminar la clase";
+              return op;
+          });
+
         app.MapPost("/classes/assigned", ProfessorClasses)
           .RequireAuthorization("ProfessorOrAdmin")
           .AddEndpointFilter<UserIdFilter>()
@@ -82,24 +100,6 @@ public static class ClassRoutes
               op.Responses["200"].Description = "Si la búsqueda fue exitosa";
               op.Responses["400"].Description = "Si el formato de entrada no es adecuado";
               op.Responses["401"].Description = "Si el usuario no está autenticado";
-              return op;
-          });
-
-        app.MapDelete("/classes/{id}", DeleteClass)
-          .RequireAuthorization("ProfessorOrAdmin")
-          .AddEndpointFilter<ExecutorFilter>()
-          .Produces(StatusCodes.Status401Unauthorized)
-          .Produces(StatusCodes.Status403Forbidden)
-          .Produces<PublicClassMAPI>(StatusCodes.Status200OK)
-          .Produces(StatusCodes.Status404NotFound)
-          .WithOpenApi(op =>
-          {
-              op.Summary = "Eliminar clases";
-              op.Description = "Eliminar una clase mediante su ID";
-              op.Responses["200"].Description = "Si la eliminación fue exitosa";
-              op.Responses["404"].Description = "Si no se encontró una clase con ese ID";
-              op.Responses["401"].Description = "Si el usuario no está autenticado";
-              op.Responses["403"].Description = "Si el usuario tiene los permisos para eliminar la clase";
               return op;
           });
 
