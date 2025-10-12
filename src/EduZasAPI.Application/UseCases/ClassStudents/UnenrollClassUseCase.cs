@@ -9,7 +9,7 @@ namespace EduZasAPI.Application.Classes;
 /// Implementa el caso de uso para añadir un usuario a una clase.
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class UnEnrollClassUseCase : DeleteUseCase<ClassUserRelationIdDTO, UnenrollClassDTO, StudentClassRelationDTO>
+public class UnenrollClassUseCase : DeleteUseCase<ClassUserRelationIdDTO, UnenrollClassDTO, StudentClassRelationDTO>
 {
     /// <summary>
     /// Lector asincrónico para acceder a los datos de dominio del usuario (<see cref="UserDomain"/>)
@@ -35,7 +35,7 @@ public class UnEnrollClassUseCase : DeleteUseCase<ClassUserRelationIdDTO, Unenro
     /// </summary>
     protected IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> _professorRelationReader;
 
-    public UnEnrollClassUseCase(
+    public UnenrollClassUseCase(
         IReaderAsync<ulong, UserDomain> userReader,
         IReaderAsync<string, ClassDomain> classReader,
         IDeleterAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> deleter,
@@ -87,8 +87,7 @@ public class UnEnrollClassUseCase : DeleteUseCase<ClassUserRelationIdDTO, Unenro
             // Si no se encuentra la relacion, se marca como error de la entrada
             case { IsNone: true }:
                 {
-                    errors.Add(new FieldErrorDTO { Field = "userId, classId", Message = "No se encontró la relacion" });
-                    break;
+                    return Result.Err(UseCaseError.NotFound());
                 }
 
             /**
