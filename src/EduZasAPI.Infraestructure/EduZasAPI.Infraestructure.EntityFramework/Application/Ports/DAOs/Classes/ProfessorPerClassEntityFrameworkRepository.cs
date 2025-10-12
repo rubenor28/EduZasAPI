@@ -37,7 +37,7 @@ public class ProfessorPerClassEntityFrameworkRepository :
         .AsQueryable()
         .Where(cs => cs.ProfessorId == id.UserId)
         .Where(cs => cs.ClassId == id.ClassId)
-        .FirstAsync();
+        .FirstOrDefaultAsync();
 
     protected async override Task<ClassProfessor?> GetByIdTracked(ClassUserRelationIdDTO id) =>
         await _ctx.ClassProfessors
@@ -45,7 +45,7 @@ public class ProfessorPerClassEntityFrameworkRepository :
         .AsQueryable()
         .Where(cs => cs.ProfessorId == id.UserId)
         .Where(cs => cs.ClassId == id.ClassId)
-        .FirstAsync();
+        .FirstOrDefaultAsync();
 
     protected override void UpdateProperties(ClassProfessor entity, ProfessorClassRelationDTO uProps)
     {
