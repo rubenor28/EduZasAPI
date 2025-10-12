@@ -55,17 +55,10 @@ public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentCla
     protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
         StudentClassRelationDTO value)
     {
-        var usrSearchTask = _usrReader.GetAsync(value.Id.UserId);
-        var classSearchTask = _classReader.GetAsync(value.Id.ClassId);
-        var userIsProfessorTask = _professorReader.GetAsync(new ClassUserRelationIdDTO
-        {
-            ClassId = value.Id.ClassId,
-            UserId = value.Id.UserId
-        });
-
         var errors = new List<FieldErrorDTO>();
 
-        if ((await classSearchTask).IsNone)
+        var classSearch = await _classReader.GetAsync(value.Id.ClassId);
+        if (classSearch.IsNone)
         {
             errors.Add(new FieldErrorDTO
             {
@@ -74,15 +67,18 @@ public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentCla
             });
         }
 
-        var usrSearch = await usrSearchTask;
-
+        var usrSearch = await _usrReader.GetAsync(value.Id.UserId);
         usrSearch.IfNone(() => errors.Add(new FieldErrorDTO
         {
             Field = "userId",
             Message = "Usuario no encontrado"
         }));
 
-        var userIsProfessorSearch = await userIsProfessorTask;
+        var userIsProfessorSearch = await _professorReader.GetAsync(new ClassUserRelationIdDTO
+        {
+            ClassId = value.Id.ClassId,
+            UserId = value.Id.UserId
+        });
         userIsProfessorSearch.IfSome(_ => errors.Add(new FieldErrorDTO
         {
             Field = "userId",
