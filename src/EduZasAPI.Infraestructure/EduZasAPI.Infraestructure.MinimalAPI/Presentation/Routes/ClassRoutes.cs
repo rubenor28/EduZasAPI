@@ -192,7 +192,11 @@ public static class ClassRoutes
         return utils.HandleResponseAsync(async () =>
         {
             var userId = utils.GetIdFromContext(ctx);
-            criteria.WithStudent = new WithStudentMAPI { Id = userId };
+
+            if (criteria.WithStudent is null)
+                criteria.WithStudent = new WithStudentMAPI { Id = userId };
+            else
+                criteria.WithStudent.Id = userId;
 
             var validation = criteria.ToDomain();
             if (validation.IsErr) return utils.FieldErrorToBadRequest(validation);
