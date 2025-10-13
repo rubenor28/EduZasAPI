@@ -119,7 +119,7 @@ public static class ClassMAPIMapper
     /// </summary>
     /// <param name="source">Instancia de <see cref="ClassUpdateMAPI"/> a convertir.</param>
     /// <returns>Un <see cref="ClassUpdateDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ClassUpdateDTO ToDomain(this ClassUpdateMAPI source, ulong userId) => new ClassUpdateDTO
+    public static ClassUpdateDTO ToDomain(this ClassUpdateMAPI source, Executor executor) => new ClassUpdateDTO
     {
         Id = source.Id,
         Active = source.Active,
@@ -127,7 +127,7 @@ public static class ClassMAPIMapper
         Color = source.Color,
         Section = source.Section.ToOptional(),
         Subject = source.Subject.ToOptional(),
-        UserId = userId
+        Executor = executor
     };
 
     /// <summary>

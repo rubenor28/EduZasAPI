@@ -44,17 +44,12 @@ public class UpdateClassUseCase : UpdateUseCase<ClassUpdateDTO, ClassDomain>
         if (classToUpdate.IsNone)
             return Result.Err(UseCaseError.NotFound());
 
-        var userSearch = await _userReader.GetAsync(value.UserId);
-        if (userSearch.IsNone) return Result.Err(UseCaseError.NotFound());
-
-        var user = userSearch.Unwrap();
-
-        if (user.Role != UserType.ADMIN)
+        if (value.Executor.Role != UserType.ADMIN)
         {
             var result = await _professorClassQuerier.GetByAsync(new ProfessorClassRelationCriteriaDTO
             {
                 Page = 1,
-                UserId = Optional<ulong>.Some(value.UserId),
+                UserId = Optional<ulong>.Some(value.Executor.Id),
                 ClassId = value.Id.ToOptional(),
             });
 

@@ -1,4 +1,5 @@
 using EduZasAPI.Domain.Common;
+using EduZasAPI.Application.Common;
 
 namespace EduZasAPI.Application.Classes;
 
@@ -28,11 +29,6 @@ public class ClassUpdateDTO
     public required string Color { get; set; }
 
     /// <summary>
-    /// Profesor que ejecuta la acción de actualización
-    /// </summary>
-    public required ulong UserId { get; set; }
-
-    /// <summary>
     /// Obtiene o establece la materia o asignatura de la clase (opcional).
     /// </summary>
     public required Optional<string> Subject { get; set; }
@@ -42,4 +38,8 @@ public class ClassUpdateDTO
     /// </summary>
     public required Optional<string> Section { get; set; }
 
+    /// <summary>
+    /// Representa el ejecutor de la operacion
+    /// </summary>
+    public required Executor Executor { get; set; }
 }

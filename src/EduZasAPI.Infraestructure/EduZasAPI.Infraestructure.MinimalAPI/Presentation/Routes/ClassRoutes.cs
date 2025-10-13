@@ -214,8 +214,8 @@ public static class ClassRoutes
     {
         return utils.HandleResponseAsync(async () =>
         {
-            var professorId = utils.GetIdFromContext(ctx);
-            var classUpdate = ClassMAPIMapper.ToDomain(data, professorId);
+            var executor = utils.GetExecutorFromContext(ctx);
+            var classUpdate = ClassMAPIMapper.ToDomain(data, executor);
             var validation = await useCase.ExecuteAsync(classUpdate);
 
             if (validation.IsErr)
@@ -293,6 +293,21 @@ public static class ClassRoutes
 
             var created = validation.Unwrap();
             return Results.Ok();
+        });
+    }
+
+    public static Task<IResult> HideClass(
+      string classId,
+      HttpContent ctx,
+      RoutesUtils utils,
+      UpdateClassUseCase useCase)
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var validation = useCase.ExecuteAsync(new ClassUpdateDTO
+            {
+              
+            });
         });
     }
 }
