@@ -49,6 +49,7 @@ public class StudentPerClassEntityFrameworkRepository :
     {
         entity.ClassId = uProps.Id.ClassId;
         entity.StudentId = uProps.Id.UserId;
+        entity.Hidden = uProps.Hidden;
     }
 
 }

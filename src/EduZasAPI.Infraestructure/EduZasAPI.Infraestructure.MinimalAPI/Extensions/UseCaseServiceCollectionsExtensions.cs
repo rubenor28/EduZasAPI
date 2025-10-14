@@ -31,6 +31,7 @@ public static class UseCaseServiceCollectionExtensions
 
         services.AddTransient<EnrollClassUseCase>();
         services.AddTransient<UnenrollClassUseCase>();
+        services.AddTransient<ToggleClassVisibilityUseCase>();
 
         return services;
     }

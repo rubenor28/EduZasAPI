@@ -4,6 +4,7 @@ using EduZasAPI.Domain.Classes;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Classes;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Classes;
 
@@ -135,6 +136,24 @@ public static class ClassRoutes
               return op;
           });
 
+        app.MapPatch("/classes/{classId}/toggle-visibility", ToggleClassVisibility)
+          .RequireAuthorization("RequireAuthenticated")
+          .AddEndpointFilter<ExecutorFilter>()
+          .Produces(StatusCodes.Status401Unauthorized)
+          .Produces(StatusCodes.Status400BadRequest)
+          .Produces(StatusCodes.Status404NotFound)
+          .Produces(StatusCodes.Status200OK)
+          .WithOpenApi(op =>
+          {
+              op.Summary = "Alternar la visibilidad de una clase";
+              op.Description = "El usuario que realiza la solicitud alterna la visibilidad de una clase en la que está inscrito.";
+              op.Responses["200"].Description = "Si la operación fue exitosa";
+              op.Responses["400"].Description = "Si el usuario o clase no son válidos";
+              op.Responses["401"].Description = "Si el usuario no está autenticado";
+              op.Responses["404"].Description = "Si el usuario no está inscrito a la clase en cuestión";
+              return op;
+          });
+
         return group;
     }
 
@@ -161,9 +180,6 @@ public static class ClassRoutes
         });
     }
 
-    // TODO: Buscar por qué me agrega active: false en el criterio
-    // que indica como respuesta a pesar de no colocar ese criterio
-    // en la búsqueda
     public static Task<IResult> ProfessorClasses(
         ClassCriteriaMAPI criteria,
         HttpContext ctx,
@@ -296,18 +312,28 @@ public static class ClassRoutes
         });
     }
 
-    public static Task<IResult> HideClass(
+    public static Task<IResult> ToggleClassVisibility(
       string classId,
-      HttpContent ctx,
+      HttpContext ctx,
       RoutesUtils utils,
-      UpdateClassUseCase useCase)
+      ToggleClassVisibilityUseCase useCase)
     {
         return utils.HandleResponseAsync(async () =>
         {
-            var validation = useCase.ExecuteAsync(new ClassUpdateDTO
+            var executor = utils.GetExecutorFromContext(ctx);
+
+            var validation = await useCase.ExecuteAsync(new ToggleClassVisibilityDTO
             {
-              
+                ClassId = classId,
+                Executor = executor,
             });
+
+            if (validation.IsErr)
+                return validation.UnwrapErr().FromDomain();
+
+            var created = validation.Unwrap();
+            return Results.Ok();
+
         });
     }
 }
