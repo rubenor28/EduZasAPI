@@ -55,6 +55,7 @@ public class UserEntityFrameworkRepository :
     /// <inheritdoc/>
     protected override User NewToEF(NewUserDTO newEntity) => new User
     {
+      Active = true,
         Email = newEntity.Email,
         FirstName = newEntity.FirstName,
         MidName = newEntity.MidName.ToNullable(),

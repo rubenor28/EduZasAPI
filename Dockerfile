@@ -18,6 +18,10 @@ RUN dotnet restore EduZasAPI.sln
 
 # Copia el resto del código y publica la aplicación
 COPY . .
+
+## Eliminar los tests de la solucion
+RUN dotnet sln EduZasAPI.sln remove tests/EduZasAPI.EntityFramework.Tests/EduZasAPI.EntityFramework.Tests.csproj
+
 RUN dotnet publish EduZasAPI.sln -c Release -o ./dist
 
 # Etapa 2: Imagen final para ejecución

@@ -37,16 +37,6 @@ public partial class EduZasDotnetContext : DbContext
     public EduZasDotnetContext(DbContextOptions<EduZasDotnetContext> options)
         : base(options)
     {
-        var environment = Environment.GetEnvironmentVariable("ServerOptions__Environment");
-        if (environment != "Production")
-        {
-            var solutionRoot = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..");
-            Env.Load(solutionRoot);
-        }
-
-        _cfg = new ConfigurationBuilder()
-          .AddEnvironmentVariables()
-          .Build();
     }
 
     public virtual DbSet<Class> Classes { get; set; }
@@ -68,9 +58,14 @@ public partial class EduZasDotnetContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(
-            _cfg.GetConnectionString("DefaultConnection"),
-            Microsoft.EntityFrameworkCore.ServerVersion.Parse("12.0.2-mariadb"));
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseMySql(
+                _cfg.GetConnectionString("DefaultConnection"),
+                Microsoft.EntityFrameworkCore.ServerVersion.Parse("12.0.2-mariadb"));
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
