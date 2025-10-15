@@ -39,7 +39,7 @@ public class AddClassUseCaseTest : IDisposable
         var userRepository = new UserEntityFrameworkRepository(_ctx, 10);
         var professorRelationRepository = new ProfessorPerClassEntityFrameworkRepository(_ctx, 10);
         var validator = new NewClassFluentValidator();
-        var idGenerator = new MockRandomStringGenerator();
+        var idGenerator = new RandomStringGeneratorService("1234567890aabcdefghijklmnopqrstuvwxyz", 20);
 
         _useCase = new AddClassUseCase(classRepository, validator, userRepository, classRepository, idGenerator, professorRelationRepository);
     }
@@ -59,7 +59,7 @@ public class AddClassUseCaseTest : IDisposable
         {
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
+            Section = Optional.Some("ABC"),
             Subject = Optional.Some("Math"),
             OwnerId = 1
         };
@@ -76,7 +76,7 @@ public class AddClassUseCaseTest : IDisposable
         {
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
+            Section = Optional.Some("ABC"),
             Subject = Optional.Some("Math"),
             OwnerId = 1000
         };
@@ -88,6 +88,7 @@ public class AddClassUseCaseTest : IDisposable
         var err = result.UnwrapErr();
         Assert.Equal(typeof(InputError), err.GetType());
         Assert.Contains(((InputError)err).Errors, e => e.Field == "ownerId");
+
     }
 
     [Fact]
@@ -98,7 +99,7 @@ public class AddClassUseCaseTest : IDisposable
         {
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
+            Section = Optional.Some("ABC"),
             Subject = Optional.Some("Math"),
             OwnerId = 1
         };
@@ -110,7 +111,30 @@ public class AddClassUseCaseTest : IDisposable
     }
 
     [Fact]
-    public async Task ExecuteAsync_WithInvalidData_ReturnsError()
+    public async Task ExecuteAsync_WithInvalidClassName_ReturnsError()
+    {
+        await SeedUser(UserType.PROFESSOR);
+        var newClass = new NewClassDTO
+        {
+            ClassName = "",
+            Color = "#ffffff",
+            Section = Optional.Some("ABC"),
+            Subject = Optional.Some("Math"),
+            OwnerId = 1
+        };
+
+        var result = await _useCase.ExecuteAsync(newClass);
+
+        Assert.True(result.IsErr);
+
+        var err = result.UnwrapErr();
+        Assert.Equal(typeof(InputError), err.GetType());
+        Assert.Contains(((InputError)err).Errors, e => e.Field == "className");
+    }
+
+
+    [Fact]
+    public async Task ExecuteAsync_WithInvalidSection_ReturnsError()
     {
         await SeedUser(UserType.PROFESSOR);
         var newClass = new NewClassDTO
@@ -128,7 +152,29 @@ public class AddClassUseCaseTest : IDisposable
 
         var err = result.UnwrapErr();
         Assert.Equal(typeof(InputError), err.GetType());
-        Assert.Contains(((InputError)err).Errors, e => e.Field == "className");
+        Assert.Contains(((InputError)err).Errors, e => e.Field == "section");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithInvalidSubject_ReturnsError()
+    {
+        await SeedUser(UserType.PROFESSOR);
+        var newClass = new NewClassDTO
+        {
+            ClassName = "", // Invalid class name
+            Color = "#ffffff",
+            Section = Optional.Some("ABC"),
+            Subject = Optional.Some("T"),
+            OwnerId = 1
+        };
+
+        var result = await _useCase.ExecuteAsync(newClass);
+
+        Assert.True(result.IsErr);
+
+        var err = result.UnwrapErr();
+        Assert.Equal(typeof(InputError), err.GetType());
+        Assert.Contains(((InputError)err).Errors, e => e.Field == "subject");
     }
 
     public void Dispose()
