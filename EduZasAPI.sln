@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.EntityFramework.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.FluentValidation.Tests", "tests\EduZasAPI.FluentValidation.Tests\EduZasAPI.FluentValidation.Tests.csproj", "{A991F034-D04F-487C-9C06-D89084620EF1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduZasAPI.Application.Tests", "tests\EduZasAPI.Application.Tests\EduZasAPI.Application.Tests.csproj", "{A6A841F1-285B-41C0-90E4-C428C946E06A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,10 @@ Global
 		{A991F034-D04F-487C-9C06-D89084620EF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A991F034-D04F-487C-9C06-D89084620EF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A991F034-D04F-487C-9C06-D89084620EF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6A841F1-285B-41C0-90E4-C428C946E06A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6A841F1-285B-41C0-90E4-C428C946E06A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6A841F1-285B-41C0-90E4-C428C946E06A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6A841F1-285B-41C0-90E4-C428C946E06A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8D8EEB23-D0CB-48CA-9804-FFE97E788740} = {04FFEE81-B591-4C83-BD54-114328A069D6}
@@ -84,6 +90,7 @@ Global
 		{8534D4E9-5948-4F99-B2BB-632EEF7C9BBD} = {04FFEE81-B591-4C83-BD54-114328A069D6}
 		{06824026-BEF1-4939-B276-CFC330AEDA08} = {FD360C74-E961-40F7-95B9-9368D9CECAB1}
 		{A991F034-D04F-487C-9C06-D89084620EF1} = {FD360C74-E961-40F7-95B9-9368D9CECAB1}
+		{A6A841F1-285B-41C0-90E4-C428C946E06A} = {FD360C74-E961-40F7-95B9-9368D9CECAB1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionWorkingFolder = {31D6B226-DD5D-454B-AA72-041EBF67C4B8}
