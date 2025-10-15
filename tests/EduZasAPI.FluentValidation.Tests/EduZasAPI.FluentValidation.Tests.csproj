@@ -18,4 +18,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EduZasAPI.Domain\EduZasAPI.Domain.csproj" />
+    <ProjectReference Include="..\..\src\EduZasAPI.Application\EduZasAPI.Application.csproj" />
+    <ProjectReference Include="..\..\src\EduZasAPI.InterfaceAdapters\EduZasAPI.InterfaceAdapters.csproj" />
+    <ProjectReference Include="..\..\src\EduZasAPI.Infraestructure\EduZasAPI.Infraestructure.FluentValidation\EduZasAPI.Infraestructure.FluentValidation.csproj" />
+  </ItemGroup>
+
 </Project>
