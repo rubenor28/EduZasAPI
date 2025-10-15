@@ -1,8 +1,6 @@
 
 using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 using EduZasAPI.Domain.Common;
-using EduZasAPI.Domain.Classes;
-using EduZasAPI.Domain.Users;
 using EduZasAPI.Application.Common;
 using EduZasAPI.Application.Classes;
 using EduZasAPI.Infraestructure.EntityFramework.Application.Common;
