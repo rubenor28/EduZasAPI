@@ -21,6 +21,7 @@ COPY . .
 
 ## Eliminar los tests de la solucion
 RUN dotnet sln EduZasAPI.sln remove tests/EduZasAPI.EntityFramework.Tests/EduZasAPI.EntityFramework.Tests.csproj
+RUN dotnet sln EduZasAPI.sln remove tests/EduZasAPI.FluentValidation.Tests/EduZasAPI.FluentValidation.Tests.csproj
 
 RUN dotnet publish EduZasAPI.sln -c Release -o ./dist
 
