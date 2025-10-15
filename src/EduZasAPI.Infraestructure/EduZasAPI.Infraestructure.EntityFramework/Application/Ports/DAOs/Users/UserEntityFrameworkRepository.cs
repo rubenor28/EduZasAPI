@@ -19,8 +19,9 @@ public class UserEntityFrameworkRepository :
     protected override ulong GetId(UserUpdateDTO entity) => entity.Id;
 
     /// <inheritdoc/>
-    protected override IQueryable<User> QueryFromCriteria(UserCriteriaDTO c) =>
-        _ctx.Users.AsNoTracking().AsQueryable()
+    protected override IQueryable<User> QueryFromCriteria(UserCriteriaDTO c)
+    {
+        var query = _ctx.Users.AsNoTracking().AsQueryable()
         .WhereOptional(c.Active, v => u => u.Active == v)
         .WhereOptional(c.Role, r => u => u.Role == (uint)r)
         .WhereOptional(c.CreatedAt, d => u => u.CreatedAt == d)
@@ -31,8 +32,15 @@ public class UserEntityFrameworkRepository :
         .WhereStringQuery(c.MotherLastname, u => u.MotherLastname)
         .WhereStringQuery(c.Email, u => u.Email)
         .WhereOptional(c.EnrolledInClass, cId => u => u.ClassStudents.Any(cs => cs.ClassId == cId))
-        .WhereOptional(c.TeachingInClass, cId => u => u.ClassProfessors.Any(cpf => cpf.ClassId == cId))
-        .OrderBy(u => u.UserId);
+        .WhereOptional(c.TeachingInClass, cId => u => u.ClassProfessors.Any(cpf => cpf.ClassId == cId));
+
+        if (_ctx.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+        {
+            query = query.OrderBy(u => u.UserId);
+        }
+
+        return query;
+    }
 
     /// <inheritdoc/>
     protected override UserDomain MapToDomain(User efEntity) => new UserDomain

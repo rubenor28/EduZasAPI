@@ -37,6 +37,17 @@ public partial class EduZasDotnetContext : DbContext
     public EduZasDotnetContext(DbContextOptions<EduZasDotnetContext> options)
         : base(options)
     {
+        var environment = Environment.GetEnvironmentVariable("ServerOptions__Environment");
+        if (environment != "Production")
+        {
+            var solutionRoot = Directory.GetCurrentDirectory();
+            var envPath = Path.Combine(solutionRoot, "..", "..", "..", ".env");
+            Env.Load(envPath);
+        }
+
+        _cfg = new ConfigurationBuilder()
+          .AddEnvironmentVariables()
+          .Build();
     }
 
     public virtual DbSet<Class> Classes { get; set; }
@@ -69,17 +80,18 @@ public partial class EduZasDotnetContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .UseCollation("utf8mb4_uca1400_ai_ci")
-            .HasCharSet("utf8mb4");
+        if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+        {
+            modelBuilder
+                .UseCollation("utf8mb4_uca1400_ai_ci")
+                .HasCharSet("utf8mb4");
+        }
 
         modelBuilder.Entity<Class>(entity =>
         {
             entity.HasKey(e => e.ClassId).HasName("PRIMARY");
 
-            entity
-                .ToTable("classes")
-                .UseCollation("utf8mb4_unicode_ci");
+            entity.ToTable("classes");
 
             entity.Property(e => e.ClassId)
                 .HasMaxLength(15)
@@ -91,15 +103,6 @@ public partial class EduZasDotnetContext : DbContext
             entity.Property(e => e.ClassName)
                 .HasMaxLength(100)
                 .HasColumnName("class_name");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.ModifiedAt)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("modified_at");
             entity.Property(e => e.Section)
                 .HasMaxLength(100)
                 .HasColumnName("section");
@@ -110,6 +113,18 @@ public partial class EduZasDotnetContext : DbContext
                 .HasMaxLength(7)
                 .HasColumnName("color")
                 .HasDefaultValueSql("'#007bff'");
+
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("modified_at");
+            }
+            else
+            {
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("modified_at");
+            }
 
             entity.HasMany(d => d.Professors).WithMany(p => p.ClassesNavigation)
                 .UsingEntity<Dictionary<string, object>>(
@@ -122,48 +137,44 @@ public partial class EduZasDotnetContext : DbContext
                         .HasConstraintName("resources_per_class_ibfk_1"),
                     j =>
                     {
-                        j.HasKey("ClassId", "ProfessorId")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j
-                            .ToTable("resources_per_class")
-                            .UseCollation("utf8mb4_unicode_ci");
+                        j.HasKey("ClassId", "ProfessorId").HasName("PRIMARY");
+                        j.ToTable("resources_per_class");
                         j.HasIndex(new[] { "ProfessorId" }, "professor_id3");
-                        j.IndexerProperty<string>("ClassId")
-                            .HasMaxLength(20)
-                            .HasColumnName("class_id");
-                        j.IndexerProperty<ulong>("ProfessorId")
-                            .HasColumnType("bigint(20) unsigned")
-                            .HasColumnName("professor_id");
+                        j.IndexerProperty<string>("ClassId").HasMaxLength(20).HasColumnName("class_id");
+                        
+                        if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+                        {
+                            j.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                            j.UseCollation("utf8mb4_unicode_ci");
+                            j.IndexerProperty<ulong>("ProfessorId").HasColumnType("bigint(20) unsigned").HasColumnName("professor_id");
+                        }
+                        else
+                        {
+                            j.IndexerProperty<ulong>("ProfessorId").HasColumnName("professor_id");
+                        }
                     });
         });
 
         modelBuilder.Entity<ClassProfessor>(entity =>
         {
-            entity.HasKey(e => new { e.ClassId, e.ProfessorId })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity
-                .ToTable("class_professors")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.HasKey(e => new { e.ClassId, e.ProfessorId }).HasName("PRIMARY");
+            entity.ToTable("class_professors");
             entity.HasIndex(e => e.ProfessorId, "professor_id");
+            entity.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
+            entity.Property(e => e.IsOwner).IsRequired().HasDefaultValue(false).HasColumnName("is_owner");
 
-            entity.Property(e => e.ClassId)
-                .HasMaxLength(20)
-                .HasColumnName("class_id");
-            entity.Property(e => e.ProfessorId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("professor_id");
-            entity.Property(e => e.IsOwner)
-                .IsRequired()
-                .HasDefaultValue(false)
-                .HasColumnName("is_owner");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.Property(e => e.ProfessorId).HasColumnType("bigint(20) unsigned").HasColumnName("professor_id");
+                entity.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("created_at");
+            }
+            else
+            {
+                entity.Property(e => e.ProfessorId).HasColumnName("professor_id");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("created_at");
+            }
 
             entity.HasOne(d => d.Class).WithMany(p => p.ClassProfessors)
                 .HasForeignKey(d => d.ClassId)
@@ -176,30 +187,24 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<ClassStudent>(entity =>
         {
-            entity.HasKey(e => new { e.ClassId, e.StudentId })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity
-                .ToTable("class_students")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.HasKey(e => new { e.ClassId, e.StudentId }).HasName("PRIMARY");
+            entity.ToTable("class_students");
             entity.HasIndex(e => e.StudentId, "student_id");
+            entity.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
+            entity.Property(e => e.Hidden).IsRequired().HasColumnName("hidden").HasDefaultValue(false);
 
-            entity.Property(e => e.ClassId)
-                .HasMaxLength(20)
-                .HasColumnName("class_id");
-            entity.Property(e => e.StudentId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("student_id");
-            entity.Property(e => e.Hidden)
-                .IsRequired()
-                .HasColumnName("hidden")
-                .HasDefaultValue(false);
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.Property(e => e.StudentId).HasColumnType("bigint(20) unsigned").HasColumnName("student_id");
+                entity.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("created_at");
+            }
+            else
+            {
+                entity.Property(e => e.StudentId).HasColumnName("student_id");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("created_at");
+            }
 
             entity.HasOne(d => d.Class).WithMany(p => p.ClassStudents)
                 .HasForeignKey(d => d.ClassId)
@@ -213,30 +218,23 @@ public partial class EduZasDotnetContext : DbContext
         modelBuilder.Entity<Notification>(entity =>
         {
             entity.HasKey(e => e.NotificationId).HasName("PRIMARY");
-
-            entity
-                .ToTable("notifications")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.ToTable("notifications");
             entity.HasIndex(e => e.ClassId, "class_id");
+            entity.Property(e => e.Active).IsRequired().HasDefaultValueSql("'1'").HasColumnName("active");
+            entity.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
+            entity.Property(e => e.Title).HasMaxLength(20).HasColumnName("title");
 
-            entity.Property(e => e.NotificationId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("notification_id");
-            entity.Property(e => e.Active)
-                .IsRequired()
-                .HasDefaultValueSql("'1'")
-                .HasColumnName("active");
-            entity.Property(e => e.ClassId)
-                .HasMaxLength(20)
-                .HasColumnName("class_id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Title)
-                .HasMaxLength(20)
-                .HasColumnName("title");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.Property(e => e.NotificationId).HasColumnType("bigint(20) unsigned").HasColumnName("notification_id");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("created_at");
+            }
+            else
+            {
+                entity.Property(e => e.NotificationId).HasColumnName("notification_id");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("created_at");
+            }
 
             entity.HasOne(d => d.Class).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.ClassId)
@@ -245,28 +243,25 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<NotificationPerUser>(entity =>
         {
-            entity.HasKey(e => new { e.NotificationId, e.UserId })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity
-                .ToTable("notification_per_user")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.HasKey(e => new { e.NotificationId, e.UserId }).HasName("PRIMARY");
+            entity.ToTable("notification_per_user");
             entity.HasIndex(e => e.UserId, "user_id");
-
-            entity.Property(e => e.NotificationId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("notification_id");
-            entity.Property(e => e.UserId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("user_id");
-            entity.Property(e => e.ModifiedAt)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("modified_at");
             entity.Property(e => e.Readed).HasColumnName("readed");
+
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                entity.Property(e => e.NotificationId).HasColumnType("bigint(20) unsigned").HasColumnName("notification_id");
+                entity.Property(e => e.UserId).HasColumnType("bigint(20) unsigned").HasColumnName("user_id");
+                entity.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("modified_at");
+            }
+            else
+            {
+                entity.Property(e => e.NotificationId).HasColumnName("notification_id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("modified_at");
+            }
 
             entity.HasOne(d => d.Notification).WithMany(p => p.NotificationPerUsers)
                 .HasForeignKey(d => d.NotificationId)
@@ -280,29 +275,23 @@ public partial class EduZasDotnetContext : DbContext
         modelBuilder.Entity<Resource>(entity =>
         {
             entity.HasKey(e => e.ResourceId).HasName("PRIMARY");
-
-            entity
-                .ToTable("resources")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.ToTable("resources");
             entity.HasIndex(e => e.ProfessorId, "professor_id1");
+            entity.Property(e => e.Active).IsRequired().HasDefaultValueSql("'1'").HasColumnName("active");
+            entity.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
+            entity.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
 
-            entity.Property(e => e.ResourceId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("resource_id");
-            entity.Property(e => e.Active)
-                .IsRequired()
-                .HasDefaultValueSql("'1'")
-                .HasColumnName("active");
-            entity.Property(e => e.Content)
-                .HasColumnType("json")
-                .HasColumnName("content");
-            entity.Property(e => e.ProfessorId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("professor_id");
-            entity.Property(e => e.Title)
-                .HasMaxLength(35)
-                .HasColumnName("title");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.Property(e => e.ResourceId).HasColumnType("bigint(20) unsigned").HasColumnName("resource_id");
+                entity.Property(e => e.ProfessorId).HasColumnType("bigint(20) unsigned").HasColumnName("professor_id");
+            }
+            else
+            {
+                entity.Property(e => e.ResourceId).HasColumnName("resource_id");
+                entity.Property(e => e.ProfessorId).HasColumnName("professor_id");
+            }
 
             entity.HasOne(d => d.Professor).WithMany(p => p.Resources)
                 .HasForeignKey(d => d.ProfessorId)
@@ -312,28 +301,24 @@ public partial class EduZasDotnetContext : DbContext
         modelBuilder.Entity<Test>(entity =>
         {
             entity.HasKey(e => e.TestId).HasName("PRIMARY");
-
-            entity
-                .ToTable("tests")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.ToTable("tests");
             entity.HasIndex(e => e.ProfessorId, "professor_id2");
+            entity.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
+            entity.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
 
-            entity.Property(e => e.TestId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("test_id");
-            entity.Property(e => e.Content)
-                .HasColumnType("json")
-                .HasColumnName("content");
-            entity.Property(e => e.ProfessorId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("professor_id");
-            entity.Property(e => e.TimeLimitMinutes)
-                .HasColumnType("int(10) unsigned")
-                .HasColumnName("time_limit_minutes");
-            entity.Property(e => e.Title)
-                .HasMaxLength(35)
-                .HasColumnName("title");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.Property(e => e.TestId).HasColumnType("bigint(20) unsigned").HasColumnName("test_id");
+                entity.Property(e => e.ProfessorId).HasColumnType("bigint(20) unsigned").HasColumnName("professor_id");
+                entity.Property(e => e.TimeLimitMinutes).HasColumnType("int(10) unsigned").HasColumnName("time_limit_minutes");
+            }
+            else
+            {
+                entity.Property(e => e.TestId).HasColumnName("test_id");
+                entity.Property(e => e.ProfessorId).HasColumnName("professor_id");
+                entity.Property(e => e.TimeLimitMinutes).HasColumnName("time_limit_minutes");
+            }
 
             entity.HasOne(d => d.Professor).WithMany(p => p.Tests)
                 .HasForeignKey(d => d.ProfessorId)
@@ -342,23 +327,22 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<TestPerClass>(entity =>
         {
-            entity.HasKey(e => new { e.TestId, e.ClassId })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity
-                .ToTable("tests_per_class")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.HasKey(e => new { e.TestId, e.ClassId }).HasName("PRIMARY");
+            entity.ToTable("tests_per_class");
             entity.HasIndex(e => e.ClassId, "class_id1");
-
-            entity.Property(e => e.TestId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("test_id");
-            entity.Property(e => e.ClassId)
-                .HasMaxLength(20)
-                .HasColumnName("class_id");
+            entity.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
             entity.Property(e => e.Visible).HasColumnName("visible");
+
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                entity.Property(e => e.TestId).HasColumnType("bigint(20) unsigned").HasColumnName("test_id");
+            }
+            else
+            {
+                entity.Property(e => e.TestId).HasColumnName("test_id");
+            }
 
             entity.HasOne(d => d.Class).WithMany(p => p.TestsPerClasses)
                 .HasForeignKey(d => d.ClassId)
@@ -372,51 +356,31 @@ public partial class EduZasDotnetContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PRIMARY");
-
-            entity
-                .ToTable("users")
-                .UseCollation("utf8mb4_unicode_ci");
-
+            entity.ToTable("users");
             entity.HasIndex(e => e.Email, "email").IsUnique();
+            entity.Property(e => e.Active).IsRequired().HasDefaultValueSql("'1'").HasColumnName("active");
+            entity.Property(e => e.Email).HasMaxLength(30).HasColumnName("email");
+            entity.Property(e => e.FatherLastname).HasMaxLength(20).HasColumnName("father_lastname");
+            entity.Property(e => e.FirstName).HasMaxLength(20).HasColumnName("first_name");
+            entity.Property(e => e.MidName).HasMaxLength(20).HasColumnName("mid_name");
+            entity.Property(e => e.MotherLastname).HasMaxLength(20).HasColumnName("mother_lastname");
+            entity.Property(e => e.Password).HasMaxLength(60).HasColumnName("password");
 
-            entity.Property(e => e.UserId)
-                .HasColumnType("bigint(20) unsigned")
-                .HasColumnName("user_id");
-            entity.Property(e => e.Active)
-                .IsRequired()
-                .HasDefaultValueSql("'1'")
-                .HasColumnName("active");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Email)
-                .HasMaxLength(30)
-                .HasColumnName("email");
-            entity.Property(e => e.FatherLastname)
-                .HasMaxLength(20)
-                .HasColumnName("father_lastname");
-            entity.Property(e => e.FirstName)
-                .HasMaxLength(20)
-                .HasColumnName("first_name");
-            entity.Property(e => e.MidName)
-                .HasMaxLength(20)
-                .HasColumnName("mid_name");
-            entity.Property(e => e.ModifiedAt)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("datetime")
-                .HasColumnName("modified_at");
-            entity.Property(e => e.MotherLastname)
-                .HasMaxLength(20)
-                .HasColumnName("mother_lastname");
-            entity.Property(e => e.Password)
-                .HasMaxLength(60)
-                .HasColumnName("password");
-            entity.Property(e => e.Role)
-                .HasDefaultValueSql("'0'")
-                .HasColumnType("int(10) unsigned")
-                .HasColumnName("role");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                entity.UseCollation("utf8mb4_unicode_ci");
+                entity.Property(e => e.UserId).HasColumnType("bigint(20) unsigned").HasColumnName("user_id");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("modified_at");
+                entity.Property(e => e.Role).HasDefaultValueSql("'0'").HasColumnType("int(10) unsigned").HasColumnName("role");
+            }
+            else
+            {
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("modified_at");
+                entity.Property(e => e.Role).HasDefaultValueSql("'0'").HasColumnName("role");
+            }
         });
 
         OnModelCreatingPartial(modelBuilder);
