@@ -1,4 +1,3 @@
-
 using EduZasAPI.Application.Users;
 using EduZasAPI.Domain.Common;
 using EduZasAPI.Infraestructure.FluentValidation.Application.Users;
@@ -16,7 +15,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 1,
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastName = "LUKE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.Some("FITZGERALD"),

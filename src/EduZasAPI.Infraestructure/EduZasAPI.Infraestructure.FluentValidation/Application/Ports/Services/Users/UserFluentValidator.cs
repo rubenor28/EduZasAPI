@@ -51,15 +51,15 @@ public class UserFluentValidator : FluentValidator<UserDomain>
 
         RuleFor(x => x.MidName)
             .Must(opt => opt.Match(
-                name => Regex.IsMatch(UserRegexs.SimpleName, name) ||
-                        Regex.IsMatch(UserRegexs.CompositeName, name),
+                name => Regex.IsMatch(name, UserRegexs.SimpleName) ||
+                        Regex.IsMatch(name, UserRegexs.CompositeName),
                 () => true
             )).WithMessage("Formato inválido");
 
         RuleFor(x => x.MotherLastname)
             .Must(opt => opt.Match(
-                name => Regex.IsMatch(UserRegexs.SimpleName, name) ||
-                        Regex.IsMatch(UserRegexs.CompositeName, name),
+                name => Regex.IsMatch(name, UserRegexs.SimpleName) ||
+                        Regex.IsMatch(name, UserRegexs.CompositeName),
                 () => true
             )).WithMessage("Formato inválido");
     }
