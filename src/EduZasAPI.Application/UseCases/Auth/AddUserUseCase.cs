@@ -78,7 +78,7 @@ public class AddUserUseCase : AddUseCase<NewUserDTO, UserDomain>
         {
             var error = new FieldErrorDTO { Field = "email", Message = "Email ya registrado" };
             errs.Add(error);
-            return Result.Err(UseCaseError.InputError(errs));
+            return Result.Err(UseCaseError.Input(errs));
         }
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);

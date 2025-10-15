@@ -1,5 +1,4 @@
 using EduZasAPI.Domain.Common;
-using EduZasAPI.Application.Common;
 
 namespace EduZasAPI.Application.Common;
 
@@ -56,7 +55,7 @@ public class UpdateUseCase<UE, E>
             var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
             {
-                var err = UseCaseError.InputError(validation.UnwrapErr());
+                var err = UseCaseError.Input(validation.UnwrapErr());
                 return Result<E, UseCaseErrorImpl>.Err(err);
             }
         }

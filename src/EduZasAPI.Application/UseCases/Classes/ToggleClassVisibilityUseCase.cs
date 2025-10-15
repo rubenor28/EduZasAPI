@@ -51,7 +51,7 @@ public class ToggleClassVisibilityUseCase : IUseCaseAsync<ToggleClassVisibilityD
             errors.Add(new FieldErrorDTO { Field = "userId", Message = "No se encontró el usuario" });
 
         if (errors.Any())
-            return Result.Err(UseCaseError.InputError(errors));
+            return Result.Err(UseCaseError.Input(errors));
 
         var relationSearch = await _relationReader.GetAsync(new ClassUserRelationIdDTO
         {

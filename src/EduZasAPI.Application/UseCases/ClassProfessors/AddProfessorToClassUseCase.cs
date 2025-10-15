@@ -96,7 +96,7 @@ public class AddProfessorToClassUseCase : AddUseCase<ProfessorClassRelationDTO, 
             Message = "Usuario no encontrado"
         }));
 
-        if (errors.Count > 0) return Result.Err(UseCaseError.InputError(errors));
+        if (errors.Count > 0) return Result.Err(UseCaseError.Input(errors));
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }

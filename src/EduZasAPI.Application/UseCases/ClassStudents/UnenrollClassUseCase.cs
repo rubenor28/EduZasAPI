@@ -129,7 +129,7 @@ public class UnenrollClassUseCase : DeleteUseCase<ClassUserRelationIdDTO, Unenro
         }
 
         if (errors.Count > 0)
-            return Result.Err(UseCaseError.InputError(errors));
+            return Result.Err(UseCaseError.Input(errors));
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }

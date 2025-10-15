@@ -62,7 +62,7 @@ public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentCla
         var relationSearch = await _studentReader.GetAsync(value.Id);
 
         if (relationSearch.IsSome)
-            return Result.Err(UseCaseError.InputError(new List<FieldErrorDTO> {
+            return Result.Err(UseCaseError.Input(new List<FieldErrorDTO> {
                 new FieldErrorDTO { Field = "userId, classId", Message = "El usuario ya se encuentra inscrito a esta clase" }
           }));
 
@@ -93,7 +93,7 @@ public class EnrollClassUseCase : AddUseCase<StudentClassRelationDTO, StudentCla
         }));
 
         if (errors.Count > 0)
-            return Result.Err(UseCaseError.InputError(errors));
+            return Result.Err(UseCaseError.Input(errors));
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }

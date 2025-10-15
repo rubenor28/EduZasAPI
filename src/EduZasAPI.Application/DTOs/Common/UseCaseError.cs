@@ -15,15 +15,15 @@ public class UseCaseError
     /// <summary>
     /// Instancia única y privada del error de tipo Unauthorized para ser reutilizada (Patrón Singleton).
     /// </summary>
-    private static readonly Unauthorized _unauthorized = new();
-    private static readonly NotFound _notFound = new();
+    private static readonly UnauthorizedError _unauthorized = new();
+    private static readonly NotFoundError _notFound = new();
 
     /// <summary>
     /// Crea un error que representa una validación de entrada de datos fallida.
     /// </summary>
     /// <param name="errors">La lista de errores de campo específicos.</param>
     /// <returns>Una instancia de error de tipo <see cref="Input"/>.</returns>
-    public static UseCaseErrorImpl InputError(List<FieldErrorDTO> errors) => new Input(errors);
+    public static UseCaseErrorImpl Input(List<FieldErrorDTO> Errors) => new InputError(Errors);
 
     /// <summary>
     /// Devuelve la instancia única de un error que representa una falla de autorización.
@@ -41,14 +41,14 @@ public class UseCaseError
 /// Representa un error ocurrido debido a una validación de entrada de datos fallida.
 /// </summary>
 /// <param name="errors">Lista de errores que detallan los campos y mensajes de la validación.</param>
-public record Input(List<FieldErrorDTO> errors) : UseCaseErrorImpl;
+public record InputError(List<FieldErrorDTO> Errors) : UseCaseErrorImpl;
 
 /// <summary>
 /// Representa un error ocurrido porque el usuario no tiene los permisos necesarios para realizar una operación.
 /// </summary>
-public record Unauthorized() : UseCaseErrorImpl;
+public record UnauthorizedError() : UseCaseErrorImpl;
 
 /// <summary>
 /// Representa un error ocurrido cuando no se encuentra un recurso.
 /// </summary>
-public record NotFound() : UseCaseErrorImpl;
+public record NotFoundError() : UseCaseErrorImpl;

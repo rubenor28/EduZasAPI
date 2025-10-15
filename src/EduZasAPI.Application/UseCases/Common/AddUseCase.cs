@@ -53,7 +53,7 @@ public class AddUseCase<NE, E> : IUseCaseAsync<NE, Result<E, UseCaseErrorImpl>>
             var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
             {
-                var err = UseCaseError.InputError(validation.UnwrapErr());
+                var err = UseCaseError.Input(validation.UnwrapErr());
                 return Result<E, UseCaseErrorImpl>.Err(err);
             }
         }

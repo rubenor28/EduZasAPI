@@ -40,7 +40,7 @@ public class DeleteUseCase<I, DE, E> : IUseCaseAsync<DE, E, UseCaseErrorImpl>
             if (validation.IsErr)
             {
                 var errors = validation.UnwrapErr();
-                return Result<E, UseCaseErrorImpl>.Err(UseCaseError.InputError(errors));
+                return Result<E, UseCaseErrorImpl>.Err(UseCaseError.Input(errors));
             }
         }
 

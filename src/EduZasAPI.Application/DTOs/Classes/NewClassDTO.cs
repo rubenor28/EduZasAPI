@@ -10,7 +10,7 @@ public class NewClassDTO
     /// <summary>
     /// Id auto generado por el sistema.
     /// </summary>
-    public required string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     /// <summary>
     /// Obtiene o establece el nombre de la clase.

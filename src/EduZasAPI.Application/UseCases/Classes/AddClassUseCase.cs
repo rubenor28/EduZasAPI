@@ -62,23 +62,21 @@ public class AddClassUseCase : AddUseCase<NewClassDTO, ClassDomain>
         var errors = new List<FieldErrorDTO>();
         var usrSearch = await _usrReader.GetAsync(value.OwnerId);
 
-        usrSearch.IfNone(() => errors.Add(new FieldErrorDTO
+        if (usrSearch.IsNone)
         {
-            Field = "ownerId",
-            Message = "No se encontró el usuario"
-        }));
+            errors.Add(new FieldErrorDTO
+            {
+                Field = "ownerId",
+                Message = "No se encontró el usuario"
+            });
+            return Result.Err(UseCaseError.Input(errors));
+        }
 
-        usrSearch.IfSome(usr =>
+        var usr = usrSearch.Unwrap();
+        if (!_allowedRoles.Contains(usr.Role))
         {
-            if (!_allowedRoles.Contains(usr.Role))
-                errors.Add(new FieldErrorDTO
-                {
-                    Field = "ownerId",
-                    Message = "No tiene los permisos apropiados"
-                });
-        });
-
-        if (errors.Count > 0) return Result.Err(UseCaseError.InputError(errors));
+            return Result.Err(UseCaseError.UnauthorizedError());
+        }
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }
