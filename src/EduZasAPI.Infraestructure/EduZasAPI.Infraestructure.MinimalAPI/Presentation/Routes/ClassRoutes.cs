@@ -4,7 +4,6 @@ using EduZasAPI.Domain.Classes;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Classes;
 using EduZasAPI.Infraestructure.MinimalAPI.Application.Common;
 using EduZasAPI.Infraestructure.MinimalAPI.Presentation.Common;
-using Microsoft.AspNetCore.Mvc;
 
 namespace EduZasAPI.Infraestructure.MinimalAPI.Presentation.Classes;
 

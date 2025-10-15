@@ -4,7 +4,6 @@ namespace EduZasAPI.Infraestructure.Bcrypt.Application.Common;
 
 // Si no está dentro del namespace 
 // no funciona esta cosa
-using BCrypt.Net;
 
 /// <summary>
 /// Implementación del servicio de hashing utilizando el algoritmo BCrypt.
@@ -21,7 +20,7 @@ public class BCryptHasher : IHashService
     /// </summary>
     /// <param name="input">Cadena de texto original a hashear.</param>
     /// <returns>El hash BCrypt generado a partir de la cadena de entrada.</returns>
-    public string Hash(string input) => BCrypt.HashPassword(inputKey: input);
+    public string Hash(string input) => BCrypt.Net.BCrypt.HashPassword(inputKey: input);
     
     /// <summary>
     /// Verifica si una cadena de texto coincide con un hash BCrypt dado.
@@ -31,5 +30,5 @@ public class BCryptHasher : IHashService
     /// <returns>
     /// true si la cadena de texto coincide con el hash BCrypt proporcionado; false en caso contrario.
     /// </returns>
-    public bool Matches(string input, string hash) => BCrypt.Verify(input, hash);
+    public bool Matches(string input, string hash) => BCrypt.Net.BCrypt.Verify(input, hash);
 }

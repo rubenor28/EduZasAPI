@@ -17,13 +17,13 @@ public static class UseCaseErrorMAPIMapper
     {
         return err switch
         {
-            Input errs => Results.BadRequest(new FieldErrorResponse
+            InputError errs => Results.BadRequest(new FieldErrorResponse
             {
                 Message = "Formato inválido",
-                Errors = errs.errors
+                Errors = errs.Errors
             }),
-            Unauthorized => Results.Forbid(),
-            NotFound => Results.NotFound(),
+            UnauthorizedError => Results.Forbid(),
+            NotFoundError => Results.NotFound(),
             _ => throw new InvalidOperationException()
         };
     }
