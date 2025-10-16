@@ -1,4 +1,6 @@
-﻿using EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
+﻿using EduZasAPI.Infraestructure.EntityFramework.Application.AgendaContacts;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Answers;
+using EduZasAPI.Infraestructure.EntityFramework.Application.Classes;
 using EduZasAPI.Infraestructure.EntityFramework.Application.ClassProfessors;
 using EduZasAPI.Infraestructure.EntityFramework.Application.ClassStudents;
 using EduZasAPI.Infraestructure.EntityFramework.Application.NotificationsPerUser;
@@ -33,6 +35,12 @@ public partial class User : ISoftDeletableEF
 
     public DateTime ModifiedAt { get; set; }
 
+    public virtual ICollection<AgendaContact> AgendaContactAgendaOwners { get; set; } = new List<AgendaContact>();
+
+    public virtual ICollection<AgendaContact> AgendaContactContacts { get; set; } = new List<AgendaContact>();
+
+    public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
+
     public virtual ICollection<ClassProfessor> ClassProfessors { get; set; } = new List<ClassProfessor>();
 
     public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
@@ -42,6 +50,4 @@ public partial class User : ISoftDeletableEF
     public virtual ICollection<Resource> Resources { get; set; } = new List<Resource>();
 
     public virtual ICollection<Test> Tests { get; set; } = new List<Test>();
-
-    public virtual ICollection<Class> ClassesNavigation { get; set; } = new List<Class>();
 }
