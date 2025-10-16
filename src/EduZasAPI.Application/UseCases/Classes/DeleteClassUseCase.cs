@@ -5,25 +5,12 @@ using EduZasAPI.Domain.Users;
 
 namespace EduZasAPI.Application.Classes;
 
-public class DeleteClassUseCase : DeleteUseCase<string, DeleteClassDTO, ClassDomain>
+public class DeleteClassUseCase(
+    IDeleterAsync<string, ClassDomain> deleter,
+    IReaderAsync<string, ClassDomain> reader,
+    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> relationReader
+) : DeleteUseCase<string, DeleteClassDTO, ClassDomain>(deleter)
 {
-    private readonly IReaderAsync<string, ClassDomain> _reader;
-    private readonly IReaderAsync<
-        ClassUserRelationIdDTO,
-        ProfessorClassRelationDTO
-    > _relationReader;
-
-    public DeleteClassUseCase(
-        IDeleterAsync<string, ClassDomain> deleter,
-        IReaderAsync<string, ClassDomain> reader,
-        IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> classRelationReader
-    )
-        : base(deleter)
-    {
-        _reader = reader;
-        _relationReader = classRelationReader;
-    }
-
     protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
         DeleteClassDTO value
     )
@@ -31,7 +18,7 @@ public class DeleteClassUseCase : DeleteUseCase<string, DeleteClassDTO, ClassDom
         if (value.Executor.Role == UserType.STUDENT)
             return Result.Err(UseCaseError.UnauthorizedError());
 
-        var classSearch = await _reader.GetAsync(value.Id);
+        var classSearch = await reader.GetAsync(value.Id);
 
         if (classSearch.IsNone)
             return Result.Err(UseCaseError.NotFound());
@@ -40,7 +27,7 @@ public class DeleteClassUseCase : DeleteUseCase<string, DeleteClassDTO, ClassDom
 
         if (value.Executor.Role != UserType.ADMIN)
         {
-            var relation = await _relationReader.GetAsync(
+            var relation = await relationReader.GetAsync(
                 new ClassUserRelationIdDTO { ClassId = c.Id, UserId = value.Executor.Id }
             );
 
