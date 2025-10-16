@@ -11,19 +11,19 @@ public static class Optional
     /// <typeparam name="T">Tipo del valor.</typeparam>
     /// <param name="value">Valor a encapsular.</param>
     /// <returns>Un <see cref="Optional{T}"/> que contiene el valor proporcionado.</returns>
-    public static Optional<T> Some<T>(T value) where T : notnull
-        => Optional<T>.Some(value);
+    public static Optional<T> Some<T>(T value)
+        where T : notnull => Optional<T>.Some(value);
 
     /// <summary>
     /// Crea un valor opcional vacío (sin valor).
     /// </summary>
     /// <typeparam name="T">Tipo del valor esperado.</typeparam>
     /// <returns>Un <see cref="Optional{T}"/> sin valor.</returns>
-    public static Optional<T> None<T>() where T : notnull
-        => Optional<T>.None();
+    public static Optional<T> None<T>()
+        where T : notnull => Optional<T>.None();
 
     /// <summary>
-    /// Convierte un valor anulable de tipo estructurado (<see cref="Nullable{T}"/>) 
+    /// Convierte un valor anulable de tipo estructurado (<see cref="Nullable{T}"/>)
     /// en una instancia de <see cref="Optional{T}"/>.
     /// </summary>
     /// <typeparam name="T">Tipo del valor estructurado.</typeparam>
@@ -32,8 +32,8 @@ public static class Optional
     /// Un <see cref="Optional{T}"/> con el valor si <paramref name="value"/> tiene contenido,
     /// o <see cref="Optional{T}.None"/> si es nulo.
     /// </returns>
-    public static Optional<T> ToOptional<T>(this T? value) where T : struct
-        => value.HasValue ? Optional<T>.Some(value.Value) : Optional<T>.None();
+    public static Optional<T> ToOptional<T>(this T? value)
+        where T : struct => value.HasValue ? Optional<T>.Some(value.Value) : Optional<T>.None();
 
     /// <summary>
     /// Convierte una referencia de objeto posiblemente nula en una instancia de <see cref="Optional{T}"/>.
@@ -44,8 +44,8 @@ public static class Optional
     /// Un <see cref="Optional{T}"/> con el valor si <paramref name="value"/> no es nulo,
     /// o <see cref="Optional{T}.None"/> si es nulo.
     /// </returns>
-    public static Optional<T> ToOptional<T>(this T? value) where T : class
-        => value is null ? Optional<T>.None() : Optional<T>.Some(value);
+    public static Optional<T> ToOptional<T>(this T? value)
+        where T : class => value is null ? Optional<T>.None() : Optional<T>.Some(value);
 }
 
 /// <summary>
@@ -56,9 +56,9 @@ public static class Optional
 /// Esta clase abstracta proporciona una forma segura de trabajar con valores que pueden estar presentes o no,
 /// evitando el uso de referencias nulas. Inspirado en los tipos Option de lenguajes funcionales.
 /// </remarks>
-public abstract class Optional<T> where T : notnull
+public abstract class Optional<T>
+    where T : notnull
 {
-
     /// <summary>
     /// Instancia única que representa un Optional vacío.
     /// </summary>
@@ -85,6 +85,13 @@ public abstract class Optional<T> where T : notnull
     /// </summary>
     /// <returns>Un Optional en estado None.</returns>
     public static Optional<T> None() => _none;
+
+    /// <summary>
+    /// Convierte implícitamente un valor de tipo <typeparamref name="T"/> en un <see cref="Optional{T}"/> en estado Some.
+    /// </summary>
+    /// <param name="value">El valor a encapsular.</param>
+    /// <returns>Un <see cref="Optional{T}"/> que contiene el valor.</returns>
+    public static implicit operator Optional<T>(T value) => new SomeOptional(value);
 
     /// <summary>
     /// Obtiene un valor que indica si el Optional contiene un valor.
@@ -124,7 +131,8 @@ public abstract class Optional<T> where T : notnull
     /// <returns>
     /// Un nuevo Optional con el valor transformado si estaba presente, o vacío si estaba vacío.
     /// </returns>
-    public abstract Optional<U> Map<U>(Func<T, U> mapper) where U : notnull;
+    public abstract Optional<U> Map<U>(Func<T, U> mapper)
+        where U : notnull;
 
     /// <summary>
     /// Encadena operaciones aplicando una función que devuelve otro Optional.
@@ -134,7 +142,8 @@ public abstract class Optional<T> where T : notnull
     /// <returns>
     /// El Optional devuelto por la función si había valor, o vacío si estaba vacío.
     /// </returns>
-    public abstract Optional<U> AndThen<U>(Func<T, Optional<U>> binder) where U : notnull;
+    public abstract Optional<U> AndThen<U>(Func<T, Optional<U>> binder)
+        where U : notnull;
 
     /// <summary>
     /// Desenvuelve el valor contenido o ejecuta una función para obtener un valor por defecto.
@@ -239,12 +248,10 @@ public abstract class Optional<T> where T : notnull
         public override U Match<U>(Func<T, U> someAction, Func<U> noneAction) => someAction(_value);
 
         /// <inheritdoc/>
-        public override Optional<U> Map<U>(Func<T, U> mapper) =>
-            Optional<U>.Some(mapper(_value));
+        public override Optional<U> Map<U>(Func<T, U> mapper) => Optional<U>.Some(mapper(_value));
 
         /// <inheritdoc/>
-        public override Optional<U> AndThen<U>(Func<T, Optional<U>> binder) =>
-            binder(_value);
+        public override Optional<U> AndThen<U>(Func<T, Optional<U>> binder) => binder(_value);
 
         /// <inheritdoc/>
         public override Optional<T> OrElse(Func<Optional<T>> provider) => this;
@@ -284,16 +291,13 @@ public abstract class Optional<T> where T : notnull
         public override U Match<U>(Func<T, U> someAction, Func<U> noneAction) => noneAction();
 
         /// <inheritdoc/>
-        public override Optional<U> Map<U>(Func<T, U> mapper) =>
-            Optional<U>.None();
+        public override Optional<U> Map<U>(Func<T, U> mapper) => Optional<U>.None();
 
         /// <inheritdoc/>
-        public override Optional<U> AndThen<U>(Func<T, Optional<U>> binder) =>
-            Optional<U>.None();
+        public override Optional<U> AndThen<U>(Func<T, Optional<U>> binder) => Optional<U>.None();
 
         /// <inheritdoc/>
-        public override Optional<T> OrElse(Func<Optional<T>> provider) =>
-            provider();
+        public override Optional<T> OrElse(Func<Optional<T>> provider) => provider();
 
         /// <inheritdoc/>
         public override void IfSome(Action<T> action) { }

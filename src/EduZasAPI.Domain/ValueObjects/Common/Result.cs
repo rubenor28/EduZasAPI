@@ -11,8 +11,8 @@ public static class Result
     /// <typeparam name="T">Tipo del valor.</typeparam>
     /// <param name="value">Valor a encapsular.</param>
     /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
-    public static Result<T, Unit> Ok<T>(T value) where T : notnull
-        => Result<T, Unit>.Ok(value);
+    public static Result<T, Unit> Ok<T>(T value)
+        where T : notnull => Result<T, Unit>.Ok(value);
 
     /// <summary>
     /// Crea un resultado fallido que contiene un error.
@@ -20,8 +20,8 @@ public static class Result
     /// <typeparam name="E">Tipo del error.</typeparam>
     /// <param name="error">Error a encapsular.</param>
     /// <returns>Un resultado fallido con el error proporcionado.</returns>
-    public static Result<Unit, E> Err<E>(E error) where E : notnull
-        => Result<Unit, E>.Err(error);
+    public static Result<Unit, E> Err<E>(E error)
+        where E : notnull => Result<Unit, E>.Err(error);
 
     /// <summary>
     /// Crea un resultado exitoso que contiene un valor.
@@ -30,8 +30,9 @@ public static class Result
     /// <typeparam name="E">Tipo del error.</typeparam>
     /// <param name="value">Valor a encapsular.</param>
     /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
-    public static Result<T, E> Ok<T, E>(T value) where T : notnull where E : notnull
-        => Result<T, E>.Ok(value);
+    public static Result<T, E> Ok<T, E>(T value)
+        where T : notnull
+        where E : notnull => Result<T, E>.Ok(value);
 
     /// <summary>
     /// Crea un resultado fallido que contiene un error.
@@ -40,8 +41,9 @@ public static class Result
     /// <typeparam name="E">Tipo del error.</typeparam>
     /// <param name="error">Error a encapsular.</param>
     /// <returns>Un resultado fallido con el error proporcionado.</returns>
-    public static Result<T, E> Err<T, E>(E error) where T : notnull where E : notnull
-        => Result<T, E>.Err(error);
+    public static Result<T, E> Err<T, E>(E error)
+        where T : notnull
+        where E : notnull => Result<T, E>.Err(error);
 }
 
 /// <summary>
@@ -139,7 +141,8 @@ public abstract class Result<T, E>
     /// <returns>
     /// Un nuevo Result con el valor transformado si era Ok, o el mismo error si era Err.
     /// </returns>
-    public abstract Result<U, E> Map<U>(Func<T, U> fn) where U : notnull;
+    public abstract Result<U, E> Map<U>(Func<T, U> fn)
+        where U : notnull;
 
     /// <summary>
     /// Aplica una función al error contenido si el resultado es Err.
@@ -149,7 +152,8 @@ public abstract class Result<T, E>
     /// <returns>
     /// Un nuevo Result con el error transformado si era Err, o el mismo valor si era Ok.
     /// </returns>
-    public abstract Result<T, F> MapErr<F>(Func<E, F> fn) where F : notnull;
+    public abstract Result<T, F> MapErr<F>(Func<E, F> fn)
+        where F : notnull;
 
     /// <summary>
     /// Encadena operaciones aplicando una función que devuelve otro Result.
@@ -159,7 +163,8 @@ public abstract class Result<T, E>
     /// <returns>
     /// El Result devuelto por la función si era Ok, o el mismo error si era Err.
     /// </returns>
-    public abstract Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) where U : notnull;
+    public abstract Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn)
+        where U : notnull;
 
     /// <summary>
     /// Maneja errores aplicando una función que devuelve otro Result en caso de error.
@@ -169,7 +174,8 @@ public abstract class Result<T, E>
     /// <returns>
     /// El Result devuelto por la función si era Err, o el mismo valor si era Ok.
     /// </returns>
-    public abstract Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) where F : notnull;
+    public abstract Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn)
+        where F : notnull;
 
     /// <summary>
     /// Ejecuta una acción si el resultado es exitoso.
@@ -198,6 +204,20 @@ public abstract class Result<T, E>
     public static Result<T, E> Err(E error) => new ErrResult(error);
 
     /// <summary>
+    /// Convierte implícitamente un valor de tipo <typeparamref name="T"/> en un <see cref="Result{T, E}"/> en estado Ok.
+    /// </summary>
+    /// <param name="value">El valor a encapsular como exitoso.</param>
+    /// <returns>Un <see cref="Result{T, E}"/> en estado Ok que contiene el valor.</returns>
+    public static implicit operator Result<T, E>(T value) => new OkResult(value);
+
+    /// <summary>
+    /// Convierte implícitamente un valor de tipo <typeparamref name="E"/> en un <see cref="Result{T, E}"/> en estado Err.
+    /// </summary>
+    /// <param name="error">El error a encapsular.</param>
+    /// <returns>Un <see cref="Result{T, E}"/> en estado Err que contiene el error.</returns>
+    public static implicit operator Result<T, E>(E error) => new ErrResult(error);
+
+    /// <summary>
     /// Implementación concreta de Result para el estado Ok.
     /// </summary>
     private sealed class OkResult : Result<T, E>
@@ -220,7 +240,8 @@ public abstract class Result<T, E>
         public override T Unwrap() => _value;
 
         /// <inheritdoc/>
-        public override E UnwrapErr() => throw new InvalidOperationException($"Tried to UnwrapErr from Ok: {_value}");
+        public override E UnwrapErr() =>
+            throw new InvalidOperationException($"Tried to UnwrapErr from Ok: {_value}");
 
         /// <inheritdoc/>
         public override T UnwrapOr(T defaultValue) => _value;
@@ -270,7 +291,8 @@ public abstract class Result<T, E>
         public override bool IsErr => true;
 
         /// <inheritdoc/>
-        public override T Unwrap() => throw new InvalidOperationException($"Tried to Unwrap from Err: {_error}");
+        public override T Unwrap() =>
+            throw new InvalidOperationException($"Tried to Unwrap from Err: {_error}");
 
         /// <inheritdoc/>
         public override E UnwrapErr() => _error;
@@ -291,7 +313,8 @@ public abstract class Result<T, E>
         public override Result<T, F> MapErr<F>(Func<E, F> fn) => Result<T, F>.Err(fn(_error));
 
         /// <inheritdoc/>
-        public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) => Result<U, E>.Err(_error);
+        public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) =>
+            Result<U, E>.Err(_error);
 
         /// <inheritdoc/>
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => fn(_error);
