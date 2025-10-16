@@ -1,7 +1,7 @@
 using EduZasAPI.Infraestructure.EntityFramework.Application.Tags;
 using EduZasAPI.Infraestructure.EntityFramework.Application.Users;
 
-namespace EduZasAPI.Infraestructure.EntityFramework.Application.Agenda;
+namespace EduZasAPI.Infraestructure.EntityFramework.Application.AgendaContacts;
 
 public partial class AgendaContact
 {
