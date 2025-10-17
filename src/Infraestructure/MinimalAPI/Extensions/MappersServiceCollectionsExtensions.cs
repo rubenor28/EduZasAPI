@@ -1,0 +1,51 @@
+using Application.DTOs.Classes;
+using Application.DTOs.ClassProfessors;
+using Application.DTOs.ClassStudents;
+using Application.DTOs.Users;
+using Domain.Entities;
+using EntityFramework.Application.DAOs.Classes;
+using EntityFramework.Application.DTOs;
+using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Common;
+
+namespace MinimalAPI.Extensions;
+
+/// <summary>
+/// Métodos de extensión para registrar los servicios de base de datos en el contenedor de dependencias.
+/// </summary>
+public static class MapperServiceCollectionExtensions
+{
+    /// <summary>
+    /// Registra el contexto de mapeo de datos en la configuración.
+    /// </summary>
+    /// <param name="services">La colección de servicios donde se registrará el contexto.</param>
+    /// <returns>La colección de servicios con el contexto de base de datos registrado.</returns>
+    public static IServiceCollection AddMapperServices(this IServiceCollection services)
+    {
+        // USERS
+        services.AddSingleton<UserEFMapper>();
+        services.AddSingleton<IMapper<User, UserDomain>>(s => s.GetRequiredService<UserEFMapper>());
+        services.AddSingleton<IMapper<NewUserDTO, User>>(s => s.GetRequiredService<UserEFMapper>());
+        services.AddSingleton<IUpdateMapper<UserUpdateDTO, User>>(s => s.GetRequiredService<UserEFMapper>());
+
+        // CLASSES
+        services.AddSingleton<ClassEFMapper>();
+        services.AddSingleton<IMapper<NewClassDTO, Class>>(s => s.GetRequiredService<ClassEFMapper>());
+        services.AddSingleton<IMapper<Class, ClassDomain>>(s => s.GetRequiredService<ClassEFMapper>());
+        services.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>>(s => s.GetRequiredService<ClassEFMapper>());
+
+        // CLASS PROFESSOR
+        services.AddSingleton<ProfessorClassEFMapper>();
+        services.AddSingleton<IMapper<ProfessorClassRelationDTO, ClassProfessor>>(s => s.GetRequiredService<ProfessorClassEFMapper>());
+        services.AddSingleton<IMapper<ClassProfessor, ProfessorClassRelationDTO>>(s => s.GetRequiredService<ProfessorClassEFMapper>());
+        services.AddSingleton<IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor>>(s => s.GetRequiredService<ProfessorClassEFMapper>());
+
+        // CLASS STUDENTS
+        services.AddSingleton<StudentClassEFMapper>();
+        services.AddSingleton<IMapper<StudentClassRelationDTO, ClassStudent>>(s => s.GetRequiredService<StudentClassEFMapper>());
+        services.AddSingleton<IMapper<ClassStudent, StudentClassRelationDTO>>(s => s.GetRequiredService<StudentClassEFMapper>());
+        services.AddSingleton<IUpdateMapper<StudentClassRelationDTO, ClassStudent>>(s => s.GetRequiredService<StudentClassEFMapper>());
+
+        return services;
+    }
+}
