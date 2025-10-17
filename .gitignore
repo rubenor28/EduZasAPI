@@ -11,6 +11,10 @@
 
 # Archivos
 !/run.sh
+!/run-dev.sh
+!/run.bat
+!/run-dev.bat
+
 !/EduZasAPI.sln
 !/Directory.Build.props
 !/README.md
