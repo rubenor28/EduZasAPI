@@ -17,4 +17,6 @@ public partial class Resource
     public DateTime ModifiedAt { get; set; }
 
     public virtual User Professor { get; set; } = null!;
+
+    public virtual ICollection<ResourcePerClass> ResourcesPerClass { get; set; } = new List<ResourcePerClass>();
 }

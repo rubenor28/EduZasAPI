@@ -25,4 +25,6 @@ public partial class Class
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<TestPerClass> TestsPerClasses { get; set; } = new List<TestPerClass>();
+
+    public virtual ICollection<ResourcePerClass> ResourcesPerClass { get; set; } = new List<ResourcePerClass>();
 }

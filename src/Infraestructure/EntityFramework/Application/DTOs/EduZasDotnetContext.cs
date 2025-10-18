@@ -1,4 +1,4 @@
-﻿using DotNetEnv;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -43,6 +43,7 @@ public partial class EduZasDotnetContext : DbContext
     public virtual DbSet<Notification> Notifications { get; set; }
     public virtual DbSet<NotificationPerUser> NotificationPerUsers { get; set; }
     public virtual DbSet<Resource> Resources { get; set; }
+    public virtual DbSet<ResourcePerClass> ResourcesPerClass { get; set; }
     public virtual DbSet<Tag> Tags { get; set; }
     public virtual DbSet<TagsPerUser> TagsPerUsers { get; set; }
     public virtual DbSet<Test> Tests { get; set; }
@@ -114,12 +115,12 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(e => e.AgendaOwner)
                 .WithMany(e => e.AgendaContactAgendaOwners)
                 .HasForeignKey(e => e.AgendaOwnerId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
             agendaContactBuilder
                 .HasOne(e => e.Contact)
                 .WithMany(e => e.AgendaContactContacts)
                 .HasForeignKey(e => e.ContactId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Answer>(answerBuilder =>
@@ -220,7 +221,7 @@ public partial class EduZasDotnetContext : DbContext
         {
             classProfessorBuilder.HasKey(e => new { e.ClassId, e.ProfessorId }).HasName("PRIMARY");
             classProfessorBuilder.ToTable("class_professors");
-            classProfessorBuilder.HasIndex(e => e.ProfessorId, "professor_id");
+            classProfessorBuilder.HasIndex(e => e.ProfessorId, "idx_class_professors_professor_id");
             classProfessorBuilder
                 .Property(e => e.ClassId)
                 .HasMaxLength(20)
@@ -270,7 +271,7 @@ public partial class EduZasDotnetContext : DbContext
         {
             classStudentBuilder.HasKey(e => new { e.ClassId, e.StudentId }).HasName("PRIMARY");
             classStudentBuilder.ToTable("class_students");
-            classStudentBuilder.HasIndex(e => e.StudentId, "student_id");
+            classStudentBuilder.HasIndex(e => e.StudentId, "idx_class_students_student_id");
             classStudentBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
             classStudentBuilder
                 .Property(e => e.Hidden)
@@ -317,7 +318,7 @@ public partial class EduZasDotnetContext : DbContext
         {
             notificationBuilder.HasKey(e => e.NotificationId).HasName("PRIMARY");
             notificationBuilder.ToTable("notifications");
-            notificationBuilder.HasIndex(e => e.ClassId, "class_id");
+            notificationBuilder.HasIndex(e => e.ClassId, "idx_notifications_class_id");
             notificationBuilder
                 .Property(e => e.Active)
                 .IsRequired()
@@ -363,7 +364,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasKey(e => new { e.NotificationId, e.UserId })
                 .HasName("PRIMARY");
             notificationPerUserBuilder.ToTable("notification_per_user");
-            notificationPerUserBuilder.HasIndex(e => e.UserId, "user_id");
+            notificationPerUserBuilder.HasIndex(e => e.UserId, "idx_notification_per_user_user_id");
             notificationPerUserBuilder.Property(e => e.Readed).HasColumnName("readed");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
@@ -423,7 +424,7 @@ public partial class EduZasDotnetContext : DbContext
         {
             resourceBuilder.HasKey(e => e.ResourceId).HasName("PRIMARY");
             resourceBuilder.ToTable("resources");
-            resourceBuilder.HasIndex(e => e.ProfessorId, "professor_id1");
+            resourceBuilder.HasIndex(e => e.ProfessorId, "idx_resources_professor_id");
             resourceBuilder
                 .Property(e => e.Active)
                 .IsRequired()
@@ -475,6 +476,47 @@ public partial class EduZasDotnetContext : DbContext
                 .WithMany(p => p.Resources)
                 .HasForeignKey(d => d.ProfessorId)
                 .HasConstraintName("resources_ibfk_1");
+        });
+
+        modelBuilder.Entity<ResourcePerClass>(resourcePerClassBuilder =>
+        {
+            resourcePerClassBuilder.HasKey(e => new { e.ClassId, e.ResourceId }).HasName("PRIMARY");
+            resourcePerClassBuilder.ToTable("resources_per_class");
+            resourcePerClassBuilder.HasIndex(e => e.ResourceId, "idx_resources_per_class_resource_id");
+
+            resourcePerClassBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
+
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                resourcePerClassBuilder.UseCollation("utf8mb4_unicode_ci");
+                resourcePerClassBuilder.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                resourcePerClassBuilder.Property(e => e.ResourceId)
+                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnName("resource_id");
+
+                resourcePerClassBuilder.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("current_timestamp()")
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+            }
+            else
+            {
+                resourcePerClassBuilder.Property(e => e.ResourceId).HasColumnName("resource_id");
+                resourcePerClassBuilder.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasColumnName("created_at");
+            }
+
+            resourcePerClassBuilder.HasOne(d => d.Class)
+                .WithMany(p => p.ResourcesPerClass)
+                .HasForeignKey(d => d.ClassId)
+                .HasConstraintName("resources_per_class_ibfk_1");
+
+            resourcePerClassBuilder.HasOne(d => d.Resource)
+                .WithMany(p => p.ResourcesPerClass)
+                .HasForeignKey(d => d.ResourceId)
+                .HasConstraintName("resources_per_class_ibfk_2");
         });
 
         modelBuilder.Entity<Tag>(tagBuilder =>
@@ -537,7 +579,7 @@ public partial class EduZasDotnetContext : DbContext
         {
             testBuilder.HasKey(e => e.TestId).HasName("PRIMARY");
             testBuilder.ToTable("tests");
-            testBuilder.HasIndex(e => e.ProfessorId, "professor_id2");
+            testBuilder.HasIndex(e => e.ProfessorId, "idx_tests_professor_id");
             testBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
             testBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
 
@@ -595,7 +637,7 @@ public partial class EduZasDotnetContext : DbContext
         {
             testPerClassBuilder.HasKey(e => new { e.TestId, e.ClassId }).HasName("PRIMARY");
             testPerClassBuilder.ToTable("tests_per_class");
-            testPerClassBuilder.HasIndex(e => e.ClassId, "class_id1");
+            testPerClassBuilder.HasIndex(e => e.ClassId, "idx_tests_per_class_class_id");
             testPerClassBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
             testPerClassBuilder.Property(e => e.Visible).HasColumnName("visible");
 
