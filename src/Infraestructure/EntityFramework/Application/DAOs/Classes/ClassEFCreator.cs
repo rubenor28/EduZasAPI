@@ -6,12 +6,8 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Classes;
 
-public class ClassEFCreator : EFCreator<ClassDomain, NewClassDTO, Class>
-{
-    public ClassEFCreator(
-        EduZasDotnetContext ctx,
-        IMapper<Class, ClassDomain> domainMapper,
-        IMapper<NewClassDTO, Class> newEntityMapper
-    )
-        : base(ctx, domainMapper, newEntityMapper) { }
-}
+public class ClassEFCreator(
+    EduZasDotnetContext ctx,
+    IMapper<Class, ClassDomain> domainMapper,
+    IMapper<NewClassDTO, Class> newEntityMapper
+) : EFCreator<ClassDomain, NewClassDTO, Class>(ctx, domainMapper, newEntityMapper);

@@ -5,13 +5,13 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
-public class ClassProfessorEFCreator
-    : EFCreator<ProfessorClassRelationDTO, ProfessorClassRelationDTO, ClassProfessor>
-{
-    public ClassProfessorEFCreator(
-        EduZasDotnetContext ctx,
-        IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
-        IMapper<ProfessorClassRelationDTO, ClassProfessor> newEntityMapper
-    )
-        : base(ctx, domainMapper, newEntityMapper) { }
-}
+public class ClassProfessorEFCreator(
+    EduZasDotnetContext ctx,
+    IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
+    IMapper<ProfessorClassRelationDTO, ClassProfessor> newEntityMapper
+)
+    : EFCreator<ProfessorClassRelationDTO, ProfessorClassRelationDTO, ClassProfessor>(
+        ctx,
+        domainMapper,
+        newEntityMapper
+    );

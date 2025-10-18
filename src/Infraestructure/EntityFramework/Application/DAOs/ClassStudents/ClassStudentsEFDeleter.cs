@@ -1,20 +1,21 @@
 using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
+using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassStudents;
 
-public class ClassStudentsEFDeleter
-    : CompositeKeyEFDeleter<ClassUserRelationIdDTO, StudentClassRelationDTO, ClassStudent>
-{
-    public ClassStudentsEFDeleter(
-        EduZasDotnetContext ctx,
-        IMapper<ClassStudent, StudentClassRelationDTO> domainMapper
+public class ClassStudentsEFDeleter(
+    EduZasDotnetContext ctx,
+    IMapper<ClassStudent, StudentClassRelationDTO> domainMapper
+)
+    : CompositeKeyEFDeleter<ClassUserRelationIdDTO, StudentClassRelationDTO, ClassStudent>(
+        ctx,
+        domainMapper
     )
-        : base(ctx, domainMapper) { }
-
+{
     public override async Task<ClassStudent?> GetTrackedById(ClassUserRelationIdDTO id) =>
         await _dbSet
             .AsTracking()

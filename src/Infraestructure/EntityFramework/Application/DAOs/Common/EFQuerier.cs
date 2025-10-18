@@ -6,24 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>
-    : EntityFrameworkDAO<EFEntity, DomainEntity>,
+public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
+    EduZasDotnetContext ctx,
+    IMapper<EFEntity, DomainEntity> domainMapper,
+    int pageSize
+)
+    : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper),
         IQuerierAsync<DomainEntity, EntityCriteria>
     where EFEntity : class
     where EntityCriteria : CriteriaDTO
     where DomainEntity : notnull
 {
-    protected readonly int _pageSize;
-
-    public EFQuerier(
-        EduZasDotnetContext ctx,
-        IMapper<EFEntity, DomainEntity> domainMapper,
-        int pageSize
-    )
-        : base(ctx, domainMapper)
-    {
-        _pageSize = pageSize;
-    }
+    protected readonly int _pageSize = pageSize;
 
     /// <summary>
     /// Calcula el offset para la paginación basado en el número de página.

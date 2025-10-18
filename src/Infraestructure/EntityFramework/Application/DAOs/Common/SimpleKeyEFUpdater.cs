@@ -1,35 +1,30 @@
 using Application.DAOs;
 using Domain.ValueObjects;
-using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using InterfaceAdapters.Mappers.Common;
 
-public class SimpleKeyEFUpdater<I, DomainEntity, UpdateDTO, EFEntity>
-    : EntityFrameworkDAO<EFEntity, DomainEntity>,
+namespace EntityFramework.Application.DAOs.Common;
+
+public class SimpleKeyEFUpdater<I, DomainEntity, UpdateDTO, EFEntity>(
+    EduZasDotnetContext ctx,
+    IMapper<EFEntity, DomainEntity> domainMapper,
+    IUpdateMapper<UpdateDTO, EFEntity> updateMapper
+)
+    : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper),
         IUpdaterAsync<DomainEntity, UpdateDTO>
     where I : notnull
     where UpdateDTO : IIdentifiable<I>
     where EFEntity : class
     where DomainEntity : notnull
 {
-    protected readonly IUpdateMapper<UpdateDTO, EFEntity> _updateMapper;
-
-    public SimpleKeyEFUpdater(
-        EduZasDotnetContext ctx,
-        IMapper<EFEntity, DomainEntity> domainMapper,
-        IUpdateMapper<UpdateDTO, EFEntity> updateMapper
-    )
-        : base(ctx, domainMapper)
-    {
-        _updateMapper = updateMapper;
-    }
+    protected readonly IUpdateMapper<UpdateDTO, EFEntity> _updateMapper = updateMapper;
 
     public async Task<DomainEntity> UpdateAsync(UpdateDTO updateData)
     {
-        var tracked = await _dbSet.FindAsync(updateData.Id);
-        if (tracked is null)
-            throw new ArgumentException($"Entity with the provided id not found");
+        var tracked =
+            await _dbSet.FindAsync(updateData.Id)
+            ?? throw new ArgumentException($"Entity with the provided id not found");
 
         _updateMapper.Map(updateData, tracked);
 

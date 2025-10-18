@@ -8,16 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
-public class ClassProfessorsEFUpdater
-    : CompositeKeyEFUpdater<ClassUserRelationIdDTO, ProfessorClassRelationDTO, ClassProfessor>
-{
-    public ClassProfessorsEFUpdater(
-        EduZasDotnetContext ctx,
-        IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
-        IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor> updateMapper
+public class ClassProfessorsEFUpdater(
+    EduZasDotnetContext ctx,
+    IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
+    IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor> updateMapper
+)
+    : CompositeKeyEFUpdater<ClassUserRelationIdDTO, ProfessorClassRelationDTO, ClassProfessor>(
+        ctx,
+        domainMapper,
+        updateMapper
     )
-        : base(ctx, domainMapper, updateMapper) { }
-
+{
     public override async Task<ClassProfessor?> GetTrackedById(ClassUserRelationIdDTO id) =>
         await _dbSet
             .AsTracking()

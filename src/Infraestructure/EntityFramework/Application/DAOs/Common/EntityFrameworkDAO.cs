@@ -4,17 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public abstract class EntityFrameworkDAO<EFEntity, DomainEntity>
+public abstract class EntityFrameworkDAO<EFEntity, DomainEntity>(
+    EduZasDotnetContext ctx,
+    IMapper<EFEntity, DomainEntity> domainMapper
+)
     where EFEntity : class
 {
-    protected readonly EduZasDotnetContext _ctx;
-    protected readonly IMapper<EFEntity, DomainEntity> _domainMapper;
-    protected readonly DbSet<EFEntity> _dbSet;
-
-    public EntityFrameworkDAO(EduZasDotnetContext ctx, IMapper<EFEntity, DomainEntity> domainMapper)
-    {
-        _ctx = ctx;
-        _dbSet = ctx.Set<EFEntity>();
-        _domainMapper = domainMapper;
-    }
+    protected readonly EduZasDotnetContext _ctx = ctx;
+    protected readonly IMapper<EFEntity, DomainEntity> _domainMapper = domainMapper;
+    protected readonly DbSet<EFEntity> _dbSet = ctx.Set<EFEntity>();
 }

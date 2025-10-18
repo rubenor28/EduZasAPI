@@ -7,16 +7,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassStudents;
 
-public class ClassStudentEFQuerier
-    : EFQuerier<StudentClassRelationDTO, StudentClassRelationCriteriaDTO, ClassStudent>
-{
-    public ClassStudentEFQuerier(
-        EduZasDotnetContext ctx,
-        IMapper<ClassStudent, StudentClassRelationDTO> domainMapper,
-        int pageSize
+public class ClassStudentEFQuerier(
+    EduZasDotnetContext ctx,
+    IMapper<ClassStudent, StudentClassRelationDTO> domainMapper,
+    int pageSize
+)
+    : EFQuerier<StudentClassRelationDTO, StudentClassRelationCriteriaDTO, ClassStudent>(
+        ctx,
+        domainMapper,
+        pageSize
     )
-        : base(ctx, domainMapper, pageSize) { }
-
+{
     public override IQueryable<ClassStudent> BuildQuery(StudentClassRelationCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()

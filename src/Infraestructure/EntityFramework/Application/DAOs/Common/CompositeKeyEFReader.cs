@@ -5,16 +5,14 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public abstract class CompositeKeyEFReader<I, DomainEntity, EFEntity>
-    : EntityFrameworkDAO<EFEntity, DomainEntity>,
-        IReaderAsync<I, DomainEntity>
+public abstract class CompositeKeyEFReader<I, DomainEntity, EFEntity>(
+    EduZasDotnetContext ctx,
+    IMapper<EFEntity, DomainEntity> domainMapper
+) : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper), IReaderAsync<I, DomainEntity>
     where I : notnull
     where EFEntity : class
     where DomainEntity : IIdentifiable<I>
 {
-    public CompositeKeyEFReader(EduZasDotnetContext ctx, IMapper<EFEntity, DomainEntity> domainMapper)
-        : base(ctx, domainMapper) { }
-
     public async Task<Optional<DomainEntity>> GetAsync(I id)
     {
         var record = await GetTrackedById(id);

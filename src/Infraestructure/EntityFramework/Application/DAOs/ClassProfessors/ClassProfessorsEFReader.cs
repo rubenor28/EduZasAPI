@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
-public class ClassProfessorsEFReader
-    : CompositeKeyEFReader<ClassUserRelationIdDTO, ProfessorClassRelationDTO, ClassProfessor>
-{
-    public ClassProfessorsEFReader(
-        EduZasDotnetContext ctx,
-        IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper
+public class ClassProfessorsEFReader(
+    EduZasDotnetContext ctx,
+    IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper
+)
+    : CompositeKeyEFReader<ClassUserRelationIdDTO, ProfessorClassRelationDTO, ClassProfessor>(
+        ctx,
+        domainMapper
     )
-        : base(ctx, domainMapper) { }
-
+{
     public override async Task<ClassProfessor?> GetTrackedById(ClassUserRelationIdDTO id) =>
         await _dbSet
             .AsTracking()

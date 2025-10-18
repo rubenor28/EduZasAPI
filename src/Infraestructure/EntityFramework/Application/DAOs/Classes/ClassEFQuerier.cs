@@ -8,15 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Classes;
 
-public class ClassEFQuerier : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>
+public class ClassEFQuerier(
+    EduZasDotnetContext ctx,
+    IMapper<Class, ClassDomain> domainMapper,
+    int pageSize
+) : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>(ctx, domainMapper, pageSize)
 {
-    public ClassEFQuerier(
-        EduZasDotnetContext ctx,
-        IMapper<Class, ClassDomain> domainMapper,
-        int pageSize
-    )
-        : base(ctx, domainMapper, pageSize) { }
-
     public override IQueryable<Class> BuildQuery(ClassCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()

@@ -7,16 +7,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
-public class ClassProfessorsEFQuerier
-    : EFQuerier<ProfessorClassRelationDTO, ProfessorClassRelationCriteriaDTO, ClassProfessor>
-{
-    public ClassProfessorsEFQuerier(
-        EduZasDotnetContext ctx,
-        IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
-        int pageSize
+public class ClassProfessorsEFQuerier(
+    EduZasDotnetContext ctx,
+    IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
+    int pageSize
+)
+    : EFQuerier<ProfessorClassRelationDTO, ProfessorClassRelationCriteriaDTO, ClassProfessor>(
+        ctx,
+        domainMapper,
+        pageSize
     )
-        : base(ctx, domainMapper, pageSize) { }
-
+{
     public override IQueryable<ClassProfessor> BuildQuery(
         ProfessorClassRelationCriteriaDTO criteria
     ) =>
