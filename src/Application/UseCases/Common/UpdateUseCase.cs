@@ -10,7 +10,7 @@ namespace Application.UseCases.Common;
 /// </summary>
 /// <typeparam name="UE">Tipo de los datos requeridos para la actualización.</typeparam>
 /// <typeparam name="E">Tipo de la entidad resultante.</typeparam>
-public class UpdateUseCase<UE, E>(
+public abstract class UpdateUseCase<UE, E>(
     IUpdaterAsync<E, UE> updater,
     IBusinessValidationService<UE>? validator = null
 )

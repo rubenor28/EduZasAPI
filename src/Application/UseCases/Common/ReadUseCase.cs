@@ -11,7 +11,7 @@ namespace Application.UseCases.Common;
 /// </summary>
 /// <typeparam name="I">Tipo del identificador de la entidad.</typeparam>
 /// <typeparam name="E">Tipo de la entidad que implementa <see cref="IIdentifiable{I}"/>.</typeparam>
-public class ReadUseCase<I, E>(IReaderAsync<I, E> reader, IBusinessValidationService<I> validator)
+public abstract class ReadUseCase<I, E>(IReaderAsync<I, E> reader, IBusinessValidationService<I> validator)
     : IUseCaseAsync<I, Optional<E>>
     where I : notnull
     where E : notnull, IIdentifiable<I>

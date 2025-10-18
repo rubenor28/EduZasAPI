@@ -11,7 +11,7 @@ namespace Application.UseCases.Common;
 /// <typeparam name="I">El tipo del identificador de la entidad.</typeparam>
 /// <typeparam name="DE">El tipo del DTO de entrada para la eliminación.</typeparam>
 /// <typeparam name="E">El tipo de la entidad de dominio que se eliminará.</typeparam>
-public class DeleteUseCase<I, DE, E>(
+public abstract class DeleteUseCase<I, DE, E>(
     IDeleterAsync<I, E> deleter,
     IBusinessValidationService<DE>? validator = null
 ) : IUseCaseAsync<DE, E>

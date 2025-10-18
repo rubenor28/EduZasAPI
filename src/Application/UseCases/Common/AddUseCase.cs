@@ -14,7 +14,7 @@ namespace Application.UseCases.Common;
 /// Esta clase proporciona una implementación base para casos de uso que crean nuevas entidades,
 /// incluyendo validación en múltiples etapas, formato de datos y extensibilidad mediante hooks.
 /// </remarks>
-public class AddUseCase<NE, E>(
+public abstract class AddUseCase<NE, E>(
     ICreatorAsync<E, NE> creator,
     IBusinessValidationService<NE>? validator = null
 ) : IUseCaseAsync<NE, E>

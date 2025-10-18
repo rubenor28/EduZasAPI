@@ -9,7 +9,7 @@ namespace Application.UseCases.Common;
 /// </summary>
 /// <typeparam name="E">Tipo de la entidad resultante de la consulta.</typeparam>
 /// <typeparam name="C">Tipo del criterio de búsqueda, debe implementar <see cref="ICriteriaDTO"/>.</typeparam>
-public class QueryUseCase<C, E>(IQuerierAsync<E, C> querier)
+public abstract class QueryUseCase<C, E>(IQuerierAsync<E, C> querier)
     : IGuaranteedUseCaseAsync<C, PaginatedQuery<E, C>>
     where C : notnull, CriteriaDTO
     where E : notnull
@@ -22,8 +22,6 @@ public class QueryUseCase<C, E>(IQuerierAsync<E, C> querier)
     /// Una consulta paginada de tipo <see cref="PaginatedQuery{E, C}"/>
     /// con los resultados correspondientes.
     /// </returns>
-    public Task<PaginatedQuery<E, C>> ExecuteAsync(C criteria)
-    {
-        return querier.GetByAsync(criteria);
-    }
+    public Task<PaginatedQuery<E, C>> ExecuteAsync(C criteria) => querier.GetByAsync(criteria); 
+    
 }
