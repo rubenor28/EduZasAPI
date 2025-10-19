@@ -20,7 +20,8 @@ public class ToggleClassVisibilityUseCaseTest : IDisposable
 
     public ToggleClassVisibilityUseCaseTest()
     {
-        _conn = new SqliteConnection("Data Source=:memory:");
+        var dbName = Guid.NewGuid().ToString();
+        _conn = new SqliteConnection($"Data Source={dbName};Mode=Memory;Cache=Shared");
         _conn.Open();
 
         var opts = new DbContextOptionsBuilder<EduZasDotnetContext>().UseSqlite(_conn).Options;
