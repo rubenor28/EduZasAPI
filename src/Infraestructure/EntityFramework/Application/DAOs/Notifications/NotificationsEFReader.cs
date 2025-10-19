@@ -3,10 +3,9 @@ using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
 
-namespace EntityFramework.Application.DAOs.Users;
+namespace EntityFramework.Application.DAOs.Notifications;
 
-public class NotificationEFReader : SimpleKeyEFReader<ulong, UserDomain, User>
-{
-    public NotificationEFReader(EduZasDotnetContext ctx, IMapper<User, UserDomain> domainMapper)
-        : base(ctx, domainMapper) { }
-}
+public class NotificationEFReader(
+    EduZasDotnetContext ctx,
+    IMapper<Notification, NotificationDomain> domainMapper
+) : SimpleKeyEFReader<ulong, NotificationDomain, Notification>(ctx, domainMapper);

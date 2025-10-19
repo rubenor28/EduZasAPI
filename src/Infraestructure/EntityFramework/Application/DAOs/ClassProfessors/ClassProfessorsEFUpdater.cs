@@ -19,7 +19,8 @@ public class ClassProfessorsEFUpdater(
         updateMapper
     )
 {
-    public override async Task<ClassProfessor?> GetTrackedById(ClassUserRelationIdDTO id) =>
+
+    protected override async Task<ClassProfessor?> GetTrackedById(ClassUserRelationIdDTO id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

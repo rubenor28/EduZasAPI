@@ -31,5 +31,5 @@ public abstract class CompositeKeyEFUpdater<I, DomainEntity, EFEntity>(
         return _domainMapper.Map(tracked);
     }
 
-    public abstract Task<EFEntity?> GetTrackedById(I id);
+    protected abstract Task<EFEntity?> GetTrackedById(I id);
 }

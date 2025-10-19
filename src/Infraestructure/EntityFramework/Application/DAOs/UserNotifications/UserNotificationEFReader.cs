@@ -6,15 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.UserNotifications;
 
-public class UserNotificationEFReader
-    : CompositeKeyEFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>
-{
-    public UserNotificationEFReader(
-        EduZasDotnetContext ctx,
-        IMapper<NotificationPerUser, UserNotificationDomain> domainMapper
+public class UserNotificationEFReader(
+    EduZasDotnetContext ctx,
+    IMapper<NotificationPerUser, UserNotificationDomain> domainMapper
+)
+    : CompositeKeyEFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(
+        ctx,
+        domainMapper
     )
-        : base(ctx, domainMapper) { }
-
+{
     public override Task<NotificationPerUser?> GetTrackedById(UserNotificationIdDTO id) =>
         _dbSet
             .AsTracking()

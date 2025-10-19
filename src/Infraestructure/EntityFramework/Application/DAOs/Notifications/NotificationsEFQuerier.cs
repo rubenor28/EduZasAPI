@@ -8,16 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Notifications;
 
-public class NotificationEFQuerier
-    : EFQuerier<NotificationDomain, NotificationCriteriaDTO, Notification>
-{
-    public NotificationEFQuerier(
-        EduZasDotnetContext ctx,
-        IMapper<Notification, NotificationDomain> domainMapper,
-        int pageSize
+public class NotificationEFQuerier(
+    EduZasDotnetContext ctx,
+    IMapper<Notification, NotificationDomain> domainMapper,
+    int pageSize
+)
+    : EFQuerier<NotificationDomain, NotificationCriteriaDTO, Notification>(
+        ctx,
+        domainMapper,
+        pageSize
     )
-        : base(ctx, domainMapper, pageSize) { }
-
+{
     public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()
