@@ -2,11 +2,15 @@ using Application.DAOs;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
+using Application.DTOs.Notifications;
+using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassStudents;
+using EntityFramework.Application.DAOs.Notifications;
+using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
@@ -101,6 +105,34 @@ public static class RepositoryServiceCollectionExtensions
                 pageSize
             )
         );
+
+        // NOTIFICATIONS
+        services.AddScoped<IReaderAsync<ulong, NotificationDomain>, NotificationEFReader>();
+        services.AddScoped<
+            ICreatorAsync<NotificationDomain, NewNotificationDTO>,
+            NotificationEFCreator
+        >();
+        services.AddScoped<IQuerierAsync<NotificationDomain, NotificationCriteriaDTO>>(
+            s => new NotificationEFQuerier(
+                s.GetRequiredService<EduZasDotnetContext>(),
+                s.GetRequiredService<IMapper<Notification, NotificationDomain>>(),
+                pageSize
+            )
+        );
+
+        // USER NOTIFICATIONS
+        services.AddScoped<
+            ICreatorAsync<UserNotificationDomain, NewUserNotificationDTO>,
+            UserNotificationEFCreator
+        >();
+        services.AddScoped<
+            IUpdaterAsync<UserNotificationDomain, UserNotificationDomain>,
+            UserNotificationEFUpdater
+        >();
+        services.AddScoped<
+            IReaderAsync<UserNotificationIdDTO, UserNotificationDomain>,
+            UserNotificationEFReader
+        >();
 
         return services;
     }

@@ -1,6 +1,8 @@
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
+using Application.DTOs.Notifications;
+using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Classes;
@@ -26,25 +28,66 @@ public static class MapperServiceCollectionExtensions
         services.AddSingleton<UserEFMapper>();
         services.AddSingleton<IMapper<User, UserDomain>>(s => s.GetRequiredService<UserEFMapper>());
         services.AddSingleton<IMapper<NewUserDTO, User>>(s => s.GetRequiredService<UserEFMapper>());
-        services.AddSingleton<IUpdateMapper<UserUpdateDTO, User>>(s => s.GetRequiredService<UserEFMapper>());
+        services.AddSingleton<IUpdateMapper<UserUpdateDTO, User>>(s =>
+            s.GetRequiredService<UserEFMapper>()
+        );
 
         // CLASSES
         services.AddSingleton<ClassEFMapper>();
-        services.AddSingleton<IMapper<NewClassDTO, Class>>(s => s.GetRequiredService<ClassEFMapper>());
-        services.AddSingleton<IMapper<Class, ClassDomain>>(s => s.GetRequiredService<ClassEFMapper>());
-        services.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>>(s => s.GetRequiredService<ClassEFMapper>());
+        services.AddSingleton<IMapper<NewClassDTO, Class>>(s =>
+            s.GetRequiredService<ClassEFMapper>()
+        );
+        services.AddSingleton<IMapper<Class, ClassDomain>>(s =>
+            s.GetRequiredService<ClassEFMapper>()
+        );
+        services.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>>(s =>
+            s.GetRequiredService<ClassEFMapper>()
+        );
 
         // CLASS PROFESSOR
         services.AddSingleton<ProfessorClassEFMapper>();
-        services.AddSingleton<IMapper<ProfessorClassRelationDTO, ClassProfessor>>(s => s.GetRequiredService<ProfessorClassEFMapper>());
-        services.AddSingleton<IMapper<ClassProfessor, ProfessorClassRelationDTO>>(s => s.GetRequiredService<ProfessorClassEFMapper>());
-        services.AddSingleton<IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor>>(s => s.GetRequiredService<ProfessorClassEFMapper>());
+        services.AddSingleton<IMapper<ProfessorClassRelationDTO, ClassProfessor>>(s =>
+            s.GetRequiredService<ProfessorClassEFMapper>()
+        );
+        services.AddSingleton<IMapper<ClassProfessor, ProfessorClassRelationDTO>>(s =>
+            s.GetRequiredService<ProfessorClassEFMapper>()
+        );
+        services.AddSingleton<IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor>>(s =>
+            s.GetRequiredService<ProfessorClassEFMapper>()
+        );
 
         // CLASS STUDENTS
         services.AddSingleton<StudentClassEFMapper>();
-        services.AddSingleton<IMapper<StudentClassRelationDTO, ClassStudent>>(s => s.GetRequiredService<StudentClassEFMapper>());
-        services.AddSingleton<IMapper<ClassStudent, StudentClassRelationDTO>>(s => s.GetRequiredService<StudentClassEFMapper>());
-        services.AddSingleton<IUpdateMapper<StudentClassRelationDTO, ClassStudent>>(s => s.GetRequiredService<StudentClassEFMapper>());
+        services.AddSingleton<IMapper<StudentClassRelationDTO, ClassStudent>>(s =>
+            s.GetRequiredService<StudentClassEFMapper>()
+        );
+        services.AddSingleton<IMapper<ClassStudent, StudentClassRelationDTO>>(s =>
+            s.GetRequiredService<StudentClassEFMapper>()
+        );
+        services.AddSingleton<IUpdateMapper<StudentClassRelationDTO, ClassStudent>>(s =>
+            s.GetRequiredService<StudentClassEFMapper>()
+        );
+
+        // NOTIFICATIONS
+        services.AddSingleton<NotificationEFMapper>();
+        services.AddSingleton<IMapper<Notification, NotificationDomain>>(s =>
+            s.GetRequiredService<NotificationEFMapper>()
+        );
+        services.AddSingleton<IMapper<NewNotificationDTO, Notification>>(s =>
+            s.GetRequiredService<NotificationEFMapper>()
+        );
+
+        // USER NOTIFICATIONS
+        services.AddSingleton<UserNotificationEFMapper>();
+        services.AddSingleton<IMapper<NotificationPerUser, UserNotificationDomain>>(s =>
+            s.GetRequiredService<UserNotificationEFMapper>()
+        );
+        services.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>>(s =>
+            s.GetRequiredService<UserNotificationEFMapper>()
+        );
+        services.AddSingleton<IUpdateMapper<UserNotificationDomain, NotificationPerUser>>(s =>
+            s.GetRequiredService<UserNotificationEFMapper>()
+        );
 
         return services;
     }
