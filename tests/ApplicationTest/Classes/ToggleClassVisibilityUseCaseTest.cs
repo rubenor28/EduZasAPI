@@ -1,6 +1,6 @@
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
-using Application.UseCases.Classes;
+using Application.UseCases.ClassStudents;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassStudents;

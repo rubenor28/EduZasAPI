@@ -6,7 +6,7 @@ using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.ValueObjects;
 
-namespace Application.UseCases.Classes;
+namespace Application.UseCases.ClassStudents;
 
 /// <summary>
 /// Represents the use case for toggling the visibility of a class for a student.

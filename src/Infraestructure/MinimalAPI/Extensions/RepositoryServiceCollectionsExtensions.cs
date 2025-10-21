@@ -133,6 +133,10 @@ public static class RepositoryServiceCollectionExtensions
             IReaderAsync<UserNotificationIdDTO, UserNotificationDomain>,
             UserNotificationEFReader
         >();
+        services.AddScoped<
+            IDeleterAsync<UserNotificationIdDTO, UserNotificationDomain>,
+            UserNotificationEFDelter
+        >();
 
         return services;
     }

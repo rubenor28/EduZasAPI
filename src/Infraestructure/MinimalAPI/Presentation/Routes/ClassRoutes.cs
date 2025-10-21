@@ -1,6 +1,7 @@
 using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using Application.UseCases.Classes;
+using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
 using Application.UseCases.Common;
 using Domain.Entities;
@@ -165,6 +166,9 @@ public static class ClassRoutes
                     "Si el usuario no está inscrito a la clase en cuestión";
                 return op;
             });
+
+        app.MapGet("", AddProfessor)
+          ;
 
         return group;
     }
@@ -352,5 +356,16 @@ public static class ClassRoutes
             var created = validation.Unwrap();
             return Results.Ok();
         });
+    }
+
+    public static Task<IResult> AddProfessor(
+        string classId,
+        HttpContext ctx,
+        RoutesUtils utils,
+        AddProfessorToClassUseCase useCase)
+    {
+      return utils.HandleResponseAsync(async () => {
+          var userId = utils.GetIdFromContext(ctx);
+          });
     }
 }
