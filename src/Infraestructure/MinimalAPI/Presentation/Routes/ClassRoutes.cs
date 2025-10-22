@@ -130,7 +130,8 @@ public static class ClassRoutes
                 op.Responses["201"].Description = "Si la inscripción fue exitosa";
                 op.Responses["400"].Description = "Si el código de la clase es inválido";
                 op.Responses["401"].Description = "Si el usuario no está autenticado";
-                op.Responses["404"].Description = "Si no se encontró una clase con el código proporcionado";
+                op.Responses["404"].Description =
+                    "Si no se encontró una clase con el código proporcionado";
                 return op;
             });
 
@@ -168,7 +169,8 @@ public static class ClassRoutes
                 op.Responses["200"].Description = "Si la operación fue exitosa";
                 op.Responses["400"].Description = "Si el usuario o clase no son válidos";
                 op.Responses["401"].Description = "Si el usuario no está autenticado";
-                op.Responses["403"].Description = "Si el usuario no tiene permisos para realizar esta acción";
+                op.Responses["403"].Description =
+                    "Si el usuario no tiene permisos para realizar esta acción";
                 op.Responses["404"].Description =
                     "Si el usuario no está inscrito a la clase en cuestión";
                 return op;
@@ -185,12 +187,16 @@ public static class ClassRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Asignar un profesor a una clase";
-                op.Description = "Asigna un profesor existente a una clase, con la opción de designarlo como propietario.";
+                op.Description =
+                    "Asigna un profesor existente a una clase, con la opción de designarlo como propietario.";
                 op.Responses["201"].Description = "Si el profesor fue asignado correctamente.";
-                op.Responses["400"].Description = "Si los datos de entrada (ej. ID de usuario) son inválidos.";
+                op.Responses["400"].Description =
+                    "Si los datos de entrada (ej. ID de usuario) son inválidos.";
                 op.Responses["401"].Description = "Si el usuario no está autenticado.";
-                op.Responses["403"].Description = "Si el usuario no tiene permisos para asignar profesores (ej. no es dueño de la clase).";
-                op.Responses["404"].Description = "Si no se encontró la clase o el usuario a asignar.";
+                op.Responses["403"].Description =
+                    "Si el usuario no tiene permisos para asignar profesores (ej. no es dueño de la clase).";
+                op.Responses["404"].Description =
+                    "Si no se encontró la clase o el usuario a asignar.";
                 return op;
             });
 
@@ -328,8 +334,7 @@ public static class ClassRoutes
             if (validation.IsErr)
                 return validation.UnwrapErr().FromDomain();
 
-            var created = validation.Unwrap();
-            return Results.Created();
+            return Results.NoContent();
         });
     }
 
@@ -354,8 +359,7 @@ public static class ClassRoutes
             if (validation.IsErr)
                 return validation.UnwrapErr().FromDomain();
 
-            var created = validation.Unwrap();
-            return Results.Ok();
+            return Results.NoContent();
         });
     }
 
@@ -377,7 +381,7 @@ public static class ClassRoutes
             if (validation.IsErr)
                 return validation.UnwrapErr().FromDomain();
 
-            return Results.Ok();
+            return Results.NoContent();
         });
     }
 
