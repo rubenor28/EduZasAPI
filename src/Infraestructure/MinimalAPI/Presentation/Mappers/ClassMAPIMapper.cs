@@ -4,6 +4,7 @@ using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Domain.Entities;
 using Domain.ValueObjects;
+using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Classes;
 
 namespace MinimalAPI.Presentation.Mappers;
@@ -103,7 +104,7 @@ public static class ClassMAPIMapper
         return new ClassCriteriaMAPI
         {
             Page = source.Page,
-            Active = source.Active.IsSome ? source.Active.Unwrap() : null,
+            Active = source.Active.ToNullable(),
             WithProfessor = withProfessor,
             WithStudent = withStudent,
             ClassName = source.ClassName.FromDomain(),

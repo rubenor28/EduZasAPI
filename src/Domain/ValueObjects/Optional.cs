@@ -65,15 +65,6 @@ public abstract class Optional<T>
     private static readonly Optional<T> _none = new NoneOptional();
 
     /// <summary>
-    /// Convierte este Optional en un valor nullable.
-    /// </summary>
-    /// <returns>
-    /// El valor contenido si existe; de lo contrario, <c>null</c> si <typeparamref name="T"/> es un tipo referencia
-    /// o el valor por defecto de <typeparamref name="T"/> si es un tipo valor.
-    /// </returns>
-    public T? ToNullable() => IsSome ? Unwrap() : default(T?);
-
-    /// <summary>
     /// Crea un Optional que contiene el valor especificado.
     /// </summary>
     /// <param name="value">Valor a contener en el Optional.</param>
