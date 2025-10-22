@@ -14,6 +14,8 @@ public class QueryUseCase<C, E>(IQuerierAsync<E, C> querier)
     where C : notnull, CriteriaDTO
     where E : notnull
 {
+    protected IQuerierAsync<E, C> _querier = querier;
+
     /// <summary>
     /// Ejecuta la consulta asíncrona con los criterios especificados.
     /// </summary>
@@ -22,5 +24,5 @@ public class QueryUseCase<C, E>(IQuerierAsync<E, C> querier)
     /// Una consulta paginada de tipo <see cref="PaginatedQuery{E, C}"/>
     /// con los resultados correspondientes.
     /// </returns>
-    public Task<PaginatedQuery<E, C>> ExecuteAsync(C criteria) => querier.GetByAsync(criteria);
+    public Task<PaginatedQuery<E, C>> ExecuteAsync(C criteria) => _querier.GetByAsync(criteria);
 }

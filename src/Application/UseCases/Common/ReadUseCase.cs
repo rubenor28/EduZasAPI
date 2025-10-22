@@ -11,11 +11,23 @@ namespace Application.UseCases.Common;
 /// </summary>
 /// <typeparam name="I">Tipo del identificador de la entidad.</typeparam>
 /// <typeparam name="E">Tipo de la entidad que implementa <see cref="IIdentifiable{I}"/>.</typeparam>
-public abstract class ReadUseCase<I, E>(IReaderAsync<I, E> reader, IBusinessValidationService<I> validator)
-    : IUseCaseAsync<I, Optional<E>>
+public abstract class ReadUseCase<I, E>(
+    IReaderAsync<I, E> reader,
+    IBusinessValidationService<I> validator
+) : IUseCaseAsync<I, Optional<E>>
     where I : notnull
     where E : notnull, IIdentifiable<I>
 {
+    /// <summary>
+    /// Entidad encargada de recuperar una entidad por ID
+    /// </summary>
+    protected readonly IReaderAsync<I, E> _reader = reader;
+
+    /// <summary>
+    /// Entidad encargada de recuperar una entidad por ID
+    /// </summary>
+    protected readonly IBusinessValidationService<I> _validator = validator;
+
     /// <summary>
     /// Ejecuta la operación de lectura validando previamente el identificador.
     /// </summary>
@@ -29,7 +41,7 @@ public abstract class ReadUseCase<I, E>(IReaderAsync<I, E> reader, IBusinessVali
     /// </returns>
     public async Task<Result<Optional<E>, UseCaseErrorImpl>> ExecuteAsync(I request)
     {
-        var validation = validator.IsValid(request);
+        var validation = _validator.IsValid(request);
 
         if (validation.IsErr)
         {
@@ -37,7 +49,7 @@ public abstract class ReadUseCase<I, E>(IReaderAsync<I, E> reader, IBusinessVali
             return UseCaseError.Input(errors);
         }
 
-        var record = await reader.GetAsync(request);
+        var record = await _reader.GetAsync(request);
         return record;
     }
 }

@@ -22,6 +22,16 @@ public abstract class AddUseCase<NE, E>(
     where E : notnull
 {
     /// <summary>
+    /// Entidad encargada de persistir una nueva entidad
+    /// </summary>
+    protected readonly ICreatorAsync<E, NE> _creator = creator;
+
+    /// <summary>
+    /// Entidad encargada de validar el formato de la entidad a insertar
+    /// </summary>
+    protected readonly IBusinessValidationService<NE>? _validator = validator;
+
+    /// <summary>
     /// Ejecuta el proceso completo de creación de una nueva entidad.
     /// </summary>
     /// <param name="request">DTO con los datos para crear la nueva entidad.</param>
@@ -33,9 +43,9 @@ public abstract class AddUseCase<NE, E>(
     {
         var formatted = PreValidationFormat(request);
 
-        if (validator is not null)
+        if (_validator is not null)
         {
-            var validation = validator.IsValid(formatted);
+            var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
             {
                 return UseCaseError.Input(validation.UnwrapErr());
@@ -52,7 +62,7 @@ public abstract class AddUseCase<NE, E>(
 
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(formatted);
-        var newRecord = await creator.AddAsync(formatted);
+        var newRecord = await _creator.AddAsync(formatted);
 
         ExtraTask(formatted, newRecord);
         await ExtraTaskAsync(formatted, newRecord);

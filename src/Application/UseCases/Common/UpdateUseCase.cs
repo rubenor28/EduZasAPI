@@ -18,6 +18,16 @@ public abstract class UpdateUseCase<UE, E>(
     where E : notnull
 {
     /// <summary>
+    /// Entidad encargada de actualizar un registro
+    /// </summary>
+    protected readonly IUpdaterAsync<E, UE> _updater = updater;
+
+    /// <summary>
+    /// Entidad encargada de validar el formato de los campos de una entidad
+    /// </summary>
+    protected readonly IBusinessValidationService<UE>? _validator = validator;
+
+    /// <summary>
     /// Ejecuta el proceso de actualización de una entidad, validando los datos de entrada
     /// y aplicando las reglas de negocio correspondientes.
     /// </summary>
@@ -42,9 +52,9 @@ public abstract class UpdateUseCase<UE, E>(
     {
         var formatted = PreValidationFormat(request);
 
-        if (validator is not null)
+        if (_validator is not null)
         {
-            var validation = validator.IsValid(formatted);
+            var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
                 return UseCaseError.Input(validation.UnwrapErr());
         }
@@ -59,7 +69,7 @@ public abstract class UpdateUseCase<UE, E>(
 
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(formatted);
-        var updatedRecord = await updater.UpdateAsync(request);
+        var updatedRecord = await _updater.UpdateAsync(request);
 
         ExtraTask(formatted, updatedRecord);
         await ExtraTaskAsync(formatted, updatedRecord);

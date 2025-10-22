@@ -20,15 +20,25 @@ public abstract class DeleteUseCase<I, DE, E>(
     where DE : notnull, IIdentifiable<I>
 {
     /// <summary>
+    /// Entidad encargada de eliminar una entidad de un medio persistente
+    /// </summary>
+    protected readonly IDeleterAsync<I, E> _deleter = deleter;
+
+    /// <summary>
+    /// Entidad encargada de validar formato de las propiedades de una entidad
+    /// </summary>
+    protected readonly IBusinessValidationService<DE>? _validator = validator;
+
+    /// <summary>
     /// Ejecuta el caso de uso para eliminar una entidad.
     /// </summary>
     /// <param name="data">El DTO con la información para la eliminación.</param>
     /// <returns>Un <see cref="Result{T, E}"/> que contiene la entidad eliminada o un error.</returns>
     public async Task<Result<E, UseCaseErrorImpl>> ExecuteAsync(DE data)
     {
-        if (validator is not null)
+        if (_validator is not null)
         {
-            var validation = validator.IsValid(data);
+            var validation = _validator.IsValid(data);
             if (validation.IsErr)
                 return UseCaseError.Input(validation.UnwrapErr());
         }
@@ -41,7 +51,7 @@ public abstract class DeleteUseCase<I, DE, E>(
         if (asyncCheck.IsErr)
             return asyncCheck.UnwrapErr();
 
-        var recordDeleted = await deleter.DeleteAsync(data.Id);
+        var recordDeleted = await _deleter.DeleteAsync(data.Id);
         ExtraTask(data, recordDeleted);
         await ExtraTaskAsync(data, recordDeleted);
         return recordDeleted;
