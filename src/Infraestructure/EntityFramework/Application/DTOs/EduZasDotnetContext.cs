@@ -546,11 +546,18 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<TagsPerUser>(tagsPerUserBuilder =>
         {
-            tagsPerUserBuilder.HasKey(e => new { e.TagId, e.ContactId }).HasName("PRIMARY");
+            tagsPerUserBuilder.HasKey(e => new { e.TagId, e.AgendaContactId }).HasName("PRIMARY");
             tagsPerUserBuilder.ToTable("tags_per_user");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
+                tagsPerUserBuilder.Property(e => e.TagId)
+                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnName("tag_id");
+                tagsPerUserBuilder.Property(e => e.AgendaContactId)
+                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnName("agenda_contact_id");
+                
                 tagsPerUserBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
@@ -559,6 +566,9 @@ public partial class EduZasDotnetContext : DbContext
             }
             else
             {
+                tagsPerUserBuilder.Property(e => e.TagId).HasColumnName("tag_id");
+                tagsPerUserBuilder.Property(e => e.AgendaContactId).HasColumnName("agenda_contact_id");
+
                 tagsPerUserBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -572,7 +582,7 @@ public partial class EduZasDotnetContext : DbContext
             tagsPerUserBuilder
                 .HasOne(e => e.Contact)
                 .WithMany(e => e.TagsPerUsers)
-                .HasForeignKey(e => e.ContactId);
+                .HasForeignKey(e => e.AgendaContactId);
         });
 
         modelBuilder.Entity<Test>(testBuilder =>
