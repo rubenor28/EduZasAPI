@@ -5,7 +5,7 @@ namespace Application.DTOs.Contacts;
 
 public sealed record ContactCriteriaDTO : CriteriaDTO
 {
-    public required ulong Id { get; set; }
-    public required string Alias { get; set; }
-    public required Optional<string> Notes { get; set; }
+    public Optional<ulong> Id { get; set; } = Optional<ulong>.None();
+    public  Optional<StringQueryDTO> Alias { get; set; } = Optional<StringQueryDTO>.None();
+    public  Optional<string> Notes { get; set; } = Optional<string>.None();
 }
