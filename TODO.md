@@ -44,7 +44,7 @@
    - [x] Tag Querier
    - [x] TagMapper
    - [ ] Registrar DI
-2. [ ] Repositorio relacion etiquetas
+2. [x] Repositorio relacion etiquetas
    - [x] ContactTagDomain
      - DTO para ID
    - [x] ContactTag Creator
@@ -54,7 +54,7 @@
    - [x] ContactTagMapper
    - [x] Registrar DI
    - [x] Tests operaciones
-3. [ ] Repositorio contacto
+3. [x] Repositorio contacto
    - [x] NewContactDTO
    - [x] UpdateContactDTO
    - [x] ContactCriteriaDTO
@@ -64,7 +64,7 @@
    - [x] ContactReader
    - [x] ContactMapper
    - [x] Registrar DI
-   - [ ] Tests operaciones
+   - [x] Tests operaciones
 4. [ ] Caso de uso agregar etiqueta
    - Buscar si existe una etiqueta con ese texto
    - Si no existe, crear, si existe devolver ID
