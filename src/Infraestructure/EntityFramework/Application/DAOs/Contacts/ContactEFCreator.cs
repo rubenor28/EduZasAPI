@@ -4,7 +4,7 @@ using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
 
-namespace EntityFramework.Application.DAOs.Contact;
+namespace EntityFramework.Application.DAOs.Contacts;
 
 public sealed class ContactEFCreator(
     EduZasDotnetContext ctx,

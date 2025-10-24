@@ -62,8 +62,8 @@
    - [x] ContactUpdater
    - [x] ContactQuerier
    - [x] ContactReader
-   - [ ] ContactMapper
-   - [ ] Registrar DI
+   - [x] ContactMapper
+   - [x] Registrar DI
    - [ ] Tests operaciones
 4. [ ] Caso de uso agregar etiqueta
    - Buscar si existe una etiqueta con ese texto

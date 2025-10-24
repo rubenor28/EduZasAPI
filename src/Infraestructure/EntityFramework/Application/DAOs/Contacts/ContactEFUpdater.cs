@@ -5,7 +5,7 @@ using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using InterfaceAdapters.Mappers.Common;
 
-namespace EntityFramework.Application.DAOs.Contact;
+namespace EntityFramework.Application.DAOs.Contacts;
 
 public sealed class ContactEFUpdater(
     EduZasDotnetContext ctx,

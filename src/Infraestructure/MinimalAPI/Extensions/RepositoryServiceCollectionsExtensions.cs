@@ -2,6 +2,7 @@ using Application.DAOs;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
+using Application.DTOs.Contacts;
 using Application.DTOs.Notifications;
 using Application.DTOs.Tags;
 using Application.DTOs.UserNotifications;
@@ -10,6 +11,7 @@ using Domain.Entities;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassStudents;
+using EntityFramework.Application.DAOs.Contact;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.UserNotifications;
@@ -143,6 +145,12 @@ public static class RepositoryServiceCollectionExtensions
         // TAGS
         services.AddScoped<ICreatorAsync<TagDomain, NewTagDTO>, TagEFCreator>();
         services.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>, TagEFQuerier>();
+
+        // CONTACS
+        services.AddScoped<ICreatorAsync<ContactDomain, NewContactDTO>, ContactEFCreator>();
+        services.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>, ContactEFQuerier>();
+        services.AddScoped<IReaderAsync<ulong, ContactDomain>, ContactEFReader>();
+        services.AddScoped<IUpdaterAsync<ContactDomain, ContactUpdateDTO>, ContactEFUpdater>();
 
         return services;
     }

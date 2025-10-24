@@ -84,6 +84,8 @@ public partial class EduZasDotnetContext : DbContext
             agendaContactBuilder.Property(e => e.AgendaOwnerId).HasColumnName("agenda_owner_id");
             agendaContactBuilder.Property(e => e.ContactId).HasColumnName("contact_id");
 
+            agendaContactBuilder.HasIndex(e => new { e.AgendaOwnerId, e.ContactId }).IsUnique();
+
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 agendaContactBuilder
