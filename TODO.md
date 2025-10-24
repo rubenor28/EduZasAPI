@@ -59,9 +59,9 @@
    - [x] UpdateContactDTO
    - [x] ContactCriteriaDTO
    - [x] ContactCreator
-   - [ ] ContactUpdater
-   - [ ] ContactQuerier
-   - [ ] ContactReader
+   - [x] ContactUpdater
+   - [x] ContactQuerier
+   - [x] ContactReader
    - [ ] ContactMapper
    - [ ] Registrar DI
    - [ ] Tests operaciones

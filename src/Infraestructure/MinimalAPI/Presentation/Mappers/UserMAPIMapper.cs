@@ -3,6 +3,7 @@ using Application.DTOs.Users;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
+using InterfaceAdapters.Mappers.Common;
 using InterfaceAdapters.Mappers.Users;
 using MinimalAPI.Application.DTOs.Users;
 
@@ -53,7 +54,7 @@ public static class UserMAPIMapper
             Role = source.Role.ToInt().Unwrap(),
         };
 
-    /// <summary>
+/// <summary>
     /// Convierte una instancia de <see cref="UserDomain"/> en un objeto de infraestructura <see cref="PublicUserMAPI"/>.
     /// </summary>
     /// <param name="source">Instancia de <see cref="UserDomain"/> a convertir.</param>
