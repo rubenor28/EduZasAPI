@@ -2,6 +2,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Notifications;
+using Application.DTOs.Tags;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
@@ -88,6 +89,11 @@ public static class MapperServiceCollectionExtensions
         services.AddSingleton<IUpdateMapper<UserNotificationDomain, NotificationPerUser>>(s =>
             s.GetRequiredService<UserNotificationEFMapper>()
         );
+
+        // TAGS
+        services.AddSingleton<TagEFMapper>();
+        services.AddSingleton<IMapper<Tag, TagDomain>>(s => s.GetRequiredService<TagEFMapper>());
+        services.AddSingleton<IMapper<NewTagDTO, Tag>>(s => s.GetRequiredService<TagEFMapper>());
 
         return services;
     }

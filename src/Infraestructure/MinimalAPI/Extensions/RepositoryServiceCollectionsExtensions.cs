@@ -3,6 +3,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Notifications;
+using Application.DTOs.Tags;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
@@ -10,6 +11,7 @@ using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Notifications;
+using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
@@ -137,6 +139,10 @@ public static class RepositoryServiceCollectionExtensions
             IDeleterAsync<UserNotificationIdDTO, UserNotificationDomain>,
             UserNotificationEFDelter
         >();
+
+        // TAGS
+        services.AddScoped<ICreatorAsync<TagDomain, NewTagDTO>, TagEFCreator>();
+        services.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>, TagEFQuerier>();
 
         return services;
     }

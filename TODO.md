@@ -42,7 +42,7 @@
    - [x] TagCriteriaDTO
    - [x] Tag Creator
    - [x] Tag Querier
-   - [ ] TagMapper
+   - [x] TagMapper
    - [ ] Registrar DI
 2. [ ] Repositorio relacion etiquetas
    - [x] ContactTagDomain
@@ -51,9 +51,9 @@
      - usa DTO para ID como entrada
    - [x] ContactTag Deleter
    - [x] ContactTag Reader
-   - [ ] ContactTagMapper
-   - [ ] Registrar DI
-   - [ ] Tests operaciones
+   - [x] ContactTagMapper
+   - [x] Registrar DI
+   - [x] Tests operaciones
 3. [ ] Repositorio contacto
    - [x] NewContactDTO
    - [x] UpdateContactDTO
