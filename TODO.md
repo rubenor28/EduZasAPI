@@ -65,14 +65,17 @@
    - [x] ContactMapper
    - [x] Registrar DI
    - [x] Tests operaciones
-4. [ ] Caso de uso agregar etiqueta
+4. [x] Caso de uso agregar etiqueta
    - Buscar si existe una etiqueta con ese texto
    - Si no existe, crear, si existe devolver ID
    - [ ] Test
-5. [ ] Caso de uso eliminar una etiqueta de contacto
+5. [ ] Caso de uso agregar una etiqueta a contacto
+   - Crear relacion etiqueta - contacto
+   - [ ] Test
+6. [ ] Caso de uso eliminar una etiqueta de contacto
    - Eliminar la relacion etiqueta - contacto
    - [ ] Test
-6. [ ] Caso de uso agregar contacto
+7. [ ] Caso de uso agregar contacto
    - Modificar campos contacto y recibir array de etiquetas que tiene
    - [ ] Test
 

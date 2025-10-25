@@ -17,13 +17,15 @@ public class UseCaseError
     /// </summary>
     private static readonly UnauthorizedError _unauthorized = new();
     private static readonly NotFoundError _notFound = new();
+    private static readonly AlreadyExistsError _exists = new();
 
     /// <summary>
     /// Crea un error que representa una validación de entrada de datos fallida.
     /// </summary>
     /// <param name="errors">La lista de errores de campo específicos.</param>
     /// <returns>Una instancia de error de tipo <see cref="Input"/>.</returns>
-    public static UseCaseErrorImpl Input(IEnumerable<FieldErrorDTO> Errors) => new InputError(Errors);
+    public static UseCaseErrorImpl Input(IEnumerable<FieldErrorDTO> Errors) =>
+        new InputError(Errors);
 
     /// <summary>
     /// Devuelve la instancia única de un error que representa una falla de autorización.
@@ -35,6 +37,8 @@ public class UseCaseError
     /// Devuelve una instancia única del error de tipo <see cref="NotFound"/>
     /// </summary>
     public static UseCaseErrorImpl NotFound() => _notFound;
+
+    public static UseCaseErrorImpl AlreadyExists() => _exists;
 }
 
 /// <summary>
@@ -52,3 +56,8 @@ public sealed record UnauthorizedError() : UseCaseErrorImpl;
 /// Representa un error ocurrido cuando no se encuentra un recurso.
 /// </summary>
 public sealed record NotFoundError() : UseCaseErrorImpl;
+
+/// <summary>
+/// Representa que la entidad que trató de crearse ya existe
+/// </summary>
+public sealed record AlreadyExistsError() : UseCaseErrorImpl;

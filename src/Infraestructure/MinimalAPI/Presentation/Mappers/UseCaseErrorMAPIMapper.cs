@@ -22,6 +22,7 @@ public static class UseCaseErrorMAPIMapper
             ),
             UnauthorizedError => Results.Forbid(),
             NotFoundError => Results.NotFound(),
+            AlreadyExistsError => Results.Conflict(),
             _ => throw new InvalidOperationException(),
         };
     }

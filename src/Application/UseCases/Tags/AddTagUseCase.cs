@@ -1,6 +1,7 @@
 using Application.DAOs;
 using Application.DTOs.Common;
 using Application.DTOs.Tags;
+using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
@@ -10,35 +11,32 @@ namespace Application.UseCases.Tags;
 
 public sealed class AddTagUseCase(
     ICreatorAsync<TagDomain, NewTagDTO> creator,
-    IQuerierAsync<TagDomain, TagCriteriaDTO> querier
-) : IUseCaseAsync<NewTagDTO, TagDomain>
+    IQuerierAsync<TagDomain, TagCriteriaDTO> querier,
+    IBusinessValidationService<NewTagDTO>? validator = null
+) : AddUseCase<NewTagDTO, TagDomain>(creator, validator)
 {
-    private readonly ICreatorAsync<TagDomain, NewTagDTO> _creator = creator;
     private readonly IQuerierAsync<TagDomain, TagCriteriaDTO> _querier = querier;
 
-    public async Task<Result<TagDomain, UseCaseErrorImpl>> ExecuteAsync(NewTagDTO request)
+    protected override NewTagDTO PreValidationFormat(NewTagDTO data)
     {
-        var formatted = Format(request);
+        data.Text = data.Text.ToUpperInvariant();
+        return data;
+    }
 
+    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+        NewTagDTO value
+    )
+    {
         var tagSearch = await _querier.GetByAsync(
             new()
             {
-                Text = new StringQueryDTO
-                {
-                    Text = formatted.Text,
-                    SearchType = StringSearchType.EQ,
-                },
+                Text = new StringQueryDTO { Text = value.Text, SearchType = StringSearchType.EQ },
             }
         );
 
         if (tagSearch.Results.Any())
-            return tagSearch.Results.First();
-    }
+            return UseCaseError.AlreadyExists();
 
-    private static NewTagDTO Format(NewTagDTO data)
-    {
-        data.Text = data.Text.ToUpperInvariant();
-
-        return data;
+        return Unit.Value;
     }
 }
