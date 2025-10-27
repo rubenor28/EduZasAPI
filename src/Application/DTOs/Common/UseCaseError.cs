@@ -31,7 +31,7 @@ public class UseCaseError
     /// Devuelve la instancia única de un error que representa una falla de autorización.
     /// </summary>
     /// <returns>La instancia singleton del error de tipo <see cref="Unauthorized"/>.</returns>
-    public static UseCaseErrorImpl UnauthorizedError() => _unauthorized;
+    public static UseCaseErrorImpl Unauthorized() => _unauthorized;
 
     /// <summary>
     /// Devuelve una instancia única del error de tipo <see cref="NotFound"/>

@@ -37,13 +37,13 @@
 > ![NOTE] Deberia considerar que el DTO de contacto al menos el publico tiene inscrustadas las etiquetas en un array?
 > ![NOTE] Diseñar nuevas clases de EF que solo agregan o eliminan
 
-1. [ ] Repositorio etiquetas
+1. [x] Repositorio etiquetas
    - [x] NewTagDTO
    - [x] TagCriteriaDTO
    - [x] Tag Creator
    - [x] Tag Querier
    - [x] TagMapper
-   - [ ] Registrar DI
+   - [x] Registrar DI
 2. [x] Repositorio relacion etiquetas
    - [x] ContactTagDomain
      - DTO para ID
@@ -69,10 +69,10 @@
    - Buscar si existe una etiqueta con ese texto
    - Si no existe, crear, si existe devolver ID
    - [ ] Test
-5. [ ] Caso de uso agregar una etiqueta a contacto
+5. [x] Caso de uso agregar una etiqueta a contacto
    - Crear relacion etiqueta - contacto
    - [ ] Test
-6. [ ] Caso de uso eliminar una etiqueta de contacto
+6. [x] Caso de uso eliminar una etiqueta de contacto
    - Eliminar la relacion etiqueta - contacto
    - [ ] Test
 7. [ ] Caso de uso agregar contacto

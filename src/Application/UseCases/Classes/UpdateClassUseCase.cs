@@ -40,7 +40,7 @@ public class UpdateClassUseCase(
             );
 
             if (result.IsNone || !result.Unwrap().IsOwner)
-                return Result.Err(UseCaseError.UnauthorizedError());
+                return Result.Err(UseCaseError.Unauthorized());
         }
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);

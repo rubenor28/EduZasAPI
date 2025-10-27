@@ -1,5 +1,3 @@
-
-using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.ClassStudents;
@@ -44,11 +42,11 @@ public class UnenrollClassUseCaseTest : IDisposable
         var studentReader = new ClassStudentsEFReader(_ctx, studentClassMapper);
 
         _useCase = new UnenrollClassUseCase(
+            studentDeleter,
+            studentReader,
             userReader,
             classReader,
-            studentDeleter,
-            professorReader,
-            studentReader
+            professorReader
         );
     }
 
@@ -78,13 +76,27 @@ public class UnenrollClassUseCaseTest : IDisposable
 
     private async Task SeedStudentRelation(string classId, ulong studentId)
     {
-        _ctx.ClassStudents.Add(new ClassStudent { ClassId = classId, StudentId = studentId, Hidden = false });
+        _ctx.ClassStudents.Add(
+            new ClassStudent
+            {
+                ClassId = classId,
+                StudentId = studentId,
+                Hidden = false,
+            }
+        );
         await _ctx.SaveChangesAsync();
     }
 
     private async Task SeedProfessorRelation(string classId, ulong professorId, bool isOwner)
     {
-        _ctx.ClassProfessors.Add(new ClassProfessor { ClassId = classId, ProfessorId = professorId, IsOwner = isOwner });
+        _ctx.ClassProfessors.Add(
+            new ClassProfessor
+            {
+                ClassId = classId,
+                ProfessorId = professorId,
+                IsOwner = isOwner,
+            }
+        );
         await _ctx.SaveChangesAsync();
     }
 
@@ -98,7 +110,7 @@ public class UnenrollClassUseCaseTest : IDisposable
         var dto = new UnenrollClassDTO
         {
             Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = student.UserId, Role = UserType.STUDENT }
+            Executor = new() { Id = student.UserId, Role = UserType.STUDENT },
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -119,7 +131,7 @@ public class UnenrollClassUseCaseTest : IDisposable
         var dto = new UnenrollClassDTO
         {
             Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = admin.UserId, Role = UserType.ADMIN }
+            Executor = new() { Id = admin.UserId, Role = UserType.ADMIN },
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -139,7 +151,7 @@ public class UnenrollClassUseCaseTest : IDisposable
         var dto = new UnenrollClassDTO
         {
             Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = owner.UserId, Role = UserType.PROFESSOR }
+            Executor = new() { Id = owner.UserId, Role = UserType.PROFESSOR },
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -159,7 +171,7 @@ public class UnenrollClassUseCaseTest : IDisposable
         var dto = new UnenrollClassDTO
         {
             Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = nonOwner.UserId, Role = UserType.PROFESSOR }
+            Executor = new() { Id = nonOwner.UserId, Role = UserType.PROFESSOR },
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -179,7 +191,7 @@ public class UnenrollClassUseCaseTest : IDisposable
         var dto = new UnenrollClassDTO
         {
             Id = new() { ClassId = cls.ClassId, UserId = student2.UserId },
-            Executor = new() { Id = student1.UserId, Role = UserType.STUDENT }
+            Executor = new() { Id = student1.UserId, Role = UserType.STUDENT },
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -198,7 +210,7 @@ public class UnenrollClassUseCaseTest : IDisposable
         var dto = new UnenrollClassDTO
         {
             Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = student.UserId, Role = UserType.STUDENT }
+            Executor = new() { Id = student.UserId, Role = UserType.STUDENT },
         };
 
         var result = await _useCase.ExecuteAsync(dto);

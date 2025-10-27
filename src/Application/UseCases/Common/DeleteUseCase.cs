@@ -13,6 +13,7 @@ namespace Application.UseCases.Common;
 /// <typeparam name="E">El tipo de la entidad de dominio que se eliminará.</typeparam>
 public abstract class DeleteUseCase<I, DE, E>(
     IDeleterAsync<I, E> deleter,
+    IReaderAsync<I, E> reader,
     IBusinessValidationService<DE>? validator = null
 ) : IUseCaseAsync<DE, E>
     where I : notnull
@@ -23,6 +24,11 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// Entidad encargada de eliminar una entidad de un medio persistente
     /// </summary>
     protected readonly IDeleterAsync<I, E> _deleter = deleter;
+
+    /// <summary>
+    /// Entidad encargada de buscar una entidad de un medio persistente por ID
+    /// </summary>
+    protected readonly IReaderAsync<I, E> _reader = reader;
 
     /// <summary>
     /// Entidad encargada de validar formato de las propiedades de una entidad
@@ -74,11 +80,20 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// <param name="value">Datos a validar.</param>
     /// <returns>Tarea que representa la validación asíncrona.</returns>
     /// <remarks>
+    /// Por defecto busca la existencia por ID del registro y retorna un <see cref="NotFoundError">
+    /// si no se encuentra
+    ///
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
     /// como verificaciones en base de datos o llamadas a servicios externos.
     /// </remarks>
-    protected virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(DE value) =>
-        Task.FromResult(Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value));
+    protected async virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(DE value)
+    {
+        var record = await _reader.GetAsync(value.Id);
+        if (record.IsNone)
+            return UseCaseError.NotFound();
+
+        return Unit.Value;
+    }
 
     /// <summary>
     /// Ejecuta tareas adicionales síncronas después de crear la entidad.

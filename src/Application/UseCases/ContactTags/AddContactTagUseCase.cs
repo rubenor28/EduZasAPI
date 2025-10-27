@@ -4,6 +4,7 @@ using Application.DTOs.ContactTag;
 using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ContactTags;
@@ -45,6 +46,17 @@ public sealed class AddContactClassUseCase(
 
         if (contactTagSearch.IsSome)
             return UseCaseError.AlreadyExists();
+
+        var authorizedToModify = request.Executor.Role switch
+        {
+            UserType.ADMIN => true,
+            UserType.STUDENT => false,
+            UserType.PROFESSOR => request.Executor.Id == contactSearch.Unwrap().AgendaOwnerId,
+            _ => throw new NotImplementedException(),
+        };
+
+        if(!authorizedToModify)
+          return UseCaseError.Unauthorized();
 
         return Unit.Value;
     }

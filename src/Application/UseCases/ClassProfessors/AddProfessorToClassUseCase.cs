@@ -45,7 +45,7 @@ public class AddProfessorToClassUseCase
 
         _handlers = new Dictionary<UserType, Func<AddProfessorToClassDTO, UseCaseResult>>
         {
-            [UserType.STUDENT] = dto => Task.FromResult(Result<ProfessorClassRelationDTO, UseCaseErrorImpl>.Err(UseCaseError.UnauthorizedError())),
+            [UserType.STUDENT] = dto => Task.FromResult(Result<ProfessorClassRelationDTO, UseCaseErrorImpl>.Err(UseCaseError.Unauthorized())),
 
             [UserType.ADMIN] = async dto => await AddProfessor(dto),
 
@@ -56,7 +56,7 @@ public class AddProfessorToClassUseCase
                 );
 
                 if (executorRelation.IsNone || !executorRelation.Unwrap().IsOwner)
-                    return UseCaseError.UnauthorizedError();
+                    return UseCaseError.Unauthorized();
 
                 return await AddProfessor(dto);
             },

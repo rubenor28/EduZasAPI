@@ -39,7 +39,7 @@ public class AddClassUseCase(
         var usr = usrSearch.Unwrap();
         if (!_allowedRoles.Contains(usr.Role))
         {
-            return UseCaseError.UnauthorizedError();
+            return UseCaseError.Unauthorized();
         }
 
         return Unit.Value;

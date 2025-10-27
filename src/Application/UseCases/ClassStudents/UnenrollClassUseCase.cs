@@ -15,12 +15,16 @@ namespace Application.UseCases.ClassStudents;
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
 public class UnenrollClassUseCase(
+    IDeleterAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> deleter,
+    IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> reader,
     IReaderAsync<ulong, UserDomain> userReader,
     IReaderAsync<string, ClassDomain> classReader,
-    IDeleterAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> deleter,
-    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorRelationReader,
-    IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> studentRelationReader
-) : DeleteUseCase<ClassUserRelationIdDTO, UnenrollClassDTO, StudentClassRelationDTO>(deleter)
+    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorRelationReader
+)
+    : DeleteUseCase<ClassUserRelationIdDTO, UnenrollClassDTO, StudentClassRelationDTO>(
+        deleter,
+        reader
+    )
 {
     /// <summary>
     /// Realiza validaciones asincrónicas antes de proceder con la adición de la relación.
@@ -47,57 +51,46 @@ public class UnenrollClassUseCase(
             errors.Add(new() { Field = "userId", Message = "Usuario no encontrado" })
         );
 
-        var studentRelationSearch = await studentRelationReader.GetAsync(value.Id);
-
-        switch (studentRelationSearch)
-        {
-            // Si no se encuentra la relacion, se marca como error de la entrada
-            case { IsNone: true }:
-            {
-                return UseCaseError.NotFound();
-            }
-
-            /**
-             * Validar que el ejecutor sea, o administrador, o profesor dueño de la clase.
-             * Se hace uso del early return. Un break indica un caso valido, y en caso de
-             * return envia un error o una excepcion según corresponda
-             */
-            case { IsSome: true }:
-            {
-                var relation = studentRelationSearch.Unwrap();
-
-                if (relation.Id.UserId == value.Executor.Id)
-                    break;
-
-                if (value.Executor.Role == UserType.ADMIN)
-                    break;
-
-                if (value.Executor.Role == UserType.STUDENT)
-                    return UseCaseError.UnauthorizedError();
-
-                var professorRelationSearch = await professorRelationReader.GetAsync(
-                    new() { UserId = value.Executor.Id, ClassId = value.Id.ClassId }
-                );
-
-                // Caso el argumento diga que el ejecutor es usuario pero los registros
-                // digan lo contrario
-                if (professorRelationSearch.IsNone)
-                    throw new InvalidOperationException(
-                        "El executor dice ser profesor pero no lo es"
-                    );
-
-                var professorRelation = professorRelationSearch.Unwrap();
-
-                if (professorRelation.IsOwner)
-                    break;
-
-                return UseCaseError.UnauthorizedError();
-            }
-        }
-
         if (errors.Count > 0)
             return UseCaseError.Input(errors);
 
+        var studentRelationSearch = await _reader.GetAsync(value.Id);
+
+        if (studentRelationSearch.IsNone)
+            return UseCaseError.NotFound();
+
+        var studentRelation = studentRelationSearch.Unwrap();
+
+        var authorized = value.Executor.Role switch
+        {
+            // Admin puede eliminar de una clase a cualquiera
+            UserType.ADMIN => true,
+            // El alumno solo puede eliminarse a sí mismo
+            UserType.STUDENT => studentRelation.Id.UserId == value.Executor.Id,
+            // El profesor solo puede eliminar si tiene los permisos adecuados
+            UserType.PROFESSOR => await IsAuthorizedProfessor(value.Executor.Id, value.Id.ClassId),
+            _ => throw new NotImplementedException("UseCase not prepared for this user type"),
+        };
+
+        if (!authorized)
+            return UseCaseError.Unauthorized();
+
         return Unit.Value;
+    }
+
+    /// <summary>
+    /// Funcion que determina si un profesor puede desincribir a un alumno
+    /// </summary>
+    private async Task<bool> IsAuthorizedProfessor(ulong professorId, string classId)
+    {
+        var professorRelationSearch = await professorRelationReader.GetAsync(
+            new() { UserId = professorId, ClassId = classId }
+        );
+
+        // El usuario es profesor, pero no de esta clase
+        if (professorRelationSearch.IsNone)
+            return false;
+
+        return professorRelationSearch.Unwrap().IsOwner;
     }
 }
