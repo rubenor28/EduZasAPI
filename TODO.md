@@ -67,14 +67,13 @@
    - [x] Tests operaciones
 4. [x] Caso de uso agregar etiqueta
    - Buscar si existe una etiqueta con ese texto
-   - Si no existe, crear, si existe devolver ID
-   - [ ] Test
+   - [x] Test
 5. [x] Caso de uso agregar una etiqueta a contacto
    - Crear relacion etiqueta - contacto
-   - [ ] Test
+   - [x] Test
 6. [x] Caso de uso eliminar una etiqueta de contacto
    - Eliminar la relacion etiqueta - contacto
-   - [ ] Test
+   - [x] Test
 7. [ ] Caso de uso agregar contacto
    - Modificar campos contacto y recibir array de etiquetas que tiene
    - [ ] Test

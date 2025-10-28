@@ -52,4 +52,13 @@ public static class UserTypeMapper
             2 => UserType.ADMIN,
             _ => Optional<UserType>.None(),
         };
+
+    public static Optional<UserType> Parse(this uint value) =>
+        value switch
+        {
+            0 => UserType.STUDENT,
+            1 => UserType.PROFESSOR,
+            2 => UserType.ADMIN,
+            _ => Optional<UserType>.None(),
+        };
 }
