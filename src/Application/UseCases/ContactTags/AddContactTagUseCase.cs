@@ -1,5 +1,6 @@
 using Application.DAOs;
 using Application.DTOs.Common;
+using Application.DTOs.Contacts;
 using Application.DTOs.ContactTag;
 using Application.Services;
 using Application.UseCases.Common;
@@ -9,7 +10,7 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ContactTags;
 
-public sealed class AddContactClassUseCase(
+public sealed class AddContactTagUseCase(
     ICreatorAsync<ContactTagDomain, NewContactTagDTO> creator,
     IReaderAsync<ulong, ContactDomain> contactReader,
     IReaderAsync<ulong, TagDomain> tagReader,
@@ -17,8 +18,8 @@ public sealed class AddContactClassUseCase(
     IBusinessValidationService<NewContactTagDTO>? validator = null
 ) : AddUseCase<NewContactTagDTO, ContactTagDomain>(creator, validator)
 {
-    private readonly IReaderAsync<ulong, ContactDomain> _contactReader = contactReader;
     private readonly IReaderAsync<ulong, TagDomain> _tagReader = tagReader;
+    private readonly IReaderAsync<ulong, ContactDomain> _contactReader = contactReader;
     private readonly IReaderAsync<ContactTagIdDTO, ContactTagDomain> _contactTagReader =
         contactTagReader;
 
@@ -32,7 +33,7 @@ public sealed class AddContactClassUseCase(
         List<FieldErrorDTO> errors = [];
 
         if (contactSearch.IsNone)
-            errors.Add(new() { Field = "agendaContactId", Message = "No se encontró el contacto" });
+            errors.Add(new() { Field = "agendaContactId", Message = "No se encontró el usuario" });
 
         if (tagSearch.IsNone)
             errors.Add(new() { Field = "tagId", Message = "No se encontró la etiqueta" });
@@ -55,8 +56,8 @@ public sealed class AddContactClassUseCase(
             _ => throw new NotImplementedException(),
         };
 
-        if(!authorizedToModify)
-          return UseCaseError.Unauthorized();
+        if (!authorizedToModify)
+            return UseCaseError.Unauthorized();
 
         return Unit.Value;
     }
