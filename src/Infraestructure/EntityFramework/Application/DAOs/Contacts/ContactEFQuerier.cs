@@ -15,6 +15,13 @@ public sealed class ContactEFQuerier(
 ) : EFQuerier<ContactDomain, ContactCriteriaDTO, AgendaContact>(ctx, domainMapper, pageSize)
 {
     public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO criteria) =>
-        _dbSet.AsNoTracking().AsQueryable().WhereStringQuery(criteria.Alias, c => c.Alias);
+        _dbSet
+            .AsNoTracking()
+            .AsQueryable()
+            .WhereStringQuery(criteria.Alias, c => c.Alias)
+            .WhereOptional(criteria.ContactId, userId => contact => contact.ContactId == userId)
+            .WhereOptional(
+                criteria.AgendaOwnerId,
+                ownerId => contact => contact.AgendaOwnerId == ownerId
+            );
 }
-

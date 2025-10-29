@@ -11,7 +11,7 @@ using Domain.Entities;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassStudents;
-using EntityFramework.Application.DAOs.Contact;
+using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.UserNotifications;
