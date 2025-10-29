@@ -63,7 +63,7 @@ public sealed class AddContactUseCase(
         };
 
         if (!authorized)
-            UseCaseError.Unauthorized();
+            return UseCaseError.Unauthorized();
 
         return Unit.Value;
     }

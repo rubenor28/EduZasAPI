@@ -1,12 +1,12 @@
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Domain.Enums;
+using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Domain.ValueObjects;
 
 namespace EntityFrameworkTest;
 
@@ -39,8 +39,20 @@ public class AgendaContactEFRepositoryTest : IDisposable
         _updater = new(_ctx, mapper, mapper);
         _querier = new(_ctx, mapper, 10);
 
-        _user1 = new User { Email = "test1@user.com", Password = "password", FirstName = "Test1", FatherLastname = "User" };
-        _user2 = new User { Email = "test2@user.com", Password = "password", FirstName = "Test2", FatherLastname = "User" };
+        _user1 = new User
+        {
+            Email = "test1@user.com",
+            Password = "password",
+            FirstName = "Test1",
+            FatherLastname = "User",
+        };
+        _user2 = new User
+        {
+            Email = "test2@user.com",
+            Password = "password",
+            FirstName = "Test2",
+            FatherLastname = "User",
+        };
         _ctx.Users.AddRange(_user1, _user2);
         _ctx.SaveChanges();
     }
@@ -53,7 +65,9 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId
+            ContactId = _user2.UserId,
+            Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
+            ContactTags = [],
         };
 
         var created = await _creator.AddAsync(newContact);
@@ -73,7 +87,9 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId
+            ContactId = _user2.UserId,
+            Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
+            ContactTags = [],
         };
         await _creator.AddAsync(newContact);
 
@@ -82,7 +98,9 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Duplicate Alias",
             Notes = "Duplicate notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId
+            ContactId = _user2.UserId,
+            Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
+            ContactTags = [],
         };
 
         await Assert.ThrowsAsync<DbUpdateException>(() => _creator.AddAsync(duplicateContact));
@@ -96,7 +114,9 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId
+            ContactId = _user2.UserId,
+            Executor = new() { Id = 1, Role = UserType.STUDENT },
+            ContactTags = [],
         };
         var created = await _creator.AddAsync(newContact);
 
@@ -122,8 +142,11 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId
+            ContactId = _user2.UserId,
+            Executor = new() { Id = 1, Role = UserType.STUDENT },
+            ContactTags = [],
         };
+
         var created = await _creator.AddAsync(newContact);
 
         var update = new ContactUpdateDTO
@@ -132,7 +155,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Updated Alias",
             Notes = "Updated notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId
+            ContactId = _user2.UserId,
         };
 
         var updated = await _updater.UpdateAsync(update);
@@ -150,17 +173,15 @@ public class AgendaContactEFRepositoryTest : IDisposable
         {
             Alias = "Alias 1",
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId
+            ContactId = _user2.UserId,
+            Executor = new() { Id = 1, Role = UserType.STUDENT },
+            ContactTags = [],
         };
         await _creator.AddAsync(newContact1);
 
         var criteria = new ContactCriteriaDTO
         {
-            Alias = new StringQueryDTO
-            {
-                Text = "Alias 1",
-                SearchType = StringSearchType.EQ
-            }
+            Alias = new StringQueryDTO { Text = "Alias 1", SearchType = StringSearchType.EQ },
         };
 
         var result = await _querier.GetByAsync(criteria);

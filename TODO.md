@@ -74,7 +74,7 @@
 6. [x] Caso de uso eliminar una etiqueta de contacto
    - Eliminar la relacion etiqueta - contacto
    - [x] Test
-7. [ ] Caso de uso agregar contacto
+7. [x] Caso de uso agregar contacto
    - Modificar campos contacto y recibir array de etiquetas que tiene
    - [ ] Test
 

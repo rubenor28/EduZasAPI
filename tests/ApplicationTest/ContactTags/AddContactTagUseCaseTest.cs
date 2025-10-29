@@ -16,7 +16,7 @@ namespace ApplicationTest.ContactTags;
 
 public class AddContactTagUseCaseTest : IDisposable
 {
-    private readonly AddContactClassUseCase _useCase;
+    private readonly AddContactTagUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
@@ -40,7 +40,7 @@ public class AddContactTagUseCaseTest : IDisposable
         var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
         var contactTagCreator = new ContactTagEFCreator(_ctx, contactTagMapper, contactTagMapper);
 
-        _useCase = new AddContactClassUseCase(
+        _useCase = new AddContactTagUseCase(
             contactTagCreator,
             contactReader,
             tagReader,
