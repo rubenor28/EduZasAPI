@@ -76,7 +76,7 @@
    - [x] Test
 7. [x] Caso de uso agregar contacto
    - Modificar campos contacto y recibir array de etiquetas que tiene
-   - [ ] Test
+   - [x] Test
 
 ## [ ] Evaluaciones
 
