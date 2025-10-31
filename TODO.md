@@ -78,21 +78,64 @@
    - Modificar campos contacto y recibir array de etiquetas que tiene
    - [x] Test
 
+- [x] Ruta agregar contacto
+- [x] Ruta buscar contacto
+  - [x] Buscar mis contactos
+  - [x] Buscar contactos registrados si eres admin
+- [x] Ruta eliminar contacto
+- [ ] Ruta modificar contacto
+- [ ] Ruta agregar etiqueta a contacto
+- [ ] Ruta eliminar etiqueta a contacto
+
 ## [ ] Evaluaciones
 
 1. [ ] Repositorio para guardar tests
-2. [ ] Repositorio para relacionar clases y tests
-3. [ ] Caso de uso agregar tests.
-   - Validar existencia de clase
-   - Validar que el profesor sea parte de la clase (dueño o no)
-   - Crear notificación de clase
-4. [ ] Validador para tests
-5. [ ] Caso de uso modificar tests.
-6. [ ] Caso de uso leer test
-7. [ ] Caso de uso buscar test
-8. [ ] Caso de uso cambiar visibilidad de test por clase
-9. [ ] Caso de uso eliminar clase
-   - Debe eliminar tambien las relaciones con otras clases
+   - [x] Crear test
+     - [x] Registro DI
+   - [x] Modificar test
+     - [x] Registro DI
+   - [x] Eliminar test
+     - [x] Registro DI
+   - [x] Obtener test por Id
+     - [x] Registro DI
+   - [x] Buscar test
+     - [x] Registro DI
+   - [x] Mapper EF a dominio
+     - [x] Registro DI
+   - [x] Mapper nuevo a EF
+     - [x] Registro DI
+   - [x] Mapper update a EF
+     - [x] Registro DI
+2. [ ] Validador de formato nuevo contacto
+3. [ ] Validador de formato actualizar contacto
+4. [x] Caso de uso agregar test
+   - [ ] Registro DI
+5. [x] Caso de uso modificar test
+   - [ ] Registro DI
+6. [x] Caso de uso obtener test
+   - [ ] Registro DI
+7. [x] Caso de uso buscar test
+   - [ ] Registro DI
+8. [x] Caso de uso eliminar test
+   - [ ] Registro DI
+   - [ ] ELIMINAR LAS RESPUESTAS POSTERIORMENTE
+   - [ ] ELIMINAR RELACIONES test per class
+
+9. [ ] Repositorio para relacionar clases y tests
+10. [ ] Crear relacion class - test
+11. [ ] Eliminar relacion class - test
+12. [ ] Toggle visibilidad relacion class - test
+13. [ ] Caso de uso agregar tests.
+    - Validar existencia de clase
+    - Validar que el profesor sea parte de la clase (dueño o no)
+    - Crear notificación de clase
+14. [ ] Validador para tests
+15. [ ] Caso de uso modificar tests.
+16. [ ] Caso de uso leer test
+17. [ ] Caso de uso buscar test
+18. [ ] Caso de uso cambiar visibilidad de test por clase
+19. [ ] Caso de uso eliminar clase
+    - Debe eliminar tambien las relaciones con otras clases
 
 ## [ ] Contenido académico
 

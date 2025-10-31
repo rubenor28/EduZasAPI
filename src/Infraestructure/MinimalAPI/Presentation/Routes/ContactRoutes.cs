@@ -31,6 +31,11 @@ public static class ContactRoutes
             .RequireAuthorization("Admin")
             .AddEndpointFilter<ExecutorFilter>();
 
+        app.MapDelete("/", DeleteContact)
+            .WithName("Eliminar contacto")
+            .RequireAuthorization("ProfesorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
         return group;
     }
 
@@ -113,5 +118,22 @@ public static class ContactRoutes
         });
     }
 
-    private static Task<IResult> DeleteContact() { }
+    private static Task<IResult> DeleteContact(
+        ulong contactId,
+        DeleteContactUseCase useCase,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var executor = utils.GetExecutorFromContext(ctx);
+            var result = await useCase.ExecuteAsync(new() { Id = contactId, Executor = executor });
+
+            if (result.IsErr)
+                return result.UnwrapErr().FromDomain();
+
+            return Results.Ok(result.Unwrap().FromDomain());
+        });
+    }
 }
