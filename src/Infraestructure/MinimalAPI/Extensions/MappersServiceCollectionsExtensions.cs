@@ -87,7 +87,7 @@ public static class MapperServiceCollectionExtensions
         services.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>>(s =>
             s.GetRequiredService<UserNotificationEFMapper>()
         );
-        services.AddSingleton<IUpdateMapper<UserNotificationDomain, NotificationPerUser>>(s =>
+        services.AddSingleton<IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>>(s =>
             s.GetRequiredService<UserNotificationEFMapper>()
         );
 

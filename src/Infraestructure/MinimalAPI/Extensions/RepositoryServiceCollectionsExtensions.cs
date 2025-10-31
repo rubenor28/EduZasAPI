@@ -132,7 +132,7 @@ public static class RepositoryServiceCollectionExtensions
             UserNotificationEFCreator
         >();
         services.AddScoped<
-            IUpdaterAsync<UserNotificationDomain, UserNotificationDomain>,
+            IUpdaterAsync<UserNotificationDomain, UserNotificationUpdateDTO>,
             UserNotificationEFUpdater
         >();
         services.AddScoped<

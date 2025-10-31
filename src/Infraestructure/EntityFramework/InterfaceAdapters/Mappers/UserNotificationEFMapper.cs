@@ -8,7 +8,7 @@ namespace EntityFramework.InterfaceAdapters.Mappers;
 public class UserNotificationEFMapper
     : IMapper<NotificationPerUser, UserNotificationDomain>,
         IMapper<NewUserNotificationDTO, NotificationPerUser>,
-        IUpdateMapper<UserNotificationDomain, NotificationPerUser>
+        IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>
 {
     public NotificationPerUser Map(NewUserNotificationDTO s) =>
         new()
@@ -25,7 +25,7 @@ public class UserNotificationEFMapper
             Readed = s.Readed,
         };
 
-    public void Map(UserNotificationDomain s, NotificationPerUser d)
+    public void Map(UserNotificationUpdateDTO s, NotificationPerUser d)
     {
         d.UserId = s.Id.UserId;
         d.NotificationId = s.Id.NotificationId;

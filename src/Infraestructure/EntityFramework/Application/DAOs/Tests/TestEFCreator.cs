@@ -6,7 +6,7 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Tests;
 
-public sealed class TestEFCreator(
+public class TestEFCreator(
     EduZasDotnetContext ctx,
     IMapper<Test, TestDomain> domainMapper,
     IMapper<NewTestDTO, Test> newEntityMapper

@@ -6,20 +6,21 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public abstract class CompositeKeyEFUpdater<I, DomainEntity, EFEntity>(
+public abstract class CompositeKeyEFUpdater<I, DomainEntity, UpdateEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> domainMapper,
-    IUpdateMapper<DomainEntity, EFEntity> updateMapper
+    IUpdateMapper<UpdateEntity, EFEntity> updateMapper
 )
     : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper),
-        IUpdaterAsync<DomainEntity, DomainEntity>
+        IUpdaterAsync<DomainEntity, UpdateEntity>
     where EFEntity : class
     where I : notnull
     where DomainEntity : IIdentifiable<I>
+    where UpdateEntity : IIdentifiable<I>
 {
-    protected readonly IUpdateMapper<DomainEntity, EFEntity> _updateMapper = updateMapper;
+    protected readonly IUpdateMapper<UpdateEntity, EFEntity> _updateMapper = updateMapper;
 
-    public async Task<DomainEntity> UpdateAsync(DomainEntity updateData)
+    public async Task<DomainEntity> UpdateAsync(UpdateEntity updateData)
     {
         var tracked =
             await GetTrackedById(updateData.Id)

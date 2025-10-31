@@ -106,36 +106,40 @@
      - [x] Registro DI
    - [x] Mapper update a EF
      - [x] Registro DI
-2. [ ] Validador de formato nuevo contacto
-3. [ ] Validador de formato actualizar contacto
-4. [x] Caso de uso agregar test
+1. [x] Test DAOs Tests
+1. [ ] Validador de formato nuevo contacto
+   - Test [ ]
+1. [ ] Validador de formato actualizar contacto
+   - [ ] Test
+1. [x] Caso de uso agregar test
    - [ ] Registro DI
-5. [x] Caso de uso modificar test
+   - [ ] Test
+1. [x] Caso de uso modificar test
    - [ ] Registro DI
-6. [x] Caso de uso obtener test
+   - [ ] Test
+1. [x] Caso de uso obtener test
    - [ ] Registro DI
-7. [x] Caso de uso buscar test
+   - [ ] Test
+1. [x] Caso de uso buscar test
    - [ ] Registro DI
-8. [x] Caso de uso eliminar test
+   - [ ] Test
+1. [x] Caso de uso eliminar test
    - [ ] Registro DI
    - [ ] ELIMINAR LAS RESPUESTAS POSTERIORMENTE
    - [ ] ELIMINAR RELACIONES test per class
+   - [ ] Test
 
-9. [ ] Repositorio para relacionar clases y tests
-10. [ ] Crear relacion class - test
-11. [ ] Eliminar relacion class - test
-12. [ ] Toggle visibilidad relacion class - test
-13. [ ] Caso de uso agregar tests.
-    - Validar existencia de clase
-    - Validar que el profesor sea parte de la clase (dueño o no)
-    - Crear notificación de clase
-14. [ ] Validador para tests
-15. [ ] Caso de uso modificar tests.
-16. [ ] Caso de uso leer test
-17. [ ] Caso de uso buscar test
-18. [ ] Caso de uso cambiar visibilidad de test por clase
-19. [ ] Caso de uso eliminar clase
-    - Debe eliminar tambien las relaciones con otras clases
+1. [x] Crear relacion class - test
+1. [x] Eliminar relacion class - test
+1. [x] Actualizar relacion class - test
+1. [x] Mapper relacion clase - test
+   - [x] Mapper nueva entidad - EF
+   - [x] Mapper actualizar entidad - EF
+   - [x] Mapper EF - dominio
+1. [ ] Caso de uso agregar tests a clase.
+1. [ ] Caso de uso cambiar visibilidad de test por clase
+1. [ ] Caso de uso eliminar test en clases
+   - [ ] Eliminar respuestas (?)
 
 ## [ ] Contenido académico
 

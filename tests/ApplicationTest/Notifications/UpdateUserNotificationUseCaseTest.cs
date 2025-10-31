@@ -1,5 +1,6 @@
 using Application.DTOs.Common;
-using Application.UseCases.Notifications;
+using Application.DTOs.UserNotifications;
+using Application.UseCases.UserNotifications;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DTOs;
@@ -9,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTest.Notifications;
 
-public class MarkNotificationAsReadUseCaseTest : IDisposable
+public class UpdateUserNotificationUseCaseTest : IDisposable
 {
-    private readonly MarkNotificationAsReadUseCase _useCase;
+    private readonly UpdateUserNotificationUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    public MarkNotificationAsReadUseCaseTest()
+    public UpdateUserNotificationUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
         _conn = new SqliteConnection($"Data Source={dbName};Mode=Memory;Cache=Shared");
@@ -35,7 +36,7 @@ public class MarkNotificationAsReadUseCaseTest : IDisposable
             userNotificationMapper
         );
 
-        _useCase = new MarkNotificationAsReadUseCase(reader, updater);
+        _useCase = new UpdateUserNotificationUseCase(updater, reader);
     }
 
     private async Task<(ulong userId, ulong notificationId)> SeedNotification(bool isRead)
@@ -78,10 +79,10 @@ public class MarkNotificationAsReadUseCaseTest : IDisposable
     public async Task ExecuteAsync_WhenNotificationExistsAndIsNotRead_ShouldUpdateReadedToTrue()
     {
         var (userId, notificationId) = await SeedNotification(isRead: false);
-        var inputDto = new UserNotificationIdDTO
+        var inputDto = new UserNotificationUpdateDTO
         {
-            UserId = userId,
-            NotificationId = notificationId,
+            Id = new() { UserId = userId, NotificationId = notificationId },
+            Readed = true,
         };
 
         var result = await _useCase.ExecuteAsync(inputDto);
@@ -98,10 +99,10 @@ public class MarkNotificationAsReadUseCaseTest : IDisposable
     public async Task ExecuteAsync_WhenNotificationDoesNotExist_ShouldReturnNotFoundError()
     {
         ulong nonExistentNotificationId = 100;
-        var inputDto = new UserNotificationIdDTO
+        var inputDto = new UserNotificationUpdateDTO
         {
-            UserId = 1,
-            NotificationId = nonExistentNotificationId,
+            Id = new() { UserId = 1, NotificationId = nonExistentNotificationId },
+            Readed = true,
         };
 
         var result = await _useCase.ExecuteAsync(inputDto);
@@ -114,10 +115,10 @@ public class MarkNotificationAsReadUseCaseTest : IDisposable
     public async Task ExecuteAsync_WhenNotificationIsAlreadyRead_ShouldReturnSuccess()
     {
         var (userId, notificationId) = await SeedNotification(isRead: true);
-        var inputDto = new UserNotificationIdDTO
+        var inputDto = new UserNotificationUpdateDTO
         {
-            UserId = userId,
-            NotificationId = notificationId,
+            Id = new() { UserId = userId, NotificationId = notificationId },
+            Readed = true,
         };
 
         var result = await _useCase.ExecuteAsync(inputDto);

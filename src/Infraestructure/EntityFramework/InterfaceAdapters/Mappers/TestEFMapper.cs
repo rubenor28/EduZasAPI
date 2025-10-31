@@ -6,37 +6,37 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers;
 
-public sealed class TestEFMapper
-    : IMapper<Test, TestDomain>,
-        IMapper<NewTestDTO, Test>,
+public class TestEFMapper
+    : IMapper<NewTestDTO, Test>,
+        IMapper<Test, TestDomain>,
         IUpdateMapper<TestUpdateDTO, Test>
 {
-    public TestDomain Map(Test input) =>
+    public Test Map(NewTestDTO nt) =>
         new()
         {
-            Id = input.TestId,
-            Title = input.Title,
-            Content = input.Content,
-            TimeLimitMinutes = input.TimeLimitMinutes.ToOptional(),
-            ProfesorId = input.ProfessorId,
-            CreatedAt = input.CreatedAt,
-            ModifiedAt = input.ModifiedAt,
+            Title = nt.Title,
+            Content = nt.Content,
+            TimeLimitMinutes = nt.TimeLimitMinutes.ToNullable(),
+            ProfessorId = nt.ProfesorId
         };
 
-    public Test Map(NewTestDTO input) =>
+    public TestDomain Map(Test t) =>
         new()
         {
-            Title = input.Title,
-            Content = input.Content,
-            TimeLimitMinutes = input.TimeLimitMinutes.ToNullable(),
-            ProfessorId = input.ProfesorId,
+            Id = t.TestId,
+            Title = t.Title,
+            Content = t.Content,
+            TimeLimitMinutes = t.TimeLimitMinutes.ToOptional(),
+            ProfesorId = t.ProfessorId,
+            CreatedAt = t.CreatedAt,
+            ModifiedAt = t.ModifiedAt
         };
 
-    public void Map(TestUpdateDTO source, Test destination)
+    public void Map(TestUpdateDTO tu, Test t)
     {
-        destination.Title = source.Title;
-        destination.Content = source.Content;
-        destination.TimeLimitMinutes = source.TimeLimitMinutes.ToNullable();
-        destination.ProfessorId = source.ProfesorId;
+        t.Title = tu.Title;
+        t.Content = tu.Content;
+        t.TimeLimitMinutes = tu.TimeLimitMinutes.ToNullable();
+        t.ProfessorId = tu.ProfesorId;
     }
 }

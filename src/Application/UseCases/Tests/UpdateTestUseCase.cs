@@ -13,10 +13,8 @@ public sealed class UpdateTestUseCase(
     IUpdaterAsync<TestDomain, TestUpdateDTO> updater,
     IReaderAsync<ulong, TestDomain> reader,
     IBusinessValidationService<TestUpdateDTO>? validator = null
-) : UpdateUseCase<TestUpdateDTO, TestDomain>(updater, validator)
+) : UpdateUseCase<ulong, TestUpdateDTO, TestDomain>(updater, reader, validator)
 {
-    private readonly IReaderAsync<ulong, TestDomain> _reader = reader;
-
     protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
         TestUpdateDTO value
     )

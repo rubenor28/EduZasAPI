@@ -10,17 +10,24 @@ namespace Application.UseCases.Common;
 /// </summary>
 /// <typeparam name="UE">Tipo de los datos requeridos para la actualización.</typeparam>
 /// <typeparam name="E">Tipo de la entidad resultante.</typeparam>
-public abstract class UpdateUseCase<UE, E>(
+public abstract class UpdateUseCase<I, UE, E>(
     IUpdaterAsync<E, UE> updater,
+    IReaderAsync<I, E> reader,
     IBusinessValidationService<UE>? validator = null
 )
-    where UE : notnull
-    where E : notnull
+    where I : notnull
+    where UE : notnull, IIdentifiable<I>
+    where E : notnull, IIdentifiable<I>
 {
     /// <summary>
     /// Entidad encargada de actualizar un registro
     /// </summary>
     protected readonly IUpdaterAsync<E, UE> _updater = updater;
+
+    /// <summary>
+    /// Entidad encargada de leer un registro
+    /// </summary>
+    protected readonly IReaderAsync<I, E> _reader = reader;
 
     /// <summary>
     /// Entidad encargada de validar el formato de los campos de una entidad
@@ -128,8 +135,14 @@ public abstract class UpdateUseCase<UE, E>(
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
     /// como verificaciones en base de datos o llamadas a servicios externos.
     /// </remarks>
-    protected virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(UE value) =>
-        Task.FromResult(Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value));
+    protected async virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(UE value)
+    {
+        var record = await _reader.GetAsync(value.Id);
+        if (record.IsNone)
+            return UseCaseError.NotFound();
+
+        return Unit.Value;
+    }
 
     /// <summary>
     /// Ejecuta tareas adicionales síncronas después de actualizar la entidad.

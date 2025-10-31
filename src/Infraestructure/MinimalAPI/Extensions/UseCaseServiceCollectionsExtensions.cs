@@ -5,6 +5,7 @@ using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
 using Application.UseCases.Common;
 using Application.UseCases.Notifications;
+using Application.UseCases.UserNotifications;
 using Domain.Entities;
 
 namespace MinimalAPI.Extensions;
@@ -44,7 +45,7 @@ public static class UseCaseServiceCollectionExtensions
         services.AddTransient<SearchNotificationUseCase>();
 
         // User notifications
-        services.AddTransient<MarkNotificationAsReadUseCase>();
+        services.AddTransient<UpdateUserNotificationUseCase>();
 
         return services;
     }

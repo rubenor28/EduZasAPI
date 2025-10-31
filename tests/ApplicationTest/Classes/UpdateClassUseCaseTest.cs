@@ -40,8 +40,8 @@ public class UpdateClassUseCaseTest : IDisposable
 
         _useCase = new UpdateClassUseCase(
             classUpdater,
-            classUpdateValidator,
             classReader,
+            classUpdateValidator,
             professorRelationReader
         );
     }

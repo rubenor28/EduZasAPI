@@ -13,13 +13,12 @@ public class ClassProfessorsEFUpdater(
     IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
     IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor> updateMapper
 )
-    : CompositeKeyEFUpdater<ClassUserRelationIdDTO, ProfessorClassRelationDTO, ClassProfessor>(
+    : RelationEFUpdater<ClassUserRelationIdDTO, ProfessorClassRelationDTO, ClassProfessor>(
         ctx,
         domainMapper,
         updateMapper
     )
 {
-
     protected override async Task<ClassProfessor?> GetTrackedById(ClassUserRelationIdDTO id) =>
         await _dbSet
             .AsTracking()

@@ -105,7 +105,7 @@ public class UserNotificationEFRepositoryTest : IDisposable
         var newUserNotification = new NewUserNotificationDTO { UserId = 1, NotificationId = 1 };
         var created = await _creator.AddAsync(newUserNotification);
 
-        var toUpdate = new UserNotificationDomain { Id = created.Id, Readed = true };
+        var toUpdate = new UserNotificationUpdateDTO { Id = created.Id, Readed = true };
 
         var updated = await _updater.UpdateAsync(toUpdate);
 
@@ -116,7 +116,7 @@ public class UserNotificationEFRepositoryTest : IDisposable
     [Fact]
     public async Task UpdateAsync_WhenRelationDoesNotExist_ThrowsException()
     {
-        var toUpdate = new UserNotificationDomain
+        var toUpdate = new UserNotificationUpdateDTO
         {
             Id = new UserNotificationIdDTO { UserId = 123, NotificationId = 456 },
             Readed = true,

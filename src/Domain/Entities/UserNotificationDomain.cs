@@ -19,4 +19,8 @@ public sealed record UserNotificationDomain : IIdentifiable<UserNotificationIdDT
     /// Indicador de lectura de la notificación por parte del usuario
     /// </summary>
     public required bool Readed { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime ModifiedAt { get; set; }
 }

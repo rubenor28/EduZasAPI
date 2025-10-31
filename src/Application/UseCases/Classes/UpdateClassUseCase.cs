@@ -15,10 +15,10 @@ namespace Application.UseCases.Classes;
 /// </summary>
 public class UpdateClassUseCase(
     IUpdaterAsync<ClassDomain, ClassUpdateDTO> updater,
+    IReaderAsync<string, ClassDomain> reader,
     IBusinessValidationService<ClassUpdateDTO> validator,
-    IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> relationReader
-) : UpdateUseCase<ClassUpdateDTO, ClassDomain>(updater, validator)
+) : UpdateUseCase<string, ClassUpdateDTO, ClassDomain>(updater, reader, validator)
 {
     /// <summary>
     /// Realiza validaciones adicionales para la actualización de la clase.
@@ -29,10 +29,6 @@ public class UpdateClassUseCase(
         ClassUpdateDTO value
     )
     {
-        var classToUpdate = await classReader.GetAsync(value.Id);
-        if (classToUpdate.IsNone)
-            return UseCaseError.NotFound();
-
         if (value.Executor.Role != UserType.ADMIN)
         {
             var result = await relationReader.GetAsync(
@@ -42,6 +38,10 @@ public class UpdateClassUseCase(
             if (result.IsNone || !result.Unwrap().IsOwner)
                 return Result.Err(UseCaseError.Unauthorized());
         }
+
+        var classToUpdate = await _reader.GetAsync(value.Id);
+        if (classToUpdate.IsNone)
+            return UseCaseError.NotFound();
 
         return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
     }

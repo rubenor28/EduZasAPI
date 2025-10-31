@@ -13,7 +13,7 @@ public class ClassStudentsEFUpdater(
     IMapper<ClassStudent, StudentClassRelationDTO> domainMapper,
     IUpdateMapper<StudentClassRelationDTO, ClassStudent> updateMapper
 )
-    : CompositeKeyEFUpdater<ClassUserRelationIdDTO, StudentClassRelationDTO, ClassStudent>(
+    : RelationEFUpdater<ClassUserRelationIdDTO, StudentClassRelationDTO, ClassStudent>(
         ctx,
         domainMapper,
         updateMapper

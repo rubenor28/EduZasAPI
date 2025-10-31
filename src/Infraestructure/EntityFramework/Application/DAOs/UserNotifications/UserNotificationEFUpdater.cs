@@ -1,3 +1,4 @@
+using Application.DTOs.UserNotifications;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
@@ -10,13 +11,14 @@ namespace EntityFramework.Application.DAOs.UserNotifications;
 public class UserNotificationEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<NotificationPerUser, UserNotificationDomain> domainMapper,
-    IUpdateMapper<UserNotificationDomain, NotificationPerUser> updateMapper
+    IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser> updateMapper
 )
-    : CompositeKeyEFUpdater<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(
-        ctx,
-        domainMapper,
-        updateMapper
-    )
+    : CompositeKeyEFUpdater<
+        UserNotificationIdDTO,
+        UserNotificationDomain,
+        UserNotificationUpdateDTO,
+        NotificationPerUser
+    >(ctx, domainMapper, updateMapper)
 {
     protected override async Task<NotificationPerUser?> GetTrackedById(UserNotificationIdDTO id) =>
         await _dbSet
