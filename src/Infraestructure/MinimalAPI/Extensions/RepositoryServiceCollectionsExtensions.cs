@@ -5,6 +5,7 @@ using Application.DTOs.ClassStudents;
 using Application.DTOs.Contacts;
 using Application.DTOs.Notifications;
 using Application.DTOs.Tags;
+using Application.DTOs.Tests;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
@@ -14,6 +15,7 @@ using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.Tags;
+using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
@@ -151,6 +153,13 @@ public static class RepositoryServiceCollectionExtensions
         services.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>, ContactEFQuerier>();
         services.AddScoped<IReaderAsync<ulong, ContactDomain>, ContactEFReader>();
         services.AddScoped<IUpdaterAsync<ContactDomain, ContactUpdateDTO>, ContactEFUpdater>();
+
+        // TEST
+        services.AddScoped<ICreatorAsync<TestDomain, NewTestDTO>, TestEFCreator>();
+        services.AddScoped<IUpdaterAsync<TestDomain, TestUpdateDTO>>();
+        services.AddScoped<IDeleterAsync<ulong, TestDomain>, TestEFDeleter>();
+        services.AddScoped<IReaderAsync<ulong, TestDomain>, TestEFReader>();
+        services.AddScoped<IQuerierAsync<TestDomain, TestCriteriaDTO>, TestEFQuerier>();
 
         return services;
     }
