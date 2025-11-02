@@ -37,53 +37,42 @@
 > ![NOTE] Deberia considerar que el DTO de contacto al menos el publico tiene inscrustadas las etiquetas en un array?
 > ![NOTE] Diseñar nuevas clases de EF que solo agregan o eliminan
 
-1. [x] Repositorio etiquetas
-   - [x] NewTagDTO
-   - [x] TagCriteriaDTO
-   - [x] Tag Creator
-   - [x] Tag Querier
-   - [x] TagMapper
-   - [x] Registrar DI
-2. [x] Repositorio relacion etiquetas
-   - [x] ContactTagDomain
+1. [ ] Repositorio etiquetas
+   - [ ] NewTagDTO
+   - [ ] TagCriteriaDTO
+   - [ ] Tag Creator
+   - [ ] Tag Querier
+   - [ ] TagMapper
+   - [ ] Registrar DI
+2. [ ] Repositorio relacion etiquetas
+   - [ ] ContactTagDomain
      - DTO para ID
-   - [x] ContactTag Creator
+   - [ ] ContactTag Creator
      - usa DTO para ID como entrada
-   - [x] ContactTag Deleter
-   - [x] ContactTag Reader
-   - [x] ContactTagMapper
-   - [x] Registrar DI
-   - [x] Tests operaciones
-3. [x] Repositorio contacto
-   - [x] NewContactDTO
-   - [x] UpdateContactDTO
-   - [x] ContactCriteriaDTO
-   - [x] ContactCreator
-   - [x] ContactUpdater
-   - [x] ContactQuerier
-   - [x] ContactReader
-   - [x] ContactMapper
-   - [x] Registrar DI
-   - [x] Tests operaciones
-4. [x] Caso de uso agregar etiqueta
-   - Buscar si existe una etiqueta con ese texto
-   - [x] Test
-5. [x] Caso de uso agregar una etiqueta a contacto
-   - Crear relacion etiqueta - contacto
-   - [x] Test
-6. [x] Caso de uso eliminar una etiqueta de contacto
-   - Eliminar la relacion etiqueta - contacto
-   - [x] Test
-7. [x] Caso de uso agregar contacto
-   - Modificar campos contacto y recibir array de etiquetas que tiene
-   - [x] Test
+   - [ ] ContactTag Deleter
+   - [ ] ContactTag Reader
+   - [ ] ContactTagMapper
+   - [ ] Registrar DI
+   - [ ] Tests operaciones
+3. [ ] Repositorio contacto
+   - [ ] NewContactDTO
+   - [ ] UpdateContactDTO
+   - [ ] ContactCriteriaDTO
+   - [ ] ContactCreator
+   - [ ] ContactUpdater
+   - [ ] ContactQuerier
+   - [ ] ContactReader
+   - [ ] ContactMapper
+   - [ ] Registrar DI
+   - [ ] Tests operaciones
+4. [ ] Caso de uso agregar etiqueta
 
-- [x] Ruta agregar contacto
-- [x] Ruta buscar contacto
-  - [x] Buscar mis contactos
-  - [x] Buscar contactos registrados si eres admin
-- [x] Ruta eliminar contacto
-- [x] Ruta modificar contacto
+- [ ] Ruta agregar contacto
+- [ ] Ruta buscar contacto
+  - [ ] Buscar mis contactos
+  - [ ] Buscar contactos registrados si eres admin
+- [ ] Ruta eliminar contacto
+- [ ] Ruta modificar contacto
 - [ ] Ruta agregar etiqueta a contacto
 - [ ] Ruta eliminar etiqueta a contacto
 
