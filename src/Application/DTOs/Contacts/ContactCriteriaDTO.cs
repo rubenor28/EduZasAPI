@@ -19,4 +19,6 @@ public sealed record ContactCriteriaDTO : CriteriaDTO
     /// Id de nuestro usuario que queremos agregar como contacto
     /// </summary>
     public Optional<ulong> ContactId { get; set; } = Optional<ulong>.None();
+
+    public Optional<IEnumerable<string>> Tags {get;set;} = Optional<IEnumerable<string>>.None();
 }

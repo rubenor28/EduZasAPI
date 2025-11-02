@@ -83,7 +83,7 @@
   - [x] Buscar mis contactos
   - [x] Buscar contactos registrados si eres admin
 - [x] Ruta eliminar contacto
-- [ ] Ruta modificar contacto
+- [x] Ruta modificar contacto
 - [ ] Ruta agregar etiqueta a contacto
 - [ ] Ruta eliminar etiqueta a contacto
 
@@ -106,40 +106,47 @@
      - [x] Registro DI
    - [x] Mapper update a EF
      - [x] Registro DI
-1. [x] Test DAOs Tests
-1. [ ] Validador de formato nuevo contacto
-   - Test [ ]
-1. [ ] Validador de formato actualizar contacto
+2. [x] Test DAOs Tests
+3. [ ] Validador de formato nuevo contacto
+   - [ ] Registro en DI
    - [ ] Test
-1. [x] Caso de uso agregar test
+4. [ ] Validador de formato actualizar contacto
+   - [ ] Test
+5. [x] Caso de uso agregar test
    - [ ] Registro DI
    - [ ] Test
-1. [x] Caso de uso modificar test
+6. [x] Caso de uso modificar test
    - [ ] Registro DI
    - [ ] Test
-1. [x] Caso de uso obtener test
+7. [x] Caso de uso obtener test
    - [ ] Registro DI
    - [ ] Test
-1. [x] Caso de uso buscar test
+8. [x] Caso de uso buscar test
    - [ ] Registro DI
    - [ ] Test
-1. [x] Caso de uso eliminar test
+9. [x] Caso de uso eliminar test
    - [ ] Registro DI
    - [ ] ELIMINAR LAS RESPUESTAS POSTERIORMENTE
    - [ ] ELIMINAR RELACIONES test per class
    - [ ] Test
 
-1. [x] Crear relacion class - test
-1. [x] Eliminar relacion class - test
-1. [x] Actualizar relacion class - test
-1. [x] Mapper relacion clase - test
-   - [x] Mapper nueva entidad - EF
-   - [x] Mapper actualizar entidad - EF
-   - [x] Mapper EF - dominio
-1. [ ] Caso de uso agregar tests a clase.
-1. [ ] Caso de uso cambiar visibilidad de test por clase
-1. [ ] Caso de uso eliminar test en clases
-   - [ ] Eliminar respuestas (?)
+10. [x] Crear relacion class - test
+    - [ ] Test
+11. [x] Eliminar relacion class - test
+    - [ ] Test
+12. [x] Actualizar relacion class - test
+    - [ ] Test
+13. [x] Mapper relacion clase - test
+    - [x] Mapper nueva entidad - EF
+    - [x] Mapper actualizar entidad - EF
+    - [x] Mapper EF - dominio
+14. [x] Caso de uso agregar tests a clase.
+    - [ ] Test
+15. [x] Caso de uso actualizar test por clase
+    - [ ] Test
+16. [x] Caso de uso eliminar test en clases
+    - [ ] Eliminar respuestas asociadas a este test
+    - [ ] Test
 
 ## [ ] Contenido académico
 

@@ -14,8 +14,9 @@ public sealed class ContactEFQuerier(
     int pageSize
 ) : EFQuerier<ContactDomain, ContactCriteriaDTO, AgendaContact>(ctx, domainMapper, pageSize)
 {
-    public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO criteria) =>
-        _dbSet
+    public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO criteria)
+    {
+        var query = _dbSet
             .AsNoTracking()
             .AsQueryable()
             .WhereStringQuery(criteria.Alias, c => c.Alias)
@@ -24,4 +25,18 @@ public sealed class ContactEFQuerier(
                 criteria.AgendaOwnerId,
                 ownerId => contact => contact.AgendaOwnerId == ownerId
             );
+
+        criteria.Tags.IfSome(tags =>
+        {
+            var distinctTags = tags.Distinct().ToList();
+            if (distinctTags.Count > 0)
+            {
+                query = query.Where(c =>
+                    distinctTags.All(tag => c.TagsPerUsers.Any(tpu => tpu.Tag.Text == tag))
+                );
+            }
+        });
+
+        return query;
+    }
 }

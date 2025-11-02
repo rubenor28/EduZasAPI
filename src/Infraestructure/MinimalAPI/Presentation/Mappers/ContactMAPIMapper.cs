@@ -26,4 +26,14 @@ public static class ContactMAPIMapper
             ContactId = source.ContactId.ToOptional(),
             AgendaOwnerId = source.AgendaOwnerId.ToOptional(),
         };
+
+    public static ContactUpdateDTO ToDomain(this ContactUpdateMAPI source) =>
+        new()
+        {
+            Id = source.Id,
+            AgendaOwnerId = source.AgendaOwnerId,
+            ContactId = source.ContactId,
+            Alias = source.Alias,
+            Notes = source.Notes.ToOptional(),
+        };
 }

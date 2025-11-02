@@ -1,10 +1,15 @@
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
+using Application.DTOs.Tags;
 using Application.UseCases.Common;
 using Application.UseCases.Contacts;
+using Application.UseCases.ContactTags;
+using Application.UseCases.Tags;
 using Domain.Entities;
 using Domain.ValueObjects;
 using MinimalAPI.Application.DTOs.Contacts;
+using MinimalAPI.Application.DTOs.ContactTags;
+using MinimalAPI.Application.DTOs.Tags;
 using MinimalAPI.Presentation.Filters;
 using MinimalAPI.Presentation.Mappers;
 
@@ -33,6 +38,16 @@ public static class ContactRoutes
 
         app.MapDelete("/", DeleteContact)
             .WithName("Eliminar contacto")
+            .RequireAuthorization("ProfesorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
+        app.MapPut("/", UpdateContact)
+            .WithName("Actualizar contacto")
+            .RequireAuthorization("ProfesorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
+        app.MapPost("/tags/search", TagsQuery)
+            .WithName("Obtener etiquetas de contacto")
             .RequireAuthorization("ProfesorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
@@ -96,7 +111,7 @@ public static class ContactRoutes
 
     private static Task<IResult> SearchContacts(
         ContactCriteriaMAPI criteria,
-        QueryUseCase<ContactCriteriaDTO, ContactDomain> useCase,
+        ContactQueryUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -136,4 +151,47 @@ public static class ContactRoutes
             return Results.Ok(result.Unwrap().FromDomain());
         });
     }
+
+    private static Task<IResult> UpdateContact(
+        ContactUpdateMAPI request,
+        UpdateContactUseCase useCase,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var executor = utils.GetExecutorFromContext(ctx);
+            var result = await useCase.ExecuteAsync(request.ToDomain());
+
+            if (result.IsErr)
+                return result.UnwrapErr().FromDomain();
+
+            return Results.Ok(result.Unwrap().FromDomain());
+        });
+    }
+
+    private static Task<IResult> TagsQuery(
+        TagCriteriaMAPI criteria,
+        TagQueryUseCase useCase,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var executor = utils.GetExecutorFromContext(ctx);
+
+            var parseTry = criteria.ToDomain();
+            if (parseTry.IsErr)
+                return parseTry.UnwrapErr().FromDomain();
+
+            var result = await useCase.ExecuteAsync(parseTry.Unwrap());
+            return Results.Ok(result);
+        });
+    }
+
+    // TODO: Agregar etiqueta a contacto
+    
+    // TODO: Eliminar etiqueta a contacto
 }
