@@ -2,12 +2,11 @@ using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.Users;
 using Application.UseCases.Contacts;
-using Application.UseCases.ContactTags;
-using Application.UseCases.Tags;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Contacts;
-using EntityFramework.Application.DAOs.ContactTag;
+using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
@@ -41,25 +40,20 @@ public class AddContactUseCaseTest : IDisposable
         var userReader = new UserEFReader(_ctx, _userMapper);
         var contactQuerier = new ContactEFQuerier(_ctx, contactMapper, 10);
         var tagMapper = new TagEFMapper();
-        var tagQuerier = new TagEFQuerier(_ctx, tagMapper, 10);
+        var tagReader = new TagEFReader(_ctx, tagMapper);
         var tagCreator = new TagEFCreator(_ctx, tagMapper, tagMapper);
-        var addTagUseCase = new AddTagUseCase(tagCreator, tagQuerier);
         var contactTagMapper = new ContactTagEFMapper();
         var contactTagCreator = new ContactTagEFCreator(_ctx, contactTagMapper, contactTagMapper);
-        var contactReaderForTag = new ContactEFReader(_ctx, contactMapper);
-        var tagReaderForTag = new TagEFReader(_ctx, tagMapper);
-        var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
-        var addContactTagUseCase = new AddContactTagUseCase(contactTagCreator, contactReaderForTag, tagReaderForTag, contactTagReader);
 
         _userCreator = new UserEFCreator(_ctx, _userMapper, _userMapper);
 
         _useCase = new AddContactUseCase(
             contactCreator,
-            userReader,
             contactQuerier,
-            tagQuerier,
-            addContactTagUseCase,
-            addTagUseCase
+            userReader,
+            tagReader,
+            tagCreator,
+            contactTagCreator
         );
     }
 
@@ -88,7 +82,7 @@ public class AddContactUseCaseTest : IDisposable
             AgendaOwnerId = agendaOwner.Id,
             ContactId = contactUser.Id,
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
         var result = await _useCase.ExecuteAsync(newContact);
@@ -108,7 +102,7 @@ public class AddContactUseCaseTest : IDisposable
             AgendaOwnerId = 999,
             ContactId = contactUser.Id,
             Executor = new Executor { Id = 999, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
         var result = await _useCase.ExecuteAsync(newContact);
@@ -131,7 +125,7 @@ public class AddContactUseCaseTest : IDisposable
             AgendaOwnerId = agendaOwner.Id,
             ContactId = 999, // Non-existent user
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
         var result = await _useCase.ExecuteAsync(newContact);
@@ -155,7 +149,7 @@ public class AddContactUseCaseTest : IDisposable
             AgendaOwnerId = agendaOwner.Id,
             ContactId = contactUser.Id,
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
         await _useCase.ExecuteAsync(firstContact);
 
@@ -166,7 +160,7 @@ public class AddContactUseCaseTest : IDisposable
             AgendaOwnerId = agendaOwner.Id,
             ContactId = contactUser.Id,
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
         var result = await _useCase.ExecuteAsync(secondContact);
@@ -189,7 +183,7 @@ public class AddContactUseCaseTest : IDisposable
             AgendaOwnerId = agendaOwner.Id,
             ContactId = contactUser.Id,
             Executor = new Executor { Id = unauthorizedUser.Id, Role = UserType.PROFESSOR },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
         var result = await _useCase.ExecuteAsync(newContact);

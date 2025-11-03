@@ -12,6 +12,11 @@ public interface IQuerierAsync<E, C>
     where C : notnull, CriteriaDTO
 {
     /// <summary>
+    /// Tamaño de elementos por página
+    /// </summary>
+    public int PageSize { get; }
+
+    /// <summary>
     /// Obtiene entidades que cumplen con los criterios especificados.
     /// </summary>
     /// <param name="query">Criterios de consulta.</param>

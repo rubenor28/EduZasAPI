@@ -1,4 +1,4 @@
-using Application.DTOs.ContactTag;
+using Application.DTOs.ContactTags;
 using Domain.Entities;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
@@ -6,16 +6,26 @@ using InterfaceAdapters.Mappers.Common;
 namespace EntityFramework.InterfaceAdapters.Mappers;
 
 public sealed class ContactTagEFMapper
-    : IMapper<TagsPerUser, ContactTagDomain>,
-        IMapper<NewContactTagDTO, TagsPerUser>
+    : IMapper<ContactTag, ContactTagDomain>,
+        IMapper<NewContactTagDTO, ContactTag>
 {
-    public ContactTagDomain Map(TagsPerUser input) =>
+    public ContactTagDomain Map(ContactTag input) =>
         new()
         {
-            Id = new() { TagId = input.TagId, AgendaContactId = input.AgendaContactId },
+            Id = new()
+            {
+                Tag = input.TagText,
+                AgendaOwnerId = input.AgendaOwnerId,
+                ContactId = input.ContactId,
+            },
             CreatedAt = input.CreatedAt,
         };
 
-    public TagsPerUser Map(NewContactTagDTO input) =>
-        new() { TagId = input.TagId, AgendaContactId = input.AgendaContactId };
+    public ContactTag Map(NewContactTagDTO input) =>
+        new()
+        {
+            TagText = input.Tag,
+            AgendaOwnerId = input.AgendaOwnerId,
+            ContactId = input.ContactId,
+        };
 }

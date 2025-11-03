@@ -1,14 +1,11 @@
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
-using Application.DTOs.Tags;
 using Application.UseCases.Common;
 using Application.UseCases.Contacts;
-using Application.UseCases.ContactTags;
 using Application.UseCases.Tags;
 using Domain.Entities;
 using Domain.ValueObjects;
 using MinimalAPI.Application.DTOs.Contacts;
-using MinimalAPI.Application.DTOs.ContactTags;
 using MinimalAPI.Application.DTOs.Tags;
 using MinimalAPI.Presentation.Filters;
 using MinimalAPI.Presentation.Mappers;
@@ -36,7 +33,7 @@ public static class ContactRoutes
             .RequireAuthorization("Admin")
             .AddEndpointFilter<ExecutorFilter>();
 
-        app.MapDelete("/", DeleteContact)
+        app.MapDelete("/{agendaOwnerId:ulong}/{contactId:ulong}", DeleteContact)
             .WithName("Eliminar contacto")
             .RequireAuthorization("ProfesorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
@@ -71,7 +68,7 @@ public static class ContactRoutes
                     Notes = request.Notes.ToOptional(),
                     AgendaOwnerId = request.AgendaOwnerId,
                     ContactId = request.ContactId,
-                    ContactTags = request.ContactTags,
+                    Tags = request.Tags.ToOptional(),
                     Executor = executor,
                 }
             );
@@ -134,6 +131,7 @@ public static class ContactRoutes
     }
 
     private static Task<IResult> DeleteContact(
+        ulong agendaOwnerId,
         ulong contactId,
         DeleteContactUseCase useCase,
         HttpContext ctx,
@@ -143,7 +141,13 @@ public static class ContactRoutes
         return utils.HandleResponseAsync(async () =>
         {
             var executor = utils.GetExecutorFromContext(ctx);
-            var result = await useCase.ExecuteAsync(new() { Id = contactId, Executor = executor });
+            var result = await useCase.ExecuteAsync(
+                new()
+                {
+                    Id = new() { AgendaOwnerId = agendaOwnerId, ContactId = contactId },
+                    Executor = executor,
+                }
+            );
 
             if (result.IsErr)
                 return result.UnwrapErr().FromDomain();
@@ -192,6 +196,6 @@ public static class ContactRoutes
     }
 
     // TODO: Agregar etiqueta a contacto
-    
+
     // TODO: Eliminar etiqueta a contacto
 }

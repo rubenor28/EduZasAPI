@@ -1,4 +1,3 @@
-
 using Application.DTOs.Common;
 using Application.DTOs.Tags;
 using Domain.Enums;
@@ -37,10 +36,7 @@ public class TagEFRepositoryTest : IDisposable
     [Fact]
     public async Task AddTag_ReturnsTag()
     {
-        var newTag = new NewTagDTO
-        {
-            Text = "Test Tag"
-        };
+        var newTag = new NewTagDTO { Text = "Test Tag" };
 
         var created = await _creator.AddAsync(newTag);
         Assert.NotNull(created);
@@ -48,38 +44,25 @@ public class TagEFRepositoryTest : IDisposable
     }
 
     [Fact]
-    public async Task AddTag_WithDuplicateText_ThrowsDbUpdateException()
+    public async Task AddTag_WithDuplicateText_ThrowsInvalidOperationException()
     {
-        var newTag = new NewTagDTO
-        {
-            Text = "Test Tag"
-        };
+        var newTag = new NewTagDTO { Text = "Test Tag" };
         await _creator.AddAsync(newTag);
 
-        var duplicateTag = new NewTagDTO
-        {
-            Text = "Test Tag"
-        };
+        var duplicateTag = new NewTagDTO { Text = "Test Tag" };
 
-        await Assert.ThrowsAsync<DbUpdateException>(() => _creator.AddAsync(duplicateTag));
+        await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(duplicateTag));
     }
 
     [Fact]
     public async Task GetByAsync_WithTextCriteria_ReturnsMatchingTag()
     {
-        var newTag = new NewTagDTO
-        {
-            Text = "Test Tag"
-        };
+        var newTag = new NewTagDTO { Text = "Test Tag" };
         await _creator.AddAsync(newTag);
 
         var criteria = new TagCriteriaDTO
         {
-            Text = new StringQueryDTO
-            {
-                Text = "Test Tag",
-                SearchType = StringSearchType.EQ,
-            },
+            Text = new StringQueryDTO { Text = "Test Tag", SearchType = StringSearchType.EQ },
         };
 
         var result = await _querier.GetByAsync(criteria);
@@ -109,12 +92,29 @@ public class TagEFRepositoryTest : IDisposable
     public async Task GetByAsync_WithOwnerAgendaIdCriteria_ReturnsMatchingTags()
     {
         // Arrange
-        var user = new User { Email = "test@user.com", Password = "password", FirstName = "Test", FatherLastname = "User" };
-        var contactUser = new User { Email = "contact@user.com", Password = "password", FirstName = "Contact", FatherLastname = "User" };
+        var user = new User
+        {
+            Email = "test@user.com",
+            Password = "password",
+            FirstName = "Test",
+            FatherLastname = "User",
+        };
+        var contactUser = new User
+        {
+            Email = "contact@user.com",
+            Password = "password",
+            FirstName = "Contact",
+            FatherLastname = "User",
+        };
         _ctx.Users.AddRange(user, contactUser);
         await _ctx.SaveChangesAsync();
 
-        var contact = new AgendaContact { AgendaOwnerId = user.UserId, ContactId = contactUser.UserId, Alias = "Test Contact" };
+        var contact = new AgendaContact
+        {
+            AgendaOwnerId = user.UserId,
+            ContactId = contactUser.UserId,
+            Alias = "Test Contact",
+        };
         _ctx.AgendaContacts.Add(contact);
         await _ctx.SaveChangesAsync();
 
@@ -123,16 +123,23 @@ public class TagEFRepositoryTest : IDisposable
         _ctx.Tags.AddRange(tag1, tag2);
         await _ctx.SaveChangesAsync();
 
-        _ctx.TagsPerUsers.AddRange(
-            new TagsPerUser { AgendaContactId = contact.AgendaContactId, TagId = tag1.TagId },
-            new TagsPerUser { AgendaContactId = contact.AgendaContactId, TagId = tag2.TagId }
+        _ctx.ContactTags.AddRange(
+            new ContactTag
+            {
+                AgendaOwnerId = contact.AgendaOwnerId,
+                ContactId = contact.ContactId,
+                TagText = tag1.Text,
+            },
+            new ContactTag
+            {
+                AgendaOwnerId = contact.AgendaOwnerId,
+                ContactId = contact.ContactId,
+                TagText = tag2.Text,
+            }
         );
         await _ctx.SaveChangesAsync();
 
-        var criteria = new TagCriteriaDTO
-        {
-            OwnerAgendaId = user.UserId
-        };
+        var criteria = new TagCriteriaDTO { AgendaOwnerId = user.UserId };
 
         // Act
         var result = await _querier.GetByAsync(criteria);

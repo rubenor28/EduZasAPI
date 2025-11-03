@@ -1,7 +1,6 @@
 using Application.DTOs.Common;
 using Application.DTOs.Tags;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
@@ -40,6 +39,5 @@ public static class TagMAPIMapper
             Text = source.Text.Match<StringQueryMAPI?>((value) => value.FromDomain(), () => null),
         };
 
-    public static PublicTagMAPI FromDomain(this TagDomain source) =>
-        new() { Id = source.Id, Text = source.Text };
+    public static PublicTagMAPI FromDomain(this TagDomain source) => new() { Text = source.Text };
 }

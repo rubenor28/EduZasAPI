@@ -4,8 +4,9 @@ namespace Domain.Entities;
 
 public sealed record ContactTagIdDTO
 {
-    public required ulong TagId { get; set; }
-    public required ulong AgendaContactId { get; set; }
+    public required string Tag { get; set; }
+    public required ulong AgendaOwnerId { get; set; }
+    public required ulong ContactId { get; set; }
 }
 
 public sealed record ContactTagDomain : IIdentifiable<ContactTagIdDTO>

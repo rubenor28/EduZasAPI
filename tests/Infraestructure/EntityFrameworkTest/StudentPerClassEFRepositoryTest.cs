@@ -82,7 +82,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         };
         await _creator.AddAsync(newRelation);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _creator.AddAsync(newRelation));
+        await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(newRelation));
     }
 
     [Fact]

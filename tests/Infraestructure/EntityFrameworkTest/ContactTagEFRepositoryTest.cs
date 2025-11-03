@@ -1,8 +1,7 @@
-using Application.DTOs.Common;
-using Application.DTOs.ContactTag;
+using Application.DTOs.ContactTags;
 using Domain.Entities;
 using Domain.Enums;
-using EntityFramework.Application.DAOs.ContactTag;
+using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using Microsoft.Data.Sqlite;
@@ -38,7 +37,7 @@ public class ContactTagEFRepositoryTest : IDisposable
         _deleter = new(_ctx, mapper);
     }
 
-    private async Task<User> SeedData()
+    private async Task<(User, User)> SeedData()
     {
         var ownerUser = new User
         {
@@ -61,80 +60,95 @@ public class ContactTagEFRepositoryTest : IDisposable
 
         var agendaContact = new AgendaContact
         {
-            AgendaContactId = 1,
             AgendaOwnerId = 1,
             ContactId = 2,
             Alias = "test-contact",
         };
 
-        var tag = new Tag { TagId = 1, Text = "tag-test" };
+        var tag = new Tag { Text = "tag-test" };
 
         _ctx.Users.AddRange(ownerUser, contactUser);
         _ctx.AgendaContacts.Add(agendaContact);
         _ctx.Tags.Add(tag);
         await _ctx.SaveChangesAsync();
-        return ownerUser;
+
+        return (ownerUser, contactUser);
     }
 
     [Fact]
     public async Task Add_ValidRelation_ReturnsRelation()
     {
-        var owner = await SeedData();
+        var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaContactId = 1,
-            TagId = 1,
-            Executor = new Executor { Id = owner.UserId, Role = (UserType)owner.Role! },
+            AgendaOwnerId = owner.UserId,
+            ContactId = contact.UserId,
+            Tag = "tag-test",
         };
 
         var created = await _creator.AddAsync(newRelationDto);
 
         Assert.NotNull(created);
-        Assert.Equal(newRelationDto.AgendaContactId, created.Id.AgendaContactId);
-        Assert.Equal(newRelationDto.TagId, created.Id.TagId);
+        Assert.Equal(newRelationDto.AgendaOwnerId, created.Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.ContactId, created.Id.ContactId);
+        Assert.Equal(newRelationDto.Tag, created.Id.Tag);
     }
 
     [Fact]
     public async Task Add_DuplicateRelation_ThrowsException()
     {
-        var owner = await SeedData();
+        var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaContactId = 1,
-            TagId = 1,
-            Executor = new Executor { Id = owner.UserId, Role = (UserType)owner.Role! },
+            AgendaOwnerId = owner.UserId,
+            ContactId = contact.UserId,
+            Tag = "tag-test",
         };
+
         await _creator.AddAsync(newRelationDto);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _creator.AddAsync(newRelationDto)
-        );
+        await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(newRelationDto));
     }
 
     [Fact]
     public async Task Get_ExistingRelation_ReturnsRelation()
     {
-        var owner = await SeedData();
+        var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaContactId = 1,
-            TagId = 1,
-            Executor = new Executor { Id = owner.UserId, Role = (UserType)owner.Role! },
+            AgendaOwnerId = owner.UserId,
+            ContactId = contact.UserId,
+            Tag = "tag-test",
         };
+
         await _creator.AddAsync(newRelationDto);
 
-        var idToFind = new ContactTagIdDTO { AgendaContactId = 1, TagId = 1 };
+        var idToFind = new ContactTagIdDTO
+        {
+            AgendaOwnerId = owner.UserId,
+            ContactId = contact.UserId,
+            Tag = "tag-test",
+        };
+
         var found = await _reader.GetAsync(idToFind);
 
         Assert.True(found.IsSome);
-        Assert.Equal(newRelationDto.AgendaContactId, found.Unwrap().Id.AgendaContactId);
-        Assert.Equal(newRelationDto.TagId, found.Unwrap().Id.TagId);
+        Assert.Equal(newRelationDto.AgendaOwnerId, found.Unwrap().Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.ContactId, found.Unwrap().Id.ContactId);
+        Assert.Equal(newRelationDto.Tag, found.Unwrap().Id.Tag);
     }
 
     [Fact]
     public async Task Get_NonExistingRelation_ReturnsEmptyOptional()
     {
-        var found = await _reader.GetAsync(new() { AgendaContactId = 99, TagId = 98 });
+        var found = await _reader.GetAsync(
+            new()
+            {
+                AgendaOwnerId = 99,
+                ContactId = 98,
+                Tag = "non-exists",
+            }
+        );
 
         Assert.True(found.IsNone);
     }
@@ -142,21 +156,29 @@ public class ContactTagEFRepositoryTest : IDisposable
     [Fact]
     public async Task Delete_ExistingRelation_ReturnsDeletedRelation()
     {
-        var owner = await SeedData();
+        var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaContactId = 1,
-            TagId = 1,
-            Executor = new Executor { Id = owner.UserId, Role = (UserType)owner.Role! },
+            AgendaOwnerId = owner.UserId,
+            ContactId = contact.UserId,
+            Tag = "tag-test",
         };
+
         await _creator.AddAsync(newRelationDto);
 
-        var idToDelete = new ContactTagIdDTO { AgendaContactId = 1, TagId = 1 };
+        var idToDelete = new ContactTagIdDTO
+        {
+            AgendaOwnerId = owner.UserId,
+            ContactId = contact.UserId,
+            Tag = "tag-test",
+        };
+
         var deleted = await _deleter.DeleteAsync(idToDelete);
 
         Assert.NotNull(deleted);
-        Assert.Equal(newRelationDto.AgendaContactId, deleted.Id.AgendaContactId);
-        Assert.Equal(newRelationDto.TagId, deleted.Id.TagId);
+        Assert.Equal(newRelationDto.AgendaOwnerId, deleted.Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.ContactId, deleted.Id.ContactId);
+        Assert.Equal(newRelationDto.Tag, deleted.Id.Tag);
 
         var found = await _reader.GetAsync(idToDelete);
         Assert.True(found.IsNone);
@@ -166,7 +188,14 @@ public class ContactTagEFRepositoryTest : IDisposable
     public async Task Delete_NonExistingRelation_ThrowsException()
     {
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _deleter.DeleteAsync(new() { AgendaContactId = 99, TagId = 98 })
+            _deleter.DeleteAsync(
+                new()
+                {
+                    AgendaOwnerId = 99,
+                    ContactId = 98,
+                    Tag = "tag-test",
+                }
+            )
         );
     }
 

@@ -21,10 +21,10 @@ public class TagEFQuerier(
             .WhereStringQuery(c.Text, t => t.Text)
             .WhereOptional(
                 c.AgendaOwnerId,
-                ownerId => tag => tag.TagsPerUsers.Any(tpu => tpu.Contact.AgendaOwnerId == ownerId)
+                agendaOwner => c => c.ContactTags.Any(ct => ct.AgendaOwnerId == agendaOwner)
             )
             .WhereOptional(
                 c.ContactId,
-                contactId => tag => tag.TagsPerUsers.Any(tpu => tpu.Contact.ContactId == contactId)
+                contactId => c => c.ContactTags.Any(ct => ct.ContactId == contactId)
             );
 }

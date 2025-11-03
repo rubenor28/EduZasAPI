@@ -32,7 +32,7 @@ public sealed class ContactEFQuerier(
             if (distinctTags.Count > 0)
             {
                 query = query.Where(c =>
-                    distinctTags.All(tag => c.TagsPerUsers.Any(tpu => tpu.Tag.Text == tag))
+                    distinctTags.All(tag => c.ContactTags.Any(tpu => tpu.Tag.Text == tag))
                 );
             }
         });

@@ -12,7 +12,6 @@ public sealed class TagEFMapper : IMapper<Tag, TagDomain>, IMapper<NewTagDTO, Ta
     public TagDomain Map(Tag input) =>
         new()
         {
-            Id = input.TagId,
             Text = input.Text,
             CreatedAt = input.CreatedAt,
         };

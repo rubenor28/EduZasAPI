@@ -205,17 +205,27 @@ public abstract class Optional<T>
     public abstract void IfNone(Action action);
 
     /// <summary>
+    /// Ejecuta la tarea especificada si contiene valor.
+    /// </summary>
+    /// <param name="action">Acción a ejecutar.</param>
+    public abstract Task IfSomeAsync(Func<T, Task> action);
+
+    /// <summary>
+    /// Ejecuta la tarea especificada no contiene valor.
+    /// </summary>
+    /// <param name="action">Acción a ejecutar.</param>
+    public abstract Task IfNoneAsync(Func<Task> action);
+
+    /// <summary>
     /// Implementación concreta de Optional para el estado Some con valor.
     /// </summary>
-    private sealed class SomeOptional : Optional<T>
+    /// <remarks>
+    /// Inicializa una nueva instancia de la clase SomeOptional.
+    /// </remarks>
+    /// <param name="value">Valor a contener en el Optional.</param>
+    private sealed class SomeOptional(T value) : Optional<T>
     {
-        private readonly T _value;
-
-        /// <summary>
-        /// Inicializa una nueva instancia de la clase SomeOptional.
-        /// </summary>
-        /// <param name="value">Valor a contener en el Optional.</param>
-        public SomeOptional(T value) => _value = value;
+        private readonly T _value = value;
 
         /// <inheritdoc/>
         public override bool IsSome => true;
@@ -252,6 +262,12 @@ public abstract class Optional<T>
 
         /// <inheritdoc/>
         public override void IfNone(Action action) { }
+
+        /// <inheritdoc/>
+        public async override Task IfSomeAsync(Func<T, Task> action) => await action(_value);
+
+        /// <inheritdoc/>
+        public override Task IfNoneAsync(Func<Task> action) => Task.CompletedTask;
     }
 
     /// <summary>
@@ -295,5 +311,11 @@ public abstract class Optional<T>
 
         /// <inheritdoc/>
         public override void IfNone(Action action) => action();
+
+        /// <inheritdoc/>
+        public override Task IfSomeAsync(Func<T, Task> action) => Task.CompletedTask;
+
+        /// <inheritdoc/>
+        public async override Task IfNoneAsync(Func<Task> action) => await action();
     }
 }

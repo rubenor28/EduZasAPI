@@ -5,5 +5,5 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Tags;
 
-public sealed class TagEFReader(EduZasDotnetContext ctx, IMapper<Tag, TagDomain> domainMapper)
-    : SimpleKeyEFReader<string, TagDomain, Tag>(ctx, domainMapper);
+public sealed class TagEFDeleter(EduZasDotnetContext ctx, IMapper<Tag, TagDomain> domainMapper)
+    : SimpleKeyEFDeleter<string, TagDomain, Tag>(ctx, domainMapper);

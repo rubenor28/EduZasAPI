@@ -151,7 +151,7 @@ public static class RepositoryServiceCollectionExtensions
         // CONTACS
         services.AddScoped<ICreatorAsync<ContactDomain, NewContactDTO>, ContactEFCreator>();
         services.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>, ContactEFQuerier>();
-        services.AddScoped<IReaderAsync<ulong, ContactDomain>, ContactEFReader>();
+        services.AddScoped<IReaderAsync<ContactIdDTO, ContactDomain>, ContactEFReader>();
         services.AddScoped<IUpdaterAsync<ContactDomain, ContactUpdateDTO>, ContactEFUpdater>();
 
         // TEST

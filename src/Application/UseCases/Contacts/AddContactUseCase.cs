@@ -1,36 +1,41 @@
 using Application.DAOs;
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
+using Application.DTOs.ContactTags;
 using Application.DTOs.Tags;
 using Application.Services;
 using Application.UseCases.Common;
-using Application.UseCases.ContactTags;
-using Application.UseCases.Tags;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.Contacts;
 
+using ContactCreator = ICreatorAsync<ContactDomain, NewContactDTO>;
+using ContactQuerier = IQuerierAsync<ContactDomain, ContactCriteriaDTO>;
+using ContactTagCreator = ICreatorAsync<ContactTagDomain, NewContactTagDTO>;
+using TagCreator = ICreatorAsync<TagDomain, NewTagDTO>;
+using TagReader = IReaderAsync<string, TagDomain>;
+using UserReader = IReaderAsync<ulong, UserDomain>;
+
 public sealed class AddContactUseCase(
-    ICreatorAsync<ContactDomain, NewContactDTO> creator,
-    IReaderAsync<ulong, UserDomain> userReader,
-    IQuerierAsync<ContactDomain, ContactCriteriaDTO> contactQuerier,
-    IQuerierAsync<TagDomain, TagCriteriaDTO> tagQuerier,
-    AddContactTagUseCase addContactTagUseCase,
-    AddTagUseCase addTagUseCase,
+    ContactCreator creator,
+    ContactQuerier querier,
+    UserReader userReader,
+    TagReader tagReader,
+    TagCreator tagCreator,
+    ContactTagCreator contactTagCreator,
     IBusinessValidationService<NewContactDTO>? validator = null
 ) : AddUseCase<NewContactDTO, ContactDomain>(creator, validator)
 {
-    // Manejo de relacion Etiqueta - Profesor
-    private readonly IQuerierAsync<TagDomain, TagCriteriaDTO> _tagQuerier = tagQuerier;
-    private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
-    private readonly IQuerierAsync<ContactDomain, ContactCriteriaDTO> _contactQuerier =
-        contactQuerier;
+    private readonly ContactQuerier _querier = querier;
 
-    // Funcionalidad extra para asignacion de etiquetas desde creacion
-    private readonly AddTagUseCase _addTagUseCase = addTagUseCase;
-    private readonly AddContactTagUseCase _addContactTagUseCase = addContactTagUseCase;
+    private readonly UserReader _userReader = userReader;
+
+    private readonly TagReader _tagReader = tagReader;
+    private readonly TagCreator _tagCreator = tagCreator;
+
+    private readonly ContactTagCreator _contactTagCreator = contactTagCreator;
 
     protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
         NewContactDTO request
@@ -38,23 +43,11 @@ public sealed class AddContactUseCase(
     {
         List<FieldErrorDTO> errors = [];
 
-        var agendaOwnerSearch = await _userReader.GetAsync(request.AgendaOwnerId);
-        if (agendaOwnerSearch.IsNone)
-            errors.Add(new() { Field = "agendaOwnerId", Message = "Usuario no encontrado" });
-
-        var contactIdSearch = await _userReader.GetAsync(request.ContactId);
-        if (contactIdSearch.IsNone)
-            errors.Add(new() { Field = "contactId", Message = "Usuario no encontrado" });
+        (await SearchUser(request.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
+        (await SearchUser(request.ContactId, "contactId")).IfErr(errors.Add);
 
         if (errors.Count != 0)
             return UseCaseError.Input(errors);
-
-        var userExistenceSearch = await _contactQuerier.GetByAsync(
-            new() { AgendaOwnerId = request.AgendaOwnerId, ContactId = request.ContactId }
-        );
-
-        if (userExistenceSearch.Results.Any())
-            return UseCaseError.AlreadyExists();
 
         var authorized = request.Executor.Role switch
         {
@@ -65,6 +58,13 @@ public sealed class AddContactUseCase(
         if (!authorized)
             return UseCaseError.Unauthorized();
 
+        var repeatedSearch = await _querier.GetByAsync(
+            new() { AgendaOwnerId = request.AgendaOwnerId, ContactId = request.ContactId }
+        );
+
+        if (repeatedSearch.Results.Any())
+            return UseCaseError.AlreadyExists();
+
         return Unit.Value;
     }
 
@@ -73,45 +73,37 @@ public sealed class AddContactUseCase(
         ContactDomain createdEntity
     )
     {
-        foreach (var tagToLink in newEntity.ContactTags)
-        {
-            var tagSearch = await _tagQuerier.GetByAsync(
-                new()
-                {
-                    Text = new StringQueryDTO
-                    {
-                        Text = tagToLink.Text,
-                        SearchType = StringSearchType.EQ,
-                    },
-                }
-            );
-
-            var tagRecord = tagSearch.Results.Any() switch
+        await newEntity.Tags.IfSomeAsync(
+            async (tags) =>
             {
-                true => tagSearch.Results.First(),
-                false => await CreateTag(tagToLink),
-            };
-
-            var validation = await _addContactTagUseCase.ExecuteAsync(
-                new()
+                var normalizedTags = tags.Distinct().ToList();
+                foreach (var tag in normalizedTags)
                 {
-                    TagId = tagRecord.Id,
-                    AgendaContactId = newEntity.AgendaOwnerId,
-                    Executor = newEntity.Executor,
-                }
-            );
+                    var tagSearch = await _tagReader.GetAsync(tag);
 
-            if(validation.IsErr) throw new Exception("No se pudo vincular la etiqueta");
-        }
+                    var tagInstance = tagSearch.IsSome
+                        ? tagSearch.Unwrap()
+                        : await _tagCreator.AddAsync(new() { Text = tag });
+
+                    await _contactTagCreator.AddAsync(
+                        new()
+                        {
+                            Tag = tagInstance.Text,
+                            AgendaOwnerId = createdEntity.Id.AgendaOwnerId,
+                            ContactId = createdEntity.Id.ContactId,
+                        }
+                    );
+                }
+            }
+        );
     }
 
-    private async Task<TagDomain> CreateTag(NewTagDTO data)
+    private async Task<Result<Unit, FieldErrorDTO>> SearchUser(ulong id, string field)
     {
-        var result = await _addTagUseCase.ExecuteAsync(data);
+        var userSearch = await _userReader.GetAsync(id);
+        if (userSearch.IsNone)
+            return new FieldErrorDTO { Field = field, Message = "Usuario no encontrado" };
 
-        if (result.IsErr)
-            throw new Exception("No se pudieron crear las etiquetas");
-
-        return result.Unwrap();
+        return Unit.Value;
     }
 }

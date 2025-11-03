@@ -14,10 +14,11 @@ public sealed class ContactEFMapper
     public ContactDomain Map(AgendaContact input) =>
         new()
         {
-            Id = input.AgendaContactId,
-            AgendaOwnerId = input.AgendaOwnerId,
+            Id = new () {
+              AgendaOwnerId = input.AgendaOwnerId,
+              ContactId = input.ContactId
+            },
             Alias = input.Alias,
-            ContactId = input.ContactId,
             Notes = input.Notes.ToOptional(),
             CreatedAt = input.CreatedAt,
             ModifiedAt = input.ModifiedAt,
@@ -34,10 +35,9 @@ public sealed class ContactEFMapper
 
     public void Map(ContactUpdateDTO source, AgendaContact destination)
     {
-        destination.AgendaContactId = source.Id;
         destination.Alias = source.Alias;
         destination.Notes = source.Notes.ToNullable();
-        destination.AgendaOwnerId = source.AgendaOwnerId;
-        destination.ContactId = source.ContactId;
+        destination.AgendaOwnerId = source.Id.AgendaOwnerId;
+        destination.ContactId = source.Id.ContactId;
     }
 }

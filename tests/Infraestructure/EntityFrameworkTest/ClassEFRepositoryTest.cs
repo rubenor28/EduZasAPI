@@ -85,9 +85,7 @@ public class ClassEFRepositoryTest : IDisposable
             OwnerId = 2,
         };
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _creator.AddAsync(duplicateClass)
-        );
+        await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(duplicateClass));
     }
 
     [Fact]

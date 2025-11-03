@@ -11,11 +11,10 @@ public static class ContactMAPIMapper
     public static PublicContactMAPI FromDomain(this ContactDomain source) =>
         new()
         {
-            Id = source.Id,
+            AgendaOwnerId = source.Id.AgendaOwnerId,
+            ContactId = source.Id.ContactId,
             Alias = source.Alias,
             Notes = source.Notes.ToNullable(),
-            AgendaOwnerId = source.AgendaOwnerId,
-            ContactId = source.ContactId,
         };
 
     public static ContactCriteriaDTO ToDomain(this ContactCriteriaMAPI source) =>
@@ -30,9 +29,7 @@ public static class ContactMAPIMapper
     public static ContactUpdateDTO ToDomain(this ContactUpdateMAPI source) =>
         new()
         {
-            Id = source.Id,
-            AgendaOwnerId = source.AgendaOwnerId,
-            ContactId = source.ContactId,
+            Id = new() { AgendaOwnerId = source.AgendaOwnerId, ContactId = source.ContactId },
             Alias = source.Alias,
             Notes = source.Notes.ToOptional(),
         };

@@ -1,5 +1,3 @@
-using Application.DTOs.Tags;
-
 namespace MinimalAPI.Application.DTOs.Contacts;
 
 public sealed record NewContactMAPI(
@@ -7,5 +5,5 @@ public sealed record NewContactMAPI(
     string? Notes,
     ulong AgendaOwnerId,
     ulong ContactId,
-    IEnumerable<NewTagDTO> ContactTags
+    IEnumerable<string>? Tags
 );

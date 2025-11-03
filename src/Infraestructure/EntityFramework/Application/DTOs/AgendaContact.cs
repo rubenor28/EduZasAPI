@@ -2,7 +2,7 @@ namespace EntityFramework.Application.DTOs;
 
 public partial class AgendaContact
 {
-    public ulong AgendaContactId { get; set; }
+    
     public string Alias { get; set; } = null!;
     public string? Notes { get; set; }
     public ulong AgendaOwnerId { get; set; }
@@ -12,5 +12,5 @@ public partial class AgendaContact
 
     public virtual User AgendaOwner { get; set; } = null!;
     public virtual User Contact { get; set; } = null!;
-    public virtual ICollection<TagsPerUser> TagsPerUsers { get; set; } = new List<TagsPerUser>();
+    public virtual ICollection<ContactTag> ContactTags { get; set; } = new List<ContactTag>();
 }

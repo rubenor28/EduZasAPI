@@ -19,6 +19,8 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
 {
     protected readonly int _pageSize = pageSize;
 
+    public int PageSize => _pageSize;
+
     /// <summary>
     /// Calcula el offset para la paginación basado en el número de página.
     /// </summary>

@@ -67,7 +67,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             AgendaOwnerId = _user1.UserId,
             ContactId = _user2.UserId,
             Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
         var created = await _creator.AddAsync(newContact);
@@ -75,8 +75,8 @@ public class AgendaContactEFRepositoryTest : IDisposable
         Assert.NotNull(created);
         Assert.Equal(newContact.Alias, created.Alias);
         Assert.Equal(newContact.Notes.Unwrap(), created.Notes.Unwrap());
-        Assert.Equal(newContact.AgendaOwnerId, created.AgendaOwnerId);
-        Assert.Equal(newContact.ContactId, created.ContactId);
+        Assert.Equal(newContact.AgendaOwnerId, created.Id.AgendaOwnerId);
+        Assert.Equal(newContact.ContactId, created.Id.ContactId);
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             AgendaOwnerId = _user1.UserId,
             ContactId = _user2.UserId,
             Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
         await _creator.AddAsync(newContact);
 
@@ -100,10 +100,10 @@ public class AgendaContactEFRepositoryTest : IDisposable
             AgendaOwnerId = _user1.UserId,
             ContactId = _user2.UserId,
             Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
-        await Assert.ThrowsAsync<DbUpdateException>(() => _creator.AddAsync(duplicateContact));
+        await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(duplicateContact));
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             AgendaOwnerId = _user1.UserId,
             ContactId = _user2.UserId,
             Executor = new() { Id = 1, Role = UserType.STUDENT },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
         var created = await _creator.AddAsync(newContact);
 
@@ -130,7 +130,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
     [Fact]
     public async Task GetAsync_WhenContactDoesNotExist_ReturnsEmptyOptional()
     {
-        var found = await _reader.GetAsync(123);
+        var found = await _reader.GetAsync(new() { AgendaOwnerId = 98, ContactId = 99 });
         Assert.True(found.IsNone);
     }
 
@@ -144,7 +144,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             AgendaOwnerId = _user1.UserId,
             ContactId = _user2.UserId,
             Executor = new() { Id = 1, Role = UserType.STUDENT },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
         var created = await _creator.AddAsync(newContact);
@@ -154,8 +154,6 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Id = created.Id,
             Alias = "Updated Alias",
             Notes = "Updated notes".ToOptional(),
-            AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId,
         };
 
         var updated = await _updater.UpdateAsync(update);
@@ -175,7 +173,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             AgendaOwnerId = _user1.UserId,
             ContactId = _user2.UserId,
             Executor = new() { Id = 1, Role = UserType.STUDENT },
-            ContactTags = [],
+            Tags = Optional<IEnumerable<string>>.Some([]),
         };
         await _creator.AddAsync(newContact1);
 

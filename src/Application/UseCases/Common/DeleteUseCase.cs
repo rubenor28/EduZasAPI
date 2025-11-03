@@ -57,7 +57,11 @@ public abstract class DeleteUseCase<I, DE, E>(
         if (asyncCheck.IsErr)
             return asyncCheck.UnwrapErr();
 
+        PrevTask(data);
+        await PrevTaskAsync(data);
+
         var recordDeleted = await _deleter.DeleteAsync(data.Id);
+
         ExtraTask(data, recordDeleted);
         await ExtraTaskAsync(data, recordDeleted);
         return recordDeleted;
@@ -96,24 +100,46 @@ public abstract class DeleteUseCase<I, DE, E>(
     }
 
     /// <summary>
-    /// Ejecuta tareas adicionales síncronas después de crear la entidad.
+    /// Ejecuta tareas adicionales síncronas después de eliminar la entidad.
     /// </summary>
-    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="createdEntity">Entidad creada en el sistema.</param>
+    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual void ExtraTask(DE newEntity, E createdEntity) { }
+    protected virtual void ExtraTask(DE deleteDTO, E deletedEntity) { }
 
     /// <summary>
-    /// Ejecuta tareas adicionales asíncronas después de crear la entidad.
+    /// Ejecuta tareas adicionales asíncronas después de eliminar la entidad.
     /// </summary>
-    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="createdEntity">Entidad creada en el sistema.</param>
+    /// <param name="deleteDTOewEntity">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
     /// <returns>Tarea que representa la operación asíncrona.</returns>
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual Task ExtraTaskAsync(DE newEntity, E createdEntity) =>
+    protected virtual Task ExtraTaskAsync(DE deleteDTO, E deletedEntity) =>
+        Task.FromResult(Unit.Value);
+
+    /// <summary>
+    /// Ejecuta tareas adicionales síncronas previas a eliminar la entidad.
+    /// </summary>
+    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
+    /// </remarks>
+    protected virtual void PrevTask(DE deleteDTO) { }
+
+    /// <summary>
+    /// Ejecuta tareas adicionales asíncronas previas a eliminar la entidad.
+    /// </summary>
+    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
+    /// </remarks>
+    protected virtual Task PrevTaskAsync(DE deleteDTO) =>
         Task.FromResult(Unit.Value);
 }
