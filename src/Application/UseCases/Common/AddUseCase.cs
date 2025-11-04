@@ -63,6 +63,9 @@ public abstract class AddUseCase<NE, E>(
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(formatted);
 
+        PrevTask(formatted);
+        await PrevTaskAsync(formatted);
+
         var newRecord = await _creator.AddAsync(formatted);
 
         ExtraTask(formatted, newRecord);

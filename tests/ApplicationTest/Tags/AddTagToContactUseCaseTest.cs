@@ -248,11 +248,9 @@ public class AddTagToContactUseCaseTest : IDisposable
         };
 
         await _useCase.ExecuteAsync(dto); // First time is OK
-
-        // Act & Assert
-        // This throws because the underlying creator tries to insert a duplicate composite PK.
-        // A more robust use case would check for this and return a custom AlreadyExistsError.
-        await Assert.ThrowsAnyAsync<Exception>(() => _useCase.ExecuteAsync(dto));
+        var result = await _useCase.ExecuteAsync(dto); // Second time should fail
+        Assert.True(result.IsErr);
+        Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
     }
 
     public void Dispose()
