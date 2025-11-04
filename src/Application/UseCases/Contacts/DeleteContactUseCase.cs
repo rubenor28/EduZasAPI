@@ -75,7 +75,7 @@ public sealed class DeleteContactUseCase(
         do
         {
             contactTags = await _tagQuerier.GetByAsync(
-                new() { ContactId = deleteDTO.Id.ContactId }
+                new() { ContactId = deleteDTO.Id.UserId }
             );
 
             var listOfTagText = contactTags.Results.Select(t => t.Text);
@@ -99,7 +99,7 @@ public sealed class DeleteContactUseCase(
                     {
                         Tag = tag,
                         AgendaOwnerId = deleteDTO.Id.AgendaOwnerId,
-                        ContactId = deleteDTO.Id.ContactId,
+                        UserId = deleteDTO.Id.UserId,
                     }
                 );
 

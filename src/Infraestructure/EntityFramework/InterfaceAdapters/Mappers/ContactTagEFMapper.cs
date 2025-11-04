@@ -16,7 +16,7 @@ public sealed class ContactTagEFMapper
             {
                 Tag = input.TagText,
                 AgendaOwnerId = input.AgendaOwnerId,
-                ContactId = input.ContactId,
+                UserId = input.UserId,
             },
             CreatedAt = input.CreatedAt,
         };
@@ -25,7 +25,7 @@ public sealed class ContactTagEFMapper
         new()
         {
             TagText = input.Tag,
-            AgendaOwnerId = input.AgendaOwnerId,
-            ContactId = input.ContactId,
+            AgendaOwnerId = input.ContactId.AgendaOwnerId,
+            UserId = input.ContactId.UserId,
         };
 }

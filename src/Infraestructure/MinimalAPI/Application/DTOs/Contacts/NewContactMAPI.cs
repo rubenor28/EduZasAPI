@@ -4,6 +4,6 @@ public sealed record NewContactMAPI(
     string Alias,
     string? Notes,
     ulong AgendaOwnerId,
-    ulong ContactId,
+    ulong UserId,
     IEnumerable<string>? Tags
 );

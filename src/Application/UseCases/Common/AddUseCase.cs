@@ -62,6 +62,7 @@ public abstract class AddUseCase<NE, E>(
 
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(formatted);
+
         var newRecord = await _creator.AddAsync(formatted);
 
         ExtraTask(formatted, newRecord);
@@ -143,6 +144,24 @@ public abstract class AddUseCase<NE, E>(
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual Task ExtraTaskAsync(NE newEntity, E createdEntity) =>
-        Task.FromResult(Unit.Value);
+    protected virtual Task ExtraTaskAsync(NE newEntity, E createdEntity) => Task.CompletedTask;
+
+    /// <summary>
+    /// Ejecuta tareas adicionales síncronas prvias a crear la entidad.
+    /// </summary>
+    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para ejecutar lógica adicional previo a la creación exitosa.
+    /// </remarks>
+    protected virtual void PrevTask(NE newEntity) { }
+
+    /// <summary>
+    /// Ejecuta tareas adicionales asíncronas previo a crear la entidad.
+    /// </summary>
+    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
+    /// <remarks>
+    /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional previo a la creación exitosa.
+    /// </remarks>
+    protected virtual Task PrevTaskAsync(NE newEntity) => Task.CompletedTask;
 }

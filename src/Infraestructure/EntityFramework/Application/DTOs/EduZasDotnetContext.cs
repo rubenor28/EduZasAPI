@@ -70,7 +70,7 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<AgendaContact>(agendaContactBuilder =>
         {
-            agendaContactBuilder.HasKey(e => new { e.AgendaOwnerId, e.ContactId }).HasName("PRIMARY");
+            agendaContactBuilder.HasKey(e => new { e.AgendaOwnerId, e.UserId }).HasName("PRIMARY");
             agendaContactBuilder.ToTable("agenda_contacts");
 
             agendaContactBuilder.Property(e => e.Alias).HasMaxLength(40).HasColumnName("alias");
@@ -79,7 +79,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasColumnType("TEXT")
                 .HasColumnName("notes");
             agendaContactBuilder.Property(e => e.AgendaOwnerId).HasColumnName("agenda_owner_id");
-            agendaContactBuilder.Property(e => e.ContactId).HasColumnName("contact_id");
+            agendaContactBuilder.Property(e => e.UserId).HasColumnName("contact_id");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
@@ -116,7 +116,7 @@ public partial class EduZasDotnetContext : DbContext
             agendaContactBuilder
                 .HasOne(e => e.Contact)
                 .WithMany(e => e.AgendaContactContacts)
-                .HasForeignKey(e => e.ContactId)
+                .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -541,7 +541,7 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<ContactTag>(contactTagBuilder =>
         {
-            contactTagBuilder.HasKey(e => new { e.TagText, e.AgendaOwnerId, e.ContactId }).HasName("PRIMARY");
+            contactTagBuilder.HasKey(e => new { e.TagText, e.AgendaOwnerId, e.UserId }).HasName("PRIMARY");
             contactTagBuilder.ToTable("contact_tags");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
@@ -552,7 +552,7 @@ public partial class EduZasDotnetContext : DbContext
                 contactTagBuilder.Property(e => e.AgendaOwnerId)
                     .HasColumnType("bigint(20) unsigned")
                     .HasColumnName("agenda_owner_id");
-                contactTagBuilder.Property(e => e.ContactId)
+                contactTagBuilder.Property(e => e.UserId)
                     .HasColumnType("bigint(20) unsigned")
                     .HasColumnName("contact_id");
                 
@@ -566,7 +566,7 @@ public partial class EduZasDotnetContext : DbContext
             {
                 contactTagBuilder.Property(e => e.TagText).HasColumnName("tag_text");
                 contactTagBuilder.Property(e => e.AgendaOwnerId).HasColumnName("agenda_owner_id");
-                contactTagBuilder.Property(e => e.ContactId).HasColumnName("contact_id");
+                contactTagBuilder.Property(e => e.UserId).HasColumnName("user_id");
 
                 contactTagBuilder
                     .Property(e => e.CreatedAt)
@@ -581,7 +581,7 @@ public partial class EduZasDotnetContext : DbContext
             contactTagBuilder
                 .HasOne(e => e.AgendaContact)
                 .WithMany(e => e.ContactTags)
-                .HasForeignKey(e => new { e.AgendaOwnerId, e.ContactId });
+                .HasForeignKey(e => new { e.AgendaOwnerId, e.UserId });
         });
 
         modelBuilder.Entity<Test>(testBuilder =>

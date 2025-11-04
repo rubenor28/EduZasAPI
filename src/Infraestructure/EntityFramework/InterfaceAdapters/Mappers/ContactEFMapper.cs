@@ -14,10 +14,7 @@ public sealed class ContactEFMapper
     public ContactDomain Map(AgendaContact input) =>
         new()
         {
-            Id = new () {
-              AgendaOwnerId = input.AgendaOwnerId,
-              ContactId = input.ContactId
-            },
+            Id = new() { AgendaOwnerId = input.AgendaOwnerId, UserId = input.UserId },
             Alias = input.Alias,
             Notes = input.Notes.ToOptional(),
             CreatedAt = input.CreatedAt,
@@ -29,7 +26,7 @@ public sealed class ContactEFMapper
         {
             Alias = input.Alias,
             Notes = input.Notes.ToNullable(),
-            ContactId = input.ContactId,
+            UserId = input.UserId,
             AgendaOwnerId = input.AgendaOwnerId,
         };
 
@@ -38,6 +35,6 @@ public sealed class ContactEFMapper
         destination.Alias = source.Alias;
         destination.Notes = source.Notes.ToNullable();
         destination.AgendaOwnerId = source.Id.AgendaOwnerId;
-        destination.ContactId = source.Id.ContactId;
+        destination.UserId = source.Id.UserId;
     }
 }

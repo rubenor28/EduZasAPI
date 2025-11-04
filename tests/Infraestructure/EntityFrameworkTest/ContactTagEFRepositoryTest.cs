@@ -61,7 +61,7 @@ public class ContactTagEFRepositoryTest : IDisposable
         var agendaContact = new AgendaContact
         {
             AgendaOwnerId = 1,
-            ContactId = 2,
+            UserId = 2,
             Alias = "test-contact",
         };
 
@@ -81,16 +81,16 @@ public class ContactTagEFRepositoryTest : IDisposable
         var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaOwnerId = owner.UserId,
-            ContactId = contact.UserId,
+            ContactId = new() { AgendaOwnerId = owner.UserId, UserId = contact.UserId },
             Tag = "tag-test",
+            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN }
         };
 
         var created = await _creator.AddAsync(newRelationDto);
 
         Assert.NotNull(created);
-        Assert.Equal(newRelationDto.AgendaOwnerId, created.Id.AgendaOwnerId);
-        Assert.Equal(newRelationDto.ContactId, created.Id.ContactId);
+        Assert.Equal(newRelationDto.ContactId.AgendaOwnerId, created.Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.ContactId.UserId, created.Id.UserId);
         Assert.Equal(newRelationDto.Tag, created.Id.Tag);
     }
 
@@ -100,9 +100,9 @@ public class ContactTagEFRepositoryTest : IDisposable
         var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaOwnerId = owner.UserId,
-            ContactId = contact.UserId,
+            ContactId = new() { AgendaOwnerId = owner.UserId, UserId = contact.UserId },
             Tag = "tag-test",
+            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN }
         };
 
         await _creator.AddAsync(newRelationDto);
@@ -116,9 +116,9 @@ public class ContactTagEFRepositoryTest : IDisposable
         var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaOwnerId = owner.UserId,
-            ContactId = contact.UserId,
+            ContactId = new() { AgendaOwnerId = owner.UserId, UserId = contact.UserId },
             Tag = "tag-test",
+            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN }
         };
 
         await _creator.AddAsync(newRelationDto);
@@ -126,15 +126,15 @@ public class ContactTagEFRepositoryTest : IDisposable
         var idToFind = new ContactTagIdDTO
         {
             AgendaOwnerId = owner.UserId,
-            ContactId = contact.UserId,
+            UserId = contact.UserId,
             Tag = "tag-test",
         };
 
         var found = await _reader.GetAsync(idToFind);
 
         Assert.True(found.IsSome);
-        Assert.Equal(newRelationDto.AgendaOwnerId, found.Unwrap().Id.AgendaOwnerId);
-        Assert.Equal(newRelationDto.ContactId, found.Unwrap().Id.ContactId);
+        Assert.Equal(newRelationDto.ContactId.AgendaOwnerId, found.Unwrap().Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.ContactId.UserId, found.Unwrap().Id.UserId);
         Assert.Equal(newRelationDto.Tag, found.Unwrap().Id.Tag);
     }
 
@@ -145,7 +145,7 @@ public class ContactTagEFRepositoryTest : IDisposable
             new()
             {
                 AgendaOwnerId = 99,
-                ContactId = 98,
+                UserId = 98,
                 Tag = "non-exists",
             }
         );
@@ -159,9 +159,9 @@ public class ContactTagEFRepositoryTest : IDisposable
         var (owner, contact) = await SeedData();
         var newRelationDto = new NewContactTagDTO
         {
-            AgendaOwnerId = owner.UserId,
-            ContactId = contact.UserId,
+            ContactId = new() { AgendaOwnerId = owner.UserId, UserId = contact.UserId },
             Tag = "tag-test",
+            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN }
         };
 
         await _creator.AddAsync(newRelationDto);
@@ -169,15 +169,15 @@ public class ContactTagEFRepositoryTest : IDisposable
         var idToDelete = new ContactTagIdDTO
         {
             AgendaOwnerId = owner.UserId,
-            ContactId = contact.UserId,
+            UserId = contact.UserId,
             Tag = "tag-test",
         };
 
         var deleted = await _deleter.DeleteAsync(idToDelete);
 
         Assert.NotNull(deleted);
-        Assert.Equal(newRelationDto.AgendaOwnerId, deleted.Id.AgendaOwnerId);
-        Assert.Equal(newRelationDto.ContactId, deleted.Id.ContactId);
+        Assert.Equal(newRelationDto.ContactId.AgendaOwnerId, deleted.Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.ContactId.UserId, deleted.Id.UserId);
         Assert.Equal(newRelationDto.Tag, deleted.Id.Tag);
 
         var found = await _reader.GetAsync(idToDelete);
@@ -192,7 +192,7 @@ public class ContactTagEFRepositoryTest : IDisposable
                 new()
                 {
                     AgendaOwnerId = 99,
-                    ContactId = 98,
+                    UserId = 98,
                     Tag = "tag-test",
                 }
             )
@@ -206,3 +206,4 @@ public class ContactTagEFRepositoryTest : IDisposable
         _ctx.Dispose();
     }
 }
+

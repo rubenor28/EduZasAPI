@@ -65,7 +65,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId,
+            UserId = _user2.UserId,
             Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -76,7 +76,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
         Assert.Equal(newContact.Alias, created.Alias);
         Assert.Equal(newContact.Notes.Unwrap(), created.Notes.Unwrap());
         Assert.Equal(newContact.AgendaOwnerId, created.Id.AgendaOwnerId);
-        Assert.Equal(newContact.ContactId, created.Id.ContactId);
+        Assert.Equal(newContact.UserId, created.Id.UserId);
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId,
+            UserId = _user2.UserId,
             Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -98,7 +98,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Duplicate Alias",
             Notes = "Duplicate notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId,
+            UserId = _user2.UserId,
             Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -114,7 +114,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId,
+            UserId = _user2.UserId,
             Executor = new() { Id = 1, Role = UserType.STUDENT },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -130,7 +130,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
     [Fact]
     public async Task GetAsync_WhenContactDoesNotExist_ReturnsEmptyOptional()
     {
-        var found = await _reader.GetAsync(new() { AgendaOwnerId = 98, ContactId = 99 });
+        var found = await _reader.GetAsync(new() { AgendaOwnerId = 98, UserId = 99 });
         Assert.True(found.IsNone);
     }
 
@@ -142,7 +142,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Test Alias",
             Notes = "Test notes".ToOptional(),
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId,
+            UserId = _user2.UserId,
             Executor = new() { Id = 1, Role = UserType.STUDENT },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -171,7 +171,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
         {
             Alias = "Alias 1",
             AgendaOwnerId = _user1.UserId,
-            ContactId = _user2.UserId,
+            UserId = _user2.UserId,
             Executor = new() { Id = 1, Role = UserType.STUDENT },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };

@@ -1,3 +1,4 @@
+
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.Users;
@@ -80,7 +81,7 @@ public class AddContactUseCaseTest : IDisposable
             Alias = "Test",
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
-            ContactId = contactUser.Id,
+            UserId = contactUser.Id,
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -100,7 +101,7 @@ public class AddContactUseCaseTest : IDisposable
             Alias = "Test",
             Notes = "Test note",
             AgendaOwnerId = 999,
-            ContactId = contactUser.Id,
+            UserId = contactUser.Id,
             Executor = new Executor { Id = 999, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -123,7 +124,7 @@ public class AddContactUseCaseTest : IDisposable
             Alias = "Test",
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
-            ContactId = 999, // Non-existent user
+            UserId = 999, // Non-existent user
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -133,7 +134,7 @@ public class AddContactUseCaseTest : IDisposable
         Assert.True(result.IsErr);
         var error = result.UnwrapErr();
         Assert.Equal(typeof(InputError), error.GetType());
-        Assert.Contains(((InputError)error).Errors, e => e.Field == "contactId");
+        Assert.Contains(((InputError)error).Errors, e => e.Field == "userId");
     }
 
     [Fact]
@@ -147,7 +148,7 @@ public class AddContactUseCaseTest : IDisposable
             Alias = "Test",
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
-            ContactId = contactUser.Id,
+            UserId = contactUser.Id,
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -158,7 +159,7 @@ public class AddContactUseCaseTest : IDisposable
             Alias = "Test",
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
-            ContactId = contactUser.Id,
+            UserId = contactUser.Id,
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -181,7 +182,7 @@ public class AddContactUseCaseTest : IDisposable
             Alias = "Test",
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
-            ContactId = contactUser.Id,
+            UserId = contactUser.Id,
             Executor = new Executor { Id = unauthorizedUser.Id, Role = UserType.PROFESSOR },
             Tags = Optional<IEnumerable<string>>.Some([]),
         };
@@ -191,6 +192,131 @@ public class AddContactUseCaseTest : IDisposable
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
+    
+    [Fact]
+    public async Task ExecuteAsync_AuthorizedNonAdminExecutor_ReturnsOk()
+    {
+        var agendaOwner = await CreateUser("owner@example.com");
+        var contactUser = await CreateUser("contact@example.com");
+
+        var newContact = new NewContactDTO
+        {
+            Alias = "Test",
+            Notes = "Test note",
+            AgendaOwnerId = agendaOwner.Id,
+            UserId = contactUser.Id,
+            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.PROFESSOR }, // Authorized non-admin
+            Tags = Optional<IEnumerable<string>>.Some([]),
+        };
+
+        var result = await _useCase.ExecuteAsync(newContact);
+
+        Assert.True(result.IsOk);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithNewTags_CreatesTagsAndAssociations()
+    {
+        var agendaOwner = await CreateUser("owner@example.com");
+        var contactUser = await CreateUser("contact@example.com");
+
+        var newContact = new NewContactDTO
+        {
+            Alias = "Test",
+            Notes = "Test note",
+            AgendaOwnerId = agendaOwner.Id,
+            UserId = contactUser.Id,
+            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            Tags = Optional<IEnumerable<string>>.Some(["tag1", "tag2"]),
+        };
+
+        var result = await _useCase.ExecuteAsync(newContact);
+
+        Assert.True(result.IsOk);
+        Assert.Equal(2, await _ctx.Tags.CountAsync());
+        Assert.Equal(2, await _ctx.ContactTags.CountAsync());
+        Assert.True(await _ctx.Tags.AnyAsync(t => t.Text == "tag1"));
+        Assert.True(await _ctx.Tags.AnyAsync(t => t.Text == "tag2"));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithExistingTags_CreatesOnlyAssociations()
+    {
+        var agendaOwner = await CreateUser("owner@example.com");
+        var contactUser = await CreateUser("contact@example.com");
+        
+        // Pre-existing tag
+        _ctx.Tags.Add(new Tag { Text = "existing-tag", CreatedAt = DateTime.UtcNow });
+        await _ctx.SaveChangesAsync();
+
+        var newContact = new NewContactDTO
+        {
+            Alias = "Test",
+            Notes = "Test note",
+            AgendaOwnerId = agendaOwner.Id,
+            UserId = contactUser.Id,
+            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            Tags = Optional<IEnumerable<string>>.Some(["existing-tag"]),
+        };
+
+        var result = await _useCase.ExecuteAsync(newContact);
+
+        Assert.True(result.IsOk);
+        Assert.Equal(1, await _ctx.Tags.CountAsync()); // No new tag created
+        Assert.Equal(1, await _ctx.ContactTags.CountAsync());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithMixedTags_CreatesAndAssociatesCorrectly()
+    {
+        var agendaOwner = await CreateUser("owner@example.com");
+        var contactUser = await CreateUser("contact@example.com");
+
+        // Pre-existing tag
+        _ctx.Tags.Add(new Tag { Text = "existing-tag", CreatedAt = DateTime.UtcNow });
+        await _ctx.SaveChangesAsync();
+
+        var newContact = new NewContactDTO
+        {
+            Alias = "Test",
+            Notes = "Test note",
+            AgendaOwnerId = agendaOwner.Id,
+            UserId = contactUser.Id,
+            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            Tags = Optional<IEnumerable<string>>.Some(["existing-tag", "new-tag"]),
+        };
+
+        var result = await _useCase.ExecuteAsync(newContact);
+
+        Assert.True(result.IsOk);
+        Assert.Equal(2, await _ctx.Tags.CountAsync()); // One new tag created
+        Assert.Equal(2, await _ctx.ContactTags.CountAsync());
+        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.TagText == "existing-tag"));
+        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.TagText == "new-tag"));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithOptionalNoneTags_ReturnsOk()
+    {
+        var agendaOwner = await CreateUser("owner@example.com");
+        var contactUser = await CreateUser("contact@example.com");
+
+        var newContact = new NewContactDTO
+        {
+            Alias = "Test",
+            Notes = "Test note",
+            AgendaOwnerId = agendaOwner.Id,
+            UserId = contactUser.Id,
+            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            Tags = Optional<IEnumerable<string>>.None(),
+        };
+
+        var result = await _useCase.ExecuteAsync(newContact);
+
+        Assert.True(result.IsOk);
+        Assert.Equal(0, await _ctx.Tags.CountAsync());
+        Assert.Equal(0, await _ctx.ContactTags.CountAsync());
+    }
 
     public void Dispose()
     {
@@ -199,3 +325,4 @@ public class AddContactUseCaseTest : IDisposable
         _ctx.Dispose();
     }
 }
+

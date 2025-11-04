@@ -44,7 +44,7 @@ public sealed class AddContactUseCase(
         List<FieldErrorDTO> errors = [];
 
         (await SearchUser(request.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
-        (await SearchUser(request.ContactId, "contactId")).IfErr(errors.Add);
+        (await SearchUser(request.UserId, "userId")).IfErr(errors.Add);
 
         if (errors.Count != 0)
             return UseCaseError.Input(errors);
@@ -59,7 +59,7 @@ public sealed class AddContactUseCase(
             return UseCaseError.Unauthorized();
 
         var repeatedSearch = await _querier.GetByAsync(
-            new() { AgendaOwnerId = request.AgendaOwnerId, ContactId = request.ContactId }
+            new() { AgendaOwnerId = request.AgendaOwnerId, UserId = request.UserId }
         );
 
         if (repeatedSearch.Results.Any())
@@ -89,8 +89,8 @@ public sealed class AddContactUseCase(
                         new()
                         {
                             Tag = tagInstance.Text,
-                            AgendaOwnerId = createdEntity.Id.AgendaOwnerId,
-                            ContactId = createdEntity.Id.ContactId,
+                            ContactId = createdEntity.Id,
+                            Executor = newEntity.Executor,
                         }
                     );
                 }

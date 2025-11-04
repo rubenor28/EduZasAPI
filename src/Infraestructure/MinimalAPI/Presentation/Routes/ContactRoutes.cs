@@ -67,7 +67,7 @@ public static class ContactRoutes
                     Alias = request.Alias,
                     Notes = request.Notes.ToOptional(),
                     AgendaOwnerId = request.AgendaOwnerId,
-                    ContactId = request.ContactId,
+                    UserId = request.UserId,
                     Tags = request.Tags.ToOptional(),
                     Executor = executor,
                 }
@@ -144,7 +144,7 @@ public static class ContactRoutes
             var result = await useCase.ExecuteAsync(
                 new()
                 {
-                    Id = new() { AgendaOwnerId = agendaOwnerId, ContactId = contactId },
+                    Id = new() { AgendaOwnerId = agendaOwnerId, UserId = contactId },
                     Executor = executor,
                 }
             );

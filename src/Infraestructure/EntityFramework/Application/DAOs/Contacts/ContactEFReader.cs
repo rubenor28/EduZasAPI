@@ -15,7 +15,7 @@ public class ContactEFReader(
         await _dbSet
             .AsTracking()
             .AsQueryable()
-            .Where(c => c.ContactId == id.ContactId)
+            .Where(c => c.UserId == id.UserId)
             .Where(c => c.AgendaOwnerId == id.AgendaOwnerId)
             .FirstOrDefaultAsync();
 }

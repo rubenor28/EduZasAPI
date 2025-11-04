@@ -17,6 +17,6 @@ public sealed class ContactTagEFReader(
             .AsQueryable()
             .Where(tpu => tpu.TagText == id.Tag)
             .Where(tpu => tpu.AgendaOwnerId == id.AgendaOwnerId)
-            .Where(tpu => tpu.ContactId == id.ContactId)
+            .Where(tpu => tpu.UserId == id.UserId)
             .FirstOrDefaultAsync();
 }

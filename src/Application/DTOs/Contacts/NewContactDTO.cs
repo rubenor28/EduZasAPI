@@ -27,12 +27,12 @@ public sealed record NewContactDTO
     ///<summary>
     /// ID usuario del dueño del contacto registrado
     ///</summary>
-    public required ulong ContactId { get; set; }
+    public required ulong UserId { get; set; }
 
     ///<summary>
     /// Etiquetas del usuario desde la creacion
     ///</summary>
-    public required Optional<IEnumerable<string>> Tags { get; set; } =
+    public Optional<IEnumerable<string>> Tags { get; set; } =
         Optional<IEnumerable<string>>.None();
 
     ///<summary>

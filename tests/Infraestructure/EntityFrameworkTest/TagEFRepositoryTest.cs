@@ -112,7 +112,7 @@ public class TagEFRepositoryTest : IDisposable
         var contact = new AgendaContact
         {
             AgendaOwnerId = user.UserId,
-            ContactId = contactUser.UserId,
+            UserId = contactUser.UserId,
             Alias = "Test Contact",
         };
         _ctx.AgendaContacts.Add(contact);
@@ -127,13 +127,13 @@ public class TagEFRepositoryTest : IDisposable
             new ContactTag
             {
                 AgendaOwnerId = contact.AgendaOwnerId,
-                ContactId = contact.ContactId,
+                UserId = contact.UserId,
                 TagText = tag1.Text,
             },
             new ContactTag
             {
                 AgendaOwnerId = contact.AgendaOwnerId,
-                ContactId = contact.ContactId,
+                UserId = contact.UserId,
                 TagText = tag2.Text,
             }
         );

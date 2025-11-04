@@ -24,6 +24,6 @@ public sealed class ContactEFUpdater(
             .AsTracking()
             .AsQueryable()
             .Where(c => c.AgendaOwnerId == id.AgendaOwnerId)
-            .Where(c => c.ContactId == id.ContactId)
+            .Where(c => c.UserId == id.UserId)
             .FirstOrDefaultAsync();
 }

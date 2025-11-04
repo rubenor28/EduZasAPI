@@ -20,7 +20,7 @@ public sealed class ContactEFQuerier(
             .AsNoTracking()
             .AsQueryable()
             .WhereStringQuery(criteria.Alias, c => c.Alias)
-            .WhereOptional(criteria.ContactId, userId => contact => contact.ContactId == userId)
+            .WhereOptional(criteria.UserId, userId => contact => contact.UserId == userId)
             .WhereOptional(
                 criteria.AgendaOwnerId,
                 ownerId => contact => contact.AgendaOwnerId == ownerId

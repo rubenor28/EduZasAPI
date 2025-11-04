@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public sealed record ContactIdDTO
 {
     public required ulong AgendaOwnerId { get; set; }
-    public required ulong ContactId { get; set; }
+    public required ulong UserId { get; set; }
 }
 
 public sealed record ContactDomain : IIdentifiable<ContactIdDTO>

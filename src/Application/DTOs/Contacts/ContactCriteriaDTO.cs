@@ -19,7 +19,7 @@ public sealed record ContactCriteriaDTO : CriteriaDTO
     ///<summary>
     /// ID usuario del dueño del contacto registrado. Campo opcional.
     ///</summary>
-    public  Optional<ulong> ContactId { get; set; } = Optional<ulong>.None();
+    public  Optional<ulong> UserId { get; set; } = Optional<ulong>.None();
 
     ///<summary>
     /// Etiquetas del usuario. Campo opcional.

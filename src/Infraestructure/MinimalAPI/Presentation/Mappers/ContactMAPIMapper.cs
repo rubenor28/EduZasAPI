@@ -12,7 +12,7 @@ public static class ContactMAPIMapper
         new()
         {
             AgendaOwnerId = source.Id.AgendaOwnerId,
-            ContactId = source.Id.ContactId,
+            UserId = source.Id.UserId,
             Alias = source.Alias,
             Notes = source.Notes.ToNullable(),
         };
@@ -22,14 +22,14 @@ public static class ContactMAPIMapper
         {
             Page = source.Page,
             Alias = source.Alias.ToOptional(),
-            ContactId = source.ContactId.ToOptional(),
+            UserId = source.UserId.ToOptional(),
             AgendaOwnerId = source.AgendaOwnerId.ToOptional(),
         };
 
     public static ContactUpdateDTO ToDomain(this ContactUpdateMAPI source) =>
         new()
         {
-            Id = new() { AgendaOwnerId = source.AgendaOwnerId, ContactId = source.ContactId },
+            Id = new() { AgendaOwnerId = source.AgendaOwnerId, UserId = source.UserId },
             Alias = source.Alias,
             Notes = source.Notes.ToOptional(),
         };

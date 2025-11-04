@@ -25,6 +25,6 @@ public class TagEFQuerier(
             )
             .WhereOptional(
                 c.ContactId,
-                contactId => c => c.ContactTags.Any(ct => ct.ContactId == contactId)
+                contactId => c => c.ContactTags.Any(ct => ct.UserId == contactId)
             );
 }

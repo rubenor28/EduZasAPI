@@ -16,7 +16,7 @@ public sealed class ContactTagEFDeleter(
             .AsTracking()
             .AsQueryable()
             .Where(tpu => tpu.TagText == id.Tag)
-            .Where(tpu => tpu.ContactId == id.ContactId)
+            .Where(tpu => tpu.UserId == id.UserId)
             .Where(tpu => tpu.AgendaOwnerId == id.AgendaOwnerId)
             .FirstOrDefaultAsync();
 }
