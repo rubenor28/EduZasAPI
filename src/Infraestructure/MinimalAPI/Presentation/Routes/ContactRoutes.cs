@@ -1,11 +1,14 @@
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
+using Application.DTOs.ContactTags;
 using Application.UseCases.Common;
 using Application.UseCases.Contacts;
+using Application.UseCases.ContactTags;
 using Application.UseCases.Tags;
 using Domain.Entities;
 using Domain.ValueObjects;
 using MinimalAPI.Application.DTOs.Contacts;
+using MinimalAPI.Application.DTOs.ContactTags;
 using MinimalAPI.Application.DTOs.Tags;
 using MinimalAPI.Presentation.Filters;
 using MinimalAPI.Presentation.Mappers;
@@ -45,6 +48,11 @@ public static class ContactRoutes
 
         app.MapPost("/tags/search", TagsQuery)
             .WithName("Obtener etiquetas de contacto")
+            .RequireAuthorization("ProfesorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
+        app.MapDelete("/{agendaOwnerId:ulong}/users/{userId:ulong}/tags/{tag}", DeleteContactTag)
+            .WithName("Eliminar etiqueta de contacto")
             .RequireAuthorization("ProfesorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
@@ -196,6 +204,55 @@ public static class ContactRoutes
     }
 
     // TODO: Agregar etiqueta a contacto
+    private static Task<IResult> AddContactTag(
+        ContactTagIdDTO value,
+        AddContactTagUseCase useCase,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var executor = utils.GetExecutorFromContext(ctx);
+            var result = await useCase.ExecuteAsync(new() { Id = value, Executor = executor });
+
+            if (result.IsErr)
+                return result.UnwrapErr().FromDomain();
+
+            return Results.Created();
+        });
+    }
 
     // TODO: Eliminar etiqueta a contacto
+    private static Task<IResult> DeleteContactTag(
+        ulong agendaOwnerId,
+        ulong userId,
+        string tag,
+        DeleteContactTagUseCase useCase,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleResponseAsync(async () =>
+        {
+            var executor = utils.GetExecutorFromContext(ctx);
+            var result = await useCase.ExecuteAsync(
+                new()
+                {
+                    Id = new()
+                    {
+                        AgendaOwnerId = agendaOwnerId,
+                        UserId = userId,
+                        Tag = tag,
+                    },
+                    Executor = executor,
+                }
+            );
+
+            if (result.IsErr)
+                return result.UnwrapErr().FromDomain();
+
+            return Results.Created();
+        });
+    }
 }

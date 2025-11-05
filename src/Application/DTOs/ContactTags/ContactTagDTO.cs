@@ -1,11 +1,11 @@
 using Application.DTOs.Common;
 using Domain.Entities;
+using Domain.ValueObjects;
 
 namespace Application.DTOs.ContactTags;
 
-public sealed record NewContactTagDTO
+public sealed record ContactTagDTO : IIdentifiable<ContactTagIdDTO>
 {
-    public required string Tag { get; set; }
-    public required ContactIdDTO ContactId { get; set; }
+    public required ContactTagIdDTO Id { get; set; }
     public required Executor Executor { get; set; }
 }

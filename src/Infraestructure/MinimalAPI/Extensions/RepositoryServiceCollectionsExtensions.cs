@@ -146,6 +146,7 @@ public static class RepositoryServiceCollectionExtensions
 
         // TAGS
         services.AddScoped<ICreatorAsync<TagDomain, NewTagDTO>, TagEFCreator>();
+        services.AddScoped<IDeleterAsync<string, TagDomain>, TagEFDeleter>();
         services.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>, TagEFQuerier>();
 
         // CONTACS
@@ -153,6 +154,8 @@ public static class RepositoryServiceCollectionExtensions
         services.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>, ContactEFQuerier>();
         services.AddScoped<IReaderAsync<ContactIdDTO, ContactDomain>, ContactEFReader>();
         services.AddScoped<IUpdaterAsync<ContactDomain, ContactUpdateDTO>, ContactEFUpdater>();
+
+        // CONTACT TAGS
 
         // TEST
         services.AddScoped<ICreatorAsync<TestDomain, NewTestDTO>, TestEFCreator>();

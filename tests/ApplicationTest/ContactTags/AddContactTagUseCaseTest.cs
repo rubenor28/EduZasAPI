@@ -1,7 +1,7 @@
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
-using Application.UseCases.Tags;
+using Application.UseCases.ContactTags;
 using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Contacts;
@@ -19,7 +19,7 @@ public class AddTagToContactUseCaseTest : IDisposable
 {
     private readonly SqliteConnection _conn;
     private readonly EduZasDotnetContext _ctx;
-    private readonly AddTagToContactUseCase _useCase;
+    private readonly AddContactTagUseCase _useCase;
     private readonly ContactEFCreator _contactCreator;
     private readonly UserEFMapper _userMapper;
 
@@ -50,7 +50,7 @@ public class AddTagToContactUseCaseTest : IDisposable
         var contactTagCreator = new ContactTagEFCreator(_ctx, contactTagMapper, contactTagMapper);
         var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
 
-        _useCase = new AddTagToContactUseCase(
+        _useCase = new AddContactTagUseCase(
             contactTagCreator,
             tagReader,
             tagCreator,
@@ -98,11 +98,15 @@ public class AddTagToContactUseCaseTest : IDisposable
         await CreateContact(owner.Id, contactUser.Id);
         await _ctx.SaveChangesAsync();
 
-        var dto = new NewContactTagDTO
+        var dto = new ContactTagDTO
         {
-            Tag = "new-tag",
-            ContactId = new() { AgendaOwnerId = owner.Id, UserId = contactUser.Id },
-            Executor = new() { Id = owner.Id, Role = UserType.PROFESSOR },
+            Id = new()
+            {
+                AgendaOwnerId = owner.Id,
+                UserId = contactUser.Id,
+                Tag = "new-tag",
+            },
+            Executor = new() { Id = owner.Id, Role = owner.Role },
         };
 
         // Act
@@ -121,11 +125,15 @@ public class AddTagToContactUseCaseTest : IDisposable
     {
         // Arrange
         var owner = await CreateUser("owner@test.com");
-        var dto = new NewContactTagDTO
+        var dto = new ContactTagDTO
         {
-            Tag = "new-tag",
-            ContactId = new() { AgendaOwnerId = owner.Id, UserId = 999 }, // Non-existent contact user
-            Executor = new() { Id = owner.Id, Role = UserType.PROFESSOR },
+            Id = new()
+            {
+                AgendaOwnerId = owner.Id,
+                UserId = 99,
+                Tag = "new-tag",
+            },
+            Executor = new() { Id = owner.Id, Role = owner.Role },
         };
 
         // Act
@@ -143,11 +151,15 @@ public class AddTagToContactUseCaseTest : IDisposable
     {
         // Arrange
         var contact = await CreateUser("contact@test.com");
-        var dto = new NewContactTagDTO
+        var dto = new ContactTagDTO
         {
-            Tag = "new-tag",
-            ContactId = new() { AgendaOwnerId = 999, UserId = contact.Id }, // Non-existent agendaOwner
-            Executor = new() { Id = contact.Id, Role = UserType.PROFESSOR },
+            Id = new()
+            {
+                AgendaOwnerId = 99,
+                UserId = contact.Id,
+                Tag = "new-tag",
+            },
+            Executor = new() { Id = contact.Id, Role = contact.Role },
         };
 
         // Act
@@ -169,11 +181,15 @@ public class AddTagToContactUseCaseTest : IDisposable
         var unauthorized = await CreateUser("unauthorized@test.com");
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new ContactTagDTO
         {
-            Tag = "new-tag",
-            ContactId = new() { AgendaOwnerId = owner.Id, UserId = contactUser.Id },
-            Executor = new() { Id = unauthorized.Id, Role = UserType.PROFESSOR }, // Unauthorized user
+            Id = new()
+            {
+                AgendaOwnerId = owner.Id,
+                UserId = contactUser.Id,
+                Tag = "new-tag",
+            },
+            Executor = new() { Id = unauthorized.Id, Role = unauthorized.Role },
         };
 
         // Act
@@ -193,11 +209,15 @@ public class AddTagToContactUseCaseTest : IDisposable
         var student = await CreateUser("student@test.com", UserType.STUDENT);
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new ContactTagDTO
         {
-            Tag = "new-tag",
-            ContactId = new() { AgendaOwnerId = owner.Id, UserId = contactUser.Id },
-            Executor = new() { Id = student.Id, Role = UserType.STUDENT },
+            Id = new()
+            {
+                AgendaOwnerId = owner.Id,
+                UserId = contactUser.Id,
+                Tag = "new-tag",
+            },
+            Executor = new() { Id = student.Id, Role = student.Role },
         };
 
         // Act
@@ -217,11 +237,15 @@ public class AddTagToContactUseCaseTest : IDisposable
         var admin = await CreateUser("admin@test.com", UserType.ADMIN);
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new ContactTagDTO
         {
-            Tag = "new-tag",
-            ContactId = new() { AgendaOwnerId = owner.Id, UserId = contactUser.Id },
-            Executor = new() { Id = admin.Id, Role = UserType.ADMIN }, // Admin can do anything
+            Id = new()
+            {
+                AgendaOwnerId = owner.Id,
+                UserId = contactUser.Id,
+                Tag = "new-tag",
+            },
+            Executor = new() { Id = admin.Id, Role = admin.Role },
         };
 
         // Act
@@ -240,11 +264,15 @@ public class AddTagToContactUseCaseTest : IDisposable
         var contactUser = await CreateUser("contact@test.com");
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new ContactTagDTO
         {
-            Tag = "duplicate-tag",
-            ContactId = new() { AgendaOwnerId = owner.Id, UserId = contactUser.Id },
-            Executor = new() { Id = owner.Id, Role = UserType.PROFESSOR },
+            Id = new()
+            {
+                AgendaOwnerId = owner.Id,
+                UserId = contactUser.Id,
+                Tag = "new-tag",
+            },
+            Executor = new() { Id = owner.Id, Role = owner.Role },
         };
 
         await _useCase.ExecuteAsync(dto); // First time is OK

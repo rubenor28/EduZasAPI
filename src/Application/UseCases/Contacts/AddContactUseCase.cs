@@ -13,7 +13,7 @@ namespace Application.UseCases.Contacts;
 
 using ContactCreator = ICreatorAsync<ContactDomain, NewContactDTO>;
 using ContactQuerier = IQuerierAsync<ContactDomain, ContactCriteriaDTO>;
-using ContactTagCreator = ICreatorAsync<ContactTagDomain, NewContactTagDTO>;
+using ContactTagCreator = ICreatorAsync<ContactTagDomain, ContactTagDTO>;
 using TagCreator = ICreatorAsync<TagDomain, NewTagDTO>;
 using TagReader = IReaderAsync<string, TagDomain>;
 using UserReader = IReaderAsync<ulong, UserDomain>;
@@ -88,8 +88,12 @@ public sealed class AddContactUseCase(
                     await _contactTagCreator.AddAsync(
                         new()
                         {
-                            Tag = tagInstance.Text,
-                            ContactId = createdEntity.Id,
+                            Id = new()
+                            {
+                                AgendaOwnerId = newEntity.AgendaOwnerId,
+                                UserId = newEntity.UserId,
+                                Tag = tagInstance.Text,
+                            },
                             Executor = newEntity.Executor,
                         }
                     );

@@ -37,44 +37,58 @@
 > ![NOTE] Deberia considerar que el DTO de contacto al menos el publico tiene inscrustadas las etiquetas en un array?
 > ![NOTE] Diseñar nuevas clases de EF que solo agregan o eliminan
 
-1. [ ] Repositorio etiquetas
-   - [ ] NewTagDTO
-   - [ ] TagCriteriaDTO
-   - [ ] Tag Creator
-   - [ ] Tag Querier
-   - [ ] TagMapper
-   - [ ] Registrar DI
-2. [ ] Repositorio relacion etiquetas
-   - [ ] ContactTagDomain
+1. [x] Repositorio etiquetas
+   - [x] NewTagDTO
+   - [x] TagCriteriaDTO
+   - [x] Tag Creator
+   - [x] Tag Deleter
+   - [x] Tag Querier
+   - [x] TagMapper
+   - [x] Registrar DI
+2. [x] Repositorio relacion etiquetas
+   - [x] ContactTagDomain
      - DTO para ID
-   - [ ] ContactTag Creator
+   - [x] ContactTag Creator
      - usa DTO para ID como entrada
-   - [ ] ContactTag Deleter
-   - [ ] ContactTag Reader
-   - [ ] ContactTagMapper
-   - [ ] Registrar DI
-   - [ ] Tests operaciones
-3. [ ] Repositorio contacto
-   - [ ] NewContactDTO
-   - [ ] UpdateContactDTO
-   - [ ] ContactCriteriaDTO
-   - [ ] ContactCreator
-   - [ ] ContactUpdater
-   - [ ] ContactQuerier
-   - [ ] ContactReader
-   - [ ] ContactMapper
-   - [ ] Registrar DI
-   - [ ] Tests operaciones
-4. [ ] Caso de uso agregar etiqueta
+   - [x] ContactTag Deleter
+   - [x] ContactTag Reader
+   - [x] ContactTagMapper
+   - [x] Registrar DI
+   - [x] Tests operaciones
+3. [x] Repositorio contacto
+   - [x] NewContactDTO
+   - [x] UpdateContactDTO
+   - [x] ContactCriteriaDTO
+   - [x] ContactCreator
+   - [x] ContactUpdater
+   - [x] ContactQuerier
+   - [x] ContactReader
+   - [x] ContactMapper
+   - [x] Registrar DI
+   - [x] Tests operaciones
 
-- [ ] Ruta agregar contacto
-- [ ] Ruta buscar contacto
-  - [ ] Buscar mis contactos
-  - [ ] Buscar contactos registrados si eres admin
-- [ ] Ruta eliminar contacto
-- [ ] Ruta modificar contacto
-- [ ] Ruta agregar etiqueta a contacto
-- [ ] Ruta eliminar etiqueta a contacto
+4. [ ] Casos de uso
+   - [x] Crear contacto
+     - [ ] Registro DI
+   - [x] Modificar contacto contacto
+     - [ ] Registro DI
+   - [x] Buscar contactos
+     - [x] Registro DI
+   - [x] Eliminar contactos
+     - [ ] Registro DI
+   - [x] Agregar etiqueta a contacto
+     - [ ] Registro DI
+   - [x] Eliminar etiqueta a contacto
+     - [ ] Registro DI
+
+- [x] Ruta agregar contacto
+- [x] Ruta buscar contacto
+  - [x] Buscar mis contactos
+  - [x] Buscar contactos registrados si eres admin
+- [x] Ruta eliminar contacto
+- [x] Ruta modificar contacto
+- [x] Ruta agregar etiqueta a contacto
+- [x] Ruta eliminar etiqueta a contacto
 
 ## [ ] Evaluaciones
 

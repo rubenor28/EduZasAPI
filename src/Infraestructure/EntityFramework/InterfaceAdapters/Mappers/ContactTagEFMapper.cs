@@ -7,7 +7,7 @@ namespace EntityFramework.InterfaceAdapters.Mappers;
 
 public sealed class ContactTagEFMapper
     : IMapper<ContactTag, ContactTagDomain>,
-        IMapper<NewContactTagDTO, ContactTag>
+        IMapper<ContactTagDTO, ContactTag>
 {
     public ContactTagDomain Map(ContactTag input) =>
         new()
@@ -21,11 +21,11 @@ public sealed class ContactTagEFMapper
             CreatedAt = input.CreatedAt,
         };
 
-    public ContactTag Map(NewContactTagDTO input) =>
+    public ContactTag Map(ContactTagDTO input) =>
         new()
         {
-            TagText = input.Tag,
-            AgendaOwnerId = input.ContactId.AgendaOwnerId,
-            UserId = input.ContactId.UserId,
+            TagText = input.Id.Tag,
+            AgendaOwnerId = input.Id.AgendaOwnerId,
+            UserId = input.Id.UserId,
         };
 }
