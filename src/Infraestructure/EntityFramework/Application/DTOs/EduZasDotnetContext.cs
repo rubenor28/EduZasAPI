@@ -122,10 +122,9 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<Answer>(answerBuilder =>
         {
-            answerBuilder.HasKey(e => e.AnswerId).HasName("PRIMARY");
+            answerBuilder.HasKey(e => new { e.TestId, e.ClassId, e.UserId }).HasName("PRIMARY");
             answerBuilder.ToTable("answer");
 
-            answerBuilder.Property(e => e.AnswerId).HasColumnName("answer_id");
             answerBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
             answerBuilder.Property(e => e.UserId).HasColumnName("user_id");
             answerBuilder.Property(e => e.TestId).HasColumnName("test_id");

@@ -18,7 +18,10 @@ public class AddTestUseCaseTest : IDisposable
     private readonly AddTestUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
+
     private readonly UserEFMapper _userMapper;
+
+    private readonly Random _random = new();
 
     public AddTestUseCaseTest()
     {
@@ -44,9 +47,10 @@ public class AddTestUseCaseTest : IDisposable
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
+        var id = _random.Next(1000, 100000);
         var user = new User
         {
-            Email = "test@test.com",
+            Email = $"test{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
@@ -68,7 +72,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test content",
-            ProfesorId = professor.Id,
+            ProfessorId = professor.Id,
             Executor = AsExecutor(admin),
         };
 
@@ -85,7 +89,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = user.Id,
+            ProfessorId = user.Id,
             Executor = AsExecutor(user),
         };
 
@@ -102,7 +106,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = 999, // Non-existent professor
+            ProfessorId = 999, // Non-existent professor
             Executor = AsExecutor(admin),
         };
 
@@ -122,7 +126,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = student.Id,
+            ProfessorId = student.Id,
             Executor = AsExecutor(student),
         };
 
@@ -141,7 +145,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = professor.Id,
+            ProfessorId = professor.Id,
             Executor = AsExecutor(unauthorizedProfessor),
         };
 

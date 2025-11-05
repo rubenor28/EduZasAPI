@@ -22,7 +22,7 @@ public sealed class UpdateTestUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.Executor.Id == value.ProfesorId,
+            UserType.PROFESSOR => value.Executor.Id == value.ProfessorId,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };

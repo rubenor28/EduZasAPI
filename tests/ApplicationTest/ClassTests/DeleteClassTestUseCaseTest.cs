@@ -18,8 +18,12 @@ public class DeleteClassTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
+    private readonly UserEFMapper _userMapper = new();
+    private readonly TestEFMapper _testMapper = new();
     private readonly ClassEFMapper _classMapper = new();
     private readonly ClassTestEFMapper _classTestMapper = new();
+
+    private readonly Random _random = new();
 
     public DeleteClassTestUseCaseTest()
     {
@@ -32,31 +36,33 @@ public class DeleteClassTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testMapper = new TestEFMapper();
-
         var classTestDeleter = new ClassTestEFDeleter(_ctx, _classTestMapper);
         var classTestReader = new ClassTestEFReader(_ctx, _classTestMapper);
-        var testReader = new TestEFReader(_ctx, testMapper);
+        var testReader = new TestEFReader(_ctx, _testMapper);
 
         _useCase = new DeleteClassTestUseCase(classTestDeleter, classTestReader, testReader);
     }
 
-    private async Task SeedUser(UserType role, ulong userId = 1)
+    private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
+        var id = (ulong)_random.Next(1000, 100000);
         var user = new User
         {
-            UserId = userId,
-            Email = "test@test.com",
+            UserId = id,
+            Email = $"user{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
             Role = (uint)role,
         };
+
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
+
+        return _userMapper.Map(user);
     }
 
-    private async Task<Test> SeedTest(ulong professorId)
+    private async Task<TestDomain> SeedTest(ulong professorId)
     {
         var test = new Test
         {
@@ -67,7 +73,7 @@ public class DeleteClassTestUseCaseTest : IDisposable
         };
         _ctx.Tests.Add(test);
         await _ctx.SaveChangesAsync();
-        return test;
+        return _testMapper.Map(test);
     }
 
     private async Task<ClassDomain> SeedClass(ulong ownerId)
@@ -111,20 +117,18 @@ public class DeleteClassTestUseCaseTest : IDisposable
         return _classTestMapper.Map(classTest);
     }
 
+    private static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
+
     [Fact]
     public async Task ExecuteAsync_WithValidDataAndAdminRole_ReturnsOk()
     {
-        await SeedUser(UserType.ADMIN, 1);
-        await SeedUser(UserType.PROFESSOR, 2);
-        var test = await SeedTest(2);
-        var @class = await SeedClass(2);
-        await SeedClassTest(@class.Id, test.TestId);
+        var admin = await SeedUser(UserType.ADMIN);
+        var professor = await SeedUser();
+        var test = await SeedTest(professor.Id);
+        var @class = await SeedClass(professor.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
-        var deleteDto = new DeleteClassTestDTO
-        {
-            Id = new ClassTestIdDTO { ClassId = @class.Id, TestId = test.TestId },
-            Executor = new Executor { Id = 1, Role = UserType.ADMIN },
-        };
+        var deleteDto = new DeleteClassTestDTO { Id = classTest.Id, Executor = AsExecutor(admin) };
 
         var result = await _useCase.ExecuteAsync(deleteDto);
 
@@ -135,15 +139,15 @@ public class DeleteClassTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithValidDataAndProfessorRole_ReturnsOk()
     {
-        await SeedUser(UserType.PROFESSOR, 1);
-        var test = await SeedTest(1);
-        var @class = await SeedClass(1);
-        await SeedClassTest(@class.Id, test.TestId);
+        var professor = await SeedUser();
+        var test = await SeedTest(professor.Id);
+        var @class = await SeedClass(professor.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
         var deleteDto = new DeleteClassTestDTO
         {
-            Id = new ClassTestIdDTO { ClassId = @class.Id, TestId = test.TestId },
-            Executor = new Executor { Id = 1, Role = UserType.PROFESSOR },
+            Id = classTest.Id,
+            Executor = AsExecutor(professor),
         };
 
         var result = await _useCase.ExecuteAsync(deleteDto);
@@ -155,12 +159,12 @@ public class DeleteClassTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_RelationNotFound_ReturnsError()
     {
-        await SeedUser(UserType.ADMIN, 1);
+        var admin = await SeedUser(UserType.ADMIN);
 
         var deleteDto = new DeleteClassTestDTO
         {
             Id = new ClassTestIdDTO { ClassId = "non-existent", TestId = 999 },
-            Executor = new Executor { Id = 1, Role = UserType.ADMIN },
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(deleteDto);
@@ -172,16 +176,16 @@ public class DeleteClassTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithStudentRole_ReturnsUnauthorizedError()
     {
-        await SeedUser(UserType.STUDENT, 1);
-        await SeedUser(UserType.PROFESSOR, 2);
-        var test = await SeedTest(2);
-        var @class = await SeedClass(2);
-        await SeedClassTest(@class.Id, test.TestId);
+        var student = await SeedUser(UserType.STUDENT);
+        var professor = await SeedUser();
+        var test = await SeedTest(professor.Id);
+        var @class = await SeedClass(professor.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
         var deleteDto = new DeleteClassTestDTO
         {
-            Id = new ClassTestIdDTO { ClassId = @class.Id, TestId = test.TestId },
-            Executor = new Executor { Id = 1, Role = UserType.STUDENT },
+            Id = classTest.Id,
+            Executor = AsExecutor(student),
         };
 
         var result = await _useCase.ExecuteAsync(deleteDto);
@@ -193,22 +197,22 @@ public class DeleteClassTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_ProfessorDeletingAnotherProfessorsRelation_ReturnsUnauthorizedError()
     {
-        await SeedUser(UserType.PROFESSOR, 1);
-        await SeedUser(UserType.PROFESSOR, 2);
-        var test = await SeedTest(2);
-        var @class = await SeedClass(2);
-        await SeedClassTest(@class.Id, test.TestId);
+        var professor1 = await SeedUser();
+        var professor2 = await SeedUser();
+        var test = await SeedTest(professor1.Id);
+        var @class = await SeedClass(professor1.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
         var deleteDto = new DeleteClassTestDTO
         {
-            Id = new ClassTestIdDTO { ClassId = @class.Id, TestId = test.TestId },
-            Executor = new Executor { Id = 1, Role = UserType.PROFESSOR },
+            Id = classTest.Id,
+            Executor = AsExecutor(professor2),
         };
 
         var result = await _useCase.ExecuteAsync(deleteDto);
 
         Assert.True(result.IsErr);
-        Assert.Equal(typeof(UnauthorizedError), result.UnwrapErr().GetType());
+        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
 
     public void Dispose()

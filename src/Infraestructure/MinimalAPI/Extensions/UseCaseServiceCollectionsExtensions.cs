@@ -7,6 +7,7 @@ using Application.UseCases.Common;
 using Application.UseCases.Contacts;
 using Application.UseCases.Notifications;
 using Application.UseCases.Tags;
+using Application.UseCases.Tests;
 using Application.UseCases.UserNotifications;
 using Domain.Entities;
 
@@ -57,6 +58,13 @@ public static class UseCaseServiceCollectionExtensions
 
         // Tags
         services.AddTransient<TagQueryUseCase>();
+
+        // Tests
+        services.AddTransient<AddTestUseCase>();
+        services.AddTransient<DeleteTestUseCase>();
+        services.AddTransient<QueryTestUseCase>();
+        services.AddTransient<ReadTestUseCase>();
+        services.AddTransient<UpdateTestUseCase>();
 
         return services;
     }

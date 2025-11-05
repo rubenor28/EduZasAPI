@@ -1,17 +1,12 @@
-
-using Application.DAOs;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
-using Application.Services;
 using Application.UseCases.ClassTests;
 using Domain.Entities;
 using Domain.Enums;
-using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.ClassTests;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
-using FluentValidationProj.Application.Services.ClassTests;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +17,13 @@ public class UpdateClassTestUseCaseTest : IDisposable
     private readonly UpdateClassTestUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
+
+    private readonly UserEFMapper _userMapper = new();
+    private readonly TestEFMapper _testMapper = new();
+    private readonly ClassEFMapper _classMapper = new();
+    private readonly ClassTestEFMapper _classTestMapper = new();
+
+    private readonly Random _random = new();
 
     public UpdateClassTestUseCaseTest()
     {
@@ -40,17 +42,17 @@ public class UpdateClassTestUseCaseTest : IDisposable
         var classTestUpdater = new ClassTestEFUpdater(_ctx, classTestMapper, classTestMapper);
         var classTestReader = new ClassTestEFReader(_ctx, classTestMapper);
         var testReader = new TestEFReader(_ctx, testMapper);
-        var validator = new ClassTestUpdateFluentValidator();
 
-        _useCase = new UpdateClassTestUseCase(classTestUpdater, classTestReader, testReader, validator);
+        _useCase = new UpdateClassTestUseCase(classTestUpdater, classTestReader, testReader);
     }
 
-    private async Task SeedUser(UserType role, ulong userId = 1)
+    private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
+        var id = (ulong)_random.Next(1000, 100000);
         var user = new User
         {
-            UserId = userId,
-            Email = "test@test.com",
+            UserId = id,
+            Email = $"user{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
@@ -58,67 +60,70 @@ public class UpdateClassTestUseCaseTest : IDisposable
         };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
+        return _userMapper.Map(user);
     }
 
-    private async Task<Test> SeedTest(ulong professorId)
+    private static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
+
+    private async Task<TestDomain> SeedTest(ulong professorId)
     {
         var test = new Test
         {
             TestId = 1,
             Title = "Original Title",
-            Description = "Original Description",
-            ProfesorId = professorId
+            Content = "Original Content",
+            ProfessorId = professorId,
         };
         _ctx.Tests.Add(test);
         await _ctx.SaveChangesAsync();
-        return test;
+
+        return _testMapper.Map(test);
     }
 
-    private async Task<Class> SeedClass(ulong ownerId)
+    private async Task<ClassDomain> SeedClass(ulong ownerId)
     {
         var @class = new Class
         {
-            ClassId = 1,
+            ClassId = $"test-class-{ownerId}",
             ClassName = "Test Class",
             Section = "A",
             Subject = "Math",
-            PublicId = "test-class",
-            OwnerId = ownerId
         };
+
         _ctx.Classes.Add(@class);
         await _ctx.SaveChangesAsync();
-        return @class;
+        return _classMapper.Map(@class);
     }
 
-    private async Task<ClassTest> SeedClassTest(ulong classId, ulong testId)
+    private async Task<ClassTestDomain> SeedClassTest(string classId, ulong testId)
     {
-        var classTest = new ClassTest
+        var classTest = new TestPerClass
         {
             ClassId = classId,
             TestId = testId,
-            OpenDate = DateTime.UtcNow,
-            CloseDate = DateTime.UtcNow.AddDays(1)
+            Visible = true,
         };
-        _ctx.ClassTests.Add(classTest);
+
+        _ctx.TestsPerClasses.Add(classTest);
         await _ctx.SaveChangesAsync();
-        return classTest;
+
+        return _classTestMapper.Map(classTest);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithValidDataAndAdminRole_ReturnsOk()
     {
-        await SeedUser(UserType.ADMIN, 1);
-        await SeedUser(UserType.PROFESSOR, 2);
-        var test = await SeedTest(2);
-        var @class = await SeedClass(2);
-        var classTest = await SeedClassTest(@class.ClassId, test.TestId);
+        var admin = await SeedUser(UserType.ADMIN);
+        var professor = await SeedUser();
+        var test = await SeedTest(professor.Id);
+        var @class = await SeedClass(professor.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = new ClassTestIdDTO { ClassId = @class.ClassId, TestId = test.TestId },
-            OpenDate = DateTime.UtcNow.AddDays(2),
-            CloseDate = DateTime.UtcNow.AddDays(3),
-            Executor = new Executor { Id = 1, Role = UserType.ADMIN }
+            Id = classTest.Id,
+            Visible = true,
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(updateDto);
@@ -129,17 +134,16 @@ public class UpdateClassTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithValidDataAndProfessorRole_ReturnsOk()
     {
-        await SeedUser(UserType.PROFESSOR, 1);
-        var test = await SeedTest(1);
-        var @class = await SeedClass(1);
-        var classTest = await SeedClassTest(@class.ClassId, test.TestId);
+        var professor = await SeedUser();
+        var test = await SeedTest(professor.Id);
+        var @class = await SeedClass(professor.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = new ClassTestIdDTO { ClassId = @class.ClassId, TestId = test.TestId },
-            OpenDate = DateTime.UtcNow.AddDays(2),
-            CloseDate = DateTime.UtcNow.AddDays(3),
-            Executor = new Executor { Id = 1, Role = UserType.PROFESSOR }
+            Id = classTest.Id,
+            Visible = true,
+            Executor = AsExecutor(professor),
         };
 
         var result = await _useCase.ExecuteAsync(updateDto);
@@ -150,14 +154,13 @@ public class UpdateClassTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_RelationNotFound_ReturnsError()
     {
-        await SeedUser(UserType.ADMIN, 1);
+        var admin = await SeedUser(UserType.ADMIN);
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = new ClassTestIdDTO { ClassId = 999, TestId = 999 },
-            OpenDate = DateTime.UtcNow.AddDays(2),
-            CloseDate = DateTime.UtcNow.AddDays(3),
-            Executor = new Executor { Id = 1, Role = UserType.ADMIN }
+            Id = new ClassTestIdDTO { ClassId = "non-existend", TestId = 999 },
+            Visible = true,
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(updateDto);
@@ -169,47 +172,45 @@ public class UpdateClassTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithStudentRole_ReturnsUnauthorizedError()
     {
-        await SeedUser(UserType.STUDENT, 1);
-        await SeedUser(UserType.PROFESSOR, 2);
-        var test = await SeedTest(2);
-        var @class = await SeedClass(2);
-        var classTest = await SeedClassTest(@class.ClassId, test.TestId);
+        var student = await SeedUser(UserType.STUDENT);
+        var professor = await SeedUser();
+        var test = await SeedTest(professor.Id);
+        var @class = await SeedClass(professor.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = new ClassTestIdDTO { ClassId = @class.ClassId, TestId = test.TestId },
-            OpenDate = DateTime.UtcNow.AddDays(2),
-            CloseDate = DateTime.UtcNow.AddDays(3),
-            Executor = new Executor { Id = 1, Role = UserType.STUDENT }
+            Id = classTest.Id,
+            Visible = true,
+            Executor = AsExecutor(student),
         };
 
         var result = await _useCase.ExecuteAsync(updateDto);
 
         Assert.True(result.IsErr);
-        Assert.Equal(typeof(UnauthorizedError), result.UnwrapErr().GetType());
+        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
 
     [Fact]
     public async Task ExecuteAsync_ProfessorUpdatingAnotherProfessorsRelation_ReturnsUnauthorizedError()
     {
-        await SeedUser(UserType.PROFESSOR, 1);
-        await SeedUser(UserType.PROFESSOR, 2);
-        var test = await SeedTest(2);
-        var @class = await SeedClass(2);
-        var classTest = await SeedClassTest(@class.ClassId, test.TestId);
+        var professor1 = await SeedUser();
+        var professor2 = await SeedUser();
+        var test = await SeedTest(professor1.Id);
+        var @class = await SeedClass(professor1.Id);
+        var classTest = await SeedClassTest(@class.Id, test.Id);
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = new ClassTestIdDTO { ClassId = @class.ClassId, TestId = test.TestId },
-            OpenDate = DateTime.UtcNow.AddDays(2),
-            CloseDate = DateTime.UtcNow.AddDays(3),
-            Executor = new Executor { Id = 1, Role = UserType.PROFESSOR }
+            Id = classTest.Id,
+            Visible = true,
+            Executor = AsExecutor(professor2),
         };
 
         var result = await _useCase.ExecuteAsync(updateDto);
 
         Assert.True(result.IsErr);
-        Assert.Equal(typeof(UnauthorizedError), result.UnwrapErr().GetType());
+        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
 
     public void Dispose()

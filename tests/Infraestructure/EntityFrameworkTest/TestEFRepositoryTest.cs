@@ -72,7 +72,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = 1,
+            ProfessorId = 1,
             Executor = new() { Id = user.Id, Role = user.Role },
         };
 
@@ -92,7 +92,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = 1,
+            ProfessorId = 1,
             Executor = new() { Id = user.Id, Role = user.Role },
         };
 
@@ -103,7 +103,7 @@ public class TestEFRepositoryTest : IDisposable
             Id = created.Id,
             Title = "Updated Test Title",
             Content = "Updated Test Content",
-            ProfesorId = 1,
+            ProfessorId = 1,
             Executor = new() { Id = user.Id, Role = user.Role },
         };
 
@@ -123,7 +123,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = 1,
+            ProfessorId = 1,
             Executor = new() { Id = user.Id, Role = user.Role },
         };
         var created = await _creator.AddAsync(newTest);
@@ -150,7 +150,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = 1,
+            ProfessorId = 1,
             Executor = new() { Id = user.Id, Role = user.Role },
         };
         var created = await _creator.AddAsync(newTest);
@@ -178,7 +178,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Math Test",
             Content = "Test Content",
-            ProfesorId = 1,
+            ProfessorId = 1,
             Executor = new() { Id = user.Id, Role = user.Role },
         };
         await _creator.AddAsync(newTest1);
@@ -187,7 +187,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Science Test",
             Content = "Test Content",
-            ProfesorId = 1,
+            ProfessorId = 1,
             Executor = new() { Id = user.Id, Role = user.Role },
         };
         await _creator.AddAsync(newTest2);

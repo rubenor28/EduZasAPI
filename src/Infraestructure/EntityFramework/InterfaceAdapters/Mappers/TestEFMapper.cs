@@ -17,7 +17,7 @@ public class TestEFMapper
             Title = nt.Title,
             Content = nt.Content,
             TimeLimitMinutes = nt.TimeLimitMinutes.ToNullable(),
-            ProfessorId = nt.ProfesorId
+            ProfessorId = nt.ProfessorId
         };
 
     public TestDomain Map(Test t) =>
@@ -37,6 +37,6 @@ public class TestEFMapper
         t.Title = tu.Title;
         t.Content = tu.Content;
         t.TimeLimitMinutes = tu.TimeLimitMinutes.ToNullable();
-        t.ProfessorId = tu.ProfesorId;
+        t.ProfessorId = tu.ProfessorId;
     }
 }

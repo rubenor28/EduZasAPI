@@ -2,7 +2,6 @@ namespace EntityFramework.Application.DTOs;
 
 public partial class Answer
 {
-    public ulong AnswerId { get; set; }
     public string Content { get; set; } = null!;
     public ulong UserId { get; set; }
     public ulong TestId { get; set; }

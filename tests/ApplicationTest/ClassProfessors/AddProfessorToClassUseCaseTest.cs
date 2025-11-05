@@ -1,6 +1,7 @@
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.Common;
 using Application.UseCases.ClassProfessors;
+using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
@@ -18,6 +19,11 @@ public class AddProfessorToClassUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
+    private readonly UserEFMapper _userMapper = new();
+    private readonly ClassEFMapper _classMapper = new();
+
+    private readonly Random _random = new();
+
     public AddProfessorToClassUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
@@ -29,8 +35,6 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var userMapper = new UserEFMapper();
-        var classMapper = new ClassEFMapper();
         var classProfessorMapper = new ProfessorClassEFMapper();
 
         var classProfessorCreator = new ClassProfessorEFCreator(
@@ -39,8 +43,8 @@ public class AddProfessorToClassUseCaseTest : IDisposable
             classProfessorMapper
         );
 
-        var userReader = new UserEFReader(_ctx, userMapper);
-        var classReader = new ClassEFReader(_ctx, classMapper);
+        var userReader = new UserEFReader(_ctx, _userMapper);
+        var classReader = new ClassEFReader(_ctx, _classMapper);
         var professorClassRelationReader = new ClassProfessorsEFReader(_ctx, classProfessorMapper);
 
         _useCase = new AddProfessorToClassUseCase(
@@ -51,9 +55,9 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         );
     }
 
-    private async Task<User> SeedUser(UserType role, ulong userId = 0)
+    private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
-        var id = userId == 0 ? (ulong)new Random().Next(1000, 100000) : userId;
+        var id = (ulong)_random.Next(1000, 100000);
         var user = new User
         {
             UserId = id,
@@ -65,36 +69,39 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
-        return user;
+        return _userMapper.Map(user);
     }
 
-    private async Task<Class> SeedClass(string classId = "TEST-CLASS")
+    private async Task<ClassDomain> SeedClass()
     {
-        var cls = new Class { ClassId = classId, ClassName = "Test Class" };
+        var number = _random.Next(1000, 100000);
+        var cls = new Class { ClassId = $"class-test-{number}", ClassName = "Test Class" };
         _ctx.Classes.Add(cls);
         await _ctx.SaveChangesAsync();
-        return cls;
+        return _classMapper.Map(cls);
     }
+
+    private static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
 
     [Fact]
     public async Task ExecuteAsync_WithValidAdmin_AddsRelationSuccessfully()
     {
         var admin = await SeedUser(UserType.ADMIN);
-        var target = await SeedUser(UserType.PROFESSOR, 200);
+        var target = await SeedUser();
         var cls = await SeedClass();
 
         var dto = new AddProfessorToClassDTO
         {
-            ClassId = cls.ClassId,
-            UserId = target.UserId,
+            ClassId = cls.Id,
+            UserId = target.Id,
             IsOwner = true,
-            Executor = new Executor { Id = admin.UserId, Role = UserType.ADMIN },
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
 
         Assert.True(result.IsOk);
-        var relation = await _ctx.ClassProfessors.FindAsync(cls.ClassId, target.UserId);
+        var relation = await _ctx.ClassProfessors.FindAsync(cls.Id, target.Id);
         Assert.NotNull(relation);
         Assert.True(relation.IsOwner);
     }
@@ -103,31 +110,31 @@ public class AddProfessorToClassUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithProfessorOwner_AddsRelationSuccessfully()
     {
         var admin = await SeedUser(UserType.ADMIN);
-        var ownerProfessor = await SeedUser(UserType.PROFESSOR, 300);
-        var newProfessor = await SeedUser(UserType.PROFESSOR, 301);
-        var cls = await SeedClass("CLASS-PROF");
+        var ownerProfessor = await SeedUser();
+        var newProfessor = await SeedUser();
+        var cls = await SeedClass();
 
         var bootstrapDto = new AddProfessorToClassDTO
         {
-            ClassId = cls.ClassId,
-            UserId = ownerProfessor.UserId,
+            ClassId = cls.Id,
+            UserId = ownerProfessor.Id,
             IsOwner = true,
-            Executor = new Executor { Id = admin.UserId, Role = UserType.ADMIN },
+            Executor = AsExecutor(admin),
         };
         var bootstrap = await _useCase.ExecuteAsync(bootstrapDto);
         Assert.True(bootstrap.IsOk);
 
         var dto = new AddProfessorToClassDTO
         {
-            ClassId = cls.ClassId,
-            UserId = newProfessor.UserId,
+            ClassId = cls.Id,
+            UserId = newProfessor.Id,
             IsOwner = false,
-            Executor = new Executor { Id = ownerProfessor.UserId, Role = UserType.PROFESSOR },
+            Executor = AsExecutor(ownerProfessor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
         Assert.True(result.IsOk);
-        var relation = await _ctx.ClassProfessors.FindAsync(cls.ClassId, newProfessor.UserId);
+        var relation = await _ctx.ClassProfessors.FindAsync(cls.Id, newProfessor.Id);
         Assert.NotNull(relation);
         Assert.False(relation.IsOwner);
     }
@@ -136,15 +143,15 @@ public class AddProfessorToClassUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithStudent_ReturnsUnauthorizedError()
     {
         var studentExecutor = await SeedUser(UserType.STUDENT);
-        var target = await SeedUser(UserType.PROFESSOR, 400);
-        var cls = await SeedClass("CLASS-STU");
+        var target = await SeedUser();
+        var cls = await SeedClass();
 
         var dto = new AddProfessorToClassDTO
         {
-            ClassId = cls.ClassId,
-            UserId = target.UserId,
+            ClassId = cls.Id,
+            UserId = target.Id,
             IsOwner = false,
-            Executor = new Executor { Id = studentExecutor.UserId, Role = UserType.STUDENT },
+            Executor = AsExecutor(studentExecutor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -157,14 +164,14 @@ public class AddProfessorToClassUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithNonExistentUser_ReturnsInputError()
     {
         var admin = await SeedUser(UserType.ADMIN);
-        var cls = await SeedClass("CLASS-NO-USER");
+        var cls = await SeedClass();
 
         var dto = new AddProfessorToClassDTO
         {
-            ClassId = cls.ClassId,
+            ClassId = cls.Id,
             UserId = 999999,
             IsOwner = false,
-            Executor = new Executor { Id = admin.UserId, Role = UserType.ADMIN },
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -182,14 +189,14 @@ public class AddProfessorToClassUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithNonExistentClass_ReturnsInputError()
     {
         var admin = await SeedUser(UserType.ADMIN);
-        var target = await SeedUser(UserType.PROFESSOR, 500);
+        var target = await SeedUser();
 
         var dto = new AddProfessorToClassDTO
         {
             ClassId = "NON-EXISTENT",
-            UserId = target.UserId,
+            UserId = target.Id,
             IsOwner = false,
-            Executor = new Executor { Id = admin.UserId, Role = UserType.ADMIN },
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -207,15 +214,15 @@ public class AddProfessorToClassUseCaseTest : IDisposable
     public async Task ExecuteAsync_WhenRelationAlreadyExists_ReturnsInputError()
     {
         var admin = await SeedUser(UserType.ADMIN);
-        var target = await SeedUser(UserType.PROFESSOR, 600);
-        var cls = await SeedClass("CLASS-DUP");
+        var target = await SeedUser();
+        var cls = await SeedClass();
 
         var dto = new AddProfessorToClassDTO
         {
-            ClassId = cls.ClassId,
-            UserId = target.UserId,
+            ClassId = cls.Id,
+            UserId = target.Id,
             IsOwner = false,
-            Executor = new Executor { Id = admin.UserId, Role = UserType.ADMIN },
+            Executor = AsExecutor(admin),
         };
 
         var first = await _useCase.ExecuteAsync(dto);

@@ -20,6 +20,8 @@ public class QueryTestUseCaseTest : IDisposable
     private readonly UserEFMapper _userMapper = new();
     private readonly TestEFMapper _testMapper = new();
 
+    private readonly Random _random = new();
+
     public QueryTestUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
@@ -36,32 +38,28 @@ public class QueryTestUseCaseTest : IDisposable
         _useCase = new QueryTestUseCase(testQuerier);
     }
 
-    private async Task<UserDomain> SeedUser(
-        ulong? userId = null,
-        UserType role = UserType.PROFESSOR
-    )
+    private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
+        var id = (ulong)_random.Next(1000, 100000);
         var user = new User
         {
-            Email = "test@test.com",
+            UserId = id,
+            Email = $"user{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
             Role = (uint)role,
         };
 
-        if (userId is not null)
-            user.UserId = (ulong)userId;
-
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
         return _userMapper.Map(user);
     }
 
-    private async Task SeedTests()
+    private async Task<(UserDomain, UserDomain)> SeedTests()
     {
-        var professor1 = await SeedUser(1);
-        var professor2 = await SeedUser(2);
+        var professor1 = await SeedUser();
+        var professor2 = await SeedUser();
 
         _ctx.Tests.AddRange(
             new Test
@@ -87,6 +85,7 @@ public class QueryTestUseCaseTest : IDisposable
             }
         );
         await _ctx.SaveChangesAsync();
+        return (professor1, professor2);
     }
 
     [Fact]
@@ -107,7 +106,7 @@ public class QueryTestUseCaseTest : IDisposable
         await SeedTests();
         var criteria = new TestCriteriaDTO
         {
-            Title = new StringQueryDTO { Text = "Math", SearchType = StringSearchType.EQ },
+            Title = new StringQueryDTO { Text = "Math", SearchType = StringSearchType.LIKE },
         };
 
         var search = await _useCase.ExecuteAsync(criteria);
@@ -121,15 +120,15 @@ public class QueryTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithProfessorIdCriteria_ReturnsMatchingTests()
     {
-        await SeedTests();
-        var criteria = new TestCriteriaDTO { ProfessorId = 2 };
+        var (_, professor2) = await SeedTests();
+        var criteria = new TestCriteriaDTO { ProfessorId = professor2.Id };
 
         var search = await _useCase.ExecuteAsync(criteria);
 
         Assert.NotNull(search);
         var results = search.Results;
         Assert.Single(results);
-        Assert.Equal<ulong>(2, results.First().ProfessorId);
+        Assert.Equal<ulong>(professor2.Id, results.First().ProfessorId);
     }
 
     public void Dispose()

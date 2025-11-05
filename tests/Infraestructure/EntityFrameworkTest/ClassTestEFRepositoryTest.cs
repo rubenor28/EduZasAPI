@@ -88,7 +88,7 @@ public class ClassTestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfesorId = professorId,
+            ProfessorId = professorId,
             Executor = new() { Id = professorId, Role = UserType.PROFESSOR },
         };
         return await _testCreator.AddAsync(newTest);

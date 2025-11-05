@@ -1,23 +1,41 @@
-
-using Application.DAOs;
 using Application.DTOs.Common;
 using Application.Services;
 using Application.UseCases.Tests;
 using Domain.Entities;
+using Domain.Enums;
+using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
-using FluentValidation;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTest.Tests;
+
+class MockUintValidator : IBusinessValidationService<ulong>
+{
+    public Result<Unit, IEnumerable<FieldErrorDTO>> IsValid(ulong data)
+    {
+        if (data <= 0)
+            return new FieldErrorDTO[]
+            {
+                new() { Field = "id", Message = "Debe ser un numero entero" },
+            };
+
+        return Unit.Value;
+    }
+}
 
 public class ReadTestUseCaseTest : IDisposable
 {
     private readonly ReadTestUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
+
+    private readonly UserEFMapper _userMapper = new();
+    private readonly TestEFMapper _testMapper = new();
+
+    private readonly Random _random = new();
 
     public ReadTestUseCaseTest()
     {
@@ -32,35 +50,53 @@ public class ReadTestUseCaseTest : IDisposable
 
         var testMapper = new TestEFMapper();
         var testReader = new TestEFReader(_ctx, testMapper);
-        var validator = new InlineValidator<ulong>();
+        var validator = new MockUintValidator();
 
         _useCase = new ReadTestUseCase(testReader, validator);
     }
 
-    private async Task<Test> SeedTest(ulong professorId)
+    private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
+    {
+        var id = (ulong)_random.Next(1000, 100000);
+        var user = new User
+        {
+            UserId = id,
+            Email = $"user{id}@test.com",
+            FirstName = "test",
+            FatherLastname = "test",
+            Password = "test",
+            Role = (uint)role,
+        };
+        _ctx.Users.Add(user);
+        await _ctx.SaveChangesAsync();
+        return _userMapper.Map(user);
+    }
+
+    private async Task<TestDomain> SeedTest(ulong professorId)
     {
         var test = new Test
         {
-            TestId = 1,
             Title = "Original Title",
-            Description = "Original Description",
-            ProfesorId = professorId
+            Content = "Original Description",
+            ProfessorId = professorId,
         };
         _ctx.Tests.Add(test);
         await _ctx.SaveChangesAsync();
-        return test;
+        return _testMapper.Map(test);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithValidId_ReturnsOk()
     {
-        var seeded = await SeedTest(1);
+        var professor = await SeedUser();
+        var test = await SeedTest(professor.Id);
 
-        var result = await _useCase.ExecuteAsync(seeded.TestId);
+        var result = await _useCase.ExecuteAsync(test.Id);
 
         Assert.True(result.IsOk);
         var foundTest = result.Unwrap();
-        Assert.Equal(seeded.TestId, foundTest.Id);
+        Assert.True(foundTest.IsSome);
+        Assert.Equal(test.Id, foundTest.Unwrap().Id);
     }
 
     [Fact]
@@ -68,8 +104,9 @@ public class ReadTestUseCaseTest : IDisposable
     {
         var result = await _useCase.ExecuteAsync(999);
 
-        Assert.True(result.IsErr);
-        Assert.Equal(typeof(NotFoundError), result.UnwrapErr().GetType());
+        Assert.True(result.IsOk);
+        var record = result.Unwrap();
+        Assert.True(record.IsNone);
     }
 
     public void Dispose()

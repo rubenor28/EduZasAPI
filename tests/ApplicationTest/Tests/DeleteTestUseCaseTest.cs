@@ -20,6 +20,8 @@ public class DeleteTestUseCaseTest : IDisposable
     private readonly TestEFMapper _testMapper = new();
     private readonly UserEFMapper _userMapper = new();
 
+    private readonly Random _random = new();
+
     public DeleteTestUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
@@ -39,9 +41,11 @@ public class DeleteTestUseCaseTest : IDisposable
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
+        var id = (ulong)_random.Next(1000, 100000);
         var user = new User
         {
-            Email = "test@test.com",
+            UserId = id,
+            Email = $"user{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",

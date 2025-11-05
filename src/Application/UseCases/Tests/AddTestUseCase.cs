@@ -24,7 +24,7 @@ public sealed class AddTestUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.Executor.Id == value.ProfesorId,
+            UserType.PROFESSOR => value.Executor.Id == value.ProfessorId,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -32,7 +32,7 @@ public sealed class AddTestUseCase(
         if (!authorized)
             return UseCaseError.Unauthorized();
 
-        var userSearch = await _userReader.GetAsync(value.ProfesorId);
+        var userSearch = await _userReader.GetAsync(value.ProfessorId);
         if (userSearch.IsNone)
             return UseCaseError.Input(
                 [new() { Field = "profesorId", Message = "No se encontró el usuario" }]
