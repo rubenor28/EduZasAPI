@@ -116,39 +116,39 @@
 
 2. [x] Test DAOs Tests
 
-4. [x] Caso de uso agregar test
+3. [x] Caso de uso agregar test
    - [ ] Registro DI
    - [ ] Test
-5. [x] Caso de uso modificar test
+4. [x] Caso de uso modificar test
    - [ ] Registro DI
    - [ ] Test
-6. [x] Caso de uso obtener test
+5. [x] Caso de uso obtener test
    - [ ] Registro DI
    - [ ] Test
-7. [x] Caso de uso buscar test
+6. [x] Caso de uso buscar test
    - [ ] Registro DI
    - [ ] Test
-8. [x] Caso de uso eliminar test
+7. [x] Caso de uso eliminar test
    - [ ] Registro DI
    - [ ] ELIMINAR LAS RESPUESTAS POSTERIORMENTE
    - [ ] ELIMINAR RELACIONES test per class
    - [ ] Test
 
-9. [x] Crear relacion class - test
+8. [x] Crear relacion class - test
    - [ ] Test
-10. [x] Eliminar relacion class - test
+9. [x] Eliminar relacion class - test
+   - [ ] Test
+10. [x] Actualizar relacion class - test
     - [ ] Test
-11. [x] Actualizar relacion class - test
-    - [ ] Test
-12. [x] Mapper relacion clase - test
+11. [x] Mapper relacion clase - test
     - [x] Mapper nueva entidad - EF
     - [x] Mapper actualizar entidad - EF
     - [x] Mapper EF - dominio
-13. [x] Caso de uso agregar tests a clase.
+12. [x] Caso de uso agregar tests a clase.
     - [ ] Test
-14. [x] Caso de uso actualizar test por clase
+13. [x] Caso de uso actualizar test por clase
     - [ ] Test
-15. [x] Caso de uso eliminar test en clases
+14. [x] Caso de uso eliminar test en clases
     - [ ] Eliminar respuestas asociadas a este test
     - [ ] Test
 

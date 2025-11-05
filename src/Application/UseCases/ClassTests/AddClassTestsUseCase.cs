@@ -47,7 +47,7 @@ public sealed class AddClassTestUseCase(
         {
             var record = testSearch.Unwrap();
             var professorSearch = await _professorReader.GetAsync(
-                new() { ClassId = value.ClassId, UserId = record.ProfesorId }
+                new() { ClassId = value.ClassId, UserId = record.ProfessorId }
             );
 
             if (professorSearch.IsNone)
@@ -64,7 +64,7 @@ public sealed class AddClassTestUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => test.ProfesorId == value.Executor.Id,
+            UserType.PROFESSOR => test.ProfessorId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };

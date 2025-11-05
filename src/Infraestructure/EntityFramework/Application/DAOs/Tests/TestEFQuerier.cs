@@ -21,5 +21,5 @@ public sealed class TestEFQuerier(
             .WhereStringQuery(criteria.Title, c => c.Title)
             .WhereStringQuery(criteria.Content, c => c.Content)
             .WhereOptional(criteria.TimeLimitMinutes, time => test => test.TimeLimitMinutes == time)
-            .WhereOptional(criteria.ProfesorId, id => test => test.ProfessorId == id);
+            .WhereOptional(criteria.ProfessorId, id => test => test.ProfessorId == id);
 }

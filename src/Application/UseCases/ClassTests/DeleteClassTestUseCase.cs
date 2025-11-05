@@ -29,7 +29,7 @@ public sealed class DeleteClassTestUseCase(
 
         var test = testSearch.Unwrap();
 
-        return test.ProfesorId == executor.Id;
+        return test.ProfessorId == executor.Id;
     }
 
     protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(

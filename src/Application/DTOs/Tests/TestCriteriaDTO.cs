@@ -10,5 +10,5 @@ public sealed record TestCriteriaDTO : CriteriaDTO
 
     // TODO: Caso busqueda de Optional<Optional<uint>> para donde el tiempo del test no importe
     public Optional<uint> TimeLimitMinutes { get; set; } = Optional<uint>.None();
-    public Optional<ulong> ProfesorId { get; set; } = Optional<ulong>.None();
+    public Optional<ulong> ProfessorId { get; set; } = Optional<ulong>.None();
 }

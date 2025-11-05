@@ -27,7 +27,7 @@ public class TestEFMapper
             Title = t.Title,
             Content = t.Content,
             TimeLimitMinutes = t.TimeLimitMinutes.ToOptional(),
-            ProfesorId = t.ProfessorId,
+            ProfessorId = t.ProfessorId,
             CreatedAt = t.CreatedAt,
             ModifiedAt = t.ModifiedAt
         };

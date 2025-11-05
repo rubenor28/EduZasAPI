@@ -55,6 +55,6 @@ public sealed class UpdateClassTestUseCase(
 
         var test = testSearch.Unwrap();
 
-        return test.ProfesorId == executor.Id;
+        return test.ProfessorId == executor.Id;
     }
 }
