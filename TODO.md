@@ -67,19 +67,23 @@
    - [x] Registrar DI
    - [x] Tests operaciones
 
-4. [ ] Casos de uso
+4. [x] Casos de uso
    - [x] Crear contacto
-     - [ ] Registro DI
+     - [x] Registro DI
    - [x] Modificar contacto contacto
-     - [ ] Registro DI
+     - [x] Registro DI
    - [x] Buscar contactos
      - [x] Registro DI
    - [x] Eliminar contactos
-     - [ ] Registro DI
+     - [x] Registro DI
    - [x] Agregar etiqueta a contacto
-     - [ ] Registro DI
+     - [x] Registro DI
    - [x] Eliminar etiqueta a contacto
-     - [ ] Registro DI
+     - [x] Registro DI
+
+5. [ ] Validador de formato nuevo contacto
+   - [ ] Registro en DI
+   - [ ] Test
 
 - [x] Ruta agregar contacto
 - [x] Ruta buscar contacto
@@ -92,7 +96,7 @@
 
 ## [ ] Evaluaciones
 
-1. [ ] Repositorio para guardar tests
+1. [x] Repositorio para guardar tests
    - [x] Crear test
      - [x] Registro DI
    - [x] Modificar test
@@ -109,45 +113,42 @@
      - [x] Registro DI
    - [x] Mapper update a EF
      - [x] Registro DI
+
 2. [x] Test DAOs Tests
-3. [ ] Validador de formato nuevo contacto
-   - [ ] Registro en DI
-   - [ ] Test
-4. [ ] Validador de formato actualizar contacto
-   - [ ] Test
-5. [x] Caso de uso agregar test
+
+4. [x] Caso de uso agregar test
    - [ ] Registro DI
    - [ ] Test
-6. [x] Caso de uso modificar test
+5. [x] Caso de uso modificar test
    - [ ] Registro DI
    - [ ] Test
-7. [x] Caso de uso obtener test
+6. [x] Caso de uso obtener test
    - [ ] Registro DI
    - [ ] Test
-8. [x] Caso de uso buscar test
+7. [x] Caso de uso buscar test
    - [ ] Registro DI
    - [ ] Test
-9. [x] Caso de uso eliminar test
+8. [x] Caso de uso eliminar test
    - [ ] Registro DI
    - [ ] ELIMINAR LAS RESPUESTAS POSTERIORMENTE
    - [ ] ELIMINAR RELACIONES test per class
    - [ ] Test
 
-10. [x] Crear relacion class - test
+9. [x] Crear relacion class - test
+   - [ ] Test
+10. [x] Eliminar relacion class - test
     - [ ] Test
-11. [x] Eliminar relacion class - test
+11. [x] Actualizar relacion class - test
     - [ ] Test
-12. [x] Actualizar relacion class - test
-    - [ ] Test
-13. [x] Mapper relacion clase - test
+12. [x] Mapper relacion clase - test
     - [x] Mapper nueva entidad - EF
     - [x] Mapper actualizar entidad - EF
     - [x] Mapper EF - dominio
-14. [x] Caso de uso agregar tests a clase.
+13. [x] Caso de uso agregar tests a clase.
     - [ ] Test
-15. [x] Caso de uso actualizar test por clase
+14. [x] Caso de uso actualizar test por clase
     - [ ] Test
-16. [x] Caso de uso eliminar test en clases
+15. [x] Caso de uso eliminar test en clases
     - [ ] Eliminar respuestas asociadas a este test
     - [ ] Test
 

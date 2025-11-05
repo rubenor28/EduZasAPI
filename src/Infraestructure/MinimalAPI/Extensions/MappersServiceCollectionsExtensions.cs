@@ -1,6 +1,8 @@
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
+using Application.DTOs.Contacts;
+using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
 using Application.DTOs.Tags;
 using Application.DTOs.Tests;
@@ -95,6 +97,27 @@ public static class MapperServiceCollectionExtensions
         services.AddSingleton<TagEFMapper>();
         services.AddSingleton<IMapper<Tag, TagDomain>>(s => s.GetRequiredService<TagEFMapper>());
         services.AddSingleton<IMapper<NewTagDTO, Tag>>(s => s.GetRequiredService<TagEFMapper>());
+
+        // CONTACTS
+        services.AddSingleton<ContactEFMapper>();
+        services.AddSingleton<IMapper<AgendaContact, ContactDomain>>(s =>
+            s.GetRequiredService<ContactEFMapper>()
+        );
+        services.AddSingleton<IMapper<NewContactDTO, AgendaContact>>(s =>
+            s.GetRequiredService<ContactEFMapper>()
+        );
+        services.AddSingleton<IUpdateMapper<ContactUpdateDTO, AgendaContact>>(s =>
+            s.GetRequiredService<ContactEFMapper>()
+        );
+
+        // CONTACT TAGS
+        services.AddSingleton<ContactTagEFMapper>();
+        services.AddSingleton<IMapper<ContactTag, ContactTagDomain>>(s =>
+            s.GetRequiredService<ContactTagEFMapper>()
+        );
+        services.AddSingleton<IMapper<ContactTagDTO, ContactTag>>(s =>
+            s.GetRequiredService<ContactTagEFMapper>()
+        );
 
         // TESTS
         services.AddSingleton<TestEFMapper>();

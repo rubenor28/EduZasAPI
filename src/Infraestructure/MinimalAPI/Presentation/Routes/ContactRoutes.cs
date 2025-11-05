@@ -1,6 +1,5 @@
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
-using Application.DTOs.ContactTags;
 using Application.UseCases.Common;
 using Application.UseCases.Contacts;
 using Application.UseCases.ContactTags;
@@ -8,7 +7,6 @@ using Application.UseCases.Tags;
 using Domain.Entities;
 using Domain.ValueObjects;
 using MinimalAPI.Application.DTOs.Contacts;
-using MinimalAPI.Application.DTOs.ContactTags;
 using MinimalAPI.Application.DTOs.Tags;
 using MinimalAPI.Presentation.Filters;
 using MinimalAPI.Presentation.Mappers;
@@ -51,8 +49,13 @@ public static class ContactRoutes
             .RequireAuthorization("ProfesorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
+        app.MapPost("/", AddContactTag)
+          .WithName("Agregar etiqueta a contacto")
+          .RequireAuthorization("ProfesorOrAdmin")
+          .AddEndpointFilter<ExecutorFilter>();
+
         app.MapDelete("/{agendaOwnerId:ulong}/users/{userId:ulong}/tags/{tag}", DeleteContactTag)
-            .WithName("Eliminar etiqueta de contacto")
+            .WithName("Eliminar etiqueta a contacto")
             .RequireAuthorization("ProfesorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
@@ -91,7 +94,7 @@ public static class ContactRoutes
 
     private static Task<IResult> SearchMyContacts(
         ContactCriteriaMAPI inputCriteria,
-        QueryUseCase<ContactCriteriaDTO, ContactDomain> useCase,
+        ContactQueryUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -203,7 +206,6 @@ public static class ContactRoutes
         });
     }
 
-    // TODO: Agregar etiqueta a contacto
     private static Task<IResult> AddContactTag(
         ContactTagIdDTO value,
         AddContactTagUseCase useCase,
@@ -223,7 +225,6 @@ public static class ContactRoutes
         });
     }
 
-    // TODO: Eliminar etiqueta a contacto
     private static Task<IResult> DeleteContactTag(
         ulong agendaOwnerId,
         ulong userId,

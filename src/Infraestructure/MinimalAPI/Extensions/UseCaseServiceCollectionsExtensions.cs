@@ -4,7 +4,9 @@ using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
 using Application.UseCases.Common;
+using Application.UseCases.Contacts;
 using Application.UseCases.Notifications;
+using Application.UseCases.Tags;
 using Application.UseCases.UserNotifications;
 using Domain.Entities;
 
@@ -46,6 +48,15 @@ public static class UseCaseServiceCollectionExtensions
 
         // User notifications
         services.AddTransient<UpdateUserNotificationUseCase>();
+
+        // Contact
+        services.AddTransient<AddContactUseCase>();
+        services.AddTransient<ContactQueryUseCase>();
+        services.AddTransient<DeleteContactUseCase>();
+        services.AddTransient<UpdateContactUseCase>();
+
+        // Tags
+        services.AddTransient<TagQueryUseCase>();
 
         return services;
     }

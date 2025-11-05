@@ -3,6 +3,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Contacts;
+using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
 using Application.DTOs.Tags;
 using Application.DTOs.Tests;
@@ -13,6 +14,7 @@ using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Contacts;
+using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.Tests;
@@ -147,22 +149,41 @@ public static class RepositoryServiceCollectionExtensions
         // TAGS
         services.AddScoped<ICreatorAsync<TagDomain, NewTagDTO>, TagEFCreator>();
         services.AddScoped<IDeleterAsync<string, TagDomain>, TagEFDeleter>();
-        services.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>, TagEFQuerier>();
+        services.AddScoped<IReaderAsync<string, TagDomain>, TagEFReader>();
+        services.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>>(s => new TagEFQuerier(
+            s.GetRequiredService<EduZasDotnetContext>(),
+            s.GetRequiredService<IMapper<Tag, TagDomain>>(),
+            pageSize
+        ));
 
         // CONTACS
-        services.AddScoped<ICreatorAsync<ContactDomain, NewContactDTO>, ContactEFCreator>();
-        services.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>, ContactEFQuerier>();
-        services.AddScoped<IReaderAsync<ContactIdDTO, ContactDomain>, ContactEFReader>();
         services.AddScoped<IUpdaterAsync<ContactDomain, ContactUpdateDTO>, ContactEFUpdater>();
+        services.AddScoped<ICreatorAsync<ContactDomain, NewContactDTO>, ContactEFCreator>();
+        services.AddScoped<IDeleterAsync<ContactIdDTO, ContactDomain>, ContactEFDeleter>();
+        services.AddScoped<IReaderAsync<ContactIdDTO, ContactDomain>, ContactEFReader>();
+        services.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>>(
+            s => new ContactEFQuerier(
+                s.GetRequiredService<EduZasDotnetContext>(),
+                s.GetRequiredService<IMapper<AgendaContact, ContactDomain>>(),
+                pageSize
+            )
+        );
 
         // CONTACT TAGS
+        services.AddScoped<ICreatorAsync<ContactTagDomain, ContactTagDTO>, ContactTagEFCreator>();
+        services.AddScoped<IDeleterAsync<ContactTagIdDTO, ContactTagDomain>, ContactTagEFDeleter>();
+        services.AddScoped<IReaderAsync<ContactTagIdDTO, ContactTagDomain>, ContactTagEFReader>();
 
         // TEST
         services.AddScoped<ICreatorAsync<TestDomain, NewTestDTO>, TestEFCreator>();
-        services.AddScoped<IUpdaterAsync<TestDomain, TestUpdateDTO>>();
+        services.AddScoped<IUpdaterAsync<TestDomain, TestUpdateDTO>, TestEFUpdater>();
         services.AddScoped<IDeleterAsync<ulong, TestDomain>, TestEFDeleter>();
         services.AddScoped<IReaderAsync<ulong, TestDomain>, TestEFReader>();
-        services.AddScoped<IQuerierAsync<TestDomain, TestCriteriaDTO>, TestEFQuerier>();
+        services.AddScoped<IQuerierAsync<TestDomain, TestCriteriaDTO>>(s => new TestEFQuerier(
+            s.GetRequiredService<EduZasDotnetContext>(),
+            s.GetRequiredService<IMapper<Test, TestDomain>>(),
+            pageSize
+        ));
 
         return services;
     }
