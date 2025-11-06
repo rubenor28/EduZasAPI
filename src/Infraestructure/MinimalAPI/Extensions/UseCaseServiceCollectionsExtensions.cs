@@ -5,6 +5,7 @@ using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
 using Application.UseCases.Common;
 using Application.UseCases.Contacts;
+using Application.UseCases.Database;
 using Application.UseCases.Notifications;
 using Application.UseCases.Tags;
 using Application.UseCases.Tests;
@@ -25,6 +26,10 @@ public static class UseCaseServiceCollectionExtensions
     /// <returns>La colección de servicios con los casos de uso registrados.</returns>
     public static IServiceCollection AddUseCases(this IServiceCollection services)
     {
+        // Backup and restore
+        services.AddScoped<BackupUseCase>();
+        services.AddScoped<RestoreUseCase>();
+
         // Auth use cases
         services.AddTransient<AddUserUseCase>();
         services.AddTransient<LoginUseCase>();

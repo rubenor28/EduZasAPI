@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFrameworkTest", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentValidationTest", "tests\Infraestructure\FluentValidationTest\FluentValidationTest.csproj", "{37096DA1-0E94-47E6-86BE-57B0DFEF0AA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mariadb", "src\Infraestructure\Mariadb\Mariadb.csproj", "{83CA6B65-BDFD-41FB-AD7D-FC58C04E3695}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{37096DA1-0E94-47E6-86BE-57B0DFEF0AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37096DA1-0E94-47E6-86BE-57B0DFEF0AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37096DA1-0E94-47E6-86BE-57B0DFEF0AA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83CA6B65-BDFD-41FB-AD7D-FC58C04E3695}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83CA6B65-BDFD-41FB-AD7D-FC58C04E3695}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83CA6B65-BDFD-41FB-AD7D-FC58C04E3695}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83CA6B65-BDFD-41FB-AD7D-FC58C04E3695}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0E5FA3C3-4942-42A2-B76E-F6B7A3D689A2} = {04FFEE81-B591-4C83-BD54-114328A069D6}
@@ -94,6 +100,7 @@ Global
 		{204E9936-EA96-4EBE-ABC8-0CBEA17EF138} = {FD360C74-E961-40F7-95B9-9368D9CECAB1}
 		{00C846E4-5CEB-4C8E-88F5-D63037BBD47E} = {204E9936-EA96-4EBE-ABC8-0CBEA17EF138}
 		{37096DA1-0E94-47E6-86BE-57B0DFEF0AA7} = {204E9936-EA96-4EBE-ABC8-0CBEA17EF138}
+		{83CA6B65-BDFD-41FB-AD7D-FC58C04E3695} = {3C43C90F-B430-45F3-9480-9A094C73C76E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionWorkingFolder = {31D6B226-DD5D-454B-AA72-041EBF67C4B8}

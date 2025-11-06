@@ -8,9 +8,14 @@
 ## Respaldo y restauración
 
 1. [x] Crear interfaz de respaldador
-2. [ ] Crear respaldador basado en ejecutar el binario mariadb-dump
-3. [ ] Crear caso de uso respaldado
+2. [x] Crear respaldador basado en ejecutar el binario mariadb-dump
+3. [x] Crear caso de uso respaldar
 4. [ ] Crear endpoint para crear un respaldo
+
+5. [x] Crear interfaz de restaurador
+6. [x] Crear restaurador
+7. [x] Crear caso de uso restaurar
+8. [ ] Crear endpoint para crear un respaldo
 
 ## [x] Notificaciones
 
@@ -117,33 +122,36 @@
 2. [x] Test DAOs Tests
 
 3. [x] Caso de uso agregar test
-   - [ ] Registro DI
-   - [ ] Test
+   - [x] Registro DI
+   - [x] Test
 4. [x] Caso de uso modificar test
    - [ ] Registro DI
-   - [ ] Test
+   - [x] Test
 5. [x] Caso de uso obtener test
    - [ ] Registro DI
-   - [ ] Test
+   - [x] Test
 6. [x] Caso de uso buscar test
-   - [ ] Registro DI
-   - [ ] Test
+   - [x] Registro DI
+   - [x] Test
 7. [x] Caso de uso eliminar test
-   - [ ] Registro DI
+   - [x] Registro DI
    - [ ] ELIMINAR LAS RESPUESTAS POSTERIORMENTE
    - [ ] ELIMINAR RELACIONES test per class
-   - [ ] Test
+   - [x] Test
 
 8. [x] Crear relacion class - test
-   - [ ] Test
+   - [x] Test
 9. [x] Eliminar relacion class - test
-   - [ ] Test
-10. [x] Actualizar relacion class - test
-    - [ ] Test
+   - [x] Test
+10. [x] Modificar relacion class - test
+
+- [x] Test
+
 11. [x] Mapper relacion clase - test
     - [x] Mapper nueva entidad - EF
     - [x] Mapper actualizar entidad - EF
     - [x] Mapper EF - dominio
+
 12. [x] Caso de uso agregar tests a clase.
     - [ ] Test
 13. [x] Caso de uso actualizar test por clase
