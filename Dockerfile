@@ -5,13 +5,19 @@ WORKDIR /home/build
 
 # Copia el archivo de solución y restaura las dependencias de todos los proyectos
 COPY EduZasAPI.sln .
-COPY src/EduZasAPI.Domain/EduZasAPI.Domain.csproj src/EduZasAPI.Domain/
-COPY src/EduZasAPI.Application/EduZasAPI.Application.csproj src/EduZasAPI.Application/
-COPY src/EduZasAPI.InterfaceAdapters/EduZasAPI.InterfaceAdapters.csproj src/EduZasAPI.InterfaceAdapters/
-COPY src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.BCrypt/EduZasAPI.Infraestructure.BCrypt.csproj src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.BCrypt/
-COPY src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.EntityFramework/EduZasAPI.Infraestructure.EntityFramework.csproj src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.EntityFramework/
-COPY src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.FluentValidation/EduZasAPI.Infraestructure.FluentValidation.csproj src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.FluentValidation/
-COPY src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.MinimalAPI/EduZasAPI.Infraestructure.MinimalAPI.csproj src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.MinimalAPI/
+COPY src/Domain/Domain.csproj src/Domain/
+COPY src/Application/Application.csproj src/Application/
+COPY src/InterfaceAdapters/InterfaceAdapters.csproj src/InterfaceAdapters/
+COPY src/Infraestructure/BCrypt/BCrypt.csproj src/Infraestructure/BCrypt/
+COPY src/Infraestructure/EntityFramework/EntityFramework.csproj src/Infraestructure/EntityFramework/
+COPY src/Infraestructure/FluentValidation/FluentValidationProj.csproj src/Infraestructure/FluentValidation/
+COPY src/Infraestructure/Mariadb/Mariadb.csproj src/Infraestructure/Mariadb/
+COPY src/Infraestructure/MinimalAPI/MinimalAPI.csproj src/Infraestructure/MinimalAPI/
+
+## Eliminar los tests de la solucion
+RUN dotnet sln EduZasAPI.sln remove tests/ApplicationTest/ApplicationTest.csproj
+RUN dotnet sln EduZasAPI.sln remove tests/Infraestructure/EntityFrameworkTest/EntityFrameworkTest.csproj
+RUN dotnet sln EduZasAPI.sln remove tests/Infraestructure/FluentValidationTest/FluentValidationTest.csproj
 
 # Restaura las dependencias de la solución
 RUN dotnet restore EduZasAPI.sln
@@ -19,15 +25,15 @@ RUN dotnet restore EduZasAPI.sln
 # Copia el resto del código y publica la aplicación
 COPY . .
 
-## Eliminar los tests de la solucion
-RUN dotnet sln EduZasAPI.sln remove tests/EduZasAPI.EntityFramework.Tests/EduZasAPI.EntityFramework.Tests.csproj
-RUN dotnet sln EduZasAPI.sln remove tests/EduZasAPI.FluentValidation.Tests/EduZasAPI.FluentValidation.Tests.csproj
 
 RUN dotnet publish EduZasAPI.sln -c Release -o ./dist
 
 # Etapa 2: Imagen final para ejecución
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
 WORKDIR /home/app
+
+# Instala el cliente de MariaDB para backups y comandos
+RUN apk add --no-cache mariadb-client
 
 # Crea un usuario no-root para mayor seguridad
 RUN adduser --disabled-password --home /app --gecos '' appuser && chown -R appuser /app
