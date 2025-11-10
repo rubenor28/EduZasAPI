@@ -8,6 +8,7 @@ using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using FluentValidationProj.Application.Services.Tests;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,11 +36,12 @@ public class AddTestUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var testMapper = new TestEFMapper();
-        var userMapper = new UserEFMapper();
-        _userMapper = userMapper;
+
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new(roleMapper, roleMapper);
 
         var testCreator = new TestEFCreator(_ctx, testMapper, testMapper);
-        var userReader = new UserEFReader(_ctx, userMapper);
+        var userReader = new UserEFReader(_ctx, _userMapper);
         var testValidator = new NewTestFluentValidator();
 
         _useCase = new AddTestUseCase(testCreator, userReader, testValidator);

@@ -9,5 +9,5 @@ namespace EntityFramework.Application.DAOs.ContactTags;
 public sealed class ContactTagEFCreator(
     EduZasDotnetContext ctx,
     IMapper<ContactTag, ContactTagDomain> domainMapper,
-    IMapper<ContactTagDTO, ContactTag> newEntityMapper
-) : EFCreator<ContactTagDomain, ContactTagDTO, ContactTag>(ctx, domainMapper, newEntityMapper);
+    IMapper<NewContactTagDTO, ContactTag> newEntityMapper
+) : EFCreator<ContactTagDomain, NewContactTagDTO, ContactTag>(ctx, domainMapper, newEntityMapper);

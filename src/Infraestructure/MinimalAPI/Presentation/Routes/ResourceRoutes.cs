@@ -1,15 +1,13 @@
 using Application.DTOs.Common;
-using Application.DTOs.Resources;
 using Application.UseCases.Resources;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Resources;
-using MinimalAPI.Presentation.Mappers;
 
 namespace MinimalAPI.Presentation.Routes;
 
 public static class ResourceRoutes
 {
-    public static RouteGroupBuilder MapUserRoutes(this WebApplication app)
+    public static RouteGroupBuilder MapResourceRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/").WithTags("Recursos académicos");
 

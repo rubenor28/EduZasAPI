@@ -62,7 +62,7 @@ public static class MapperServiceCollectionExtensions
 
         // CLASS STUDENTS
         services.AddSingleton<StudentClassEFMapper>();
-        services.AddSingleton<IMapper<StudentClassRelationDTO, ClassStudent>>(s =>
+        services.AddSingleton<IMapper<EnrollClassDTO, ClassStudent>>(s =>
             s.GetRequiredService<StudentClassEFMapper>()
         );
         services.AddSingleton<IMapper<ClassStudent, StudentClassRelationDTO>>(s =>
@@ -115,7 +115,7 @@ public static class MapperServiceCollectionExtensions
         services.AddSingleton<IMapper<ContactTag, ContactTagDomain>>(s =>
             s.GetRequiredService<ContactTagEFMapper>()
         );
-        services.AddSingleton<IMapper<ContactTagDTO, ContactTag>>(s =>
+        services.AddSingleton<IMapper<NewContactTagDTO, ContactTag>>(s =>
             s.GetRequiredService<ContactTagEFMapper>()
         );
 

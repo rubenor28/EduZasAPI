@@ -79,37 +79,31 @@ public class ContactTagEFRepositoryTest : IDisposable
     public async Task Add_ValidRelation_ReturnsRelation()
     {
         var (owner, contact) = await SeedData();
-        var newRelationDto = new ContactTagDTO
+        var newRelationDto = new NewContactTagDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.UserId,
-                UserId = contact.UserId,
-                Tag = "tag-test",
-            },
+            AgendaOwnerId = owner.UserId,
+            UserId = contact.UserId,
+            Tag = "tag-test",
             Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
         var created = await _creator.AddAsync(newRelationDto);
 
         Assert.NotNull(created);
-        Assert.Equal(newRelationDto.Id.AgendaOwnerId, created.Id.AgendaOwnerId);
-        Assert.Equal(newRelationDto.Id.UserId, created.Id.UserId);
-        Assert.Equal(newRelationDto.Id.Tag, created.Id.Tag);
+        Assert.Equal(newRelationDto.AgendaOwnerId, created.Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.UserId, created.Id.UserId);
+        Assert.Equal(newRelationDto.Tag, created.Id.Tag);
     }
 
     [Fact]
     public async Task Add_DuplicateRelation_ThrowsException()
     {
         var (owner, contact) = await SeedData();
-        var newRelationDto = new ContactTagDTO
+        var newRelationDto = new NewContactTagDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.UserId,
-                UserId = contact.UserId,
-                Tag = "tag-test",
-            },
+            AgendaOwnerId = owner.UserId,
+            UserId = contact.UserId,
+            Tag = "tag-test",
             Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
@@ -122,14 +116,11 @@ public class ContactTagEFRepositoryTest : IDisposable
     public async Task Get_ExistingRelation_ReturnsRelation()
     {
         var (owner, contact) = await SeedData();
-        var newRelationDto = new ContactTagDTO
+        var newRelationDto = new NewContactTagDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.UserId,
-                UserId = contact.UserId,
-                Tag = "tag-test",
-            },
+            AgendaOwnerId = owner.UserId,
+            UserId = contact.UserId,
+            Tag = "tag-test",
             Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
@@ -145,9 +136,9 @@ public class ContactTagEFRepositoryTest : IDisposable
         var found = await _reader.GetAsync(idToFind);
 
         Assert.True(found.IsSome);
-        Assert.Equal(newRelationDto.Id.AgendaOwnerId, found.Unwrap().Id.AgendaOwnerId);
-        Assert.Equal(newRelationDto.Id.UserId, found.Unwrap().Id.UserId);
-        Assert.Equal(newRelationDto.Id.Tag, found.Unwrap().Id.Tag);
+        Assert.Equal(newRelationDto.AgendaOwnerId, found.Unwrap().Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.UserId, found.Unwrap().Id.UserId);
+        Assert.Equal(newRelationDto.Tag, found.Unwrap().Id.Tag);
     }
 
     [Fact]
@@ -169,14 +160,11 @@ public class ContactTagEFRepositoryTest : IDisposable
     public async Task Delete_ExistingRelation_ReturnsDeletedRelation()
     {
         var (owner, contact) = await SeedData();
-        var newRelationDto = new ContactTagDTO
+        var newRelationDto = new NewContactTagDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.UserId,
-                UserId = contact.UserId,
-                Tag = "tag-test",
-            },
+            AgendaOwnerId = owner.UserId,
+            UserId = contact.UserId,
+            Tag = "tag-test",
             Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
@@ -192,9 +180,9 @@ public class ContactTagEFRepositoryTest : IDisposable
         var deleted = await _deleter.DeleteAsync(idToDelete);
 
         Assert.NotNull(deleted);
-        Assert.Equal(newRelationDto.Id.AgendaOwnerId, deleted.Id.AgendaOwnerId);
-        Assert.Equal(newRelationDto.Id.UserId, deleted.Id.UserId);
-        Assert.Equal(newRelationDto.Id.Tag, deleted.Id.Tag);
+        Assert.Equal(newRelationDto.AgendaOwnerId, deleted.Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.UserId, deleted.Id.UserId);
+        Assert.Equal(newRelationDto.Tag, deleted.Id.Tag);
 
         var found = await _reader.GetAsync(idToDelete);
         Assert.True(found.IsNone);

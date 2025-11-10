@@ -157,13 +157,12 @@ public static class AuthRoutes
         HttpContext ctx,
         RoutesUtils utils,
         ReadUserUseCase useCase,
-        IMapper<Executor, ReadUserDTO> requestMapper,
         IMapper<UserDomain, PublicUserMAPI> userMapper
     )
     {
         return await utils.HandleUseCaseAsync(
             useCase,
-            mapRequest: () => requestMapper.Map(utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => utils.GetIdFromContext(ctx),
             mapResponse: (user) => Results.Ok(userMapper.Map(user))
         );
     }

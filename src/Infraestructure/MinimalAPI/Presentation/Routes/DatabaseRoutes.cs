@@ -2,7 +2,6 @@ using Application.DTOs.Common;
 using Application.DTOs.Database;
 using Application.UseCases.Database;
 using InterfaceAdapters.Mappers.Common;
-using MinimalAPI.Presentation.Mappers;
 
 namespace MinimalAPI.Presentation.Routes;
 

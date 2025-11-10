@@ -91,7 +91,7 @@ public static class RepositoryServiceCollectionExtensions
 
         // CLASS STUDENTS
         services.AddScoped<
-            ICreatorAsync<StudentClassRelationDTO, StudentClassRelationDTO>,
+            ICreatorAsync<StudentClassRelationDTO, EnrollClassDTO>,
             ClassStudentEFCreator
         >();
         services.AddScoped<
@@ -170,7 +170,7 @@ public static class RepositoryServiceCollectionExtensions
         );
 
         // CONTACT TAGS
-        services.AddScoped<ICreatorAsync<ContactTagDomain, ContactTagDTO>, ContactTagEFCreator>();
+        services.AddScoped<ICreatorAsync<ContactTagDomain, NewContactTagDTO>, ContactTagEFCreator>();
         services.AddScoped<IDeleterAsync<ContactTagIdDTO, ContactTagDomain>, ContactTagEFDeleter>();
         services.AddScoped<IReaderAsync<ContactTagIdDTO, ContactTagDomain>, ContactTagEFReader>();
 

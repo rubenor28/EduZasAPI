@@ -220,15 +220,13 @@ public abstract class Result<T, E>
     /// <summary>
     /// Implementación concreta de Result para el estado Ok.
     /// </summary>
-    private sealed class OkResult : Result<T, E>
+    /// <remarks>
+    /// Inicializa una nueva instancia de la clase OkResult.
+    /// </remarks>
+    /// <param name="value">Valor a contener en el resultado exitoso.</param>
+    private sealed class OkResult(T value) : Result<T, E>
     {
-        private readonly T _value;
-
-        /// <summary>
-        /// Inicializa una nueva instancia de la clase OkResult.
-        /// </summary>
-        /// <param name="value">Valor a contener en el resultado exitoso.</param>
-        public OkResult(T value) => _value = value;
+        private readonly T _value = value;
 
         /// <inheritdoc/>
         public override bool IsOk => true;
@@ -274,15 +272,13 @@ public abstract class Result<T, E>
     /// <summary>
     /// Implementación concreta de Result para el estado Err.
     /// </summary>
-    private sealed class ErrResult : Result<T, E>
+    /// <remarks>
+    /// Inicializa una nueva instancia de la clase ErrResult.
+    /// </remarks>
+    /// <param name="error">Error a contener en el resultado fallido.</param>
+    private sealed class ErrResult(E error) : Result<T, E>
     {
-        private readonly E _error;
-
-        /// <summary>
-        /// Inicializa una nueva instancia de la clase ErrResult.
-        /// </summary>
-        /// <param name="error">Error a contener en el resultado fallido.</param>
-        public ErrResult(E error) => _error = error;
+        private readonly E _error = error;
 
         /// <inheritdoc/>
         public override bool IsOk => false;

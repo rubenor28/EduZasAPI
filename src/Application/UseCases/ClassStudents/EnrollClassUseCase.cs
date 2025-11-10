@@ -71,12 +71,10 @@ public class EnrollClassUseCase(
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
 
-        var profRel = professorSearch.Unwrap();
-
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => profRel.Id.UserId == value.Executor.Id,
+            UserType.PROFESSOR => value.UserId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };

@@ -1,7 +1,8 @@
-
+using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.ClassStudents;
+using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
@@ -9,6 +10,7 @@ using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +21,9 @@ public class EnrollClassUseCaseTest : IDisposable
     private readonly EnrollClassUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
+
+    private readonly UserEFMapper _userMapper;
+    private readonly ClassEFMapper _classMapper = new();
 
     public EnrollClassUseCaseTest()
     {
@@ -31,27 +36,28 @@ public class EnrollClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var userMapper = new UserEFMapper();
-        var classMapper = new ClassEFMapper();
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new(roleMapper, roleMapper);
+
         var studentClassMapper = new StudentClassEFMapper();
         var professorClassMapper = new ProfessorClassEFMapper();
 
-        var userReader = new UserEFReader(_ctx, userMapper);
-        var classReader = new ClassEFReader(_ctx, classMapper);
+        var userReader = new UserEFReader(_ctx, _userMapper);
+        var classReader = new ClassEFReader(_ctx, _classMapper);
         var studentReader = new ClassStudentsEFReader(_ctx, studentClassMapper);
         var professorReader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
         var creator = new ClassStudentEFCreator(_ctx, studentClassMapper, studentClassMapper);
 
         _useCase = new EnrollClassUseCase(
+            creator,
             userReader,
             classReader,
             studentReader,
-            professorReader,
-            creator
+            professorReader
         );
     }
 
-    private async Task<User> SeedUser(ulong userId = 1)
+    private async Task<UserDomain> SeedUser(ulong userId = 1)
     {
         var user = new User
         {
@@ -64,32 +70,39 @@ public class EnrollClassUseCaseTest : IDisposable
         };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
-        return user;
+        return _userMapper.Map(user);
     }
 
-    private async Task<Class> SeedClass(string classId = "TEST-CLASS")
+    private async Task<ClassDomain> SeedClass(string classId = "TEST-CLASS")
     {
         var cls = new Class { ClassId = classId, ClassName = "Test Class" };
         _ctx.Classes.Add(cls);
         await _ctx.SaveChangesAsync();
-        return cls;
+        return _classMapper.Map(cls);
     }
+
+    public static Executor AsExecutor(UserDomain value) =>
+        new() { Id = value.Id, Role = value.Role };
 
     [Fact]
     public async Task ExecuteAsync_WithValidData_EnrollsSuccessfully()
     {
         var user = await SeedUser();
         var cls = await SeedClass();
-        var dto = new StudentClassRelationDTO
+        var adminUser = await SeedUser(2);
+        adminUser.Role = UserType.ADMIN;
+
+        var dto = new EnrollClassDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = user.UserId },
-            Hidden = false
+            ClassId = cls.Id,
+            UserId = user.Id,
+            Executor = AsExecutor(adminUser),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
 
         Assert.True(result.IsOk);
-        var relation = await _ctx.ClassStudents.FindAsync(cls.ClassId, user.UserId);
+        var relation = await _ctx.ClassStudents.FindAsync(cls.Id, user.Id);
         Assert.NotNull(relation);
     }
 
@@ -98,47 +111,54 @@ public class EnrollClassUseCaseTest : IDisposable
     {
         var user = await SeedUser();
         var cls = await SeedClass();
-        var dto = new StudentClassRelationDTO
+        var adminUser = await SeedUser(2);
+        adminUser.Role = UserType.ADMIN;
+
+        var dto = new EnrollClassDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = user.UserId },
-            Hidden = false
+            ClassId = cls.Id,
+            UserId = user.Id,
+            Executor = AsExecutor(adminUser),
         };
         await _useCase.ExecuteAsync(dto); // Enroll first time
 
         var result = await _useCase.ExecuteAsync(dto); // Attempt to enroll again
 
         Assert.True(result.IsErr);
-        var error = result.UnwrapErr() as InputError;
-        Assert.NotNull(error);
-        Assert.Contains(error.Errors, e => e.Message.Contains("El usuario ya se encuentra inscrito"));
+        Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
     }
 
     [Fact]
     public async Task ExecuteAsync_WithNonExistentClass_ReturnsInputError()
     {
         var user = await SeedUser();
-        var dto = new StudentClassRelationDTO
+        var dto = new EnrollClassDTO
         {
-            Id = new() { ClassId = "NON-EXISTENT", UserId = user.UserId },
-            Hidden = false
+            ClassId = "NON-EXISTENT",
+            UserId = user.Id,
+            Executor = AsExecutor(user),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
 
         Assert.True(result.IsErr);
-        var error = result.UnwrapErr() as InputError;
-        Assert.NotNull(error);
-        Assert.Contains(error.Errors, e => e.Field == "classId" && e.Message == "Clase no encontrada");
+        Assert.IsType<InputError>(result.UnwrapErr());
+        var error = result.UnwrapErr();
+        Assert.Contains(
+            ((InputError)error).Errors,
+            e => e.Field == "classId" && e.Message == "Clase no encontrada"
+        );
     }
 
     [Fact]
     public async Task ExecuteAsync_WithNonExistentUser_ReturnsInputError()
     {
         var cls = await SeedClass();
-        var dto = new StudentClassRelationDTO
+        var dto = new EnrollClassDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = 999 },
-            Hidden = false
+            ClassId = cls.Id,
+            UserId = 999,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -146,7 +166,10 @@ public class EnrollClassUseCaseTest : IDisposable
         Assert.True(result.IsErr);
         var error = result.UnwrapErr() as InputError;
         Assert.NotNull(error);
-        Assert.Contains(error.Errors, e => e.Field == "userId" && e.Message == "Usuario no encontrado");
+        Assert.Contains(
+            error.Errors,
+            e => e.Field == "userId" && e.Message == "Usuario no encontrado"
+        );
     }
 
     [Fact]
@@ -154,23 +177,32 @@ public class EnrollClassUseCaseTest : IDisposable
     {
         var professor = await SeedUser();
         var cls = await SeedClass();
-        _ctx.ClassProfessors.Add(new ClassProfessor { ClassId = cls.ClassId, ProfessorId = professor.UserId, IsOwner = false });
+        _ctx.ClassProfessors.Add(
+            new ClassProfessor
+            {
+                ClassId = cls.Id,
+                ProfessorId = professor.Id,
+                IsOwner = false,
+            }
+        );
         await _ctx.SaveChangesAsync();
 
-        var dto = new StudentClassRelationDTO
+        var dto = new EnrollClassDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = professor.UserId },
-            Hidden = false
+            ClassId = cls.Id,
+            UserId = professor.Id,
+            Executor = AsExecutor(professor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
 
-
-
         Assert.True(result.IsErr);
         var error = result.UnwrapErr() as InputError;
         Assert.NotNull(error);
-        Assert.Contains(error.Errors, e => e.Message.Contains("El usuario ya es profesor de la clase"));
+        Assert.Contains(
+            error.Errors,
+            e => e.Message.Contains("El usuario ya es profesor de la clase")
+        );
     }
 
     public void Dispose()

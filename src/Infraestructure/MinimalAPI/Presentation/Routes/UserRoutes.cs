@@ -6,7 +6,6 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Users;
-using MinimalAPI.Presentation.Mappers;
 
 namespace MinimalAPI.Presentation.Routes;
 

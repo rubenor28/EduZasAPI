@@ -8,6 +8,7 @@ using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,8 +19,8 @@ public class DeleteContactTagUseCaseTest : IDisposable
     private readonly SqliteConnection _conn;
     private readonly EduZasDotnetContext _ctx;
     private readonly DeleteContactTagUseCase _useCase;
-    private readonly UserEFMapper _userMapper = new();
 
+    private readonly UserEFMapper _userMapper;
     private readonly ContactEFMapper _contactMapper = new();
 
     public DeleteContactTagUseCaseTest()
@@ -32,6 +33,9 @@ public class DeleteContactTagUseCaseTest : IDisposable
 
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
+
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new(roleMapper, roleMapper);
 
         var contactMapper = new ContactEFMapper();
         var contactQuerier = new ContactEFQuerier(_ctx, contactMapper, 10);
@@ -100,6 +104,8 @@ public class DeleteContactTagUseCaseTest : IDisposable
         await _ctx.SaveChangesAsync();
     }
 
+    private static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
+
     [Fact]
     public async Task ExecuteAsync_WhenTagExistsAndIsTheOnlyOne_ShouldDeleteTagAndContactTag()
     {
@@ -110,7 +116,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new ContactTagDTO
+        var dto = new DeleteContactTagDTO
         {
             Id = new()
             {
@@ -118,7 +124,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
                 UserId = contactUser.Id,
                 Tag = tag,
             },
-            Executor = new() { Id = owner.Id, Role = owner.Role },
+            Executor = AsExecutor(owner),
         };
 
         // Act
@@ -143,7 +149,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
         await CreateContactTag(owner.Id, contactUser1.Id, tag);
         await CreateContactTag(owner.Id, contactUser2.Id, tag);
 
-        var dto = new ContactTagDTO
+        var dto = new DeleteContactTagDTO
         {
             Id = new()
             {
@@ -151,7 +157,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
                 UserId = contactUser1.Id,
                 Tag = tag,
             },
-            Executor = new() { Id = owner.Id, Role = owner.Role },
+            Executor = AsExecutor(owner),
         };
 
         // Act
@@ -171,7 +177,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
         var contactUser = await CreateUser("contact@test.com");
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new ContactTagDTO
+        var dto = new DeleteContactTagDTO
         {
             Id = new()
             {
@@ -179,7 +185,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
                 UserId = contactUser.Id,
                 Tag = "non-existent-tag",
             },
-            Executor = new() { Id = owner.Id, Role = owner.Role },
+            Executor = AsExecutor(owner),
         };
 
         // Act
@@ -201,7 +207,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new ContactTagDTO
+        var dto = new DeleteContactTagDTO
         {
             Id = new()
             {
@@ -209,7 +215,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
                 UserId = contactUser.Id,
                 Tag = tag,
             },
-            Executor = new() { Id = unauthorized.Id, Role = unauthorized.Role },
+            Executor = AsExecutor(unauthorized),
         };
 
         // Act
@@ -231,7 +237,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new ContactTagDTO
+        var dto = new DeleteContactTagDTO
         {
             Id = new()
             {
@@ -239,7 +245,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
                 UserId = contactUser.Id,
                 Tag = tag,
             },
-            Executor = new() { Id = admin.Id, Role = admin.Role },
+            Executor = AsExecutor(admin),
         };
 
         // Act
@@ -261,7 +267,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new ContactTagDTO
+        var dto = new DeleteContactTagDTO
         {
             Id = new()
             {
@@ -269,7 +275,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
                 UserId = contactUser.Id,
                 Tag = tag,
             },
-            Executor = new() { Id = student.Id, Role = student.Role },
+            Executor = AsExecutor(student),
         };
 
         // Act

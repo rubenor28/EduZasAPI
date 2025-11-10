@@ -16,7 +16,7 @@ namespace MinimalAPI.Presentation.Routes;
 
 public static class ContactRoutes
 {
-    public static RouteGroupBuilder MappContactRoutes(this WebApplication app)
+    public static RouteGroupBuilder MapContactRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/contacts").WithTags("Contactos");
 

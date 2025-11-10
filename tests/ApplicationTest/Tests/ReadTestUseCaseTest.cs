@@ -7,6 +7,7 @@ using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,8 +33,8 @@ public class ReadTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserEFMapper _userMapper = new();
     private readonly TestEFMapper _testMapper = new();
+    private readonly UserEFMapper _userMapper;
 
     private readonly Random _random = new();
 
@@ -47,6 +48,9 @@ public class ReadTestUseCaseTest : IDisposable
 
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
+
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new(roleMapper, roleMapper);
 
         var testMapper = new TestEFMapper();
         var testReader = new TestEFReader(_ctx, testMapper);
@@ -95,8 +99,8 @@ public class ReadTestUseCaseTest : IDisposable
 
         Assert.True(result.IsOk);
         var foundTest = result.Unwrap();
-        Assert.True(foundTest.IsSome);
-        Assert.Equal(test.Id, foundTest.Unwrap().Id);
+        Assert.NotNull(foundTest);
+        Assert.Equal(test.Id, foundTest.Id);
     }
 
     [Fact]
@@ -104,9 +108,8 @@ public class ReadTestUseCaseTest : IDisposable
     {
         var result = await _useCase.ExecuteAsync(999);
 
-        Assert.True(result.IsOk);
-        var record = result.Unwrap();
-        Assert.True(record.IsNone);
+        Assert.True(result.IsErr);
+        Assert.IsType<NotFoundError>(result.UnwrapErr());
     }
 
     public void Dispose()

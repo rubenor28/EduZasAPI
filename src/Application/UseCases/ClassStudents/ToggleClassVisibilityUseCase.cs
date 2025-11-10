@@ -26,9 +26,6 @@ public class ToggleClassVisibilityUseCase(
     /// <returns>A result indicating success or a use case error.</returns>
     public async Task<Result<Unit, UseCaseError>> ExecuteAsync(ToggleClassVisibilityDTO value)
     {
-        var authorized = IsAuthorized(value);
-        if (!authorized)
-            return UseCaseErrors.Unauthorized();
 
         var errors = new List<FieldErrorDTO>();
 
@@ -36,12 +33,16 @@ public class ToggleClassVisibilityUseCase(
             errors.Add(new() { Field = "classId", Message = "No se encontró la clase" })
         );
 
-        (await userReader.GetAsync(value.Executor.Id)).IfNone(() =>
+        (await userReader.GetAsync(value.UserId)).IfNone(() =>
             errors.Add(new() { Field = "userId", Message = "No se encontró el usuario" })
         );
 
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
+
+        var authorized = IsAuthorized(value);
+        if (!authorized)
+            return UseCaseErrors.Unauthorized();
 
         var relationSearch = await relationReader.GetAsync(
             new() { ClassId = value.ClassId, UserId = value.UserId }
@@ -61,8 +62,7 @@ public class ToggleClassVisibilityUseCase(
         value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.UserId == value.Executor.Id,
-            UserType.STUDENT => false,
-            _ => throw new NotImplementedException(),
+            // Solo si es el propio estudiante de la relacion podra ocultar una clase
+            _ => value.UserId == value.Executor.Id,
         };
 }

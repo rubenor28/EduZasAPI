@@ -6,6 +6,7 @@ using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ public class DeleteTestUseCaseTest : IDisposable
     private readonly SqliteConnection _conn;
 
     private readonly TestEFMapper _testMapper = new();
-    private readonly UserEFMapper _userMapper = new();
+    private readonly UserEFMapper _userMapper;
 
     private readonly Random _random = new();
 
@@ -32,6 +33,9 @@ public class DeleteTestUseCaseTest : IDisposable
 
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
+
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new(roleMapper, roleMapper);
 
         var testDeleter = new TestEFDeleter(_ctx, _testMapper);
         var testReader = new TestEFReader(_ctx, _testMapper);

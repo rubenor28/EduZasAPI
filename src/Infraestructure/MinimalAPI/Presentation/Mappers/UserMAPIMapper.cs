@@ -53,7 +53,6 @@ public sealed class UserMAPIMapper(
             Password = input.Password,
             MotherLastname = input.MotherLastname.ToOptional(),
             MidName = input.MidName.ToOptional(),
-            Executor = ex,
         };
 
     /// <summary>

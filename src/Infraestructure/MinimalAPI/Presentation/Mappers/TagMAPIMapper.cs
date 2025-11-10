@@ -1,11 +1,9 @@
 using Application.DTOs.Common;
-using Application.DTOs.Contacts;
 using Application.DTOs.Tags;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
-using MinimalAPI.Application.DTOs.Contacts;
 using MinimalAPI.Application.DTOs.Tags;
 
 namespace MinimalAPI.Presentation.Mappers;
@@ -20,7 +18,6 @@ public class TagMAPIMapper(
     : IMapper<TagCriteriaMAPI, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
         IMapper<TagCriteriaDTO, TagCriteriaMAPI>,
         IMapper<TagDomain, PublicTagMAPI>,
-        IMapper<PaginatedQuery<ContactDomain, ContactCriteriaDTO>, PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>>,
         IMapper<PaginatedQuery<TagDomain, TagCriteriaDTO>, PaginatedQuery<string, TagCriteriaMAPI>>
 {
     private readonly StringQueryToDomainMapper _strqToDomainMapper = strqToDomainMapper;

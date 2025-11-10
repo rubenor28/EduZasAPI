@@ -49,5 +49,9 @@ app.UseHttpsRedirection();
 app.MapUserRoutes();
 app.MapAuthRoutes();
 app.MapClassRoutes();
+app.MapContactRoutes();
+app.MapDatabaseRoutes();
+app.MapNotificationRoutes();
+app.MapResourceRoutes();
 
 app.Run();

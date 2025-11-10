@@ -45,6 +45,14 @@ public sealed class AddContactTagUseCase(
         NewContactTagDTO value
     )
     {
+        // Buscar errores en campos del DTO
+        List<FieldErrorDTO> errors = [];
+        (await SearchUser(value.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
+        (await SearchUser(value.UserId, "userId")).IfErr(errors.Add);
+
+        if (errors.Count > 0)
+            return UseCaseErrors.Input(errors);
+
         // Validar permisos
         var authorized = value.Executor.Role switch
         {
@@ -56,14 +64,6 @@ public sealed class AddContactTagUseCase(
 
         if (!authorized)
             return UseCaseErrors.Unauthorized();
-
-        // Buscar errores en campos del DTO
-        List<FieldErrorDTO> errors = [];
-        (await SearchUser(value.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
-        (await SearchUser(value.UserId, "userId")).IfErr(errors.Add);
-
-        if (errors.Count > 0)
-            return UseCaseErrors.Input(errors);
 
         // Buscar si existe el contacto
         var contact = await _contactReader.GetAsync(

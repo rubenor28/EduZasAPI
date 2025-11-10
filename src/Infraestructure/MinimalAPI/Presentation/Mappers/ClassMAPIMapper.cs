@@ -5,6 +5,7 @@ using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Classes;
+using MinimalAPI.Application.DTOs.ClassStudents;
 using MinimalAPI.Application.DTOs.Common;
 
 namespace MinimalAPI.Presentation.Mappers;

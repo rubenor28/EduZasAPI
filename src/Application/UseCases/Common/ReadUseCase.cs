@@ -11,12 +11,11 @@ namespace Application.UseCases.Common;
 /// </summary>
 /// <typeparam name="I">Tipo del identificador de la entidad.</typeparam>
 /// <typeparam name="E">Tipo de la entidad que implementa <see cref="IIdentifiable{I}"/>.</typeparam>
-public abstract class ReadUseCase<I, RE, E>(
+public abstract class ReadUseCase<I, E>(
     IReaderAsync<I, E> reader,
     IBusinessValidationService<I> validator
-) : IUseCaseAsync<RE, E>
+) : IUseCaseAsync<I, E>
     where I : notnull
-    where RE : notnull, IIdentifiable<I>
     where E : notnull, IIdentifiable<I>
 {
     /// <summary>
@@ -40,9 +39,9 @@ public abstract class ReadUseCase<I, RE, E>(
     /// <item><description>Una lista de errores de validación si la operación falla.</description></item>
     /// </list>
     /// </returns>
-    public async Task<Result<E, UseCaseError>> ExecuteAsync(RE request)
+    public async Task<Result<E, UseCaseError>> ExecuteAsync(I request)
     {
-        var validation = _validator.IsValid(request.Id);
+        var validation = _validator.IsValid(request);
 
         if (validation.IsErr)
         {
@@ -50,7 +49,7 @@ public abstract class ReadUseCase<I, RE, E>(
             return UseCaseErrors.Input(errors);
         }
 
-        var record = await _reader.GetAsync(request.Id);
+        var record = await _reader.GetAsync(request);
 
         if(record.IsNone)
           return UseCaseErrors.NotFound();
