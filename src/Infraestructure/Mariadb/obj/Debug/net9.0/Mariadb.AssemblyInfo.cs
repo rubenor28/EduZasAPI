@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Mariadb")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d8846f8dc78350a593b74977fb61b593bc2a91b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cb148bbbe138b43a6ebe426a3701232a64ab93be")]
 [assembly: System.Reflection.AssemblyProductAttribute("Mariadb")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Mariadb")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

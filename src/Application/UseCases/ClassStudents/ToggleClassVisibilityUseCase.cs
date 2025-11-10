@@ -4,6 +4,7 @@ using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassStudents;
@@ -23,27 +24,31 @@ public class ToggleClassVisibilityUseCase(
     /// </summary>
     /// <param name="value">The DTO containing the class ID and executor information.</param>
     /// <returns>A result indicating success or a use case error.</returns>
-    public async Task<Result<Unit, UseCaseErrorImpl>> ExecuteAsync(ToggleClassVisibilityDTO value)
+    public async Task<Result<Unit, UseCaseError>> ExecuteAsync(ToggleClassVisibilityDTO value)
     {
+        var authorized = IsAuthorized(value);
+        if (!authorized)
+            return UseCaseErrors.Unauthorized();
+
         var errors = new List<FieldErrorDTO>();
 
-        var classSearch = await classReader.GetAsync(value.ClassId);
-        if (classSearch.IsNone)
-            errors.Add(new() { Field = "classId", Message = "No se encontró la clase" });
+        (await classReader.GetAsync(value.ClassId)).IfNone(() =>
+            errors.Add(new() { Field = "classId", Message = "No se encontró la clase" })
+        );
 
-        var userSearch = await userReader.GetAsync(value.Executor.Id);
-        if (userSearch.IsNone)
-            errors.Add(new() { Field = "userId", Message = "No se encontró el usuario" });
+        (await userReader.GetAsync(value.Executor.Id)).IfNone(() =>
+            errors.Add(new() { Field = "userId", Message = "No se encontró el usuario" })
+        );
 
         if (errors.Count > 0)
-            return UseCaseError.Input(errors);
+            return UseCaseErrors.Input(errors);
 
         var relationSearch = await relationReader.GetAsync(
-            new() { ClassId = value.ClassId, UserId = value.Executor.Id }
+            new() { ClassId = value.ClassId, UserId = value.UserId }
         );
 
         if (relationSearch.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         var relation = relationSearch.Unwrap();
         relation.Hidden = !relation.Hidden;
@@ -51,4 +56,13 @@ public class ToggleClassVisibilityUseCase(
         await updater.UpdateAsync(relation);
         return Unit.Value;
     }
+
+    public static bool IsAuthorized(ToggleClassVisibilityDTO value) =>
+        value.Executor.Role switch
+        {
+            UserType.ADMIN => true,
+            UserType.PROFESSOR => value.UserId == value.Executor.Id,
+            UserType.STUDENT => false,
+            _ => throw new NotImplementedException(),
+        };
 }

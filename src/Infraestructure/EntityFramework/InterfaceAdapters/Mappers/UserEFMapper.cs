@@ -4,22 +4,25 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
-using InterfaceAdapters.Mappers.Users;
 
 namespace EntityFramework.InterfaceAdapters.Mappers;
 
-public class UserEFMapper
-    : IMapper<User, UserDomain>,
-        IMapper<NewUserDTO, User>,
-        IUpdateMapper<UserUpdateDTO, User>
+public class UserEFMapper(
+    IMapper<uint, Result<UserType, Unit>> userTypeToDomainMapper,
+    IMapper<UserType, uint> userTypeFromDomainMapper
+) : IMapper<User, UserDomain>, IMapper<NewUserDTO, User>, IUpdateMapper<UserUpdateDTO, User>
 {
+    private readonly IMapper<uint, Result<UserType, Unit>> _userTypeToDomainMapper =
+        userTypeToDomainMapper;
+    private readonly IMapper<UserType, uint> _userTypeFromDomainMapper = userTypeFromDomainMapper;
+
     public UserDomain Map(User source) =>
         new()
         {
             Id = source.UserId,
             Active = source.Active ?? false,
             Email = source.Email,
-            FatherLastName = source.FatherLastname,
+            FatherLastname = source.FatherLastname,
             FirstName = source.FirstName,
             MidName = source.MidName.ToOptional(),
             MotherLastname = source.MotherLastname.ToOptional(),
@@ -28,7 +31,7 @@ public class UserEFMapper
             Password = source.Password,
             Role = source.Role is null
                 ? UserType.STUDENT
-                : UserTypeMapper.FromInt((int)source.Role).Unwrap(),
+                : _userTypeToDomainMapper.Map((uint)source.Role).Unwrap(),
         };
 
     public User Map(NewUserDTO source) =>
@@ -37,7 +40,7 @@ public class UserEFMapper
             Active = true,
             Email = source.Email,
             Password = source.Password,
-            Role = (uint)UserType.STUDENT.ToInt().Unwrap(),
+            Role = _userTypeFromDomainMapper.Map(UserType.STUDENT),
             FirstName = source.FirstName,
             FatherLastname = source.FatherLastName,
             MidName = source.MidName.ToNullable(),
@@ -54,5 +57,6 @@ public class UserEFMapper
         destination.MidName = source.MidName.ToNullable();
         destination.MotherLastname = source.MotherLastname.ToNullable();
         destination.Active = source.Active;
+        destination.Role = _userTypeFromDomainMapper.Map(source.Role);
     }
 }

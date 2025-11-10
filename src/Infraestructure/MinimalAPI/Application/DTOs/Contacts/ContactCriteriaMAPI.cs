@@ -18,4 +18,6 @@ public sealed record ContactCriteriaMAPI : CriteriaDTO
     /// Id de nuestro usuario que queremos agregar como contacto
     /// </summary>
     public ulong? UserId { get; init; } = null;
+
+    public IEnumerable<string>? Tags { get; init; }
 }

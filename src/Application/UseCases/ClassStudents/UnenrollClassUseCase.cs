@@ -36,7 +36,7 @@ public class UnenrollClassUseCase(
     /// Un <see cref="Result{TSuccess, TFailure}"/> que indica si la validación fue exitosa
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
-    protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UnenrollClassDTO value
     )
     {
@@ -52,12 +52,12 @@ public class UnenrollClassUseCase(
         );
 
         if (errors.Count > 0)
-            return UseCaseError.Input(errors);
+            return UseCaseErrors.Input(errors);
 
         var studentRelationSearch = await _reader.GetAsync(value.Id);
 
         if (studentRelationSearch.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         var studentRelation = studentRelationSearch.Unwrap();
 
@@ -73,7 +73,7 @@ public class UnenrollClassUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
     }

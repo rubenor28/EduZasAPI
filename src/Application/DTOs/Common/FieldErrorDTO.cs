@@ -21,5 +21,5 @@ public sealed record class FieldErrorDTO
     /// Obtiene el mensaje descriptivo que explica el error de validación.
     /// </summary>
     /// <value>Mensaje de error descriptivo. Campo obligatorio.</value>
-    public required string Message { get; init; }
+    public string Message { get; init; } = "Formato inválido";
 }

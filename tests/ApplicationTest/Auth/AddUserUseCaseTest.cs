@@ -2,13 +2,12 @@ using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Bcrypt.Application.Services;
-using Domain.Entities;
 using Domain.ValueObjects;
-using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using FluentValidationProj.Application.Services.Auth;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +31,8 @@ public class AddUserUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var hasher = new BCryptHasher();
-        var mapper = new UserEFMapper();
+        var roleMapper = new UserTypeMapper();
+        var mapper = new UserEFMapper(roleMapper, roleMapper);
         var creator = new UserEFCreator(_ctx, mapper, mapper);
         var querier = new UserEFQuerier(_ctx, mapper, 10);
         var validator = new NewUserFluentValidator();

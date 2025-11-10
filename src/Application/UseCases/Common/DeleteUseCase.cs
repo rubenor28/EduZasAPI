@@ -40,13 +40,13 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// </summary>
     /// <param name="data">El DTO con la información para la eliminación.</param>
     /// <returns>Un <see cref="Result{T, E}"/> que contiene la entidad eliminada o un error.</returns>
-    public async Task<Result<E, UseCaseErrorImpl>> ExecuteAsync(DE data)
+    public async Task<Result<E, UseCaseError>> ExecuteAsync(DE data)
     {
         if (_validator is not null)
         {
             var validation = _validator.IsValid(data);
             if (validation.IsErr)
-                return UseCaseError.Input(validation.UnwrapErr());
+                return UseCaseErrors.Input(validation.UnwrapErr());
         }
 
         var syncCheck = ExtraValidation(data);
@@ -75,8 +75,8 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// <remarks>
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
     /// </remarks>
-    protected virtual Result<Unit, UseCaseErrorImpl> ExtraValidation(DE value) =>
-        Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
+    protected virtual Result<Unit, UseCaseError> ExtraValidation(DE value) =>
+        Result<Unit, UseCaseError>.Ok(Unit.Value);
 
     /// <summary>
     /// Realiza validaciones adicionales asíncronas.
@@ -90,11 +90,11 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
     /// como verificaciones en base de datos o llamadas a servicios externos.
     /// </remarks>
-    protected async virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(DE value)
+    protected async virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(DE value)
     {
         var record = await _reader.GetAsync(value.Id);
         if (record.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         return Unit.Value;
     }
@@ -140,6 +140,5 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual Task PrevTaskAsync(DE deleteDTO) =>
-        Task.FromResult(Unit.Value);
+    protected virtual Task PrevTaskAsync(DE deleteDTO) => Task.FromResult(Unit.Value);
 }

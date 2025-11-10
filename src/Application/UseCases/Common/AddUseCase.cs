@@ -39,7 +39,7 @@ public abstract class AddUseCase<NE, E>(
     /// Una tarea que representa la operación asíncrona. El resultado contiene la entidad creada
     /// o una lista de errores de validación si el proceso falla.
     /// </returns>
-    public async virtual Task<Result<E, UseCaseErrorImpl>> ExecuteAsync(NE request)
+    public async virtual Task<Result<E, UseCaseError>> ExecuteAsync(NE request)
     {
         var formatted = PreValidationFormat(request);
 
@@ -48,7 +48,7 @@ public abstract class AddUseCase<NE, E>(
             var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
             {
-                return UseCaseError.Input(validation.UnwrapErr());
+                return UseCaseErrors.Input(validation.UnwrapErr());
             }
         }
 
@@ -113,8 +113,8 @@ public abstract class AddUseCase<NE, E>(
     /// <remarks>
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
     /// </remarks>
-    protected virtual Result<Unit, UseCaseErrorImpl> ExtraValidation(NE value) =>
-        Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
+    protected virtual Result<Unit, UseCaseError> ExtraValidation(NE value) =>
+        Result<Unit, UseCaseError>.Ok(Unit.Value);
 
     /// <summary>
     /// Realiza validaciones adicionales asíncronas.
@@ -125,8 +125,8 @@ public abstract class AddUseCase<NE, E>(
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
     /// como verificaciones en base de datos o llamadas a servicios externos.
     /// </remarks>
-    protected virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(NE value) =>
-        Task.FromResult(Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value));
+    protected virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(NE value) =>
+        Task.FromResult(Result<Unit, UseCaseError>.Ok(Unit.Value));
 
     /// <summary>
     /// Ejecuta tareas adicionales síncronas después de crear la entidad.

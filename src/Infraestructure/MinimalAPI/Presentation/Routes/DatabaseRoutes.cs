@@ -1,5 +1,7 @@
+using Application.DTOs.Common;
 using Application.DTOs.Database;
 using Application.UseCases.Database;
+using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Presentation.Mappers;
 
 namespace MinimalAPI.Presentation.Routes;
@@ -27,29 +29,26 @@ public static class DatabaseRoutes
     public static async Task<IResult> CreateBackup(
         BackupUseCase useCase,
         RoutesUtils utils,
-        HttpContext httpContext
+        HttpContext ctx
     )
     {
-        return await utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(httpContext);
-            var result = await useCase.ExecuteAsync(executor);
-
-            if (result.IsErr)
-                return result.UnwrapErr().FromDomain();
-
-            var stream = result.Unwrap();
-            var fileName = $"backup-{DateTime.UtcNow:yyyyMMddHHmmss}.sql";
-
-            return Results.File(stream, "application/octet-stream", fileName);
-        });
+        return await utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => utils.GetExecutorFromContext(ctx),
+            mapResponse: (stream) =>
+            {
+                var fileName = $"backup-{DateTime.UtcNow:yyyyMMddHHmmss}.sql";
+                return Results.File(stream, "application/octet-stream", fileName);
+            }
+        );
     }
 
     public static async Task<IResult> RestoreFromBackup(
         RestoreUseCase useCase,
         RoutesUtils utils,
         HttpContext httpContext,
-        IFormFile file
+        IFormFile file,
+        IMapper<UseCaseError, IResult> useCaseErrorsMapper
     )
     {
         return await utils.HandleResponseAsync(async () =>
@@ -65,11 +64,10 @@ public static class DatabaseRoutes
             await using var inputStream = file.OpenReadStream();
 
             var request = new RestoreRequestDTO { Executor = executor, InputStream = inputStream };
-
             var result = await useCase.ExecuteAsync(request);
 
             if (result.IsErr)
-                return result.UnwrapErr().FromDomain();
+                return useCaseErrorsMapper.Map(result.UnwrapErr());
 
             return Results.Ok("Restauración completada con éxito.");
         });

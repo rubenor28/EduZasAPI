@@ -5,6 +5,7 @@ using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassStudents;
@@ -14,16 +15,21 @@ namespace Application.UseCases.ClassStudents;
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
 public class EnrollClassUseCase(
+    ICreatorAsync<StudentClassRelationDTO, EnrollClassDTO> creator,
     IReaderAsync<ulong, UserDomain> userReader,
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> studentReader,
-    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorReader,
-    ICreatorAsync<StudentClassRelationDTO, StudentClassRelationDTO> creator
-) : AddUseCase<StudentClassRelationDTO, StudentClassRelationDTO>(creator)
+    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorReader
+) : AddUseCase<EnrollClassDTO, StudentClassRelationDTO>(creator)
 {
-    protected override StudentClassRelationDTO PostValidationFormat(
-        StudentClassRelationDTO value
-    ) => new() { Id = value.Id, Hidden = true };
+    private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
+    private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
+    private readonly IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> _studentReader =
+        studentReader;
+    private readonly IReaderAsync<
+        ClassUserRelationIdDTO,
+        ProfessorClassRelationDTO
+    > _professorReader = professorReader;
 
     /// <summary>
     /// Realiza validaciones asincrónicas antes de proceder con la adición de la relación.
@@ -35,46 +41,55 @@ public class EnrollClassUseCase(
     /// Un <see cref="Result{TSuccess, TFailure}"/> que indica si la validación fue exitosa
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
-    protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
-        StudentClassRelationDTO value
+    protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        EnrollClassDTO value
     )
     {
-        var relationSearch = await studentReader.GetAsync(value.Id);
-
-        if (relationSearch.IsSome)
-            return UseCaseError.Input(
-                [
-                    new()
-                    {
-                        Field = "userId, classId",
-                        Message = "El usuario ya se encuentra inscrito a esta clase",
-                    },
-                ]
-            );
-
         var errors = new List<FieldErrorDTO>();
 
-        var classSearch = await classReader.GetAsync(value.Id.ClassId);
-        if (classSearch.IsNone)
-        {
-            errors.Add(new() { Field = "classId", Message = "Clase no encontrada" });
-        }
+        (await _classReader.GetAsync(value.ClassId)).IfNone(() =>
+            errors.Add(new() { Field = "classId", Message = "Clase no encontrada" })
+        );
 
-        var usrSearch = await userReader.GetAsync(value.Id.UserId);
-        usrSearch.IfNone(() =>
+        (await _userReader.GetAsync(value.UserId)).IfNone(() =>
             errors.Add(new() { Field = "userId", Message = "Usuario no encontrado" })
         );
 
-        var userIsProfessorSearch = await professorReader.GetAsync(value.Id);
+        var professorId = new ClassUserRelationIdDTO
+        {
+            UserId = value.UserId,
+            ClassId = value.ClassId,
+        };
 
-        userIsProfessorSearch.IfSome(_ =>
+        var professorSearch = await _professorReader.GetAsync(professorId);
+        professorSearch.IfSome(_ =>
             errors.Add(
                 new() { Field = "userId", Message = "El usuario ya es profesor de la clase" }
             )
         );
 
         if (errors.Count > 0)
-            return UseCaseError.Input(errors);
+            return UseCaseErrors.Input(errors);
+
+        var profRel = professorSearch.Unwrap();
+
+        var authorized = value.Executor.Role switch
+        {
+            UserType.ADMIN => true,
+            UserType.PROFESSOR => profRel.Id.UserId == value.Executor.Id,
+            UserType.STUDENT => false,
+            _ => throw new NotImplementedException(),
+        };
+
+        if (!authorized)
+            return UseCaseErrors.Unauthorized();
+
+        var relationSearch = await _studentReader.GetAsync(
+            new() { ClassId = value.ClassId, UserId = value.UserId }
+        );
+
+        if (relationSearch.IsSome)
+            return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
     }

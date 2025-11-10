@@ -10,9 +10,6 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Classes;
 
-/// <summary>
-/// Caso de uso para la creación de nuevas clases con generación automática de identificador único.
-/// </summary>
 public class AddClassUseCase(
     ICreatorAsync<ClassDomain, NewClassDTO> creator,
     IBusinessValidationService<NewClassDTO> validator,
@@ -22,73 +19,69 @@ public class AddClassUseCase(
     ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO> professorRelationCreator
 ) : AddUseCase<NewClassDTO, ClassDomain>(creator, validator)
 {
-    private readonly IEnumerable<UserType> _allowedRoles = [UserType.ADMIN, UserType.PROFESSOR];
     private const int _maxIdGenerationTries = 20;
+    private readonly IReaderAsync<string, ClassDomain> _reader = reader;
+    private readonly IRandomStringGeneratorService _idGenerator = idGenerator;
+    private readonly ICreatorAsync<
+        ProfessorClassRelationDTO,
+        ProfessorClassRelationDTO
+    > _professorRelationCreator = professorRelationCreator;
 
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override Result<Unit, UseCaseError> ExtraValidation(NewClassDTO value)
+    {
+        var authorized = value.Executor.Role switch
+        {
+            UserType.ADMIN => true,
+            UserType.PROFESSOR => value.OwnerId == value.Executor.Id,
+            UserType.STUDENT => false,
+            _ => throw new NotImplementedException(),
+        };
+
+        if (!authorized)
+            return UseCaseErrors.Unauthorized();
+
+        return Unit.Value;
+    }
+
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         NewClassDTO value
     )
     {
         var usrSearch = await userReader.GetAsync(value.OwnerId);
 
         if (usrSearch.IsNone)
-            return UseCaseError.Input(
+            return UseCaseErrors.Input(
                 [new() { Field = "ownerId", Message = "No se encontró el usuario" }]
             );
-
-        var usr = usrSearch.Unwrap();
-        if (!_allowedRoles.Contains(usr.Role))
-        {
-            return UseCaseError.Unauthorized();
-        }
 
         return Unit.Value;
     }
 
-    /// <summary>
-    /// Genera un identificador único para la clase antes de la persistencia.
-    /// </summary>
-    /// <param name="value">DTO con los datos de la nueva clase.</param>
-    /// <returns>DTO con el identificador único generado.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// Se lanza cuando no se puede generar un identificador único después del número máximo de intentos.
-    /// </exception>
-    protected async override Task<NewClassDTO> PostValidationFormatAsync(NewClassDTO value)
+    protected override async Task<NewClassDTO> PostValidationFormatAsync(NewClassDTO value)
     {
-        string id;
         for (int i = 0; i < _maxIdGenerationTries; i++)
         {
-            id = idGenerator.Generate();
-            var repeated = await reader.GetAsync(id);
+            var newId = _idGenerator.Generate();
+            var repeated = await _reader.GetAsync(newId);
 
             if (repeated.IsNone)
             {
-                value.Id = id;
+                value.Id = newId;
                 return value;
             }
         }
 
         throw new InvalidOperationException(
-            $"No se pudo generar un identificador único después de {_maxIdGenerationTries} intentos. Es posible que se hayan agotado las combinaciones disponibles."
+            $"Tras {_maxIdGenerationTries} intentos no se pudo generar un ID unico a una clase"
         );
     }
 
-    /// <summary>
-    /// Crea la relación profesor - clase asignando por defecto al
-    /// al profesor como dueño
-    /// </summary>
-    /// <param name="newEntity">DTO con el ID del profesor</param>
-    /// <param name="createdEntity">Clase creada con ID generado </param>
-    protected async override Task ExtraTaskAsync(NewClassDTO newEntity, ClassDomain createdEntity)
+    protected override async Task ExtraTaskAsync(NewClassDTO newEntity, ClassDomain createdEntity)
     {
-        await professorRelationCreator.AddAsync(
-            new ProfessorClassRelationDTO
+        await _professorRelationCreator.AddAsync(
+            new()
             {
-                Id = new ClassUserRelationIdDTO
-                {
-                    UserId = newEntity.OwnerId,
-                    ClassId = createdEntity.Id,
-                },
+                Id = new() { ClassId = createdEntity.Id, UserId = newEntity.OwnerId },
                 IsOwner = true,
             }
         );

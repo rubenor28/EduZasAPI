@@ -1,15 +1,19 @@
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
+using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
 using Application.UseCases.Common;
 using Domain.Entities;
+using Domain.ValueObjects;
+using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Classes;
+using MinimalAPI.Application.DTOs.ClassProfessors;
+using MinimalAPI.Application.DTOs.ClassStudents;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Presentation.Filters;
-using MinimalAPI.Presentation.Mappers;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -135,7 +139,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapDelete("/classes/enroll/{classId}", UnenrollClass)
+        app.MapDelete("/classes/enroll/{classId}/{userId:ulong}", UnenrollClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -176,7 +180,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/classes/{classId}/professors", AddProfessor)
+        app.MapPost("/classes/professors", AddProfessor)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status201Created)
@@ -206,211 +210,175 @@ public static class ClassRoutes
     public static Task<IResult> AddClass(
         NewClassMAPI newClass,
         AddClassUseCase useCase,
-        RoutesUtils utils,
-        HttpContext ctx
+        IMapper<ClassDomain, PublicClassDTO> responseMapper,
+        IMapper<NewClassMAPI, Executor, NewClassDTO> requestMapper,
+        HttpContext ctx,
+        RoutesUtils utils
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var userId = utils.GetIdFromContext(ctx);
-            var newC = ClassMAPIMapper.ToDomain(newClass, userId);
-
-            var validation = await useCase.ExecuteAsync(newC);
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            var newRecord = validation.Unwrap();
-            var publicRecord = ClassMAPIMapper.FromDomain(newRecord);
-
-            return Results.Created($"/users/{publicRecord.Id}", publicRecord);
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => requestMapper.Map(newClass, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (classRecord) =>
+                Results.Created($"/users/{classRecord.Id}", responseMapper.Map(classRecord))
+        );
     }
 
     public static Task<IResult> ProfessorClasses(
         ClassCriteriaMAPI criteria,
         HttpContext ctx,
         RoutesUtils utils,
-        QueryUseCase<ClassCriteriaDTO, ClassDomain> useCase
+        QueryClassUseCase useCase,
+        IMapper<
+            ClassCriteriaMAPI,
+            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
+        > requestMapper,
+        IMapper<
+            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
+            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+        > responseMapper
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var userId = utils.GetIdFromContext(ctx);
-            criteria.WithProfessor = new() { Id = userId };
-
-            var validation = criteria.ToDomain();
-            if (validation.IsErr)
-                return utils.FieldErrorToBadRequest(validation.UnwrapErr());
-
-            var result = await useCase.ExecuteAsync(validation.Unwrap());
-            return Results.Ok(result.FromDomain());
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () =>
+                requestMapper.Map(
+                    criteria with
+                    {
+                        WithProfessor = new()
+                        {
+                            Id = utils.GetIdFromContext(ctx),
+                            IsOwner = criteria.WithProfessor?.IsOwner,
+                        },
+                    }
+                ),
+            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
+        );
     }
 
     public static Task<IResult> EnrolledClasses(
-        ClassCriteriaMAPI criteria,
+        ClassCriteriaMAPI request,
+        QueryUseCase<ClassCriteriaDTO, ClassDomain> useCase,
+        IMapper<
+            ClassCriteriaMAPI,
+            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
+        > requestMapper,
+        IMapper<
+            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
+            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+        > responseMapper,
         HttpContext ctx,
-        RoutesUtils utils,
-        QueryUseCase<ClassCriteriaDTO, ClassDomain> useCase
+        RoutesUtils utils
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var userId = utils.GetIdFromContext(ctx);
-
-            if (criteria.WithStudent is null)
-                criteria.WithStudent = new() { Id = userId };
-            else
-                criteria.WithStudent.Id = userId;
-
-            var validation = criteria.ToDomain();
-            if (validation.IsErr)
-                return utils.FieldErrorToBadRequest(validation.UnwrapErr());
-
-            var result = await useCase.ExecuteAsync(validation.Unwrap());
-            return Results.Ok(result.FromDomain());
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () =>
+                requestMapper.Map(
+                    request with
+                    {
+                        WithStudent = new()
+                        {
+                            Id = utils.GetIdFromContext(ctx),
+                            Hidden = request.WithStudent?.Hidden,
+                        },
+                    }
+                ),
+            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
+        );
     }
 
     public static Task<IResult> UpdateClass(
         ClassUpdateMAPI data,
+        UpdateClassUseCase useCase,
+        IMapper<ClassDomain, PublicClassMAPI> responseMapper,
+        IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO> requestMapper,
         HttpContext ctx,
-        RoutesUtils utils,
-        UpdateClassUseCase useCase
+        RoutesUtils utils
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-            var classUpdate = ClassMAPIMapper.ToDomain(data, executor);
-            var validation = await useCase.ExecuteAsync(classUpdate);
-
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            var updated = validation.Unwrap();
-            return Results.Ok(updated.FromDomain());
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (classRecord) => Results.Ok(responseMapper.Map(classRecord))
+        );
     }
 
     public static Task<IResult> DeleteClass(
         string id,
         HttpContext ctx,
         RoutesUtils utils,
-        DeleteClassUseCase useCase
+        DeleteClassUseCase useCase,
+        IMapper<string, Executor, DeleteClassDTO> requestMapper
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-            var validation = await useCase.ExecuteAsync(new() { Id = id, Executor = executor });
-
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            var deleted = validation.Unwrap();
-            return Results.NoContent();
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => requestMapper.Map(id, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (_) => Results.NoContent()
+        );
     }
 
     public static Task<IResult> EnrollClass(
         EnrollClassMAPI data,
         HttpContext ctx,
         RoutesUtils utils,
-        EnrollClassUseCase useCase
+        EnrollClassUseCase useCase,
+        IMapper<EnrollClassMAPI, Executor, EnrollClassDTO> requestMapper
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var userId = utils.GetIdFromContext(ctx);
-            var validation = await useCase.ExecuteAsync(
-                new()
-                {
-                    Id = new() { ClassId = data.ClassId, UserId = userId },
-                    Hidden = false,
-                }
-            );
-
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            return Results.NoContent();
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (_) => Results.Created()
+        );
     }
 
     public static Task<IResult> UnenrollClass(
         string classId,
+        ulong userId,
+        IMapper<string, ulong, Executor, UnenrollClassDTO> requestMapper,
         HttpContext ctx,
         RoutesUtils utils,
         UnenrollClassUseCase useCase
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-            var validation = await useCase.ExecuteAsync(
-                new()
-                {
-                    Id = new() { ClassId = classId, UserId = executor.Id },
-                    Executor = executor,
-                }
-            );
-
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            return Results.NoContent();
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => requestMapper.Map(classId, userId, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (_) => Results.NoContent()
+        );
     }
 
     public static Task<IResult> ToggleClassVisibility(
         string classId,
+        ulong studentId,
         HttpContext ctx,
         RoutesUtils utils,
-        ToggleClassVisibilityUseCase useCase
+        ToggleClassVisibilityUseCase useCase,
+        IMapper<string, ulong, Executor, ToggleClassVisibilityDTO> requestMapper
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-
-            var validation = await useCase.ExecuteAsync(
-                new() { ClassId = classId, Executor = executor }
-            );
-
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            return Results.NoContent();
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () =>
+                requestMapper.Map(classId, studentId, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (_) => Results.NoContent()
+        );
     }
 
     public static Task<IResult> AddProfessor(
-        string classId,
         AddProfessorToClassMAPI data,
         HttpContext ctx,
         RoutesUtils utils,
-        AddProfessorToClassUseCase useCase
+        AddProfessorToClassUseCase useCase,
+        IMapper<AddProfessorToClassMAPI, Executor, AddProfessorToClassDTO> requestMapper
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-
-            var dto = new AddProfessorToClassDTO()
-            {
-                ClassId = classId,
-                UserId = data.UserId,
-                IsOwner = data.IsOwner,
-                Executor = executor,
-            };
-
-            var result = await useCase.ExecuteAsync(dto);
-
-            if (result.IsErr)
-                return result.UnwrapErr().FromDomain();
-
-            return Results.Created();
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (_) => Results.NoContent()
+        );
     }
 }

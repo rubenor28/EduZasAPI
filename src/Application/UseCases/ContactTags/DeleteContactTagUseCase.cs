@@ -13,7 +13,7 @@ namespace Application.UseCases.ContactTags;
 using ContactQuerier = IQuerierAsync<ContactDomain, ContactCriteriaDTO>;
 using ContactTagDeleter = IDeleterAsync<ContactTagIdDTO, ContactTagDomain>;
 using ContactTagReader = IReaderAsync<ContactTagIdDTO, ContactTagDomain>;
-using ContactTagValidator = IBusinessValidationService<ContactTagDTO>;
+using ContactTagValidator = IBusinessValidationService<DeleteContactTagDTO>;
 using TagDeleter = IDeleterAsync<string, TagDomain>;
 
 public sealed class DeleteContactTagUseCase(
@@ -22,13 +22,18 @@ public sealed class DeleteContactTagUseCase(
     ContactQuerier contactQuerier,
     TagDeleter tagDeleter,
     ContactTagValidator? validator = null
-) : DeleteUseCase<ContactTagIdDTO, ContactTagDTO, ContactTagDomain>(deleter, reader, validator)
+)
+    : DeleteUseCase<ContactTagIdDTO, DeleteContactTagDTO, ContactTagDomain>(
+        deleter,
+        reader,
+        validator
+    )
 {
     private readonly ContactQuerier _contactQuerier = contactQuerier;
     private readonly TagDeleter _tagDeleter = tagDeleter;
 
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
-        ContactTagDTO value
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        DeleteContactTagDTO value
     )
     {
         var authorized = value.Executor.Role switch
@@ -40,17 +45,17 @@ public sealed class DeleteContactTagUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         var recordSearch = await _reader.GetAsync(value.Id);
         if (recordSearch.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         return Unit.Value;
     }
 
     protected override async Task ExtraTaskAsync(
-        ContactTagDTO deleteDTO,
+        DeleteContactTagDTO deleteDTO,
         ContactTagDomain deletedEntity
     )
     {

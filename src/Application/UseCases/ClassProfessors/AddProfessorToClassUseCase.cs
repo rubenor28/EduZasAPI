@@ -14,7 +14,7 @@ using IClassReader = IReaderAsync<string, ClassDomain>;
 using IProfessorCreator = ICreatorAsync<ProfessorClassRelationDTO, ProfessorClassRelationDTO>;
 using IProfessorReader = IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO>;
 using IUserReader = IReaderAsync<ulong, UserDomain>;
-using UseCaseResult = Task<Result<ProfessorClassRelationDTO, UseCaseErrorImpl>>;
+using UseCaseResult = Task<Result<ProfessorClassRelationDTO, UseCaseError>>;
 
 /// <summary>
 /// Implementa el caso de uso para añadir un usuario a una clase, validando
@@ -45,7 +45,7 @@ public class AddProfessorToClassUseCase
 
         _handlers = new Dictionary<UserType, Func<AddProfessorToClassDTO, UseCaseResult>>
         {
-            [UserType.STUDENT] = dto => Task.FromResult(Result<ProfessorClassRelationDTO, UseCaseErrorImpl>.Err(UseCaseError.Unauthorized())),
+            [UserType.STUDENT] = dto => Task.FromResult(Result<ProfessorClassRelationDTO, UseCaseError>.Err(UseCaseErrors.Unauthorized())),
 
             [UserType.ADMIN] = async dto => await AddProfessor(dto),
 
@@ -56,7 +56,7 @@ public class AddProfessorToClassUseCase
                 );
 
                 if (executorRelation.IsNone || !executorRelation.Unwrap().IsOwner)
-                    return UseCaseError.Unauthorized();
+                    return UseCaseErrors.Unauthorized();
 
                 return await AddProfessor(dto);
             },
@@ -76,7 +76,7 @@ public class AddProfessorToClassUseCase
             errors.Add(new() { Field = "classId", Message = "Clase no encontrada" });
 
         if (errors.Count > 0)
-            return UseCaseError.Input(errors);
+            return UseCaseErrors.Input(errors);
 
         var relationSearch = await _professorReader.GetAsync(
             new() { UserId = value.UserId, ClassId = value.ClassId }

@@ -1,32 +1,20 @@
 using Application.DTOs.Users;
 using Domain.Entities;
+using InterfaceAdapters.Mappers.Common;
 
 namespace InterfaceAdapters.Mappers.Users;
 
-public static class UserDomainMapper
+public class UserDomainMapper : IMapper<UserDomain, PublicUserDTO>
 {
-    public static UserUpdateDTO ToUserUpdateDTO(this UserDomain source) =>
+    public PublicUserDTO Map(UserDomain source) =>
         new()
-        {
-            Id = source.Id,
-            Active = source.Active,
-            Email = source.Email,
-            FirstName = source.FirstName,
-            MidName = source.MidName,
-            FatherLastName = source.FatherLastName,
-            Password = source.Password,
-            MotherLastname = source.MotherLastname,
-        };
-
-    public static PublicUserDTO ToPublicUserDTO(this UserDomain source) =>
-        new ()
         {
             Id = source.Id,
             Email = source.Email,
             Role = source.Role,
             FirstName = source.FirstName,
             MidName = source.MidName,
-            FatherLastName = source.FatherLastName,
+            FatherLastName = source.FatherLastname,
             MotherLastname = source.MotherLastname,
         };
 }

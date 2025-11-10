@@ -15,7 +15,7 @@ public sealed class UpdateTestUseCase(
     IBusinessValidationService<TestUpdateDTO>? validator = null
 ) : UpdateUseCase<ulong, TestUpdateDTO, TestDomain>(updater, reader, validator)
 {
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         TestUpdateDTO value
     )
     {
@@ -28,11 +28,11 @@ public sealed class UpdateTestUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         var record = await _reader.GetAsync(value.Id);
         if (record.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         return Unit.Value;
     }

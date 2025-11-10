@@ -7,6 +7,7 @@ using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using FluentValidationProj.Application.Services.Auth;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +32,10 @@ public class LoginUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var hasher = new BCryptHasher();
-        var userMapper = new UserEFMapper();
+
+        var roleMapper = new UserTypeMapper();
+        var userMapper = new UserEFMapper(roleMapper, roleMapper);
+
         var querier = new UserEFQuerier(_ctx, userMapper, 10);
         var credentialsValidator = new UserCredentialsFluentValidator();
         var creator = new UserEFCreator(_ctx, userMapper, userMapper);

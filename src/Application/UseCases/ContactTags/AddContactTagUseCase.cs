@@ -11,7 +11,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.ContactTags;
 
 using ContactReader = IReaderAsync<ContactIdDTO, ContactDomain>;
-using ContactTagCreator = ICreatorAsync<ContactTagDomain, ContactTagDTO>;
+using ContactTagCreator = ICreatorAsync<ContactTagDomain, NewContactTagDTO>;
 using ContactTagReader = IReaderAsync<ContactTagIdDTO, ContactTagDomain>;
 using TagCreator = ICreatorAsync<TagDomain, NewTagDTO>;
 using TagReader = IReaderAsync<string, TagDomain>;
@@ -24,8 +24,8 @@ public sealed class AddContactTagUseCase(
     UserReader userReader,
     ContactReader contactReader,
     ContactTagReader contactTagReader,
-    IBusinessValidationService<ContactTagDTO>? validator = null
-) : AddUseCase<ContactTagDTO, ContactTagDomain>(creator, validator)
+    IBusinessValidationService<NewContactTagDTO>? validator = null
+) : AddUseCase<NewContactTagDTO, ContactTagDomain>(creator, validator)
 {
     private readonly ContactReader _contactReader = contactReader;
     private readonly ContactTagReader _contactTagReader = contactTagReader;
@@ -35,60 +35,64 @@ public sealed class AddContactTagUseCase(
 
     private readonly UserReader _userReader = userReader;
 
-    private async Task CreateTagIfNotExists(string tag)
-    {
-        var tagRecord = await _tagReader.GetAsync(tag);
-
-        if (tagRecord.IsNone)
-            await _tagCreator.AddAsync(new() { Text = tag });
-    }
-
-    private async Task<Result<Unit, FieldErrorDTO>> SearchUser(ulong userId, string field)
-    {
-        return (await _userReader.GetAsync(userId)).IsSome
-            ? Unit.Value
-            : new FieldErrorDTO { Field = field, Message = "Usuario no encontrado" };
-    }
-
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
-        ContactTagDTO value
-    )
-    {
-        // Buscar errores en campos del DTO
-        List<FieldErrorDTO> errors = [];
-        (await SearchUser(value.Id.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
-        (await SearchUser(value.Id.UserId, "userId")).IfErr(errors.Add);
-
-        if (errors.Count > 0)
-            return UseCaseError.Input(errors);
-
-        // Buscar si existe el contacto
-        var contact = await _contactReader.GetAsync(
-            new() { AgendaOwnerId = value.Id.AgendaOwnerId, UserId = value.Id.UserId }
+    private async Task<Result<Unit, FieldErrorDTO>> SearchUser(ulong userId, string field) =>
+        (await _userReader.GetAsync(userId)).Match<Result<Unit, FieldErrorDTO>>(
+            (_) => Unit.Value,
+            () => new FieldErrorDTO { Field = field, Message = "Usuario no encontrado" }
         );
 
-        if (contact.IsNone)
-            return UseCaseError.NotFound();
-
-        var existingAssociation = await _contactTagReader.GetAsync(value.Id);
-        if (existingAssociation.IsSome)
-            return UseCaseError.AlreadyExists();
-
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        NewContactTagDTO value
+    )
+    {
         // Validar permisos
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.Id.AgendaOwnerId == value.Executor.Id,
+            UserType.PROFESSOR => value.AgendaOwnerId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new InvalidOperationException(),
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
+
+        // Buscar errores en campos del DTO
+        List<FieldErrorDTO> errors = [];
+        (await SearchUser(value.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
+        (await SearchUser(value.UserId, "userId")).IfErr(errors.Add);
+
+        if (errors.Count > 0)
+            return UseCaseErrors.Input(errors);
+
+        // Buscar si existe el contacto
+        var contact = await _contactReader.GetAsync(
+            new() { AgendaOwnerId = value.AgendaOwnerId, UserId = value.UserId }
+        );
+
+        if (contact.IsNone)
+            return UseCaseErrors.NotFound();
+
+        var existingAssociation = await _contactTagReader.GetAsync(
+            new()
+            {
+                Tag = value.Tag,
+                AgendaOwnerId = value.AgendaOwnerId,
+                UserId = value.UserId,
+            }
+        );
+
+        if (existingAssociation.IsSome)
+            return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
     }
 
-    protected override async Task PrevTaskAsync(ContactTagDTO newEntity) =>
-        await CreateTagIfNotExists(newEntity.Id.Tag);
+    protected override async Task PrevTaskAsync(NewContactTagDTO newEntity)
+    {
+        var tagRecord = await _tagReader.GetAsync(newEntity.Tag);
+
+        if (tagRecord.IsNone)
+            await _tagCreator.AddAsync(new() { Text = newEntity.Tag });
+    }
 }

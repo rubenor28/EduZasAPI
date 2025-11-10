@@ -1,4 +1,4 @@
-namespace MinimalAPI.Application.DTOs.Classes;
+namespace MinimalAPI.Application.DTOs.ClassStudents;
 
 public sealed record StudentClassRelationCriteriaMAPI
 {

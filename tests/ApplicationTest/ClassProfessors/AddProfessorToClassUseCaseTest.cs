@@ -8,6 +8,7 @@ using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserEFMapper _userMapper = new();
+    private readonly UserEFMapper _userMapper;
     private readonly ClassEFMapper _classMapper = new();
 
     private readonly Random _random = new();
@@ -36,6 +37,9 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var classProfessorMapper = new ProfessorClassEFMapper();
+
+        var userTypeMapper = new UserTypeMapper();
+        _userMapper = new(userTypeMapper, userTypeMapper);
 
         var classProfessorCreator = new ClassProfessorEFCreator(
             _ctx,

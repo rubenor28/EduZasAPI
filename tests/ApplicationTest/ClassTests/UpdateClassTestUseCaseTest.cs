@@ -7,6 +7,7 @@ using EntityFramework.Application.DAOs.ClassTests;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ public class UpdateClassTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserEFMapper _userMapper = new();
+    private readonly UserEFMapper _userMapper;
     private readonly TestEFMapper _testMapper = new();
     private readonly ClassEFMapper _classMapper = new();
     private readonly ClassTestEFMapper _classTestMapper = new();
@@ -35,6 +36,9 @@ public class UpdateClassTestUseCaseTest : IDisposable
 
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
+
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new(roleMapper, roleMapper);
 
         var classTestMapper = new ClassTestEFMapper();
         var testMapper = new TestEFMapper();

@@ -32,14 +32,14 @@ public sealed class DeleteClassTestUseCase(
         return test.ProfessorId == executor.Id;
     }
 
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         DeleteClassTestDTO value
     )
     {
         var recordSearch = await _reader.GetAsync(value.Id);
 
         if (recordSearch.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         var authorized = value.Executor.Role switch
         {
@@ -53,7 +53,7 @@ public sealed class DeleteClassTestUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
     }

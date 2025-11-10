@@ -29,7 +29,7 @@ public sealed class AddClassTestUseCase(
         ProfessorClassRelationDTO
     > _professorReader = professorReader;
 
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         NewClassTestDTO value
     )
     {
@@ -57,7 +57,7 @@ public sealed class AddClassTestUseCase(
         }
 
         if (errors.Count > 0)
-            return UseCaseError.Input(errors);
+            return UseCaseErrors.Input(errors);
 
         var test = testSearch.Unwrap();
 
@@ -70,14 +70,14 @@ public sealed class AddClassTestUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         var classTestSearch = await _classTestReader.GetAsync(
             new() { ClassId = value.ClassId, TestId = value.TestId }
         );
 
         if (classTestSearch.IsSome)
-            return UseCaseError.AlreadyExists();
+            return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
     }

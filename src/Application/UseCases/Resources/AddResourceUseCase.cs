@@ -1,0 +1,51 @@
+using Application.DAOs;
+using Application.DTOs.Common;
+using Application.DTOs.Resources;
+using Application.Services;
+using Application.UseCases.Common;
+using Domain.Entities;
+using Domain.Enums;
+using Domain.ValueObjects;
+
+namespace Application.UseCases.Resources;
+
+public sealed class AddResourceUseCase(
+    ICreatorAsync<ResourceDomain, NewResourceDTO> creator,
+    IReaderAsync<ulong, UserDomain> userReader,
+    IBusinessValidationService<NewResourceDTO>? validator = null
+) : AddUseCase<NewResourceDTO, ResourceDomain>(creator, validator)
+{
+    private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
+
+    protected override Result<Unit, UseCaseError> ExtraValidation(NewResourceDTO value)
+    {
+        var authorized = value.Executor.Role switch
+        {
+            UserType.ADMIN => true,
+            UserType.PROFESSOR => value.ProfessorId == value.Executor.Id,
+            UserType.STUDENT => false,
+            _ => throw new NotImplementedException(),
+        };
+
+        if (!authorized)
+            return UseCaseErrors.Unauthorized();
+
+        return Unit.Value;
+    }
+
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        NewResourceDTO value
+    )
+    {
+        List<FieldErrorDTO> errors = [];
+
+        var userSearch = await _userReader.GetAsync(value.ProfessorId);
+        if (userSearch.IsNone)
+            errors.Add(new() { Field = "professorId", Message = "Usuario no encontrado" });
+
+        if (errors.Count > 0)
+            return UseCaseErrors.Input(errors);
+
+        return Unit.Value;
+    }
+}

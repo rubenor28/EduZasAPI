@@ -1,64 +1,108 @@
 using Domain.Enums;
 using Domain.ValueObjects;
+using InterfaceAdapters.Mappers.Common;
 
 namespace InterfaceAdapters.Mappers.Users;
 
-/// <summary>
-/// Métodos de extensión para mapear valores de <see cref="UserType"/> a representaciones
-/// en <see cref="string"/> o <see cref="int"/> y viceversa.
-/// </summary>
-public static class UserTypeMapper
+public class UserTypeMapper
+    : IMapper<UserType, int>,
+        IMapper<int, Result<UserType, Unit>>,
+        IMapper<UserType, long>,
+        IMapper<long, Result<UserType, Unit>>,
+        IMapper<UserType, ulong>,
+        IMapper<ulong, Result<UserType, Unit>>,
+        IMapper<UserType, string>,
+        IMapper<string, Result<UserType, Unit>>,
+        IMapper<uint, Result<UserType, Unit>>,
+        IMapper<UserType, uint>
 {
-    /// <summary>
-    /// Convierte un <see cref="UserType"/> a su representación en entero.
-    /// </summary>
-    /// <param name="value">Valor de <see cref="UserType"/>.</param>
-    /// <returns>Un <see cref="Optional{Int32}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<int> ToInt(this UserType value)
-    {
-        return value switch
+    Result<UserType, Unit> IMapper<uint, Result<UserType, Unit>>.Map(uint input) =>
+        input switch
+        {
+            0 => UserType.STUDENT,
+            1 => UserType.PROFESSOR,
+            2 => UserType.ADMIN,
+            _ => Unit.Value,
+        };
+
+    uint IMapper<UserType, uint>.Map(UserType input) =>
+        input switch
         {
             UserType.STUDENT => 0,
             UserType.PROFESSOR => 1,
             UserType.ADMIN => 2,
-            _ => Optional<int>.None(),
+            _ => throw new NotImplementedException(),
         };
-    }
 
-    /// <summary>
-    /// Convierte un string a su <see cref="UserType"/> correspondiente.
-    /// </summary>
-    /// <param name="value">Valor en string a convertir.</param>
-    /// <returns>Un <see cref="Optional{UserType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<UserType> FromString(string value) =>
-        value switch
+    int IMapper<UserType, int>.Map(UserType input) =>
+        input switch
+        {
+            UserType.STUDENT => 0,
+            UserType.PROFESSOR => 1,
+            UserType.ADMIN => 2,
+            _ => throw new NotImplementedException(),
+        };
+
+    Result<UserType, Unit> IMapper<int, Result<UserType, Unit>>.Map(int input) =>
+        input switch
+        {
+            0 => UserType.STUDENT,
+            1 => UserType.PROFESSOR,
+            2 => UserType.ADMIN,
+            _ => Unit.Value,
+        };
+
+    long IMapper<UserType, long>.Map(UserType input) =>
+        input switch
+        {
+            UserType.STUDENT => 0,
+            UserType.PROFESSOR => 1,
+            UserType.ADMIN => 2,
+            _ => throw new NotImplementedException(),
+        };
+
+    Result<UserType, Unit> IMapper<long, Result<UserType, Unit>>.Map(long input) =>
+        input switch
+        {
+            0 => UserType.STUDENT,
+            1 => UserType.PROFESSOR,
+            2 => UserType.ADMIN,
+            _ => Unit.Value,
+        };
+
+    ulong IMapper<UserType, ulong>.Map(UserType input) =>
+        input switch
+        {
+            UserType.STUDENT => 0,
+            UserType.PROFESSOR => 1,
+            UserType.ADMIN => 2,
+            _ => throw new NotImplementedException(),
+        };
+
+    Result<UserType, Unit> IMapper<ulong, Result<UserType, Unit>>.Map(ulong input) =>
+        input switch
+        {
+            0 => UserType.STUDENT,
+            1 => UserType.PROFESSOR,
+            2 => UserType.ADMIN,
+            _ => Unit.Value,
+        };
+
+    string IMapper<UserType, string>.Map(UserType input) =>
+        input switch
+        {
+            UserType.STUDENT => "STUDENT",
+            UserType.PROFESSOR => "PROFESSOR",
+            UserType.ADMIN => "ADMIN",
+            _ => throw new NotImplementedException(),
+        };
+
+    Result<UserType, Unit> IMapper<string, Result<UserType, Unit>>.Map(string input) =>
+        input switch
         {
             "STUDENT" => UserType.STUDENT,
             "PROFESSOR" => UserType.PROFESSOR,
             "ADMIN" => UserType.ADMIN,
-            _ => Optional<UserType>.None(),
-        };
-
-    /// <summary>
-    /// Convierte un entero a su <see cref="UserType"/> correspondiente.
-    /// </summary>
-    /// <param name="value">Valor entero a convertir.</param>
-    /// <returns>Un <see cref="Optional{UserType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Optional<UserType> FromInt(int value) =>
-        value switch
-        {
-            0 => UserType.STUDENT,
-            1 => UserType.PROFESSOR,
-            2 => UserType.ADMIN,
-            _ => Optional<UserType>.None(),
-        };
-
-    public static Optional<UserType> Parse(this uint value) =>
-        value switch
-        {
-            0 => UserType.STUDENT,
-            1 => UserType.PROFESSOR,
-            2 => UserType.ADMIN,
-            _ => Optional<UserType>.None(),
+            _ => Unit.Value,
         };
 }

@@ -102,12 +102,15 @@ public class SearchNotificationUseCaseTest
         var criteria = new NotificationCriteriaDTO { UserId = 1 };
 
         var result = await _useCase.ExecuteAsync(criteria);
+        
+        Assert.True(result.IsOk);
+        var search = result.Unwrap();
 
-        Assert.NotNull(result);
-        Assert.Equal(result.Criteria, criteria);
-        Assert.True(result.Results.Any());
+        Assert.NotNull(search);
+        Assert.Equal(search.Criteria, criteria);
+        Assert.True(search.Results.Any());
 
-        var seekedNotification = result.Results.First();
+        var seekedNotification = search.Results.First();
         Assert.NotNull(seekedNotification);
         Assert.Equal(notification.Title, seekedNotification.Title);
         Assert.Equal(notification.ClassId, seekedNotification.ClassId);
@@ -120,9 +123,11 @@ public class SearchNotificationUseCaseTest
 
         var result = await _useCase.ExecuteAsync(criteria);
 
-        Assert.NotNull(result);
-        Assert.Equal(result.Criteria, criteria);
-        Assert.False(result.Results.Any());
+        Assert.True(result.IsOk);
+        var search = result.Unwrap();
+        Assert.NotNull(search);
+        Assert.Equal(search.Criteria, criteria);
+        Assert.False(search.Results.Any());
     }
 
     [Fact]
@@ -142,11 +147,13 @@ public class SearchNotificationUseCaseTest
         var criteria = new NotificationCriteriaDTO { ClassId = "Test-Class" };
         var result = await _useCase.ExecuteAsync(criteria);
 
-        Assert.NotNull(result);
-        Assert.Equal(result.Criteria, criteria);
-        Assert.True(result.Results.Any());
+        Assert.True(result.IsOk);
+        var search = result.Unwrap();
+        Assert.NotNull(search);
+        Assert.Equal(search.Criteria, criteria);
+        Assert.True(search.Results.Any());
 
-        var seekedNotification = result.Results.First();
+        var seekedNotification = search.Results.First();
         Assert.NotNull(seekedNotification);
         Assert.Equal(notification.Title, seekedNotification.Title);
         Assert.Equal(notification.ClassId, seekedNotification.ClassId);
@@ -159,8 +166,10 @@ public class SearchNotificationUseCaseTest
 
         var result = await _useCase.ExecuteAsync(criteria);
 
-        Assert.NotNull(result);
-        Assert.Equal(result.Criteria, criteria);
-        Assert.False(result.Results.Any());
+        Assert.True(result.IsOk);
+        var search = result.Unwrap();
+        Assert.NotNull(search);
+        Assert.Equal(search.Criteria, criteria);
+        Assert.False(search.Results.Any());
     }
 }

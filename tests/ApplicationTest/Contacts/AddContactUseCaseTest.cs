@@ -12,6 +12,7 @@ using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +23,7 @@ public class AddContactUseCaseTest : IDisposable
     private readonly SqliteConnection _conn;
     private readonly EduZasDotnetContext _ctx;
     private readonly AddContactUseCase _useCase;
-    private readonly UserEFMapper _userMapper = new();
+    private readonly UserEFMapper _userMapper;
     private readonly UserEFCreator _userCreator;
 
     public AddContactUseCaseTest()
@@ -35,6 +36,9 @@ public class AddContactUseCaseTest : IDisposable
 
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
+
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new UserEFMapper(roleMapper, roleMapper);
 
         var contactMapper = new ContactEFMapper();
         var contactCreator = new ContactEFCreator(_ctx, contactMapper, contactMapper);

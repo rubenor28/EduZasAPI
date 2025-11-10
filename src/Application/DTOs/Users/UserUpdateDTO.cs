@@ -1,3 +1,5 @@
+using Application.DTOs.Common;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.DTOs.Users;
@@ -47,6 +49,17 @@ public sealed record UserUpdateDTO : IIdentifiable<ulong>
     public required string Password { get; set; }
 
     /// <summary>
+    /// Obtiene o establece el estado de activación del usuario.
+    /// </summary>
+    /// <value>
+    /// true si el usuario está activo; false si está inactivo.
+    /// Valor por defecto: true.
+    /// </value>
+    public required bool Active { get; set; }
+
+    public required UserType Role { get; set; }
+
+    /// <summary>
     /// Obtiene o establece el segundo nombre del usuario (opcional).
     /// </summary>
     /// <value>
@@ -67,11 +80,7 @@ public sealed record UserUpdateDTO : IIdentifiable<ulong>
     public Optional<string> MotherLastname { get; set; } = Optional<string>.None();
 
     /// <summary>
-    /// Obtiene o establece el estado de activación del usuario.
+    /// DTO que representa el usuario que ejecuta la accion
     /// </summary>
-    /// <value>
-    /// true si el usuario está activo; false si está inactivo.
-    /// Valor por defecto: true.
-    /// </value>
-    public bool Active { get; set; } = true;
+    public required Executor Executor { get; set; }
 }

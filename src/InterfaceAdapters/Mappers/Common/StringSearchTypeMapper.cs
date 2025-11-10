@@ -3,33 +3,11 @@ using Domain.ValueObjects;
 
 namespace InterfaceAdapters.Mappers.Common;
 
-/// <summary>
-/// Métodos de extensión para mapear valores de <see cref="StringSearchType"/> a representaciones
-/// en <see cref="string"/> o <see cref="int"/> y viceversa.
-/// </summary>
-public static class StringSearchMapper
+public class StringSearchMapper
+    : IMapper<StringSearchType, string>,
+        IMapper<string, Result<StringSearchType, Unit>>
 {
-    /// <summary>
-    /// Convierte un <see cref="StringSearchType"/> a su representación en entero.
-    /// </summary>
-    /// <param name="value">Valor de <see cref="StringSearchType"/>.</param>
-    /// <returns>Un <see cref="Result{Int32, Unit}"/> con el valor correspondiente, o error si no es válido.</returns>
-    public static Result<int, Unit> ToInt(this StringSearchType value)
-    {
-        return value switch
-        {
-            StringSearchType.EQ => 0,
-            StringSearchType.LIKE => 1,
-            _ => Unit.Value,
-        };
-    }
-
-    /// <summary>
-    /// Convierte un string a su <see cref="StringSearchType"/> correspondiente.
-    /// </summary>
-    /// <param name="value">Valor en string a convertir.</param>
-    /// <returns>Un <see cref="Optional{StringSearchType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Result<StringSearchType, Unit> FromString(string value) =>
+    public Result<StringSearchType, Unit> Map(string value) =>
         value switch
         {
             "EQUALS" => StringSearchType.EQ,
@@ -37,16 +15,11 @@ public static class StringSearchMapper
             _ => Unit.Value,
         };
 
-    /// <summary>
-    /// Convierte un entero a su <see cref="StringSearchType"/> correspondiente.
-    /// </summary>
-    /// <param name="value">Valor entero a convertir.</param>
-    /// <returns>Un <see cref="Optional{StringSearchType}"/> con el valor correspondiente, o vacío si no es válido.</returns>
-    public static Result<StringSearchType, Unit> FromInt(int value) =>
+    public string Map(StringSearchType value) =>
         value switch
         {
-            0 => StringSearchType.EQ,
-            1 => StringSearchType.LIKE,
-            _ => Unit.Value,
+            StringSearchType.EQ => "EQUALS",
+            StringSearchType.LIKE => "LIKE",
+            _ => throw new NotImplementedException(),
         };
 }

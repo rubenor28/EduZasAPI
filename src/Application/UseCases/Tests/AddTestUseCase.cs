@@ -17,7 +17,7 @@ public sealed class AddTestUseCase(
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         NewTestDTO value
     )
     {
@@ -30,11 +30,11 @@ public sealed class AddTestUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         var userSearch = await _userReader.GetAsync(value.ProfessorId);
         if (userSearch.IsNone)
-            return UseCaseError.Input(
+            return UseCaseErrors.Input(
                 [new() { Field = "profesorId", Message = "No se encontró el usuario" }]
             );
 

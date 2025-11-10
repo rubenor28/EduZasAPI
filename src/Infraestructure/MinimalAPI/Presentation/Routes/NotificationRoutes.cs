@@ -1,10 +1,12 @@
+using Application.DAOs;
 using Application.DTOs.Common;
+using Application.DTOs.Notifications;
 using Application.UseCases.Notifications;
 using Domain.Entities;
+using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Notifications;
 using MinimalAPI.Presentation.Filters;
-using MinimalAPI.Presentation.Mappers;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -42,22 +44,19 @@ public static class NotificationRoutes
         int page,
         SearchNotificationUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        RoutesUtils utils,
+        IReaderAsync<string, ClassDomain> classReader,
+        IMapper<int, ulong, NotificationCriteriaDTO> reqMapper,
+        IMapper<
+            PaginatedQuery<NotificationDomain, NotificationCriteriaDTO>,
+            PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>
+        > resMapper
     )
     {
-        var userId = utils.GetIdFromContext(ctx);
-        var search = await useCase.ExecuteAsync(
-            new() { Page = page <= 0 ? 1 : page, UserId = userId }
+        return await utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(page, utils.GetIdFromContext(ctx)),
+            mapResponse: (search) => Results.Ok(resMapper.Map(search))
         );
-
-        var results = new
-        {
-            search.Page,
-            search.Results,
-            search.TotalPages,
-            Criteria = search.Criteria.FromDomain(),
-        };
-
-        return Results.Ok(results);
     }
 }

@@ -24,4 +24,9 @@ public sealed record NewClassMAPI
     /// Obtiene o establece el color de la clase en formato hexadecimal.
     /// </summary>
     public required string Color { get; set; }
+
+    /// <summary>
+    /// Id dueño de la clase.
+    /// </summary>
+    public required ulong OwnerId { get; set; }
 }

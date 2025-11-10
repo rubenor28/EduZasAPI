@@ -1,9 +1,11 @@
 ﻿using Application.DTOs.Common;
 using Application.DTOs.Users;
+using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +33,8 @@ public class UserEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new UserEFMapper();
+        var roleMapper = new UserTypeMapper();
+        var mapper = new UserEFMapper(roleMapper, roleMapper);
 
         _creator = new(_ctx, mapper, mapper);
         _updater = new(_ctx, mapper, mapper);
@@ -39,6 +42,8 @@ public class UserEFRepositoryTest : IDisposable
         _deleter = new(_ctx, mapper);
         _querier = new(_ctx, mapper, 10);
     }
+
+    public static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
 
     [Fact]
     public async Task AddUser_RetunsUser()
@@ -103,6 +108,8 @@ public class UserEFRepositoryTest : IDisposable
             Active = false,
             MidName = "update",
             MotherLastname = "update",
+            Role = UserType.PROFESSOR,
+            Executor = AsExecutor(created),
         };
 
         var updatedUser = await _updater.UpdateAsync(update);
@@ -111,7 +118,7 @@ public class UserEFRepositoryTest : IDisposable
         Assert.Equal(update.Email, updatedUser.Email);
         Assert.Equal(update.FirstName, updatedUser.FirstName);
         Assert.Equal(update.Password, updatedUser.Password);
-        Assert.Equal(update.FatherLastName, updatedUser.FatherLastName);
+        Assert.Equal(update.FatherLastName, updatedUser.FatherLastname);
         Assert.Equal(update.Active, updatedUser.Active);
         Assert.Equal(update.MidName.Unwrap(), updatedUser.MidName.Unwrap());
         Assert.Equal(update.MotherLastname.Unwrap(), updatedUser.MotherLastname.Unwrap());
@@ -149,6 +156,8 @@ public class UserEFRepositoryTest : IDisposable
             Active = false,
             MidName = "update",
             MotherLastname = "update",
+            Role = created.Role,
+            Executor = AsExecutor(created),
         };
 
         await Assert.ThrowsAsync<DbUpdateException>(() =>

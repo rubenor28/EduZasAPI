@@ -43,4 +43,14 @@ public readonly struct Unit : IEquatable<Unit>
     /// </summary>
     /// <returns>La cadena "()", que representa el valor unitario.</returns>
     public override string ToString() => "()";
+
+    public static bool operator ==(Unit left, Unit right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Unit left, Unit right)
+    {
+        return !(left == right);
+    }
 }

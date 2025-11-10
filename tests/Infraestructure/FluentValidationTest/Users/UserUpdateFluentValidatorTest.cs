@@ -1,4 +1,5 @@
 using Application.DTOs.Users;
+using Domain.Enums;
 using FluentValidationProj.Application.Services.Users;
 
 namespace FluentValidationTest.Users;
@@ -19,7 +20,9 @@ public class UserUpdateFluentValidatorTest
             Password = "Password123!",
             MidName = "FITZGERALD",
             MotherLastname = "KENNEDY",
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -37,7 +40,9 @@ public class UserUpdateFluentValidatorTest
             FatherLastName = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -59,7 +64,9 @@ public class UserUpdateFluentValidatorTest
             FatherLastName = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -81,7 +88,9 @@ public class UserUpdateFluentValidatorTest
             FatherLastName = fatherLastName,
             Email = "john.doe@example.com",
             Password = "Password123!",
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -102,7 +111,9 @@ public class UserUpdateFluentValidatorTest
             FatherLastName = "DOE",
             Email = email,
             Password = "Password123!",
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -126,7 +137,9 @@ public class UserUpdateFluentValidatorTest
             FatherLastName = "DOE",
             Email = "john.doe@example.com",
             Password = password,
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -148,7 +161,9 @@ public class UserUpdateFluentValidatorTest
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = midName,
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -170,7 +185,9 @@ public class UserUpdateFluentValidatorTest
             Email = "john.doe@example.com",
             Password = "Password123!",
             MotherLastname = motherLastname,
-            Active = true
+            Active = true,
+            Role = UserType.ADMIN,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);

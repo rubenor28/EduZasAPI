@@ -15,17 +15,17 @@ public class DeleteClassUseCase(
     IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> relationReader
 ) : DeleteUseCase<string, DeleteClassDTO, ClassDomain>(deleter, reader)
 {
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         DeleteClassDTO value
     )
     {
         if (value.Executor.Role == UserType.STUDENT)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         var classSearch = await _reader.GetAsync(value.Id);
 
         if (classSearch.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         var c = classSearch.Unwrap();
 
@@ -36,7 +36,7 @@ public class DeleteClassUseCase(
             );
 
             if (relation.IsNone || relation.Unwrap().IsOwner == false)
-                return UseCaseError.Unauthorized();
+                return UseCaseErrors.Unauthorized();
         }
 
         return Unit.Value;

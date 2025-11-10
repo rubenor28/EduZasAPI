@@ -57,7 +57,7 @@ public sealed record UserCriteriaMAPI : CriteriaDTO
     /// Optional que contiene el apellido paterno para filtrar,
     /// o null si no se desea filtrar por este campo.
     /// </value>
-    public StringQueryMAPI? FatherLastName { get; set; } = null;
+    public StringQueryMAPI? FatherLastname { get; set; } = null;
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido materno del usuario.

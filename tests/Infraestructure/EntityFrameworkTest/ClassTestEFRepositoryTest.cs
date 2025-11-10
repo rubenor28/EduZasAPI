@@ -1,5 +1,6 @@
 using Application.DTOs.Classes;
 using Application.DTOs.ClassTests;
+using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.DTOs.Users;
 using Domain.Entities;
@@ -11,6 +12,7 @@ using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,9 +44,10 @@ public class ClassTestEFRepositoryTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var classTestMapper = new ClassTestEFMapper();
+        var userTypeMapper = new UserTypeMapper();
         var classMapper = new ClassEFMapper();
         var testMapper = new TestEFMapper();
-        var userMapper = new UserEFMapper();
+        var userMapper = new UserEFMapper(userTypeMapper, userTypeMapper);
 
         _creator = new(_ctx, classTestMapper, classTestMapper);
         _updater = new(_ctx, classTestMapper, classTestMapper);
@@ -63,12 +66,14 @@ public class ClassTestEFRepositoryTest : IDisposable
             FirstName = "Test",
             FatherLastName = "Professor",
             Email = "test.professor@email.com",
-            Password = "password"
+            Password = "password",
         };
         return await _userCreator.AddAsync(newUser);
     }
 
-    private async Task<ClassDomain> CreateSampleClass(ulong professorId)
+    private static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
+
+    private async Task<ClassDomain> CreateSampleClass(UserDomain professor)
     {
         var newClass = new NewClassDTO
         {
@@ -77,19 +82,21 @@ public class ClassTestEFRepositoryTest : IDisposable
             Color = "#ffffff",
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
-            OwnerId = professorId,
+            OwnerId = professor.Id,
+            Executor = AsExecutor(professor),
         };
+
         return await _classCreator.AddAsync(newClass);
     }
 
-    private async Task<TestDomain> CreateSampleTest(ulong professorId)
+    private async Task<TestDomain> CreateSampleTest(UserDomain professor)
     {
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfessorId = professorId,
-            Executor = new() { Id = professorId, Role = UserType.PROFESSOR },
+            ProfessorId = professor.Id,
+            Executor = new() { Id = professor.Id, Role = professor.Role },
         };
         return await _testCreator.AddAsync(newTest);
     }
@@ -98,15 +105,15 @@ public class ClassTestEFRepositoryTest : IDisposable
     public async Task AddClassTest_ReturnsClassTest()
     {
         var professor = await CreateSampleProfessor();
-        var createdClass = await CreateSampleClass(professor.Id);
-        var createdTest = await CreateSampleTest(professor.Id);
+        var createdClass = await CreateSampleClass(professor);
+        var createdTest = await CreateSampleTest(professor);
 
         var newClassTest = new NewClassTestDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
             Visible = true,
-            Executor = new() { Id = professor.Id, Role = UserType.PROFESSOR },
+            Executor = AsExecutor(professor),
         };
 
         var created = await _creator.AddAsync(newClassTest);
@@ -116,21 +123,19 @@ public class ClassTestEFRepositoryTest : IDisposable
         Assert.Equal(newClassTest.TestId, created.Id.TestId);
     }
 
-
-
     [Fact]
     public async Task UpdateClassTest_ReturnsUpdatedClassTest()
     {
         var professor = await CreateSampleProfessor();
-        var createdClass = await CreateSampleClass(professor.Id);
-        var createdTest = await CreateSampleTest(professor.Id);
+        var createdClass = await CreateSampleClass(professor);
+        var createdTest = await CreateSampleTest(professor);
 
         var newClassTestDto = new NewClassTestDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
             Visible = true,
-            Executor = new() { Id = professor.Id, Role = UserType.PROFESSOR },
+            Executor = AsExecutor(professor),
         };
         await _creator.AddAsync(newClassTestDto);
 
@@ -138,7 +143,7 @@ public class ClassTestEFRepositoryTest : IDisposable
         {
             Id = new() { ClassId = createdClass.Id, TestId = createdTest.Id },
             Visible = false,
-            Executor = new() { Id = professor.Id, Role = UserType.PROFESSOR },
+            Executor = AsExecutor(professor),
         };
 
         var updatedClassTest = await _updater.UpdateAsync(updateDto);
@@ -151,15 +156,15 @@ public class ClassTestEFRepositoryTest : IDisposable
     public async Task DeleteClassTest_ShouldRemoveRelation()
     {
         var professor = await CreateSampleProfessor();
-        var createdClass = await CreateSampleClass(professor.Id);
-        var createdTest = await CreateSampleTest(professor.Id);
+        var createdClass = await CreateSampleClass(professor);
+        var createdTest = await CreateSampleTest(professor);
 
         var newClassTestDto = new NewClassTestDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
             Visible = true,
-            Executor = new() { Id = professor.Id, Role = UserType.PROFESSOR },
+            Executor = AsExecutor(professor),
         };
 
         await _creator.AddAsync(newClassTestDto);

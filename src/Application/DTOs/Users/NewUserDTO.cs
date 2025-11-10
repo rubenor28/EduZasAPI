@@ -1,3 +1,4 @@
+using Application.DTOs.Common;
 using Domain.ValueObjects;
 
 namespace Application.DTOs.Users;
@@ -55,4 +56,9 @@ public sealed record NewUserDTO
     /// si se proporciona, o <c>None</c> si no está presente. Se normaliza a mayúsculas invariables.
     /// </value>
     public Optional<string> MidName { get; set; } = Optional<string>.None();
+
+    /// <summary>
+    /// Información de quien ejecuta la accion.
+    /// </summary>
+    public required Executor Executor { get; set; }
 }

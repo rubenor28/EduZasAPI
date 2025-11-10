@@ -11,11 +11,12 @@ namespace Application.UseCases.Common;
 /// </summary>
 /// <typeparam name="I">Tipo del identificador de la entidad.</typeparam>
 /// <typeparam name="E">Tipo de la entidad que implementa <see cref="IIdentifiable{I}"/>.</typeparam>
-public abstract class ReadUseCase<I, E>(
+public abstract class ReadUseCase<I, RE, E>(
     IReaderAsync<I, E> reader,
     IBusinessValidationService<I> validator
-) : IUseCaseAsync<I, Optional<E>>
+) : IUseCaseAsync<RE, E>
     where I : notnull
+    where RE : notnull, IIdentifiable<I>
     where E : notnull, IIdentifiable<I>
 {
     /// <summary>
@@ -39,17 +40,21 @@ public abstract class ReadUseCase<I, E>(
     /// <item><description>Una lista de errores de validación si la operación falla.</description></item>
     /// </list>
     /// </returns>
-    public async Task<Result<Optional<E>, UseCaseErrorImpl>> ExecuteAsync(I request)
+    public async Task<Result<E, UseCaseError>> ExecuteAsync(RE request)
     {
-        var validation = _validator.IsValid(request);
+        var validation = _validator.IsValid(request.Id);
 
         if (validation.IsErr)
         {
             var errors = validation.UnwrapErr();
-            return UseCaseError.Input(errors);
+            return UseCaseErrors.Input(errors);
         }
 
-        var record = await _reader.GetAsync(request);
-        return record;
+        var record = await _reader.GetAsync(request.Id);
+
+        if(record.IsNone)
+          return UseCaseErrors.NotFound();
+
+        return record.Unwrap();
     }
 }

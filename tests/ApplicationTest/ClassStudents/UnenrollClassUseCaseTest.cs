@@ -8,6 +8,7 @@ using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +31,9 @@ public class UnenrollClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var userMapper = new UserEFMapper();
+        var roleMapper = new UserTypeMapper();
+        var userMapper = new UserEFMapper(roleMapper, roleMapper);
+
         var classMapper = new ClassEFMapper();
         var studentClassMapper = new StudentClassEFMapper();
         var professorClassMapper = new ProfessorClassEFMapper();

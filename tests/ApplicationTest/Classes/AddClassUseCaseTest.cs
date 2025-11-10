@@ -2,6 +2,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using Application.Services;
 using Application.UseCases.Classes;
+using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
@@ -9,6 +10,7 @@ using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using FluentValidationProj.Application.Services.Classes;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +29,8 @@ public class AddClassUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
+    private readonly UserEFMapper _userMapper;
+
     public AddClassUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
@@ -43,7 +47,9 @@ public class AddClassUseCaseTest : IDisposable
             20
         );
 
-        var userMapper = new UserEFMapper();
+        var userTypeMapper = new UserTypeMapper();
+        _userMapper = new UserEFMapper(userTypeMapper, userTypeMapper);
+
         var classMapper = new ClassEFMapper();
         var professorClassMapper = new ProfessorClassEFMapper();
         var classCreator = new ClassEFCreator(_ctx, classMapper, classMapper);
@@ -56,7 +62,7 @@ public class AddClassUseCaseTest : IDisposable
 
         var classValidator = new NewClassFluentValidator();
 
-        var userReader = new UserEFReader(_ctx, userMapper);
+        var userReader = new UserEFReader(_ctx, _userMapper);
         var classReader = new ClassEFReader(_ctx, classMapper);
 
         _useCase = new AddClassUseCase(
@@ -69,7 +75,7 @@ public class AddClassUseCaseTest : IDisposable
         );
     }
 
-    private async Task SeedUser(UserType role)
+    private async Task<UserDomain> SeedUser(UserType role)
     {
         var user = new User
         {
@@ -82,12 +88,15 @@ public class AddClassUseCaseTest : IDisposable
         };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
+        return _userMapper.Map(user);
     }
+
+    public static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
 
     [Fact]
     public async Task ExecuteAsync_WithValidData_ReturnsOk()
     {
-        await SeedUser(UserType.PROFESSOR);
+        var user = await SeedUser(UserType.PROFESSOR);
         var newClass = new NewClassDTO
         {
             ClassName = "Test Class",
@@ -95,6 +104,7 @@ public class AddClassUseCaseTest : IDisposable
             Section = "ABC",
             Subject = "Math",
             OwnerId = 1,
+            Executor = AsExecutor(user),
         };
 
         var result = await _useCase.ExecuteAsync(newClass);
@@ -112,6 +122,7 @@ public class AddClassUseCaseTest : IDisposable
             Section = "ABC",
             Subject = "Math",
             OwnerId = 1000,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = await _useCase.ExecuteAsync(newClass);
@@ -126,7 +137,7 @@ public class AddClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_UserNotAuthorized_ReturnsError()
     {
-        await SeedUser(UserType.STUDENT);
+        var user = await SeedUser(UserType.STUDENT);
         var newClass = new NewClassDTO
         {
             ClassName = "Test Class",
@@ -134,6 +145,7 @@ public class AddClassUseCaseTest : IDisposable
             Section = "ABC",
             Subject = "Math",
             OwnerId = 1,
+            Executor = AsExecutor(user)
         };
 
         var result = await _useCase.ExecuteAsync(newClass);
@@ -145,7 +157,7 @@ public class AddClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithInvalidClassName_ReturnsError()
     {
-        await SeedUser(UserType.PROFESSOR);
+        var user = await SeedUser(UserType.PROFESSOR);
         var newClass = new NewClassDTO
         {
             ClassName = "",
@@ -153,6 +165,7 @@ public class AddClassUseCaseTest : IDisposable
             Section = "ABC",
             Subject = "Math",
             OwnerId = 1,
+            Executor = AsExecutor(user)
         };
 
         var result = await _useCase.ExecuteAsync(newClass);
@@ -167,7 +180,7 @@ public class AddClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithInvalidSection_ReturnsError()
     {
-        await SeedUser(UserType.PROFESSOR);
+        var user = await SeedUser(UserType.PROFESSOR);
         var newClass = new NewClassDTO
         {
             ClassName = "", // Invalid class name
@@ -175,6 +188,7 @@ public class AddClassUseCaseTest : IDisposable
             Section = "A",
             Subject = "Math",
             OwnerId = 1,
+            Executor = AsExecutor(user)
         };
 
         var result = await _useCase.ExecuteAsync(newClass);
@@ -189,7 +203,7 @@ public class AddClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithInvalidSubject_ReturnsError()
     {
-        await SeedUser(UserType.PROFESSOR);
+        var user = await SeedUser(UserType.PROFESSOR);
         var newClass = new NewClassDTO
         {
             ClassName = "", // Invalid class name
@@ -197,6 +211,7 @@ public class AddClassUseCaseTest : IDisposable
             Section = "ABC",
             Subject = "T",
             OwnerId = 1,
+            Executor = AsExecutor(user)
         };
 
         var result = await _useCase.ExecuteAsync(newClass);

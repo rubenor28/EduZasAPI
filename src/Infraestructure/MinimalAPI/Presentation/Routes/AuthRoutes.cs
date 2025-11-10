@@ -1,13 +1,12 @@
-using Application.DAOs;
+using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Domain.Entities;
-using InterfaceAdapters.Mappers.Users;
+using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Users;
 using MinimalAPI.Application.Services;
 using MinimalAPI.Presentation.Filters;
-using MinimalAPI.Presentation.Mappers;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -64,25 +63,21 @@ public static class AuthRoutes
     /// <param name="useCase">Caso de uso para registrar al usuario.</param>
     /// <param name="utils">Utilidad para manejar respuestas y excepciones.</param>
     /// <returns>Un <see cref="IResult"/> con el resultado de la operación.</returns>
-    public static Task<IResult> AddUser(
-        NewUserMAPI newUser,
+    public static async Task<IResult> AddUser(
+        NewUserMAPI request,
         AddUserUseCase useCase,
-        RoutesUtils utils
+        RoutesUtils utils,
+        IMapper<NewUserMAPI, Executor, NewUserDTO> newUserMapper,
+        IMapper<UserDomain, PublicUserMAPI> userMapper,
+        IMapper<UseCaseError, IResult> useCaseErrorMapper,
+        HttpContext ctx
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var newUsr = UserMAPIMapper.ToDomain(newUser);
-            var validation = await useCase.ExecuteAsync(newUsr);
-
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            var newRecord = validation.Unwrap();
-            var publicUser = UserMAPIMapper.FromDomain(newRecord);
-
-            return Results.Created($"/users/{publicUser.Id}", publicUser);
-        });
+        return await utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => newUserMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (user) => Results.Created($"/users/{user.Id}", userMapper.Map(user))
+        );
     }
 
     /// <summary>
@@ -100,6 +95,7 @@ public static class AuthRoutes
     public async static Task<IResult> Login(
         UserCredentialsDTO credentials,
         LoginUseCase useCase,
+        IMapper<UserDomain, PublicUserMAPI> userMapper,
         RoutesUtils utils,
         JwtSettings jwtSettings,
         JwtService jwtService,
@@ -107,31 +103,27 @@ public static class AuthRoutes
         IWebHostEnvironment env
     )
     {
-        return await utils.HandleResponseAsync(async () =>
-        {
-            var validation = await useCase.ExecuteAsync(credentials);
-
-            if (validation.IsErr)
-                return validation.UnwrapErr().FromDomain();
-
-            var user = validation.Unwrap();
-
-            var token = jwtService.Generate(new AuthPayload { Id = user.Id, Role = user.Role });
-
-            var cookieOpts = new CookieOptions
+        return await utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => credentials,
+            mapResponse: (user) =>
             {
-                HttpOnly = true,
-                Secure = env.IsProduction(),
-                SameSite = env.IsProduction() ? SameSiteMode.Strict : SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddMinutes(jwtSettings.ExpiresMinutes),
-            };
+                var token = jwtService.Generate(new AuthPayload { Id = user.Id, Role = user.Role });
 
-            httpContext.Response.Cookies.Append("AuthToken", token, cookieOpts);
+                var cookieOpts = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = env.IsProduction(),
+                    SameSite = env.IsProduction() ? SameSiteMode.Strict : SameSiteMode.Lax,
+                    Path = "/",
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(jwtSettings.ExpiresMinutes),
+                };
 
-            var publicUser = UserMAPIMapper.FromDomain(user.ToPublicUserDTO());
-            return Results.Ok(publicUser);
-        });
+                httpContext.Response.Cookies.Append("AuthToken", token, cookieOpts);
+
+                return Results.Ok(userMapper.Map(user));
+            }
+        );
     }
 
     /// <summary>
@@ -140,36 +132,39 @@ public static class AuthRoutes
     /// <param name="httpContext">Contexto HTTP actual.</param>
     /// <param name="env">Entorno de ejecución (dev/prod).</param>
     /// <returns>Un <see cref="IResult"/> indicando el éxito de la operación.</returns>
-    public static IResult Logout(HttpContext httpContext, IWebHostEnvironment env)
+    public static IResult Logout(
+        RoutesUtils utils,
+        HttpContext httpContext,
+        IWebHostEnvironment env
+    )
     {
-        var cookieOpts = new CookieOptions
+        return utils.HandleResponse(() =>
         {
-            HttpOnly = true,
-            Secure = env.IsProduction(),
-            SameSite = env.IsProduction() ? SameSiteMode.Strict : SameSiteMode.Lax,
-            Path = "/",
-        };
+            var cookieOpts = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = env.IsProduction(),
+                SameSite = env.IsProduction() ? SameSiteMode.Strict : SameSiteMode.Lax,
+                Path = "/",
+            };
 
-        httpContext.Response.Cookies.Delete("AuthToken", cookieOpts);
-        return Results.Ok();
+            httpContext.Response.Cookies.Delete("AuthToken", cookieOpts);
+            return Results.NoContent();
+        });
     }
 
     public static async Task<IResult> UserData(
         HttpContext ctx,
         RoutesUtils utils,
-        IReaderAsync<ulong, UserDomain> reader
+        ReadUserUseCase useCase,
+        IMapper<Executor, ReadUserDTO> requestMapper,
+        IMapper<UserDomain, PublicUserMAPI> userMapper
     )
     {
-        var userId = utils.GetIdFromContext(ctx);
-        var usrSearch = await reader.GetAsync(userId);
-
-        if (usrSearch.IsNone)
-            return Results.Problem("Error al procesar al usuario");
-
-        var usr = UserMAPIMapper.FromDomain(usrSearch.Unwrap());
-
-        return Results.Ok(
-            new WithDataResponse<PublicUserMAPI> { Message = "Autenticado", Data = usr }
+        return await utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => requestMapper.Map(utils.GetExecutorFromContext(ctx)),
+            mapResponse: (user) => Results.Ok(userMapper.Map(user))
         );
     }
 }

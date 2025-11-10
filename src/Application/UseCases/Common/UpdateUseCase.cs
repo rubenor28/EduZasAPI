@@ -14,7 +14,7 @@ public abstract class UpdateUseCase<I, UE, E>(
     IUpdaterAsync<E, UE> updater,
     IReaderAsync<I, E> reader,
     IBusinessValidationService<UE>? validator = null
-)
+) : IUseCaseAsync<UE, E>
     where I : notnull
     where UE : notnull, IIdentifiable<I>
     where E : notnull, IIdentifiable<I>
@@ -55,7 +55,7 @@ public abstract class UpdateUseCase<I, UE, E>(
     /// Un <see cref="Result{T, E}"/> que contiene la entidad actualizada en caso de éxito,
     /// o una lista de <see cref="FieldErrorDTO"/> si las validaciones fallan.
     /// </returns>
-    public async Task<Result<E, UseCaseErrorImpl>> ExecuteAsync(UE request)
+    public async Task<Result<E, UseCaseError>> ExecuteAsync(UE request)
     {
         var formatted = PreValidationFormat(request);
 
@@ -63,7 +63,7 @@ public abstract class UpdateUseCase<I, UE, E>(
         {
             var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
-                return UseCaseError.Input(validation.UnwrapErr());
+                return UseCaseErrors.Input(validation.UnwrapErr());
         }
 
         var syncCheck = ExtraValidation(formatted);
@@ -72,7 +72,7 @@ public abstract class UpdateUseCase<I, UE, E>(
 
         var asyncCheck = await ExtraValidationAsync(formatted);
         if (asyncCheck.IsErr)
-            return Result<E, UseCaseErrorImpl>.Err(asyncCheck.UnwrapErr());
+            return Result<E, UseCaseError>.Err(asyncCheck.UnwrapErr());
 
         formatted = PostValidationFormat(formatted);
         formatted = await PostValidationFormatAsync(formatted);
@@ -123,8 +123,8 @@ public abstract class UpdateUseCase<I, UE, E>(
     /// <remarks>
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
     /// </remarks>
-    protected virtual Result<Unit, UseCaseErrorImpl> ExtraValidation(UE value) =>
-        Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
+    protected virtual Result<Unit, UseCaseError> ExtraValidation(UE value) =>
+        Result<Unit, UseCaseError>.Ok(Unit.Value);
 
     /// <summary>
     /// Realiza validaciones adicionales asíncronas.
@@ -135,11 +135,11 @@ public abstract class UpdateUseCase<I, UE, E>(
     /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
     /// como verificaciones en base de datos o llamadas a servicios externos.
     /// </remarks>
-    protected async virtual Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(UE value)
+    protected async virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(UE value)
     {
         var record = await _reader.GetAsync(value.Id);
         if (record.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         return Unit.Value;
     }

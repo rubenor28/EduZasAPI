@@ -5,6 +5,7 @@ using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,7 +43,8 @@ public class TestEFRepositoryTest : IDisposable
         _querier = new(_ctx, testMapper, 10);
         _deleter = new(_ctx, testMapper);
 
-        _userMapper = new();
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new(roleMapper, roleMapper);
     }
 
     private async Task<UserDomain> CreateUser(UserType role = UserType.STUDENT)

@@ -1,248 +1,203 @@
 using Application.DTOs.Classes;
-using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Classes;
+using MinimalAPI.Application.DTOs.Common;
 
 namespace MinimalAPI.Presentation.Mappers;
 
+// Alias para mejorar la legibilidad de los tipos de mapeadores genéricos complejos.
+using StringQueryFromDomainMapper = IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>;
+using StringQueryToDomainMapper = IMapper<
+    StringQueryMAPI?,
+    Result<Optional<StringQueryDTO>, IEnumerable<FieldErrorDTO>>
+>;
+
 /// <summary>
-/// Proporciona métodos de extensión para mapear entre DTOs de la API mínima y DTOs de dominio para clases.
+/// Mapeador centralizado para la entidad 'Class' en la capa de la API.
 /// </summary>
-public static class ClassMAPIMapper
+/// <remarks>
+/// Esta clase se encarga de las transformaciones entre los DTOs de la API (Minimal API),
+/// los DTOs de la capa de aplicación y las entidades de dominio para 'Class'.
+/// Implementa directamente toda la lógica de mapeo, incluyendo la de sub-componentes
+/// como <see cref="WithProfessorDTO"/> y <see cref="WithStudentDTO"/>.
+/// </remarks>
+public class ClassMAPIMapper(
+    StringQueryToDomainMapper strqToDomainMapper,
+    StringQueryFromDomainMapper strqFromDomainMapper
+)
+    : IMapper<ClassDomain, PublicClassMAPI>,
+        IMapper<NewClassMAPI, Executor, NewClassDTO>,
+        IMapper<ClassCriteriaMAPI, Result<ClassCriteriaDTO, List<FieldErrorDTO>>>,
+        IMapper<ClassCriteriaDTO, ClassCriteriaMAPI>,
+        IMapper<WithProfessorDTO, WithProfessorMAPI>,
+        IMapper<WithStudentDTO, WithStudentMAPI>,
+        IMapper<Optional<WithStudentDTO>, WithStudentMAPI?>,
+        IMapper<Optional<WithProfessorDTO>, WithProfessorMAPI?>,
+        IMapper<WithStudentMAPI?, Optional<WithStudentDTO>>,
+        IMapper<WithProfessorMAPI?, Optional<WithProfessorDTO>>,
+        IMapper<
+            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
+            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+        >,
+        IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO>,
+        IMapper<string, Executor, DeleteClassDTO>,
+        IMapper<EnrollClassMAPI, ulong, StudentClassRelationDTO>
 {
+    private readonly StringQueryToDomainMapper _strqToDomainMapper = strqToDomainMapper;
+    private readonly StringQueryFromDomainMapper _strqFromDomainMapper = strqFromDomainMapper;
+
     /// <summary>
-    /// Convierte un objeto <see cref="ClassCriteriaMAPI"/> en un <see cref="ClassCriteriaDTO"/> de dominio.
+    /// Valida y mapea los criterios de búsqueda de clases desde la API a un DTO para la capa de aplicación.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="ClassCriteriaMAPI"/> a mapear.</param>
-    /// <returns>
-    /// Un <see cref="Result{T, E}"/> que contiene el <see cref="ClassCriteriaDTO"/> si la conversión
-    /// fue exitosa, o una lista de <see cref="FieldErrorDTO"/> si se encontraron errores de formato.
-    /// </returns>
-    public static Result<ClassCriteriaDTO, List<FieldErrorDTO>> ToDomain(
-        this ClassCriteriaMAPI source
-    )
+    public Result<ClassCriteriaDTO, List<FieldErrorDTO>> Map(ClassCriteriaMAPI source)
     {
-        var className = Optional<StringQueryDTO>.None();
-        var subject = Optional<StringQueryDTO>.None();
-        var section = Optional<StringQueryDTO>.None();
-        var withStudentOpt = Optional<WithStudent>.None();
-        var withProfessorOpt = Optional<WithProfessor>.None();
+        List<FieldErrorDTO> errors = [];
+        var subjectValidation = _strqToDomainMapper.Map(source.Subject);
+        subjectValidation.IfErr(errors.AddRange);
 
-        var withStudent = source.WithStudent;
-        var withProfessor = source.WithProfessor;
+        var classNameValidation = _strqToDomainMapper.Map(source.ClassName);
+        classNameValidation.IfErr(errors.AddRange);
 
-        if (withStudent is not null)
-        {
-            var hidden = withStudent.Hidden is null
-                ? Optional<bool>.None()
-                : Optional<bool>.Some((bool)withStudent.Hidden);
+        var sectionValidation = _strqToDomainMapper.Map(source.Section);
+        sectionValidation.IfErr(errors.AddRange);
 
-            withStudentOpt = Optional<WithStudent>.Some(
-                new WithStudent { Id = withStudent.Id, Hidden = hidden }
-            );
-        }
-
-        if (withProfessor is not null)
-        {
-            var isOwner = withProfessor.IsOwner is null
-                ? Optional<bool>.None()
-                : Optional<bool>.Some((bool)withProfessor.IsOwner);
-
-            withProfessorOpt = Optional<WithProfessor>.Some(
-                new WithProfessor { Id = withProfessor.Id, IsOwner = isOwner }
-            );
-        }
-
-        var errs = new List<FieldErrorDTO>();
-        StringQueryMAPIMapper.ParseStringQuery(source.ClassName, "className", ref className, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.Subject, "subject", ref subject, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.Section, "section", ref section, errs);
-
-        if (errs.Count > 0)
-            return Result.Err<ClassCriteriaDTO, List<FieldErrorDTO>>(errs);
+        if (errors.Count > 0)
+            return Result.Err<ClassCriteriaDTO, List<FieldErrorDTO>>(errors);
 
         return Result.Ok<ClassCriteriaDTO, List<FieldErrorDTO>>(
             new ClassCriteriaDTO
             {
                 Page = source.Page,
                 Active = source.Active.ToOptional(),
-                WithStudent = withStudentOpt,
-                WithProfessor = withProfessorOpt,
-                Subject = subject,
-                ClassName = className,
-                Section = section,
+                Subject = subjectValidation.Unwrap(),
+                ClassName = classNameValidation.Unwrap(),
+                Section = sectionValidation.Unwrap(),
+                WithStudent = Map(source.WithStudent),
+                WithProfessor = Map(source.WithProfessor),
             }
         );
     }
 
     /// <summary>
-    /// Convierte una instancia de <see cref="ClassCriteriaDTO"/> en un objeto de infraestructura <see cref="ClassCriteriaMAPI"/>.
+    /// Mapea los criterios de búsqueda desde la capa de aplicación de vuelta a su representación en la API.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="ClassCriteriaDTO"/> a convertir.</param>
-    /// <returns>Un <see cref="ClassCriteriaMAPI"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ClassCriteriaMAPI FromDomain(this ClassCriteriaDTO source)
-    {
-        WithProfessorMAPI? withProfessor = null;
-        WithStudentMAPI? withStudent = null;
-
-        source.WithProfessor.IfSome(wp =>
+    public ClassCriteriaMAPI Map(ClassCriteriaDTO input) =>
+        new()
         {
-            withProfessor = new WithProfessorMAPI { Id = wp.Id };
-            wp.IsOwner.IfSome(o => withProfessor.IsOwner = o);
-        });
-
-        source.WithStudent.IfSome(ws =>
-        {
-            withStudent = new WithStudentMAPI { Id = ws.Id };
-            ws.Hidden.IfSome(h => withStudent.Hidden = h);
-        });
-
-        return new ClassCriteriaMAPI
-        {
-            Page = source.Page,
-            Active = source.Active.ToNullable(),
-            WithProfessor = withProfessor,
-            WithStudent = withStudent,
-            ClassName = source.ClassName.FromDomain(),
-            Section = source.Section.FromDomain(),
-            Subject = source.Subject.FromDomain(),
+            Page = input.Page,
+            Active = input.Active.ToNullable(),
+            Subject = _strqFromDomainMapper.Map(input.Subject),
+            Section = _strqFromDomainMapper.Map(input.Section),
+            ClassName = _strqFromDomainMapper.Map(input.ClassName),
+            WithProfessor = Map(input.WithProfessor),
+            WithStudent = Map(input.WithStudent),
         };
+
+    /// <summary>
+    /// Mapea un <see cref="WithProfessorDTO"/> a su representación para la API, <see cref="WithProfessorMAPI"/>.
+    /// </summary>
+    public WithProfessorMAPI Map(WithProfessorDTO input) =>
+        new() { Id = input.Id, IsOwner = input.IsOwner.ToNullable() };
+
+    /// <summary>
+    /// Mapea un <see cref="Optional{T}"/> de <see cref="WithProfessorDTO"/> a un <see cref="WithProfessorMAPI"/> nullable.
+    /// </summary>
+    public WithProfessorMAPI? Map(Optional<WithProfessorDTO> input) =>
+        input.Match<WithProfessorMAPI?>(Map, () => null);
+
+    /// <summary>
+    /// Mapea un <see cref="WithProfessorMAPI"/> nullable desde la API a un <see cref="Optional{T}"/> de <see cref="WithProfessorDTO"/>.
+    /// </summary>
+    public Optional<WithProfessorDTO> Map(WithProfessorMAPI? input) =>
+        input is not null
+            ? new WithProfessorDTO { Id = input.Id, IsOwner = input.IsOwner.ToOptional() }
+            : Optional<WithProfessorDTO>.None();
+
+    /// <summary>
+    /// Mapea un <see cref="WithStudentDTO"/> a su representación para la API, <see cref="WithStudentMAPI"/>.
+    /// </summary>
+    public WithStudentMAPI Map(WithStudentDTO input) =>
+        new() { Id = input.Id, Hidden = input.Hidden.ToNullable() };
+
+    /// <summary>
+    /// Mapea un <see cref="Optional{T}"/> de <see cref="WithStudentDTO"/> a un <see cref="WithStudentMAPI"/> nullable.
+    /// </summary>
+    public WithStudentMAPI? Map(Optional<WithStudentDTO> input) =>
+        input.Match<WithStudentMAPI?>(Map, () => null);
+
+    /// <summary>
+    /// Mapea un <see cref="WithStudentMAPI"/> nullable desde la API a un <see cref="Optional{T}"/> de <see cref="WithStudentDTO"/>.
+    /// </summary>
+    public Optional<WithStudentDTO> Map(WithStudentMAPI? input) =>
+        input is not null
+            ? new WithStudentDTO { Id = input.Id, Hidden = input.Hidden.ToOptional() }
+            : Optional<WithStudentDTO>.None();
+
+    public NewClassDTO Map(NewClassMAPI in1, Executor in2)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
-    /// Convierte una instancia de <see cref="ClassUpdateMAPI"/> en un <see cref="ClassUpdateDTO"/> de dominio.
+    /// Mapea una entidad de dominio <see cref="ClassDomain"/> a la representación de la API.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="ClassUpdateMAPI"/> a convertir.</param>
-    /// <returns>Un <see cref="ClassUpdateDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ClassUpdateDTO ToDomain(this ClassUpdateMAPI source, Executor executor) =>
+    public PublicClassMAPI Map(ClassDomain input) =>
         new()
         {
-            Id = source.Id,
-            Active = source.Active,
-            ClassName = source.ClassName,
-            Color = source.Color,
-            Section = source.Section.ToOptional(),
-            Subject = source.Subject.ToOptional(),
-            Executor = executor,
+            Id = input.Id,
+            Active = input.Active,
+            ClassName = input.ClassName,
+            Color = input.Color,
+            Section = input.Section.ToNullable(),
+            Subject = input.Subject.ToNullable(),
         };
 
     /// <summary>
-    /// Convierte una instancia de <see cref="NewClassMAPI"/> en un <see cref="NewClassDTO"/> de dominio.
+    /// Mapea una entidad de dominio a la representación de la API.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="NewClassMAPI"/> a convertir.</param>
-    /// <param name="ownerId">Identificador del propietario de la clase.</param>
-    /// <returns>Un <see cref="NewClassDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static NewClassDTO ToDomain(this NewClassMAPI source, ulong ownerId) =>
-        new()
-        {
-            Id = string.Empty,
-            ClassName = source.ClassName,
-            Color = source.Color,
-            OwnerId = ownerId,
-            Subject = source.Subject.ToOptional(),
-            Section = source.Section.ToOptional(),
-        };
-
-    /// <summary>
-    /// Convierte una instancia de <see cref="ProfessorClassRelationMAPI"/> en un <see cref="ProfessorClassRelationDTO"/> de dominio.
-    /// </summary>
-    /// <param name="source">Instancia de <see cref="ProfessorClassRelationMAPI"/> a convertir.</param>
-    /// <returns>Un <see cref="ProfessorClassRelationDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ProfessorClassRelationDTO ToDomain(this ProfessorClassRelationMAPI source) =>
-        new()
-        {
-            Id = new ClassUserRelationIdDTO
-            {
-                UserId = source.ProfessorId,
-                ClassId = source.ClassId,
-            },
-            IsOwner = source.IsOwner,
-        };
-
-    /// <summary>
-    /// Convierte una instancia de <see cref="StudentClassRelationMAPI"/> en un <see cref="StudentClassRelationDTO"/> de dominio.
-    /// </summary>
-    /// <param name="source">Instancia de <see cref="StudentClassRelationMAPI"/> a convertir.</param>
-    /// <returns>Un <see cref="StudentClassRelationDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static StudentClassRelationDTO ToDomain(this StudentClassRelationMAPI source) =>
-        new()
-        {
-            Id = new ClassUserRelationIdDTO { UserId = source.StudentId, ClassId = source.ClassId },
-            Hidden = source.Hidden,
-        };
-
-    /// <summary>
-    /// Convierte una instancia de <see cref="ProfessorClassRelationCriteriaMAPI"/> en un <see cref="ProfessorClassRelationCriteriaDTO"/> de dominio.
-    /// </summary>
-    /// <param name="source">Instancia de <see cref="ProfessorClassRelationCriteriaMAPI"/> a convertir.</param>
-    /// <returns>Un <see cref="ProfessorClassRelationCriteriaDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ProfessorClassRelationCriteriaDTO ToDomain(
-        this ProfessorClassRelationCriteriaMAPI source
+    public PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI> Map(
+        PaginatedQuery<ClassDomain, ClassCriteriaDTO> search
     ) =>
         new()
         {
-            ClassId = source.ClassId.ToOptional(),
-            UserId = source.ProfessorId.ToOptional(),
-            IsOwner = source.IsOwner.ToOptional(),
+            Page = search.Page,
+            Criteria = Map(search.Criteria),
+            TotalPages = search.TotalPages,
+            Results = search.Results.Select(Map),
         };
 
     /// <summary>
-    /// Convierte una instancia de <see cref="ProfessorClassRelationCriteriaDTO"/> en un objeto de infraestructura <see cref="ProfessorClassRelationCriteriaMAPI"/>.
+    /// Mapea la representación de la API a una entidad de dominio.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="ProfessorClassRelationCriteriaDTO"/> a convertir.</param>
-    /// <returns>Un <see cref="ProfessorClassRelationCriteriaMAPI"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static ProfessorClassRelationCriteriaMAPI FromDomain(
-        this ProfessorClassRelationCriteriaDTO source
-    ) =>
+    public ClassUpdateDTO Map(ClassUpdateMAPI data, Executor ex) =>
         new()
         {
-            ClassId = source.ClassId.ToNullable(),
-            ProfessorId = source.UserId.ToNullable(),
-            IsOwner = source.IsOwner.ToNullable(),
+            Id = data.Id,
+            Active = data.Active,
+            ClassName = data.ClassName,
+            Section = data.Section.ToOptional(),
+            Subject = data.Subject.ToOptional(),
+            Color = data.Color,
+            Executor = ex,
         };
 
     /// <summary>
-    /// Convierte una instancia de <see cref="StudentClassRelationCriteriaMAPI"/> en un <see cref="StudentClassRelationCriteriaDTO"/> de dominio.
+    /// Mapea la representación de la API a una entidad de dominio.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="StudentClassRelationCriteriaMAPI"/> a convertir.</param>
-    /// <returns>Un <see cref="StudentClassRelationCriteriaDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static StudentClassRelationCriteriaDTO ToDomain(
-        this StudentClassRelationCriteriaMAPI source
-    ) => new() { ClassId = source.ClassId.ToOptional(), UserId = source.StudentId.ToOptional() };
+    public DeleteClassDTO Map(string id, Executor ex) => new() { Id = id, Executor = ex };
 
     /// <summary>
-    /// Convierte una instancia de <see cref="ClassDomain"/> en un objeto de infraestructura <see cref="PublicClassMAPI"/>.
+    /// Mapea la representación de la API a una entidad de dominio.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="ClassDomain"/> a convertir.</param>
-    /// <returns>Un <see cref="PublicClassMAPI"/> con los valores correspondientes mapeados desde <paramref name="source"/>.</returns>
-    public static PublicClassMAPI FromDomain(this ClassDomain source) =>
+    public StudentClassRelationDTO Map(EnrollClassMAPI data, ulong userId) =>
         new()
         {
-            Id = source.Id,
-            Active = source.Active,
-            ClassName = source.ClassName,
-            Color = source.Color,
-            Subject = source.Subject.ToNullable(),
-            Section = source.Section.ToNullable(),
-        };
-
-    /// <summary>
-    /// Convierte una consulta paginada de dominio en una consulta paginada de la API mínima.
-    /// </summary>
-    /// <param name="source">Consulta paginada de dominio a convertir.</param>
-    /// <returns>Una consulta paginada de la API mínima con los valores correspondientes mapeados.</returns>
-    public static PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI> FromDomain(
-        this PaginatedQuery<ClassDomain, ClassCriteriaDTO> source
-    ) =>
-        new()
-        {
-            Page = source.Page,
-            TotalPages = source.TotalPages,
-            Criteria = source.Criteria.FromDomain(),
-            Results = source.Results.Select(FromDomain).ToList(),
+            Id = new() { ClassId = data.ClassId, UserId = data.UserId },
+            Hidden = false,
         };
 }
+

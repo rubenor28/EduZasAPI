@@ -1,3 +1,4 @@
+using Application.DTOs.Common;
 using Domain.ValueObjects;
 
 namespace Application.DTOs.Classes;
@@ -7,9 +8,6 @@ namespace Application.DTOs.Classes;
 /// </summary>
 public sealed record NewClassDTO
 {
-    /// <summary>
-    /// Id auto generado por el sistema.
-    /// </summary>
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
@@ -36,4 +34,9 @@ public sealed record NewClassDTO
     /// Id del profesor dueño de la clase nueva
     /// </summary>
     public required ulong OwnerId { get; set; }
+
+    /// <summary>
+    /// Ejecutor de la accion
+    /// </summary>
+    public required Executor Executor { get; set; }
 }

@@ -25,7 +25,7 @@ public class UpdateClassUseCase(
     /// </summary>
     /// <param name="value">DTO con los datos de la clase a actualizar.</param>
     /// <returns>Un resultado que indica si la validación fue exitosa o no.</returns>
-    protected async override Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         ClassUpdateDTO value
     )
     {
@@ -36,13 +36,13 @@ public class UpdateClassUseCase(
             );
 
             if (result.IsNone || !result.Unwrap().IsOwner)
-                return Result.Err(UseCaseError.Unauthorized());
+                return Result.Err(UseCaseErrors.Unauthorized());
         }
 
         var classToUpdate = await _reader.GetAsync(value.Id);
         if (classToUpdate.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
-        return Result<Unit, UseCaseErrorImpl>.Ok(Unit.Value);
+        return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }
 }

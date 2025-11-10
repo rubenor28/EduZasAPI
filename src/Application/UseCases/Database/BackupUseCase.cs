@@ -17,10 +17,10 @@ public sealed class BackupUseCase(IDatabaseExporter exporter) : IUseCaseAsync<Ex
             _ => false,
         };
 
-    public async Task<Result<Stream, UseCaseErrorImpl>> ExecuteAsync(Executor executor)
+    public async Task<Result<Stream, UseCaseError>> ExecuteAsync(Executor executor)
     {
         if (!IsAuthorized(executor))
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         var stream = await _exporter.ExportBackupAsync();
 

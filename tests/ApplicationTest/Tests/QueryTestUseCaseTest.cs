@@ -96,8 +96,10 @@ public class QueryTestUseCaseTest : IDisposable
 
         var result = await _useCase.ExecuteAsync(criteria);
 
-        Assert.NotNull(result);
-        Assert.Equal(3, result.Results.Count());
+        Assert.True(result.IsOk);
+        var search = result.Unwrap();
+        Assert.NotNull(search);
+        Assert.Equal(3, search.Results.Count());
     }
 
     [Fact]
@@ -109,8 +111,10 @@ public class QueryTestUseCaseTest : IDisposable
             Title = new StringQueryDTO { Text = "Math", SearchType = StringSearchType.LIKE },
         };
 
-        var search = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(criteria);
 
+        Assert.True(result.IsOk);
+        var search = result.Unwrap();
         Assert.NotNull(search);
         var results = search.Results;
         Assert.Single(results);
@@ -123,12 +127,14 @@ public class QueryTestUseCaseTest : IDisposable
         var (_, professor2) = await SeedTests();
         var criteria = new TestCriteriaDTO { ProfessorId = professor2.Id };
 
-        var search = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(criteria);
 
+        Assert.True(result.IsOk);
+        var search = result.Unwrap();
         Assert.NotNull(search);
         var results = search.Results;
         Assert.Single(results);
-        Assert.Equal<ulong>(professor2.Id, results.First().ProfessorId);
+        Assert.Equal(professor2.Id, results.First().ProfessorId);
     }
 
     public void Dispose()

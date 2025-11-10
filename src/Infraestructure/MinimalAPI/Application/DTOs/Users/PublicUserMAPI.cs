@@ -59,5 +59,5 @@ public sealed record PublicUserMAPI
     /// Rol del usuario definido por <see cref="UserType"/>. 
     /// Valor por defecto: STUDENT.
     /// </value>
-    public int Role { get; set; } = 0;
+    public required ulong Role { get; set; }
 }

@@ -4,66 +4,64 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
-using InterfaceAdapters.Mappers.Users;
+using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Users;
 
 namespace MinimalAPI.Presentation.Mappers;
 
 /// <summary>
-/// Proporciona métodos de extensión para mapear entre DTOs de la API mínima y DTOs de dominio.
+/// Mapeador centralizado para la entidad de Usuario en la capa de la API.
 /// </summary>
-public static class UserMAPIMapper
+/// <remarks>
+/// Esta clase implementa múltiples interfaces <see cref="IMapper{TIn, TOut}"/> para manejar
+/// las diversas transformaciones entre los DTOs de la API (Minimal API), los DTOs de la capa de aplicación
+/// y las entidades de dominio relacionadas con el usuario.
+/// Su rol es actuar como un "Adaptador" en el contexto de Clean Architecture.
+/// </remarks>
+public sealed class UserMAPIMapper(
+    IMapper<UserType, ulong> roleFromDomainMapper,
+    IMapper<int, UserType> roleToDomainMapper,
+    IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper
+)
+    : IMapper<UserDomain, UserMAPI>,
+        IMapper<Executor, ReadUserDTO>,
+        IMapper<UserDomain, PublicUserMAPI>,
+        IMapper<PublicUserDTO, PublicUserMAPI>,
+        IMapper<NewUserMAPI, Executor, NewUserDTO>,
+        IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>
 {
+    private readonly IMapper<UserType, ulong> _roleFromDomainMapper = roleFromDomainMapper;
+    private readonly IMapper<int, UserType> _roleToDomainMapper = roleToDomainMapper;
+
+    private readonly IMapper<
+        StringQueryMAPI?,
+        Result<Optional<StringQueryDTO>, Unit>
+    > _strqToDomainMapper = strqToDomainMapper;
+
     /// <summary>
-    /// Convierte una instancia de <see cref="NewUserMAPI"/> en un objeto de dominio <see cref="NewUserDTO"/>.
+    /// Mapea los datos de un nuevo usuario desde la API y el ejecutor de la acción a un DTO para el caso de uso de creación.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="NewUserMAPI"/> a convertir.</param>
-    /// <returns>
-    /// Un <see cref="NewUserDTO"/> con los valores correspondientes mapeados desde <paramref name="source"/>.
-    /// Los campos opcionales (<c>MotherLastname</c>, <c>MidName</c>) se convierten a <see cref="Optional{T}"/>.
-    /// </returns>
-    public static NewUserDTO ToDomain(this NewUserMAPI source) =>
+    /// <param name="input">El DTO de la API con los datos del nuevo usuario.</param>
+    /// <param name="ex">El <see cref="Executor"/> que realiza la operación.</param>
+    /// <returns>Un <see cref="NewUserDTO"/> para la capa de aplicación.</returns>
+    public NewUserDTO Map(NewUserMAPI input, Executor ex) =>
         new()
         {
-            FirstName = source.FirstName,
-            FatherLastName = source.FatherLastName,
-            Email = source.Email,
-            Password = source.Password,
-            MotherLastname = source.MotherLastname.ToOptional(),
-            MidName = source.MidName.ToOptional(),
+            FirstName = input.FirstName,
+            FatherLastName = input.FatherLastName,
+            Email = input.Email,
+            Password = input.Password,
+            MotherLastname = input.MotherLastname.ToOptional(),
+            MidName = input.MidName.ToOptional(),
+            Executor = ex,
         };
 
     /// <summary>
-    /// Convierte una instancia de <see cref="PublicUserDTO"/> en un objeto de infraestructura <see cref="PublicUserMAPI"/>.
+    /// Mapea un DTO público de la capa de aplicación a un DTO público para la API.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="PublicUserDTO"/> a convertir.</param>
-    /// <returns>
-    /// Un <see cref="PublicUserMAPI"/> con los valores correspondientes mapeados desde <paramref name="source"/>.
-    /// Los valores opcionales (<c>MotherLastname</c>, <c>MidName</c>) se convierten a tipos anulables,
-    /// y el rol se transforma a un entero mediante el mapper de enums.
-    /// </returns>
-    public static PublicUserMAPI FromDomain(this PublicUserDTO source) =>
-        new()
-        {
-            Id = source.Id,
-            FirstName = source.FirstName,
-            FatherLastName = source.FatherLastName,
-            Email = source.Email,
-            MotherLastname = source.MotherLastname.ToNullable(),
-            MidName = source.MidName.ToNullable(),
-            Role = source.Role.ToInt().Unwrap(),
-        };
-
-/// <summary>
-    /// Convierte una instancia de <see cref="UserDomain"/> en un objeto de infraestructura <see cref="PublicUserMAPI"/>.
-    /// </summary>
-    /// <param name="source">Instancia de <see cref="UserDomain"/> a convertir.</param>
-    /// <returns>
-    /// Un <see cref="PublicUserMAPI"/> con los valores correspondientes mapeados desde <paramref name="source"/>.
-    /// Los valores opcionales (<c>MotherLastname</c>, <c>MidName</c>) se convierten a tipos anulables,
-    /// y el rol se transforma a un entero mediante el mapper de enums.
-    /// </returns>
-    public static PublicUserMAPI FromDomain(this UserDomain source) =>
+    /// <param name="source">El DTO de la capa de aplicación.</param>
+    /// <returns>Un <see cref="PublicUserMAPI"/> con datos públicos del usuario.</returns>
+    public PublicUserMAPI Map(PublicUserDTO source) =>
         new()
         {
             Id = source.Id,
@@ -72,75 +70,103 @@ public static class UserMAPIMapper
             Email = source.Email,
             MotherLastname = source.MotherLastname.ToNullable(),
             MidName = source.MidName.ToNullable(),
-            Role = source.Role.ToInt().Unwrap(),
+            Role = _roleFromDomainMapper.Map(source.Role),
         };
 
     /// <summary>
-    /// Convierte una instancia de <see cref="RolChangeMAPI"/> en un <see cref="RolChangeDTO"/>.
+    /// Mapea una entidad de dominio de usuario a un DTO público para la API.
     /// </summary>
-    /// <param name="value">Instancia de <see cref="RolChangeMAPI"/> a convertir.</param>
-    /// <returns>
-    /// Un objeto <see cref="RolChangeDTO"/> con el identificador y el rol
-    /// mapeados al modelo de dominio.
-    /// Si el rol no se puede convertir, se asigna el valor por defecto <c>0</c>.
-    /// </returns>
-    public static RolChangeDTO ToDomain(this RolChangeMAPI value) =>
-        new() { Id = value.Id, Role = UserTypeMapper.FromInt(value.Role).UnwrapOr(0) };
+    /// <param name="source">La entidad <see cref="UserDomain"/>.</param>
+    /// <returns>Un <see cref="PublicUserMAPI"/> con datos públicos del usuario.</returns>
+    public PublicUserMAPI Map(UserDomain source) =>
+        new()
+        {
+            Id = source.Id,
+            FirstName = source.FirstName,
+            FatherLastName = source.FatherLastname,
+            Email = source.Email,
+            MotherLastname = source.MotherLastname.ToNullable(),
+            MidName = source.MidName.ToNullable(),
+            Role = _roleFromDomainMapper.Map(source.Role),
+        };
 
     /// <summary>
-    /// Convierte un objeto <see cref="UserCriteriaMAPI"/> en un <see cref="UserCriteriaDTO"/> de dominio.
+    /// Valida y mapea los criterios de búsqueda de usuarios desde la API a un DTO para la capa de aplicación.
     /// </summary>
-    /// <param name="source">Instancia de <see cref="UserCriteriaMAPI"/> a mapear.</param>
+    /// <remarks>
+    /// Este método combina la validación y el mapeo. Si la validación falla, devuelve una lista de errores.
+    /// En un diseño más estricto, la validación podría extraerse a un componente separado.
+    /// </remarks>
+    /// <param name="source">Los criterios de búsqueda provenientes de la API.</param>
     /// <returns>
-    /// Un <see cref="Result{T, E}"/> que contiene el <see cref="UserCriteriaDTO"/> si la conversión
-    /// fue exitosa, o una lista de <see cref="FieldErrorDTO"/> si se encontraron errores de formato.
+    /// Un <see cref="Result{T, E}"/> que contiene el <see cref="UserCriteriaDTO"/> si la validación es exitosa,
+    /// o una colección de <see cref="FieldErrorDTO"/> si falla.
     /// </returns>
-    public static Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>> ToDomain(
-        this UserCriteriaMAPI source
-    )
+    public Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>> Map(UserCriteriaMAPI source)
     {
-        var role = Optional<UserType>.None();
-        var firstName = Optional<StringQueryDTO>.None();
-        var midName = Optional<StringQueryDTO>.None();
-        var fatherLastName = Optional<StringQueryDTO>.None();
-        var motherLastname = Optional<StringQueryDTO>.None();
-        var email = Optional<StringQueryDTO>.None();
-        var password = Optional<StringQueryDTO>.None();
-
         var errs = new List<FieldErrorDTO>();
-        StringQueryMAPIMapper.ParseStringQuery(source.FirstName, "firstName", ref firstName, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.MidName, "midName", ref midName, errs);
-        StringQueryMAPIMapper.ParseStringQuery(
-            source.FatherLastName,
-            "fatherLastName",
-            ref fatherLastName,
-            errs
-        );
-        StringQueryMAPIMapper.ParseStringQuery(
-            source.MotherLastname,
-            "motherLastname",
-            ref motherLastname,
-            errs
-        );
-        StringQueryMAPIMapper.ParseStringQuery(source.Email, "email", ref email, errs);
-        StringQueryMAPIMapper.ParseStringQuery(source.Password, "password", ref password, errs);
+        var firstNameValidation = _strqToDomainMapper.Map(source.FirstName);
+        firstNameValidation.IfErr(_ => errs.Add(new() { Field = "fistName" }));
+
+        var midNameValidation = _strqToDomainMapper.Map(source.MidName);
+        midNameValidation.IfErr(_ => errs.Add(new() { Field = "midName" }));
+
+        var fatherLastNameValidation = _strqToDomainMapper.Map(source.FatherLastname);
+        fatherLastNameValidation.IfErr(_ => errs.Add(new() { Field = "fatherLastname" }));
+
+        var motherLastnameValidation = _strqToDomainMapper.Map(source.MotherLastname);
+        motherLastnameValidation.IfErr(_ => errs.Add(new() { Field = "motherLastname" }));
+
+        var emailValidation = _strqToDomainMapper.Map(source.Email);
+        emailValidation.IfErr(_ => errs.Add(new() { Field = "email" }));
+
+        var passwordValidation = _strqToDomainMapper.Map(source.Password);
+        passwordValidation.IfErr(_ => errs.Add(new() { Field = "password" }));
 
         if (errs.Count > 0)
             return errs;
 
         return new UserCriteriaDTO
         {
-            FirstName = firstName,
-            MidName = midName,
-            FatherLastName = fatherLastName,
-            MotherLastname = motherLastname,
-            Email = email,
-            Password = password,
-            Role = role,
+            FirstName = firstNameValidation.Unwrap(),
+            MidName = midNameValidation.Unwrap(),
+            FatherLastName = fatherLastNameValidation.Unwrap(),
+            MotherLastname = motherLastnameValidation.Unwrap(),
+            Email = emailValidation.Unwrap(),
+            Password = passwordValidation.Unwrap(),
+            Role = source.Role is null
+                ? Optional<UserType>.None()
+                : _roleToDomainMapper.Map((int)source.Role),
             Page = source.Page,
             Active = source.Active.ToOptional(),
             CreatedAt = source.CreatedAt.ToOptional(),
             ModifiedAt = source.CreatedAt.ToOptional(),
         };
     }
+
+    /// <summary>
+    /// Mapea un <see cref="Executor"/> a un <see cref="ReadUserDTO"/> para casos de uso de lectura.
+    /// </summary>
+    /// <param name="input">El <see cref="Executor"/> que realiza la acción.</param>
+    /// <returns>Un <see cref="ReadUserDTO"/> que encapsula al ejecutor.</returns>
+    public ReadUserDTO Map(Executor input) => new() { Id = input.Id, Executor = input };
+
+    /// <summary>
+    /// Mapea una entidad de dominio <see cref="UserDomain"/> a su representación completa para la API.
+    /// </summary>
+    /// <param name="input">La entidad de dominio del usuario.</param>
+    /// <returns>Un DTO <see cref="UserMAPI"/> con todos los datos del usuario.</returns>
+    UserMAPI IMapper<UserDomain, UserMAPI>.Map(UserDomain input) =>
+        new()
+        {
+            Id = input.Id,
+            Active = input.Active,
+            Email = input.Email,
+            Role = _roleFromDomainMapper.Map(input.Role),
+            FirstName = input.FirstName,
+            FatherLastName = input.FatherLastname,
+            MidName = input.MidName.ToNullable(),
+            MotherLastname = input.MotherLastname.ToNullable(),
+            Password = input.Password,
+        };
 }

@@ -36,13 +36,13 @@ public sealed class DeleteContactUseCase(
     private readonly TagDeleter _tagDeleter = tagDeleter;
 
     /// <inheritdoc>
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         DeleteContactDTO value
     )
     {
         var recordSearch = await _reader.GetAsync(value.Id);
         if (recordSearch.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         var record = recordSearch.Unwrap();
 
@@ -55,7 +55,7 @@ public sealed class DeleteContactUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
     }

@@ -6,7 +6,7 @@ namespace Application.DTOs.Classes;
 /// <summary>
 /// Representa los criterios de búsqueda para un profesor en una clase.
 /// </summary>
-public sealed record WithProfessor
+public sealed record WithProfessorDTO
 {
     /// <summary>
     /// ID del profesor a buscar.
@@ -22,7 +22,7 @@ public sealed record WithProfessor
 /// <summary>
 /// Representa los criterios de búsqueda para un estudiante en una clase.
 /// </summary>
-public sealed record WithStudent
+public sealed record WithStudentDTO
 {
     /// <summary>
     /// ID del estudiante a buscar.
@@ -63,10 +63,10 @@ public sealed record ClassCriteriaDTO : CriteriaDTO
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen asignado un profesor específico.
     /// </summary>
-    public Optional<WithProfessor> WithProfessor { get; set; } = Optional<WithProfessor>.None();
+    public Optional<WithProfessorDTO> WithProfessor { get; set; } = Optional<WithProfessorDTO>.None();
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen inscrito un estudiante específico.
     /// </summary>
-    public Optional<WithStudent> WithStudent { get; set; } = Optional<WithStudent>.None();
+    public Optional<WithStudentDTO> WithStudent { get; set; } = Optional<WithStudentDTO>.None();
 }

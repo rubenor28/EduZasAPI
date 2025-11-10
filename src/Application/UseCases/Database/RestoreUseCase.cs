@@ -28,10 +28,10 @@ public sealed class RestoreUseCase(IDatabaseImporter importer)
     /// </summary>
     /// <param name="request">La solicitud con el stream del respaldo.</param>
     /// <returns>Un resultado que indica éxito o un error.</returns>
-    public async Task<Result<Unit, UseCaseErrorImpl>> ExecuteAsync(RestoreRequestDTO request)
+    public async Task<Result<Unit, UseCaseError>> ExecuteAsync(RestoreRequestDTO request)
     {
         if (!IsAuthorized(request.Executor))
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         await _importer.RestoreAsync(request.InputStream);
 

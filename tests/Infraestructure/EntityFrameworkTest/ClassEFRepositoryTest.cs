@@ -52,6 +52,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var created = await _creator.AddAsync(newClass);
@@ -72,6 +73,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         await _creator.AddAsync(newClass);
 
@@ -83,6 +85,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("B"),
             Subject = Optional.Some("Science"),
             OwnerId = 2,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(duplicateClass));
@@ -99,6 +102,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         var created = await _creator.AddAsync(newClass);
 
@@ -110,7 +114,7 @@ public class ClassEFRepositoryTest : IDisposable
             Active = false,
             Section = Optional.Some("B"),
             Subject = Optional.Some("Science"),
-            Executor = new() { Id = 1, Role = UserType.PROFESSOR },
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var updatedClass = await _updater.UpdateAsync(update);
@@ -135,6 +139,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         var created = await _creator.AddAsync(newClass);
 
@@ -163,6 +168,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         var created = await _creator.AddAsync(newClass);
 
@@ -194,6 +200,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         await _creator.AddAsync(newClass1);
 
@@ -205,6 +212,7 @@ public class ClassEFRepositoryTest : IDisposable
             Section = Optional.Some("B"),
             Subject = Optional.Some("Science"),
             OwnerId = 2,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         await _creator.AddAsync(newClass2);
 

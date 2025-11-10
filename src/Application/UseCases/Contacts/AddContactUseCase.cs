@@ -37,7 +37,7 @@ public sealed class AddContactUseCase(
 
     private readonly ContactTagCreator _contactTagCreator = contactTagCreator;
 
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         NewContactDTO request
     )
     {
@@ -47,7 +47,7 @@ public sealed class AddContactUseCase(
         (await SearchUser(request.UserId, "userId")).IfErr(errors.Add);
 
         if (errors.Count != 0)
-            return UseCaseError.Input(errors);
+            return UseCaseErrors.Input(errors);
 
         var authorized = request.Executor.Role switch
         {
@@ -56,14 +56,14 @@ public sealed class AddContactUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         var repeatedSearch = await _querier.GetByAsync(
             new() { AgendaOwnerId = request.AgendaOwnerId, UserId = request.UserId }
         );
 
         if (repeatedSearch.Results.Any())
-            return UseCaseError.AlreadyExists();
+            return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
     }

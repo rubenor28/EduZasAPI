@@ -41,13 +41,13 @@ public class LoginUseCase(
     /// 3. Compara la contraseña proporcionada con el hash almacenado
     /// 4. Genera un token de autenticación si las credenciales son correctas
     /// </remarks>
-    public async Task<Result<UserDomain, UseCaseErrorImpl>> ExecuteAsync(
+    public async Task<Result<UserDomain, UseCaseError>> ExecuteAsync(
         UserCredentialsDTO credentials
     )
     {
         var validation = validator.IsValid(credentials);
         if (validation.IsErr)
-            return UseCaseError.Input(validation.UnwrapErr());
+            return UseCaseErrors.Input(validation.UnwrapErr());
 
         var emailSearch = new StringQueryDTO
         {
@@ -69,13 +69,13 @@ public class LoginUseCase(
             throw new InvalidDataException($"Repeated email {credentials.Email} stored");
 
         if (results == 0)
-            return UseCaseError.Input([new() { Field = "email", Message = "Email no encontrado" }]);
+            return UseCaseErrors.Input([new() { Field = "email", Message = "Email no encontrado" }]);
 
         var usr = userSearch.Results.ToList()[0];
 
         var pwdMatch = hasher.Matches(credentials.Password, usr.Password);
         if (!pwdMatch)
-            return UseCaseError.Input(
+            return UseCaseErrors.Input(
                 [new() { Field = "password", Message = "Contraseña incorrecta" }]
             );
 

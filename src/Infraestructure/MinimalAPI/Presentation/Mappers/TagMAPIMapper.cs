@@ -1,43 +1,68 @@
 using Application.DTOs.Common;
+using Application.DTOs.Contacts;
 using Application.DTOs.Tags;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs.Contacts;
 using MinimalAPI.Application.DTOs.Tags;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-public static class TagMAPIMapper
-{
-    public static Result<TagCriteriaDTO, UseCaseErrorImpl> ToDomain(this TagCriteriaMAPI source)
-    {
-        var invalidFormat = source.Text is not null && source.Text.ToDomain().IsErr;
+using StringQueryFromDomainMapper = IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>;
+using StringQueryToDomainMapper = IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>;
 
-        if (invalidFormat)
-            return UseCaseError.Input([new() { Field = "text", Message = "Formato invalido" }]);
+public class TagMAPIMapper(
+    StringQueryToDomainMapper strqToDomainMapper,
+    StringQueryFromDomainMapper strqFromDomainMapper
+)
+    : IMapper<TagCriteriaMAPI, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
+        IMapper<TagCriteriaDTO, TagCriteriaMAPI>,
+        IMapper<TagDomain, PublicTagMAPI>,
+        IMapper<PaginatedQuery<ContactDomain, ContactCriteriaDTO>, PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>>,
+        IMapper<PaginatedQuery<TagDomain, TagCriteriaDTO>, PaginatedQuery<string, TagCriteriaMAPI>>
+{
+    private readonly StringQueryToDomainMapper _strqToDomainMapper = strqToDomainMapper;
+    private readonly StringQueryFromDomainMapper _strqFromDomainMapper = strqFromDomainMapper;
+
+    public Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>> Map(TagCriteriaMAPI source)
+    {
+        List<FieldErrorDTO> errs = [];
+        var textValidation = _strqToDomainMapper.Map(source.Text);
+        textValidation.IfErr(_ => errs.Add(new() { Field = "text", Message = "Formato invalido" }));
+
+        if (errs.Count > 0)
+            return errs;
 
         return new TagCriteriaDTO
         {
-            Text = source.Text switch
-            {
-                not null => source.Text.ToDomain().Unwrap(),
-                null => Optional<StringQueryDTO>.None(),
-            },
+            Text = textValidation.Unwrap(),
             ContactId = source.ContactId.ToOptional(),
             AgendaOwnerId = source.AgendaOwnerId.ToOptional(),
             Page = source.Page,
         };
     }
 
-    public static TagCriteriaMAPI FromDomain(this TagCriteriaDTO source) =>
+    public TagCriteriaMAPI Map(TagCriteriaDTO source) =>
         new()
         {
             Page = source.Page,
             ContactId = source.ContactId.ToNullable(),
             AgendaOwnerId = source.AgendaOwnerId.ToNullable(),
-            Text = source.Text.Match<StringQueryMAPI?>((value) => value.FromDomain(), () => null),
+            Text = _strqFromDomainMapper.Map(source.Text),
         };
 
-    public static PublicTagMAPI FromDomain(this TagDomain source) => new() { Text = source.Text };
+    public PublicTagMAPI Map(TagDomain source) => new() { Text = source.Text };
+
+    public PaginatedQuery<string, TagCriteriaMAPI> Map(
+        PaginatedQuery<TagDomain, TagCriteriaDTO> input
+    ) =>
+        new()
+        {
+            Page = input.Page,
+            Criteria = Map(input.Criteria),
+            Results = input.Results.Select(t => t.Text),
+            TotalPages = input.TotalPages,
+        };
 }

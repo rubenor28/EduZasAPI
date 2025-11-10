@@ -1,4 +1,5 @@
 using Application.DTOs.Classes;
+using Domain.Enums;
 using FluentValidationProj.Application.Services.Classes;
 
 namespace FluentValidationTest.Classes;
@@ -18,6 +19,7 @@ public class NewClassFluentValidatorTest
             Section = "Section A",
             Subject = "Subject B",
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 
         var result = _validator.IsValid(dto);
@@ -38,6 +40,7 @@ public class NewClassFluentValidatorTest
             Section = "Section A",
             Subject = "Subject B",
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 
         var result = _validator.IsValid(dto);
@@ -57,6 +60,7 @@ public class NewClassFluentValidatorTest
             Section = "Section A",
             Subject = "S",
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 
         var result = _validator.IsValid(dto);
@@ -76,6 +80,7 @@ public class NewClassFluentValidatorTest
             Section = "S",
             Subject = "Subject B",
             OwnerId = 1,
+            Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 
         var result = _validator.IsValid(dto);

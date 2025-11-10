@@ -22,7 +22,7 @@ public interface IUseCaseAsync<TRequest, TResponse>
     /// Contiene un resultado que puede ser exitoso con <typeparamref name="TResponse"/>
     /// o fallido con <typeparamref name="TError"/>.
     /// </returns>
-    Task<Result<TResponse, UseCaseErrorImpl>> ExecuteAsync(TRequest request);
+    Task<Result<TResponse, UseCaseError>> ExecuteAsync(TRequest request);
 }
 
 /// <summary>

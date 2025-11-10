@@ -18,14 +18,14 @@ public sealed class UpdateClassTestUseCase(
 {
     private readonly IReaderAsync<ulong, TestDomain> _testReader = testReader;
 
-    protected override async Task<Result<Unit, UseCaseErrorImpl>> ExtraValidationAsync(
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         ClassTestUpdateDTO value
     )
     {
         var recordSearch = await _reader.GetAsync(value.Id);
 
         if (recordSearch.IsNone)
-            return UseCaseError.NotFound();
+            return UseCaseErrors.NotFound();
 
         var authorized = value.Executor.Role switch
         {
@@ -39,7 +39,7 @@ public sealed class UpdateClassTestUseCase(
         };
 
         if (!authorized)
-            return UseCaseError.Unauthorized();
+            return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
     }
