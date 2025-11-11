@@ -210,8 +210,8 @@ public static class ClassRoutes
     public static Task<IResult> AddClass(
         NewClassMAPI newClass,
         AddClassUseCase useCase,
-        IMapper<ClassDomain, PublicClassDTO> responseMapper,
         IMapper<NewClassMAPI, Executor, NewClassDTO> requestMapper,
+        IMapper<ClassDomain, PublicClassMAPI> responseMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -324,12 +324,12 @@ public static class ClassRoutes
         HttpContext ctx,
         RoutesUtils utils,
         EnrollClassUseCase useCase,
-        IMapper<EnrollClassMAPI, Executor, EnrollClassDTO> requestMapper
+        IMapper<EnrollClassMAPI, ulong, EnrollClassDTO> requestMapper
     )
     {
         return utils.HandleUseCaseAsync(
             useCase,
-            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => requestMapper.Map(data, utils.GetIdFromContext(ctx)),
             mapResponse: (_) => Results.Created()
         );
     }
@@ -368,17 +368,32 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> AddProfessor(
-        AddProfessorToClassMAPI data,
+        ClassProfessorMAPI data,
         HttpContext ctx,
         RoutesUtils utils,
-        AddProfessorToClassUseCase useCase,
-        IMapper<AddProfessorToClassMAPI, Executor, AddProfessorToClassDTO> requestMapper
+        AddClassProfessorUseCase useCase,
+        IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO> requestMapper
     )
     {
         return utils.HandleUseCaseAsync(
             useCase,
             mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
             mapResponse: (_) => Results.NoContent()
+        );
+    }
+
+    public static Task<IResult> UpdateProfessor(
+        ClassProfessorMAPI request,
+        UpdateClassProfessorUseCase useCase,
+        HttpContext ctx,
+        RoutesUtils utils,
+        IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO> reqMapper
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapResponse: _ => Results.NoContent()
         );
     }
 }

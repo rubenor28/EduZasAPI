@@ -21,17 +21,17 @@ using UseCaseResult = Task<Result<ProfessorClassRelationDTO, UseCaseError>>;
 /// que el usuario posea los permisos requeridos (Professor o Administrador).
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class AddProfessorToClassUseCase
-    : IUseCaseAsync<AddProfessorToClassDTO, ProfessorClassRelationDTO>
+public class AddClassProfessorUseCase
+    : IUseCaseAsync<NewClassProfessorDTO, ProfessorClassRelationDTO>
 {
     private readonly IProfessorCreator _creator;
     private readonly IUserReader _userReader;
     private readonly IClassReader _classReader;
     private readonly IProfessorReader _professorReader;
 
-    private readonly Dictionary<UserType, Func<AddProfessorToClassDTO, UseCaseResult>> _handlers;
+    private readonly Dictionary<UserType, Func<NewClassProfessorDTO, UseCaseResult>> _handlers;
 
-    public AddProfessorToClassUseCase(
+    public AddClassProfessorUseCase(
         IProfessorCreator creator,
         IUserReader userReader,
         IClassReader classReader,
@@ -43,7 +43,7 @@ public class AddProfessorToClassUseCase
         _classReader = classReader;
         _professorReader = professorRelationReader;
 
-        _handlers = new Dictionary<UserType, Func<AddProfessorToClassDTO, UseCaseResult>>
+        _handlers = new Dictionary<UserType, Func<NewClassProfessorDTO, UseCaseResult>>
         {
             [UserType.STUDENT] = dto => Task.FromResult(Result<ProfessorClassRelationDTO, UseCaseError>.Err(UseCaseErrors.Unauthorized())),
 
@@ -63,7 +63,7 @@ public class AddProfessorToClassUseCase
         };
     }
 
-    public async UseCaseResult ExecuteAsync(AddProfessorToClassDTO value)
+    public async UseCaseResult ExecuteAsync(NewClassProfessorDTO value)
     {
         var userSearch = await _userReader.GetAsync(value.UserId);
         List<FieldErrorDTO> errors = [];
@@ -91,7 +91,7 @@ public class AddProfessorToClassUseCase
         return await handler(value);
     }
 
-    private async Task<ProfessorClassRelationDTO> AddProfessor(AddProfessorToClassDTO value)
+    private async Task<ProfessorClassRelationDTO> AddProfessor(NewClassProfessorDTO value)
     {
         var relation = await _creator.AddAsync(
             new()

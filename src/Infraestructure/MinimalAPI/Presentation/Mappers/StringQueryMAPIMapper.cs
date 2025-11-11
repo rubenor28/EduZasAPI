@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Application.DTOs.Common;
 using Domain.Enums;
 using Domain.ValueObjects;
@@ -11,10 +10,10 @@ public class StringQueryMAPIMapper(
     IMapper<string, Result<StringSearchType, Unit>> searchTypeToDomainMapper,
     IMapper<StringSearchType, string> searchTypeFromDomainMapper
 )
-    : IMapper<StringQueryMAPI, Result<StringQueryDTO, IEnumerable<FieldErrorDTO>>>,
+    : IMapper<StringQueryMAPI, Result<StringQueryDTO, Unit>>,
         IMapper<StringQueryDTO, StringQueryMAPI>,
         IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>,
-        IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, IEnumerable<FieldErrorDTO>>>
+        IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>
 {
     private readonly IMapper<string, Result<StringSearchType, Unit>> _searchTypeToDomainMapper =
         searchTypeToDomainMapper;
@@ -22,17 +21,15 @@ public class StringQueryMAPIMapper(
     private readonly IMapper<StringSearchType, string> _searchTypeFromDomainMapper =
         searchTypeFromDomainMapper;
 
-    public Result<StringQueryDTO, IEnumerable<FieldErrorDTO>> Map(StringQueryMAPI source)
+    public Result<StringQueryDTO, Unit> Map(StringQueryMAPI source)
     {
-        List<FieldErrorDTO> errors = [];
+        ushort errors = 0;
 
         var searchType = _searchTypeToDomainMapper.Map(source.SearchType);
+        searchType.IfErr((_) => errors++);
 
-        if (searchType.IsErr)
-            errors.Add(new() { Field = "searchType", Message = "Formato invalido" });
-
-        if (errors.Count > 0)
-            return errors;
+        if (errors > 0)
+            return Unit.Value;
 
         return new StringQueryDTO { SearchType = searchType.Unwrap(), Text = source.Text };
     }
@@ -47,20 +44,17 @@ public class StringQueryMAPIMapper(
     public StringQueryMAPI? Map(Optional<StringQueryDTO> input) =>
         input.Match<StringQueryMAPI?>((strQuery) => Map(strQuery), () => null);
 
-    Result<Optional<StringQueryDTO>, IEnumerable<FieldErrorDTO>> IMapper<
+    Result<Optional<StringQueryDTO>, Unit> IMapper<
         StringQueryMAPI?,
-        Result<Optional<StringQueryDTO>, IEnumerable<FieldErrorDTO>>
+        Result<Optional<StringQueryDTO>, Unit>
     >.Map(StringQueryMAPI? input)
     {
         if (input is null)
             return Optional<StringQueryDTO>.None();
 
         var parse = Map(input);
-
         if (parse.IsErr)
-            return Result<Optional<StringQueryDTO>, IEnumerable<FieldErrorDTO>>.Err(
-                parse.UnwrapErr()
-            );
+            return Unit.Value;
 
         return Optional<StringQueryDTO>.Some(parse.Unwrap());
     }

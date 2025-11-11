@@ -9,19 +9,19 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassProfessors;
 
-public sealed class UpdateProfessorToClassUseCase(
-    IUpdaterAsync<ProfessorClassRelationDTO, ProfessorClassRelationUpdateDTO> updater,
+public sealed class UpdateClassProfessorUseCase(
+    IUpdaterAsync<ProfessorClassRelationDTO, ClassProfessorUpdateDTO> updater,
     IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> reader,
-    IBusinessValidationService<ProfessorClassRelationUpdateDTO>? validator = null
+    IBusinessValidationService<ClassProfessorUpdateDTO>? validator = null
 )
     : UpdateUseCase<
         ClassUserRelationIdDTO,
-        ProfessorClassRelationUpdateDTO,
+        ClassProfessorUpdateDTO,
         ProfessorClassRelationDTO
     >(updater, reader, validator)
 {
     protected override Result<Unit, UseCaseError> ExtraValidation(
-        ProfessorClassRelationUpdateDTO value
+        ClassProfessorUpdateDTO value
     )
     {
         var authorized = value.Executor.Role switch

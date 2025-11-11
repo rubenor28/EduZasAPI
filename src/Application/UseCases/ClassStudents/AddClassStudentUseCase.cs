@@ -1,6 +1,4 @@
 using Application.DAOs;
-using Application.DTOs.Classes;
-using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.Common;
@@ -14,22 +12,20 @@ namespace Application.UseCases.ClassStudents;
 /// Implementa el caso de uso para añadir un usuario a una clase.
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class EnrollClassUseCase(
-    ICreatorAsync<StudentClassRelationDTO, EnrollClassDTO> creator,
+public class AddStudentClassUseCase(
+    ICreatorAsync<ClassStudentDomain, NewClassStudentDTO> creator,
     IReaderAsync<ulong, UserDomain> userReader,
     IReaderAsync<string, ClassDomain> classReader,
-    IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> studentReader,
-    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorReader
-) : AddUseCase<EnrollClassDTO, StudentClassRelationDTO>(creator)
+    IReaderAsync<UserClassRelationId, ClassStudentDomain> studentReader,
+    IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader
+) : AddUseCase<NewClassStudentDTO, ClassStudentDomain>(creator)
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
-    private readonly IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> _studentReader =
+    private readonly IReaderAsync<UserClassRelationId, ClassStudentDomain> _studentReader =
         studentReader;
-    private readonly IReaderAsync<
-        ClassUserRelationIdDTO,
-        ProfessorClassRelationDTO
-    > _professorReader = professorReader;
+    private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
+        professorReader;
 
     /// <summary>
     /// Realiza validaciones asincrónicas antes de proceder con la adición de la relación.
@@ -42,7 +38,7 @@ public class EnrollClassUseCase(
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        EnrollClassDTO value
+        NewClassStudentDTO value
     )
     {
         var errors = new List<FieldErrorDTO>();
@@ -55,7 +51,7 @@ public class EnrollClassUseCase(
             errors.Add(new() { Field = "userId", Message = "Usuario no encontrado" })
         );
 
-        var professorId = new ClassUserRelationIdDTO
+        var professorId = new UserClassRelationId
         {
             UserId = value.UserId,
             ClassId = value.ClassId,

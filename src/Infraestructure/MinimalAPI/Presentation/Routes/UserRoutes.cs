@@ -22,46 +22,22 @@ public static class UserRoutes
     }
 
     public static Task<IResult> SearchUsers(
-        UserCriteriaMAPI request,
+        UserCriteriaMAPI criteria,
         UserQueryUseCase useCase,
-        HttpContext ctx,
-        RoutesUtils utils,
-        IMapper<UseCaseError, IResult> useCaseErrorMapper,
+        IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
         IMapper<
-            UserCriteriaMAPI,
-            Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > criteriaMapper
+            PaginatedQuery<UserDomain, UserCriteriaDTO>,
+            PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>
+        > resMapper,
+        HttpContext ctx,
+        RoutesUtils utils
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-            var parse = criteriaMapper.Map(request);
-
-            if (parse.IsErr)
-            {
-                var useCaseError = UseCaseErrors.Input(parse.UnwrapErr());
-                return useCaseErrorMapper.Map(useCaseError);
-            }
-
-            var criteria = parse.Unwrap();
-            var result = await useCase.ExecuteAsync(parse.Unwrap());
-
-            if (result.IsErr)
-                return useCaseErrorMapper.Map(result.UnwrapErr());
-
-            var search = result.Unwrap();
-
-            return Results.Ok(
-                new PaginatedQuery<UserDomain, UserCriteriaMAPI>()
-                {
-                    Page = search.Page,
-                    Criteria = request,
-                    TotalPages = search.TotalPages,
-                    Results = search.Results,
-                }
-            );
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(criteria),
+            mapResponse: (search) => Results.Ok(resMapper.Map(search))
+        );
     }
 
     public static Task<IResult> UpdateUser(
@@ -69,45 +45,15 @@ public static class UserRoutes
         UpdateUserUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils,
-        IMapper<UseCaseError, IResult> useCaseErrorMapper,
-        IMapper<uint, Result<UserType, Unit>> roleMapper
+        IMapper<UserUpdateMAPI, Executor, UserUpdateDTO> reqMapper,
+        IMapper<UserDomain, PublicUserMAPI> resMapper
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-            var role = roleMapper.Map(request.Role);
-
-            if (role.IsErr)
-            {
-                var error = UseCaseErrors.Input(
-                    [new() { Field = "role", Message = "Formato inválido" }]
-                );
-
-                return useCaseErrorMapper.Map(error);
-            }
-
-            var result = await useCase.ExecuteAsync(
-                new UserUpdateDTO
-                {
-                    Id = request.Id,
-                    Active = request.Active,
-                    Email = request.Email,
-                    FatherLastName = request.FatherLastName,
-                    FirstName = request.FirstName,
-                    MotherLastname = request.MotherLastname.ToOptional(),
-                    MidName = request.MidName.ToOptional(),
-                    Password = request.Password,
-                    Role = role.Unwrap(),
-                    Executor = executor,
-                }
-            );
-
-            if (result.IsErr)
-                return useCaseErrorMapper.Map(result.UnwrapErr());
-
-            return Results.Ok(result.Unwrap());
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (user) => Results.Ok(resMapper.Map(user))
+        );
     }
 
     public static Task<IResult> DeleteUser(
@@ -115,20 +61,14 @@ public static class UserRoutes
         DeleteUserUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils,
-        IMapper<UseCaseError, IResult> useCaseErrorMapper,
-        IMapper<UserDomain, PublicUserMAPI> userMapper
+        IMapper<ulong, Executor, DeleteUserDTO> reqMapper,
+        IMapper<UserDomain, PublicUserMAPI> resMapper
     )
     {
-        return utils.HandleResponseAsync(async () =>
-        {
-            var executor = utils.GetExecutorFromContext(ctx);
-            var result = await useCase.ExecuteAsync(new() { Id = userId, Executor = executor });
-
-            if (result.IsErr)
-                return useCaseErrorMapper.Map(result.UnwrapErr());
-
-            var user = result.Unwrap();
-            return Results.Ok(userMapper.Map(user));
-        });
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(userId, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (user) => Results.Ok(resMapper.Map(user))
+        );
     }
 }

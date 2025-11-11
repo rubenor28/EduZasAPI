@@ -1,6 +1,4 @@
 using Application.DAOs;
-using Application.DTOs.Classes;
-using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.Common;
@@ -14,18 +12,17 @@ namespace Application.UseCases.ClassStudents;
 /// Implementa el caso de uso para añadir un usuario a una clase.
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class UnenrollClassUseCase(
-    IDeleterAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> deleter,
-    IReaderAsync<ClassUserRelationIdDTO, StudentClassRelationDTO> reader,
+public class DeleteClassStudentUseCase(
+    IDeleterAsync<UserClassRelationId, ClassStudentDomain> deleter,
+    IReaderAsync<UserClassRelationId, ClassStudentDomain> reader,
     IReaderAsync<ulong, UserDomain> userReader,
     IReaderAsync<string, ClassDomain> classReader,
-    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorRelationReader
-)
-    : DeleteUseCase<ClassUserRelationIdDTO, UnenrollClassDTO, StudentClassRelationDTO>(
-        deleter,
-        reader
-    )
+    IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader
+) : DeleteUseCase<UserClassRelationId, DeleteClassStudentDTO, ClassStudentDomain>(deleter, reader)
 {
+    private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
+        professorReader;
+
     /// <summary>
     /// Realiza validaciones asincrónicas antes de proceder con la adición de la relación.
     /// Las validaciones incluyen la existencia de la clase, la existencia del usuario y
@@ -37,7 +34,7 @@ public class UnenrollClassUseCase(
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        UnenrollClassDTO value
+        DeleteClassStudentDTO value
     )
     {
         var errors = new List<FieldErrorDTO>();
@@ -83,7 +80,7 @@ public class UnenrollClassUseCase(
     /// </summary>
     private async Task<bool> IsAuthorizedProfessor(ulong professorId, string classId)
     {
-        var professorRelationSearch = await professorRelationReader.GetAsync(
+        var professorRelationSearch = await _professorReader.GetAsync(
             new() { UserId = professorId, ClassId = classId }
         );
 

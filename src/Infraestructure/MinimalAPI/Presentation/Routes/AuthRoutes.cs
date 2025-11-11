@@ -69,7 +69,6 @@ public static class AuthRoutes
         RoutesUtils utils,
         IMapper<NewUserMAPI, Executor, NewUserDTO> newUserMapper,
         IMapper<UserDomain, PublicUserMAPI> userMapper,
-        IMapper<UseCaseError, IResult> useCaseErrorMapper,
         HttpContext ctx
     )
     {

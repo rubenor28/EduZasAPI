@@ -1,21 +1,16 @@
 using Application.DTOs.Classes;
-using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Classes;
-using MinimalAPI.Application.DTOs.ClassStudents;
 using MinimalAPI.Application.DTOs.Common;
 
 namespace MinimalAPI.Presentation.Mappers;
 
 // Alias para mejorar la legibilidad de los tipos de mapeadores genéricos complejos.
 using StringQueryFromDomainMapper = IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>;
-using StringQueryToDomainMapper = IMapper<
-    StringQueryMAPI?,
-    Result<Optional<StringQueryDTO>, IEnumerable<FieldErrorDTO>>
->;
+using StringQueryToDomainMapper = IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>;
 
 /// <summary>
 /// Mapeador centralizado para la entidad 'Class' en la capa de la API.
@@ -32,7 +27,7 @@ public class ClassMAPIMapper(
 )
     : IMapper<ClassDomain, PublicClassMAPI>,
         IMapper<NewClassMAPI, Executor, NewClassDTO>,
-        IMapper<ClassCriteriaMAPI, Result<ClassCriteriaDTO, List<FieldErrorDTO>>>,
+        IMapper<ClassCriteriaMAPI, Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
         IMapper<ClassCriteriaDTO, ClassCriteriaMAPI>,
         IMapper<WithProfessorDTO, WithProfessorMAPI>,
         IMapper<WithStudentDTO, WithStudentMAPI>,
@@ -45,8 +40,7 @@ public class ClassMAPIMapper(
             PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
         >,
         IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO>,
-        IMapper<string, Executor, DeleteClassDTO>,
-        IMapper<EnrollClassMAPI, ulong, StudentClassRelationDTO>
+        IMapper<string, Executor, DeleteClassDTO>
 {
     private readonly StringQueryToDomainMapper _strqToDomainMapper = strqToDomainMapper;
     private readonly StringQueryFromDomainMapper _strqFromDomainMapper = strqFromDomainMapper;
@@ -54,22 +48,22 @@ public class ClassMAPIMapper(
     /// <summary>
     /// Valida y mapea los criterios de búsqueda de clases desde la API a un DTO para la capa de aplicación.
     /// </summary>
-    public Result<ClassCriteriaDTO, List<FieldErrorDTO>> Map(ClassCriteriaMAPI source)
+    public Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>> Map(ClassCriteriaMAPI source)
     {
-        List<FieldErrorDTO> errors = [];
+        List<FieldErrorDTO> errs = [];
         var subjectValidation = _strqToDomainMapper.Map(source.Subject);
-        subjectValidation.IfErr(errors.AddRange);
+        subjectValidation.IfErr(_ => errs.Add(new() { Field = "subject" }));
 
         var classNameValidation = _strqToDomainMapper.Map(source.ClassName);
-        classNameValidation.IfErr(errors.AddRange);
+        classNameValidation.IfErr(_ => errs.Add(new() { Field = "className" }));
 
         var sectionValidation = _strqToDomainMapper.Map(source.Section);
-        sectionValidation.IfErr(errors.AddRange);
+        sectionValidation.IfErr(_ => errs.Add(new() { Field = "section" }));
 
-        if (errors.Count > 0)
-            return Result.Err<ClassCriteriaDTO, List<FieldErrorDTO>>(errors);
+        if (errs.Count > 0)
+            return Result.Err<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>(errs);
 
-        return Result.Ok<ClassCriteriaDTO, List<FieldErrorDTO>>(
+        return Result.Ok<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>(
             new ClassCriteriaDTO
             {
                 Page = source.Page,
@@ -190,15 +184,4 @@ public class ClassMAPIMapper(
     /// Mapea la representación de la API a una entidad de dominio.
     /// </summary>
     public DeleteClassDTO Map(string id, Executor ex) => new() { Id = id, Executor = ex };
-
-    /// <summary>
-    /// Mapea la representación de la API a una entidad de dominio.
-    /// </summary>
-    public StudentClassRelationDTO Map(EnrollClassMAPI data, ulong userId) =>
-        new()
-        {
-            Id = new() { ClassId = data.ClassId, UserId = data.UserId },
-            Hidden = false,
-        };
 }
-

@@ -1,11 +1,11 @@
 using Application.DTOs.Common;
 
-namespace MinimalAPI.Application.DTOs.ClassProfessors;
+namespace Application.DTOs.ClassStudents;
 
-public sealed record class AddProfessorToClassMAPI
+public sealed record NewClassStudentDTO
 {
-    public required string ClassId { get; set; }
     public required ulong UserId { get; set; }
+    public required string ClassId { get; set; }
     public required bool IsOwner { get; set; }
     public required Executor Executor { get; set; }
 }

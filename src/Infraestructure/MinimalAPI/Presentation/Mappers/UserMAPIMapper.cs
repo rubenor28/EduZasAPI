@@ -20,7 +20,7 @@ namespace MinimalAPI.Presentation.Mappers;
 /// </remarks>
 public sealed class UserMAPIMapper(
     IMapper<UserType, ulong> roleFromDomainMapper,
-    IMapper<int, UserType> roleToDomainMapper,
+    IMapper<int, Result<UserType, Unit>> roleToDomainMapper,
     IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper
 )
     : IMapper<UserDomain, UserMAPI>,
@@ -31,7 +31,7 @@ public sealed class UserMAPIMapper(
         IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>
 {
     private readonly IMapper<UserType, ulong> _roleFromDomainMapper = roleFromDomainMapper;
-    private readonly IMapper<int, UserType> _roleToDomainMapper = roleToDomainMapper;
+    private readonly IMapper<int, Result<UserType, Unit>> _roleToDomainMapper = roleToDomainMapper;
 
     private readonly IMapper<
         StringQueryMAPI?,
@@ -122,6 +122,12 @@ public sealed class UserMAPIMapper(
         var passwordValidation = _strqToDomainMapper.Map(source.Password);
         passwordValidation.IfErr(_ => errs.Add(new() { Field = "password" }));
 
+        var roleValidation = source.Role is null
+            ? Unit.Value
+            : _roleToDomainMapper.Map((int)source.Role);
+
+        roleValidation.IfErr(_ => errs.Add(new() { Field = "role" }));
+
         if (errs.Count > 0)
             return errs;
 
@@ -133,9 +139,7 @@ public sealed class UserMAPIMapper(
             MotherLastname = motherLastnameValidation.Unwrap(),
             Email = emailValidation.Unwrap(),
             Password = passwordValidation.Unwrap(),
-            Role = source.Role is null
-                ? Optional<UserType>.None()
-                : _roleToDomainMapper.Map((int)source.Role),
+            Role = roleValidation.Unwrap(),
             Page = source.Page,
             Active = source.Active.ToOptional(),
             CreatedAt = source.CreatedAt.ToOptional(),
