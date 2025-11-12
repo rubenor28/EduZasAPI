@@ -1,4 +1,5 @@
 using Application.DTOs.ClassProfessors;
+using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
@@ -7,10 +8,10 @@ namespace EntityFramework.Application.DAOs.ClassProfessors;
 
 public class ClassProfessorEFCreator(
     EduZasDotnetContext ctx,
-    IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper,
-    IMapper<ProfessorClassRelationDTO, ClassProfessor> newEntityMapper
+    IMapper<ClassProfessor, ClassProfessorDomain> domainMapper,
+    IMapper<NewClassProfessorDTO, ClassProfessor> newEntityMapper
 )
-    : EFCreator<ProfessorClassRelationDTO, ProfessorClassRelationDTO, ClassProfessor>(
+    : EFCreator<ClassProfessorDomain, NewClassProfessorDTO, ClassProfessor>(
         ctx,
         domainMapper,
         newEntityMapper

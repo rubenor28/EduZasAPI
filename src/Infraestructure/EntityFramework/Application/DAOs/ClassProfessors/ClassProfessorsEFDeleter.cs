@@ -1,5 +1,4 @@
-using Application.DTOs.Classes;
-using Application.DTOs.ClassProfessors;
+using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
@@ -9,14 +8,14 @@ namespace EntityFramework.Application.DAOs.ClassProfessors;
 
 public class ClassProfessorsEFDeleter(
     EduZasDotnetContext ctx,
-    IMapper<ClassProfessor, ProfessorClassRelationDTO> domainMapper
+    IMapper<ClassProfessor, ClassProfessorDomain> domainMapper
 )
-    : CompositeKeyEFDeleter<ClassUserRelationIdDTO, ProfessorClassRelationDTO, ClassProfessor>(
+    : CompositeKeyEFDeleter<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(
         ctx,
         domainMapper
     )
 {
-    public override async Task<ClassProfessor?> GetTrackedById(ClassUserRelationIdDTO id) =>
+    public override async Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

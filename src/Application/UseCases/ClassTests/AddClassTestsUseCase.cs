@@ -1,6 +1,4 @@
 using Application.DAOs;
-using Application.DTOs.Classes;
-using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
 using Application.Services;
@@ -16,7 +14,7 @@ public sealed class AddClassTestUseCase(
     IReaderAsync<ulong, TestDomain> testReader,
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> classTestReader,
-    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> professorReader,
+    IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader,
     IBusinessValidationService<NewClassTestDTO>? validator = null
 ) : AddUseCase<NewClassTestDTO, ClassTestDomain>(creator, validator)
 {
@@ -24,10 +22,8 @@ public sealed class AddClassTestUseCase(
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
     private readonly IReaderAsync<ClassTestIdDTO, ClassTestDomain> _classTestReader =
         classTestReader;
-    private readonly IReaderAsync<
-        ClassUserRelationIdDTO,
-        ProfessorClassRelationDTO
-    > _professorReader = professorReader;
+    private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
+        professorReader;
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         NewClassTestDTO value
@@ -35,36 +31,30 @@ public sealed class AddClassTestUseCase(
     {
         List<FieldErrorDTO> errors = [];
 
-        var classSearch = await _classReader.GetAsync(value.ClassId);
-        if (classSearch.IsNone)
-            errors.Add(new() { Field = "classId", Message = "No se encontró la clase" });
+        (await _classReader.GetAsync(value.ClassId)).IfNone(() =>
+            errors.Add(new() { Field = "classId", Message = "No se encontró la clase" })
+        );
 
         var testSearch = await _testReader.GetAsync(value.TestId);
-        if (testSearch.IsNone)
-            errors.Add(new() { Field = "testId", Message = "No se encontró el test" });
 
-        if (testSearch.IsSome)
-        {
-            var record = testSearch.Unwrap();
-            var professorSearch = await _professorReader.GetAsync(
-                new() { ClassId = value.ClassId, UserId = record.ProfessorId }
-            );
-
-            if (professorSearch.IsNone)
-                errors.Add(
-                    new() { Field = "testId", Message = "El dueño debe ser profesor de la clase" }
-                );
-        }
+        testSearch.IfNone(() =>
+            errors.Add(new() { Field = "testId", Message = "No se encontró el test" })
+        );
 
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
 
-        var test = testSearch.Unwrap();
-
         var authorized = value.Executor.Role switch
         {
-            UserType.ADMIN => true,
-            UserType.PROFESSOR => test.ProfessorId == value.Executor.Id,
+            UserType.ADMIN => await TestOwnerIsClassProfessor(
+                testSearch.Unwrap().ProfessorId,
+                value.ClassId
+            ),
+            UserType.PROFESSOR => await IsProfessorAuthorized(
+                value.Executor.Id,
+                value.ClassId,
+                testSearch.Unwrap()
+            ),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -80,5 +70,27 @@ public sealed class AddClassTestUseCase(
             return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
+    }
+
+    private async Task<bool> TestOwnerIsClassProfessor(ulong testOwner, string classId)
+    {
+        var professor = await _professorReader.GetAsync(
+            new() { ClassId = classId, UserId = testOwner }
+        );
+
+        return professor.IsSome;
+    }
+
+    private async Task<bool> IsProfessorAuthorized(
+        ulong professorId,
+        string classId,
+        TestDomain test
+    )
+    {
+        var professorSearch = await _professorReader.GetAsync(
+            new() { ClassId = classId, UserId = professorId }
+        );
+
+        return professorSearch.IsNone && test.ProfessorId == professorId;
     }
 }

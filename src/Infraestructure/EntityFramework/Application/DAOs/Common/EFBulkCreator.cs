@@ -4,28 +4,20 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public class EFCreator<DomainEntity, NewEntity, EFEntity>(
+public class EFBulkCreator<DomainEntity, NewEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> domainMapper,
     IMapper<NewEntity, EFEntity> newEntityMapper
 )
     : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper),
-        ICreatorAsync<DomainEntity, NewEntity>, IBulkCreatorAsync<DomainEntity, NewEntity>
+        IBulkCreatorAsync<DomainEntity, NewEntity>
     where EFEntity : class
     where NewEntity : notnull
     where DomainEntity : notnull
 {
     protected readonly IMapper<NewEntity, EFEntity> _newEntityMapper = newEntityMapper;
 
-    public async Task<DomainEntity> AddAsync(NewEntity value)
-    {
-        var entity = _newEntityMapper.Map(value);
-        await _dbSet.AddAsync(entity);
-        await _ctx.SaveChangesAsync();
-        return _domainMapper.Map(entity);
-    }
-
-    public async Task<IEnumerable<DomainEntity>> AddRangeAsync(IEnumerable<NewEntity> data)
+    public async Task<IEnumerable<DomainEntity>> AddAsync(IEnumerable<NewEntity> data)
     {
         var entities = data.Select(_newEntityMapper.Map);
         await _dbSet.AddRangeAsync(entities);

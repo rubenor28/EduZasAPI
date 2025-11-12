@@ -2,6 +2,7 @@ using Application.DAOs;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Notifications;
 using Application.DTOs.UserNotifications;
+using Application.DTOs.Users;
 using Application.UseCases.Common;
 using Domain.Entities;
 
@@ -9,38 +10,34 @@ namespace Application.UseCases.Notifications;
 
 public sealed class AddNotificationUseCase(
     ICreatorAsync<NotificationDomain, NewNotificationDTO> notificationCreator,
-    ICreatorAsync<UserNotificationDomain, NewUserNotificationDTO> userNotificationCreator,
-    IQuerierAsync<StudentClassRelationDTO, StudentClassRelationCriteriaDTO> classStudentsQuerier
+    IBulkCreatorAsync<UserNotificationDomain, NewUserNotificationDTO> userNotificationCreator,
+    IQuerierAsync<UserDomain, UserCriteriaDTO> userQuerier
 ) : AddUseCase<NewNotificationDTO, NotificationDomain>(notificationCreator)
 {
-    private readonly ICreatorAsync<
+    private readonly IBulkCreatorAsync<
         UserNotificationDomain,
         NewUserNotificationDTO
     > _userNotificatoinCreator = userNotificationCreator;
 
-    private readonly IQuerierAsync<
-        StudentClassRelationDTO,
-        StudentClassRelationCriteriaDTO
-    > _classStudentsQuerier = classStudentsQuerier;
+    private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuerier = userQuerier;
 
     // TODO: Crear una interfaz IBulkAdderAsync para paralelizar la creacion de
     // las relaciones de forma thread-safety
     protected override async Task ExtraTaskAsync(
-        NewNotificationDTO newEntity,
-        NotificationDomain createdEntity
+        NewNotificationDTO newE,
+        NotificationDomain created
     )
     {
-        var studentsSearch = await _classStudentsQuerier.GetByAsync(
-            new() { ClassId = newEntity.ClassId }
+        var studentsSearch = await _userQuerier.GetByAsync(
+            new() { EnrolledInClass = newE.ClassId }
         );
 
-        var studentIds = studentsSearch.Results.Select(u => u.Id.UserId);
-
-        foreach (var studentId in studentIds)
+        var newNotifications = studentsSearch.Results.Select(u => new NewUserNotificationDTO
         {
-            await _userNotificatoinCreator.AddAsync(
-                new() { UserId = studentId, NotificationId = createdEntity.Id }
-            );
-        }
+            UserId = u.Id,
+            NotificationId = created.Id,
+        });
+
+        await _userNotificatoinCreator.AddRangeAsync(newNotifications);
     }
 }

@@ -47,9 +47,7 @@ public abstract class AddUseCase<NE, E>(
         {
             var validation = _validator.IsValid(formatted);
             if (validation.IsErr)
-            {
                 return UseCaseErrors.Input(validation.UnwrapErr());
-            }
         }
 
         var syncCheck = ExtraValidation(formatted);

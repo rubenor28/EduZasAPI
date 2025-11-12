@@ -1,6 +1,5 @@
 using Application.DAOs;
 using Application.DTOs.Classes;
-using Application.DTOs.ClassProfessors;
 using Application.DTOs.Common;
 using Application.Services;
 using Application.UseCases.Common;
@@ -17,9 +16,12 @@ public class UpdateClassUseCase(
     IUpdaterAsync<ClassDomain, ClassUpdateDTO> updater,
     IReaderAsync<string, ClassDomain> reader,
     IBusinessValidationService<ClassUpdateDTO> validator,
-    IReaderAsync<ClassUserRelationIdDTO, ProfessorClassRelationDTO> relationReader
+    IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader
 ) : UpdateUseCase<string, ClassUpdateDTO, ClassDomain>(updater, reader, validator)
 {
+    private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
+        professorReader;
+
     /// <summary>
     /// Realiza validaciones adicionales para la actualización de la clase.
     /// </summary>
@@ -29,20 +31,30 @@ public class UpdateClassUseCase(
         ClassUpdateDTO value
     )
     {
-        if (value.Executor.Role != UserType.ADMIN)
+        var authorized = value.Executor.Role switch
         {
-            var result = await relationReader.GetAsync(
-                new() { UserId = value.Executor.Id, ClassId = value.Id }
-            );
+            UserType.ADMIN => true,
+            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.Id),
+            UserType.STUDENT => false,
+            _ => throw new NotImplementedException(),
+        };
 
-            if (result.IsNone || !result.Unwrap().IsOwner)
-                return Result.Err(UseCaseErrors.Unauthorized());
-        }
+        if (!authorized)
+            return UseCaseErrors.Unauthorized();
 
         var classToUpdate = await _reader.GetAsync(value.Id);
         if (classToUpdate.IsNone)
             return UseCaseErrors.NotFound();
 
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
+    }
+
+    private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
+    {
+        var professorSearch = await _professorReader.GetAsync(
+            new() { UserId = professorId, ClassId = classId }
+        );
+
+        return professorSearch.IsSome && professorSearch.Unwrap().IsOwner;
     }
 }
