@@ -6,7 +6,7 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
-public class ClassProfessorEFCreator(
+public class ClassProfessorsEFCreator(
     EduZasDotnetContext ctx,
     IMapper<ClassProfessor, ClassProfessorDomain> domainMapper,
     IMapper<NewClassProfessorDTO, ClassProfessor> newEntityMapper

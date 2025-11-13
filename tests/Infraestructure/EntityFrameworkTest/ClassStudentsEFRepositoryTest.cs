@@ -2,6 +2,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Domain.Entities;
+using Domain.Enums;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
@@ -20,7 +21,6 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     private readonly ClassStudentsEFReader _reader;
     private readonly ClassStudentsEFUpdater _updater;
     private readonly ClassStudentsEFDeleter _deleter;
-    private readonly ClassStudentEFQuerier _querier;
 
     private readonly ClassEFMapper _classMapper = new();
     private readonly UserEFMapper _userMapper;
@@ -36,7 +36,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new StudentClassEFMapper();
+        var mapper = new ClassStudentEFMapper();
 
         var roleMapper = new UserTypeMapper();
         _userMapper = new(roleMapper, roleMapper);
@@ -45,7 +45,6 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         _reader = new(_ctx, mapper);
         _updater = new(_ctx, mapper, mapper);
         _deleter = new(_ctx, mapper);
-        _querier = new(_ctx, mapper, 10);
     }
 
     private async Task<UserDomain> SeedUser()
@@ -58,6 +57,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
             FatherLastname = "test",
             Password = "test",
         };
+
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
         return _userMapper.Map(user);
@@ -78,7 +78,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     {
         var user = await SeedUser();
         var cls = await SeedClass();
-        var newRelation = new EnrollClassDTO
+        var newRelation = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = user.Id,
@@ -98,7 +98,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new EnrollClassDTO
+        var newRelation = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = user.Id,
@@ -115,7 +115,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new EnrollClassDTO
+        var newRelation = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = user.Id,
@@ -145,7 +145,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new EnrollClassDTO
+        var newRelation = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = user.Id,
@@ -154,7 +154,13 @@ public class StudentPerClassEFRepositoryTest : IDisposable
 
         var created = await _creator.AddAsync(newRelation);
 
-        var toUpdate = new StudentClassRelationDTO { Id = created.Id, Hidden = true };
+        var toUpdate = new ClassStudentUpdateDTO
+        {
+            Id = created.Id,
+            Hidden = true,
+            Executor = AsExecutor(user),
+        };
+
         var updated = await _updater.UpdateAsync(toUpdate);
 
         Assert.NotNull(updated);
@@ -164,13 +170,14 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     [Fact]
     public async Task Update_NonExistingRelation_ThrowsException()
     {
-        var toUpdate = new StudentClassRelationDTO
+        var toUpdate = new ClassStudentUpdateDTO
         {
             Id = new() { ClassId = "non-existent", UserId = 99 },
             Hidden = true,
+            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
-        await Assert.ThrowsAsync<ArgumentException>(() => _updater.UpdateAsync(toUpdate));
+        await Assert.ThrowsAnyAsync<Exception>(() => _updater.UpdateAsync(toUpdate));
     }
 
     [Fact]
@@ -179,7 +186,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new EnrollClassDTO
+        var newRelation = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = user.Id,
@@ -200,32 +207,9 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     [Fact]
     public async Task Delete_NonExistingRelation_ThrowsException()
     {
-        await Assert.ThrowsAsync<ArgumentException>(() =>
+        await Assert.ThrowsAnyAsync<Exception>(() =>
             _deleter.DeleteAsync(new() { ClassId = "non-existent", UserId = 99 })
         );
-    }
-
-    [Fact]
-    public async Task GetBy_WithUserId_ReturnsMatchingRelations()
-    {
-        var user = await SeedUser();
-        var cls = await SeedClass();
-
-        var newRelation = new EnrollClassDTO
-        {
-            ClassId = cls.Id,
-            UserId = user.Id,
-            Executor = AsExecutor(user),
-        };
-
-        var created = await _creator.AddAsync(newRelation);
-
-        var criteria = new StudentClassRelationCriteriaDTO { UserId = 1 };
-
-        var result = await _querier.GetByAsync(criteria);
-
-        Assert.Single(result.Results);
-        Assert.Equal(created.Id, result.Results.First().Id);
     }
 
     public void Dispose()

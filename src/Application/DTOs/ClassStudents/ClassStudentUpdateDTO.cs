@@ -7,6 +7,6 @@ namespace Application.DTOs.ClassStudents;
 public sealed record ClassStudentUpdateDTO : IIdentifiable<UserClassRelationId>
 {
     public required UserClassRelationId Id { get; set; }
-    public required bool IsOwner { get; set; }
+    public required bool Hidden { get; set; }
     public required Executor Executor { get; set; }
 }

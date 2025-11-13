@@ -1,30 +1,32 @@
 using Application.DTOs.ClassProfessors;
+using Domain.Entities;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers;
 
-public class ProfessorClassEFMapper
-    : IMapper<ClassProfessor, ProfessorClassRelationDTO>,
-        IMapper<ProfessorClassRelationDTO, ClassProfessor>,
-        IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor>
+public class ClassProfessorEFMapper
+    : IMapper<ClassProfessor, ClassProfessorDomain>,
+        IMapper<NewClassProfessorDTO, ClassProfessor>,
+        IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>
 {
-    public ClassProfessor Map(ProfessorClassRelationDTO r) =>
+    public ClassProfessor Map(NewClassProfessorDTO r) =>
         new()
         {
-            ClassId = r.Id.ClassId,
-            ProfessorId = r.Id.UserId,
+            ClassId = r.ClassId,
+            ProfessorId = r.UserId,
             IsOwner = r.IsOwner,
         };
 
-    public ProfessorClassRelationDTO Map(ClassProfessor efEntity) =>
+    public ClassProfessorDomain Map(ClassProfessor efEntity) =>
         new()
         {
             Id = new() { ClassId = efEntity.ClassId, UserId = efEntity.ProfessorId },
             IsOwner = efEntity.IsOwner ?? false,
+            CreatedAt = efEntity.CreatedAt,
         };
 
-    public void Map(ProfessorClassRelationDTO uProps, ClassProfessor entity)
+    public void Map(ClassProfessorUpdateDTO uProps, ClassProfessor entity)
     {
         entity.ClassId = uProps.Id.ClassId;
         entity.ProfessorId = uProps.Id.UserId;

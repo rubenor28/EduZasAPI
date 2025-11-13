@@ -1,10 +1,13 @@
 ﻿using Application.DTOs.Notifications;
 using Application.UseCases.Notifications;
-using EntityFramework.Application.DAOs.ClassStudents;
+using Domain.Entities;
+using Domain.Enums;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.UserNotifications;
+using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +19,11 @@ public class SearchNotificationUseCaseTest
     private readonly SearchNotificationUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
+
+    private readonly Random _rdm = new();
+
+    private readonly ClassEFMapper _classMapper = new();
+    private readonly UserEFMapper _userMapper;
 
     public SearchNotificationUseCaseTest()
     {
@@ -30,7 +38,6 @@ public class SearchNotificationUseCaseTest
 
         var notificationMapper = new NotificationEFMapper();
         var userNotificationMapper = new UserNotificationEFMapper();
-        var studentClassMapper = new StudentClassEFMapper();
 
         var notificationCreator = new NotificationEFCreator(
             _ctx,
@@ -44,65 +51,65 @@ public class SearchNotificationUseCaseTest
             userNotificationMapper
         );
 
-        var classStudentsQuerier = new ClassStudentEFQuerier(_ctx, studentClassMapper, 10);
+        var roleMapper = new UserTypeMapper();
+        _userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var userQuerier = new UserEFQuerier(_ctx, _userMapper, 10);
 
         _addNotificationUseCase = new AddNotificationUseCase(
             notificationCreator,
             userNotificationCreator,
-            classStudentsQuerier
+            userQuerier
         );
 
         var notificationQuerier = new NotificationEFQuerier(_ctx, notificationMapper, 10);
         _useCase = new SearchNotificationUseCase(notificationQuerier);
     }
 
-    private async Task SeedClass(string classId = "TEST-CLASS")
+    private async Task<(ClassDomain, UserDomain)> SeedStudent()
     {
-        _ctx.Classes.Add(new Class { ClassId = classId, ClassName = "Test Class" });
-        await _ctx.SaveChangesAsync();
-    }
+        var id = (ulong)_rdm.NextInt64(1, 100_000);
 
-    private async Task SeedStudent(string classId, ulong userId)
-    {
-        _ctx.Users.Add(
-            new()
-            {
-                UserId = userId,
-                Email = $"student{userId}@test.com",
-                FirstName = "test",
-                FatherLastname = "test",
-                Password = "test",
-            }
-        );
+        var user = new User
+        {
+            UserId = id,
+            Email = $"student{id}@test.com",
+            FirstName = "test",
+            FatherLastname = "test",
+            Password = "test",
+        };
+
+        var cls = new Class { ClassId = $"class-test-{id}", ClassName = "Test Class" };
+
+        _ctx.Users.Add(user);
+
+        _ctx.Classes.Add(cls);
+
         _ctx.ClassStudents.Add(
             new()
             {
-                ClassId = classId,
-                StudentId = userId,
+                ClassId = $"class-test-{id}",
+                StudentId = id,
                 Hidden = false,
             }
         );
+
         await _ctx.SaveChangesAsync();
+        return (_classMapper.Map(cls), _userMapper.Map(user));
     }
 
     [Fact]
     public async Task SearchUserNotification_ByStudent_ReturnsNotification()
     {
-        await SeedClass("Test-Class");
-        await SeedStudent("Test-Class", 1);
+        var (cls, user) = await SeedStudent();
 
-        var notification = new NewNotificationDTO
-        {
-            ClassId = "Test-Class",
-            Title = "Test",
-        };
+        var notification = new NewNotificationDTO { ClassId = cls.Id, Title = "Test" };
 
         await _addNotificationUseCase.ExecuteAsync(notification);
 
-        var criteria = new NotificationCriteriaDTO { UserId = 1 };
+        var criteria = new NotificationCriteriaDTO { UserId = user.Id };
 
         var result = await _useCase.ExecuteAsync(criteria);
-        
+
         Assert.True(result.IsOk);
         var search = result.Unwrap();
 
@@ -133,18 +140,13 @@ public class SearchNotificationUseCaseTest
     [Fact]
     public async Task SearchUserNotification_ByClass_ReturnsNotification()
     {
-        await SeedClass("Test-Class");
-        await SeedStudent("Test-Class", 1);
+        var (cls, _) = await SeedStudent();
 
-        var notification = new NewNotificationDTO
-        {
-            ClassId = "Test-Class",
-            Title = "Test",
-        };
+        var notification = new NewNotificationDTO { ClassId = cls.Id, Title = "Test" };
 
         await _addNotificationUseCase.ExecuteAsync(notification);
 
-        var criteria = new NotificationCriteriaDTO { ClassId = "Test-Class" };
+        var criteria = new NotificationCriteriaDTO { ClassId = cls.Id };
         var result = await _useCase.ExecuteAsync(criteria);
 
         Assert.True(result.IsOk);
@@ -163,7 +165,6 @@ public class SearchNotificationUseCaseTest
     public async Task SearchUserNotification_ByClass_ReturnsEmtpy()
     {
         var criteria = new NotificationCriteriaDTO { ClassId = "Test-Class" };
-
         var result = await _useCase.ExecuteAsync(criteria);
 
         Assert.True(result.IsOk);

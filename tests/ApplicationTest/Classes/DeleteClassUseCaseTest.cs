@@ -29,7 +29,7 @@ public class DeleteClassUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var classMapper = new ClassEFMapper();
-        var classProfessorMapper = new ProfessorClassEFMapper();
+        var classProfessorMapper = new ClassProfessorEFMapper();
 
         var classDeleter = new ClassEFDeleter(_ctx, classMapper);
         var classReader = new ClassEFReader(_ctx, classMapper);

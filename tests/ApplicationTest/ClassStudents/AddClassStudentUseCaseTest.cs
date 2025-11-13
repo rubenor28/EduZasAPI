@@ -1,4 +1,3 @@
-using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.ClassStudents;
@@ -18,12 +17,14 @@ namespace ApplicationTest.ClassStudents;
 
 public class EnrollClassUseCaseTest : IDisposable
 {
-    private readonly EnrollClassUseCase _useCase;
+    private readonly AddClassStudentUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
     private readonly UserEFMapper _userMapper;
     private readonly ClassEFMapper _classMapper = new();
+
+    private readonly Random _rdm = new();
 
     public EnrollClassUseCaseTest()
     {
@@ -39,8 +40,8 @@ public class EnrollClassUseCaseTest : IDisposable
         var roleMapper = new UserTypeMapper();
         _userMapper = new(roleMapper, roleMapper);
 
-        var studentClassMapper = new StudentClassEFMapper();
-        var professorClassMapper = new ProfessorClassEFMapper();
+        var studentClassMapper = new ClassStudentEFMapper();
+        var professorClassMapper = new ClassProfessorEFMapper();
 
         var userReader = new UserEFReader(_ctx, _userMapper);
         var classReader = new ClassEFReader(_ctx, _classMapper);
@@ -48,7 +49,7 @@ public class EnrollClassUseCaseTest : IDisposable
         var professorReader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
         var creator = new ClassStudentEFCreator(_ctx, studentClassMapper, studentClassMapper);
 
-        _useCase = new EnrollClassUseCase(
+        _useCase = new AddClassStudentUseCase(
             creator,
             userReader,
             classReader,
@@ -57,25 +58,28 @@ public class EnrollClassUseCaseTest : IDisposable
         );
     }
 
-    private async Task<UserDomain> SeedUser(ulong userId = 1)
+    private async Task<UserDomain> SeedUser(UserType role = UserType.STUDENT)
     {
+        var id = (ulong)_rdm.NextInt64(1, 100_000);
+
         var user = new User
         {
-            UserId = userId,
-            Email = $"user{userId}@test.com",
+            UserId = id,
+            Email = $"user-{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
-            Role = (uint)UserType.STUDENT,
+            Role = (uint)role,
         };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
         return _userMapper.Map(user);
     }
 
-    private async Task<ClassDomain> SeedClass(string classId = "TEST-CLASS")
+    private async Task<ClassDomain> SeedClass()
     {
-        var cls = new Class { ClassId = classId, ClassName = "Test Class" };
+        var id = (ulong)_rdm.NextInt64(1, 100_000);
+        var cls = new Class { ClassId = $"class-{id}", ClassName = "Test Class" };
         _ctx.Classes.Add(cls);
         await _ctx.SaveChangesAsync();
         return _classMapper.Map(cls);
@@ -89,10 +93,9 @@ public class EnrollClassUseCaseTest : IDisposable
     {
         var user = await SeedUser();
         var cls = await SeedClass();
-        var adminUser = await SeedUser(2);
-        adminUser.Role = UserType.ADMIN;
+        var adminUser = await SeedUser(UserType.ADMIN);
 
-        var dto = new EnrollClassDTO
+        var dto = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = user.Id,
@@ -111,10 +114,9 @@ public class EnrollClassUseCaseTest : IDisposable
     {
         var user = await SeedUser();
         var cls = await SeedClass();
-        var adminUser = await SeedUser(2);
-        adminUser.Role = UserType.ADMIN;
+        var adminUser = await SeedUser(UserType.ADMIN);
 
-        var dto = new EnrollClassDTO
+        var dto = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = user.Id,
@@ -132,7 +134,7 @@ public class EnrollClassUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithNonExistentClass_ReturnsInputError()
     {
         var user = await SeedUser();
-        var dto = new EnrollClassDTO
+        var dto = new NewClassStudentDTO
         {
             ClassId = "NON-EXISTENT",
             UserId = user.Id,
@@ -153,12 +155,13 @@ public class EnrollClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithNonExistentUser_ReturnsInputError()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var cls = await SeedClass();
-        var dto = new EnrollClassDTO
+        var dto = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = 999,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -187,7 +190,7 @@ public class EnrollClassUseCaseTest : IDisposable
         );
         await _ctx.SaveChangesAsync();
 
-        var dto = new EnrollClassDTO
+        var dto = new NewClassStudentDTO
         {
             ClassId = cls.Id,
             UserId = professor.Id,

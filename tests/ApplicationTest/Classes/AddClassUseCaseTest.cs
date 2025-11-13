@@ -51,10 +51,10 @@ public class AddClassUseCaseTest : IDisposable
         _userMapper = new UserEFMapper(userTypeMapper, userTypeMapper);
 
         var classMapper = new ClassEFMapper();
-        var professorClassMapper = new ProfessorClassEFMapper();
+        var professorClassMapper = new ClassProfessorEFMapper();
         var classCreator = new ClassEFCreator(_ctx, classMapper, classMapper);
 
-        var professorClassCreator = new ClassProfessorEFCreator(
+        var professorClassCreator = new ClassProfessorsEFCreator(
             _ctx,
             professorClassMapper,
             professorClassMapper

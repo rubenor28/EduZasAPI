@@ -1,5 +1,4 @@
-using Application.DTOs.Classes;
-using Application.DTOs.ClassStudents;
+using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
@@ -9,14 +8,10 @@ namespace EntityFramework.Application.DAOs.ClassStudents;
 
 public class ClassStudentsEFReader(
     EduZasDotnetContext ctx,
-    IMapper<ClassStudent, StudentClassRelationDTO> domainMapper
-)
-    : CompositeKeyEFReader<ClassUserRelationIdDTO, StudentClassRelationDTO, ClassStudent>(
-        ctx,
-        domainMapper
-    )
+    IMapper<ClassStudent, ClassStudentDomain> domainMapper
+) : CompositeKeyEFReader<UserClassRelationId, ClassStudentDomain, ClassStudent>(ctx, domainMapper)
 {
-    public override async Task<ClassStudent?> GetTrackedById(ClassUserRelationIdDTO id) =>
+    public override async Task<ClassStudent?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

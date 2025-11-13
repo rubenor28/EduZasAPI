@@ -14,9 +14,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTest.ClassProfessors;
 
-public class AddProfessorToClassUseCaseTest : IDisposable
+public class AddClassProfessorUseCaseTest : IDisposable
 {
-    private readonly AddProfessorToClassUseCase _useCase;
+    private readonly AddClassProfessorUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
@@ -25,7 +25,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
 
     private readonly Random _random = new();
 
-    public AddProfessorToClassUseCaseTest()
+    public AddClassProfessorUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
         _conn = new SqliteConnection($"Data Source={dbName};Mode=Memory;Cache=Shared");
@@ -36,32 +36,35 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classProfessorMapper = new ProfessorClassEFMapper();
 
         var userTypeMapper = new UserTypeMapper();
         _userMapper = new(userTypeMapper, userTypeMapper);
 
-        var classProfessorCreator = new ClassProfessorEFCreator(
+
+        var userReader = new UserEFReader(_ctx, _userMapper);
+        var classReader = new ClassEFReader(_ctx, _classMapper);
+
+        var classProfessorMapper = new ClassProfessorEFMapper();
+
+        var professorReader = new ClassProfessorsEFReader(_ctx, classProfessorMapper);
+
+        var professorCreator = new ClassProfessorsEFCreator(
             _ctx,
             classProfessorMapper,
             classProfessorMapper
         );
 
-        var userReader = new UserEFReader(_ctx, _userMapper);
-        var classReader = new ClassEFReader(_ctx, _classMapper);
-        var professorClassRelationReader = new ClassProfessorsEFReader(_ctx, classProfessorMapper);
-
-        _useCase = new AddProfessorToClassUseCase(
-            classProfessorCreator,
+        _useCase = new AddClassProfessorUseCase(
+            professorCreator,
+            professorReader,
             userReader,
-            classReader,
-            professorClassRelationReader
+            classReader
         );
     }
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
-        var id = (ulong)_random.Next(1000, 100000);
+        var id = (ulong)_random.Next(1, 100_000);
         var user = new User
         {
             UserId = id,
@@ -78,7 +81,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
 
     private async Task<ClassDomain> SeedClass()
     {
-        var number = _random.Next(1000, 100000);
+        var number = _random.Next(1, 100_000);
         var cls = new Class { ClassId = $"class-test-{number}", ClassName = "Test Class" };
         _ctx.Classes.Add(cls);
         await _ctx.SaveChangesAsync();
@@ -94,7 +97,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         var target = await SeedUser();
         var cls = await SeedClass();
 
-        var dto = new AddProfessorToClassDTO
+        var dto = new NewClassProfessorDTO
         {
             ClassId = cls.Id,
             UserId = target.Id,
@@ -118,7 +121,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         var newProfessor = await SeedUser();
         var cls = await SeedClass();
 
-        var bootstrapDto = new AddProfessorToClassDTO
+        var bootstrapDto = new NewClassProfessorDTO
         {
             ClassId = cls.Id,
             UserId = ownerProfessor.Id,
@@ -128,7 +131,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         var bootstrap = await _useCase.ExecuteAsync(bootstrapDto);
         Assert.True(bootstrap.IsOk);
 
-        var dto = new AddProfessorToClassDTO
+        var dto = new NewClassProfessorDTO
         {
             ClassId = cls.Id,
             UserId = newProfessor.Id,
@@ -150,7 +153,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         var target = await SeedUser();
         var cls = await SeedClass();
 
-        var dto = new AddProfessorToClassDTO
+        var dto = new NewClassProfessorDTO
         {
             ClassId = cls.Id,
             UserId = target.Id,
@@ -170,7 +173,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var cls = await SeedClass();
 
-        var dto = new AddProfessorToClassDTO
+        var dto = new NewClassProfessorDTO
         {
             ClassId = cls.Id,
             UserId = 999999,
@@ -195,7 +198,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var target = await SeedUser();
 
-        var dto = new AddProfessorToClassDTO
+        var dto = new NewClassProfessorDTO
         {
             ClassId = "NON-EXISTENT",
             UserId = target.Id,
@@ -221,7 +224,7 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         var target = await SeedUser();
         var cls = await SeedClass();
 
-        var dto = new AddProfessorToClassDTO
+        var dto = new NewClassProfessorDTO
         {
             ClassId = cls.Id,
             UserId = target.Id,
@@ -233,7 +236,8 @@ public class AddProfessorToClassUseCaseTest : IDisposable
         Assert.True(first.IsOk);
 
         var second = await _useCase.ExecuteAsync(dto);
-        Assert.True(second.IsOk);
+        Assert.True(second.IsErr);
+        Assert.IsType<AlreadyExistsError>(second.UnwrapErr());
     }
 
     public void Dispose()

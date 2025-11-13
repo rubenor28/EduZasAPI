@@ -1,6 +1,7 @@
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.UseCases.ClassStudents;
+using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
@@ -14,13 +15,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTest.ClassStudents;
 
-public class UnenrollClassUseCaseTest : IDisposable
+public class DeleteClassStudentUseCaseTest : IDisposable
 {
-    private readonly UnenrollClassUseCase _useCase;
+    private readonly DeleteClassStudentUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    public UnenrollClassUseCaseTest()
+    private readonly Random _rdm = new();
+
+    private readonly ClassEFMapper _classMapper = new();
+    private readonly UserEFMapper _userMapper;
+
+    public DeleteClassStudentUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
         _conn = new SqliteConnection($"Data Source={dbName};Mode=Memory;Cache=Shared");
@@ -32,19 +38,18 @@ public class UnenrollClassUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var roleMapper = new UserTypeMapper();
-        var userMapper = new UserEFMapper(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(roleMapper, roleMapper);
 
-        var classMapper = new ClassEFMapper();
-        var studentClassMapper = new StudentClassEFMapper();
-        var professorClassMapper = new ProfessorClassEFMapper();
+        var studentClassMapper = new ClassStudentEFMapper();
+        var professorClassMapper = new ClassProfessorEFMapper();
 
-        var userReader = new UserEFReader(_ctx, userMapper);
-        var classReader = new ClassEFReader(_ctx, classMapper);
+        var userReader = new UserEFReader(_ctx, _userMapper);
+        var classReader = new ClassEFReader(_ctx, _classMapper);
         var studentDeleter = new ClassStudentsEFDeleter(_ctx, studentClassMapper);
         var professorReader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
         var studentReader = new ClassStudentsEFReader(_ctx, studentClassMapper);
 
-        _useCase = new UnenrollClassUseCase(
+        _useCase = new DeleteClassStudentUseCase(
             studentDeleter,
             studentReader,
             userReader,
@@ -53,12 +58,13 @@ public class UnenrollClassUseCaseTest : IDisposable
         );
     }
 
-    private async Task<User> SeedUser(UserType role, ulong userId)
+    private async Task<UserDomain> SeedUser(UserType role = UserType.STUDENT)
     {
+        var id = (ulong)_rdm.NextInt64(1, 100_000);
         var user = new User
         {
-            UserId = userId,
-            Email = $"user{userId}@test.com",
+            UserId = id,
+            Email = $"user{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
@@ -66,15 +72,18 @@ public class UnenrollClassUseCaseTest : IDisposable
         };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
-        return user;
+        return _userMapper.Map(user);
     }
 
-    private async Task<Class> SeedClass(string classId = "TEST-CLASS")
+    private static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
+
+    private async Task<ClassDomain> SeedClass()
     {
-        var cls = new Class { ClassId = classId, ClassName = "Test Class" };
+        var id = _rdm.NextInt64(1, 10_000);
+        var cls = new Class { ClassId = $"class-{id}", ClassName = "Test Class" };
         _ctx.Classes.Add(cls);
         await _ctx.SaveChangesAsync();
-        return cls;
+        return _classMapper.Map(cls);
     }
 
     private async Task SeedStudentRelation(string classId, ulong studentId)
@@ -90,7 +99,7 @@ public class UnenrollClassUseCaseTest : IDisposable
         await _ctx.SaveChangesAsync();
     }
 
-    private async Task SeedProfessorRelation(string classId, ulong professorId, bool isOwner)
+    private async Task SeedProfessorRelation(string classId, ulong professorId, bool isOwner = true)
     {
         _ctx.ClassProfessors.Add(
             new ClassProfessor
@@ -106,35 +115,35 @@ public class UnenrollClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_StudentUnenrollsThemselves_Succeeds()
     {
-        var student = await SeedUser(UserType.STUDENT, 1);
+        var student = await SeedUser();
         var cls = await SeedClass();
-        await SeedStudentRelation(cls.ClassId, student.UserId);
+        await SeedStudentRelation(cls.Id, student.Id);
 
-        var dto = new UnenrollClassDTO
+        var dto = new DeleteClassStudentDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = student.UserId, Role = UserType.STUDENT },
+            Id = new() { ClassId = cls.Id, UserId = student.Id },
+            Executor = AsExecutor(student),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
 
         Assert.True(result.IsOk);
-        var relation = await _ctx.ClassStudents.FindAsync(cls.ClassId, student.UserId);
+        var relation = await _ctx.ClassStudents.FindAsync(cls.Id, student.Id);
         Assert.Null(relation);
     }
 
     [Fact]
     public async Task ExecuteAsync_AdminUnenrollsStudent_Succeeds()
     {
-        var admin = await SeedUser(UserType.ADMIN, 1);
-        var student = await SeedUser(UserType.STUDENT, 2);
+        var admin = await SeedUser(UserType.ADMIN);
+        var student = await SeedUser();
         var cls = await SeedClass();
-        await SeedStudentRelation(cls.ClassId, student.UserId);
+        await SeedStudentRelation(cls.Id, student.Id);
 
-        var dto = new UnenrollClassDTO
+        var dto = new DeleteClassStudentDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = admin.UserId, Role = UserType.ADMIN },
+            Id = new() { ClassId = cls.Id, UserId = student.Id },
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -145,16 +154,16 @@ public class UnenrollClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_OwnerUnenrollsStudent_Succeeds()
     {
-        var owner = await SeedUser(UserType.PROFESSOR, 1);
-        var student = await SeedUser(UserType.STUDENT, 2);
+        var owner = await SeedUser(UserType.PROFESSOR);
+        var student = await SeedUser();
         var cls = await SeedClass();
-        await SeedProfessorRelation(cls.ClassId, owner.UserId, true);
-        await SeedStudentRelation(cls.ClassId, student.UserId);
+        await SeedProfessorRelation(cls.Id, owner.Id);
+        await SeedStudentRelation(cls.Id, student.Id);
 
-        var dto = new UnenrollClassDTO
+        var dto = new DeleteClassStudentDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = owner.UserId, Role = UserType.PROFESSOR },
+            Id = new() { ClassId = cls.Id, UserId = student.Id },
+            Executor = AsExecutor(owner),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -165,16 +174,16 @@ public class UnenrollClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_NonOwnerProfessorUnenrolls_ReturnsUnauthorized()
     {
-        var nonOwner = await SeedUser(UserType.PROFESSOR, 1);
-        var student = await SeedUser(UserType.STUDENT, 2);
+        var nonOwner = await SeedUser(UserType.PROFESSOR);
+        var student = await SeedUser();
         var cls = await SeedClass();
-        await SeedProfessorRelation(cls.ClassId, nonOwner.UserId, false);
-        await SeedStudentRelation(cls.ClassId, student.UserId);
+        await SeedProfessorRelation(cls.Id, nonOwner.Id, false);
+        await SeedStudentRelation(cls.Id, student.Id);
 
-        var dto = new UnenrollClassDTO
+        var dto = new DeleteClassStudentDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = nonOwner.UserId, Role = UserType.PROFESSOR },
+            Id = new() { ClassId = cls.Id, UserId = student.Id },
+            Executor = AsExecutor(nonOwner),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -186,15 +195,15 @@ public class UnenrollClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_AnotherStudentUnenrolls_ReturnsUnauthorized()
     {
-        var student1 = await SeedUser(UserType.STUDENT, 1);
-        var student2 = await SeedUser(UserType.STUDENT, 2);
+        var student1 = await SeedUser();
+        var student2 = await SeedUser();
         var cls = await SeedClass();
-        await SeedStudentRelation(cls.ClassId, student2.UserId);
+        await SeedStudentRelation(cls.Id, student2.Id);
 
-        var dto = new UnenrollClassDTO
+        var dto = new DeleteClassStudentDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = student2.UserId },
-            Executor = new() { Id = student1.UserId, Role = UserType.STUDENT },
+            Id = new() { ClassId = cls.Id, UserId = student2.Id },
+            Executor = AsExecutor(student1),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -206,14 +215,14 @@ public class UnenrollClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_RelationNotFound_ReturnsNotFoundError()
     {
-        var student = await SeedUser(UserType.STUDENT, 1);
+        var student = await SeedUser();
         var cls = await SeedClass();
         // No relation seeded
 
-        var dto = new UnenrollClassDTO
+        var dto = new DeleteClassStudentDTO
         {
-            Id = new() { ClassId = cls.ClassId, UserId = student.UserId },
-            Executor = new() { Id = student.UserId, Role = UserType.STUDENT },
+            Id = new() { ClassId = cls.Id, UserId = student.Id },
+            Executor = AsExecutor(student),
         };
 
         var result = await _useCase.ExecuteAsync(dto);

@@ -157,7 +157,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPatch("/classes/{classId}/toggle-visibility", ToggleClassVisibility)
+        app.MapPatch("/classes", UpdateClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -289,7 +289,7 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> UpdateClass(
-        ClassUpdateMAPI data,
+        ClassUpdateMAPI request,
         UpdateClassUseCase useCase,
         IMapper<ClassDomain, PublicClassMAPI> responseMapper,
         IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO> requestMapper,
@@ -299,7 +299,7 @@ public static class ClassRoutes
     {
         return utils.HandleUseCaseAsync(
             useCase,
-            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => requestMapper.Map(request, utils.GetExecutorFromContext(ctx)),
             mapResponse: (classRecord) => Results.Ok(responseMapper.Map(classRecord))
         );
     }
@@ -323,8 +323,8 @@ public static class ClassRoutes
         EnrollClassMAPI data,
         HttpContext ctx,
         RoutesUtils utils,
-        EnrollClassUseCase useCase,
-        IMapper<EnrollClassMAPI, ulong, EnrollClassDTO> requestMapper
+        AddClassStudentUseCase useCase,
+        IMapper<EnrollClassMAPI, ulong, NewClassStudentDTO> requestMapper
     )
     {
         return utils.HandleUseCaseAsync(
@@ -337,10 +337,10 @@ public static class ClassRoutes
     public static Task<IResult> UnenrollClass(
         string classId,
         ulong userId,
-        IMapper<string, ulong, Executor, UnenrollClassDTO> requestMapper,
+        IMapper<string, ulong, Executor, DeleteClassStudentDTO> requestMapper,
         HttpContext ctx,
         RoutesUtils utils,
-        UnenrollClassUseCase useCase
+        DeleteClassStudentUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
@@ -350,19 +350,18 @@ public static class ClassRoutes
         );
     }
 
-    public static Task<IResult> ToggleClassVisibility(
-        string classId,
-        ulong studentId,
+    public static Task<IResult> UpdateClassStudent(
+        ClassStudentUpdateMAPI request,
         HttpContext ctx,
         RoutesUtils utils,
-        ToggleClassVisibilityUseCase useCase,
-        IMapper<string, ulong, Executor, ToggleClassVisibilityDTO> requestMapper
+        UpdateClassStudentUseCase useCase,
+        IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO> requestMapper
     )
     {
         return utils.HandleUseCaseAsync(
             useCase,
             mapRequest: () =>
-                requestMapper.Map(classId, studentId, utils.GetExecutorFromContext(ctx)),
+                requestMapper.Map(request, utils.GetExecutorFromContext(ctx)),
             mapResponse: (_) => Results.NoContent()
         );
     }

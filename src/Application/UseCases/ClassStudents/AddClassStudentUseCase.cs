@@ -12,7 +12,7 @@ namespace Application.UseCases.ClassStudents;
 /// Implementa el caso de uso para añadir un usuario a una clase.
 /// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
 /// </summary>
-public class AddStudentClassUseCase(
+public class AddClassStudentUseCase(
     ICreatorAsync<ClassStudentDomain, NewClassStudentDTO> creator,
     IReaderAsync<ulong, UserDomain> userReader,
     IReaderAsync<string, ClassDomain> classReader,

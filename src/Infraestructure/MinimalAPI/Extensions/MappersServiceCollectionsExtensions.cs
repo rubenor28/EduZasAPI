@@ -133,43 +133,37 @@ public static class MapperServiceCollectionExtensions
 
         // CLASS PROFESSOR
         // EF
-        s.AddSingleton<ProfessorClassEFMapper>();
+        s.AddSingleton<ClassProfessorEFMapper>();
 
-        s.AddSingleton<IMapper<ProfessorClassRelationDTO, ClassProfessor>>(sp =>
-            sp.GetRequiredService<ProfessorClassEFMapper>());
+        s.AddSingleton<IMapper<NewClassProfessorDTO, ClassProfessor>>(sp =>
+            sp.GetRequiredService<ClassProfessorEFMapper>());
 
-        s.AddSingleton<IMapper<ClassProfessor, ProfessorClassRelationDTO>>(sp =>
-            sp.GetRequiredService<ProfessorClassEFMapper>());
+        s.AddSingleton<IMapper<ClassProfessor, ClassProfessorDomain>>(sp =>
+            sp.GetRequiredService<ClassProfessorEFMapper>());
 
-        s.AddSingleton<IUpdateMapper<ProfessorClassRelationDTO, ClassProfessor>>(sp =>
-            sp.GetRequiredService<ProfessorClassEFMapper>());
+        s.AddSingleton<IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>>(sp =>
+            sp.GetRequiredService<ClassProfessorEFMapper>());
 
         // Minimal API
         s.AddSingleton<ClassProfessorMAPIMapper>();
-        s.AddSingleton<IMapper<NewClassProfessorMAPI, Executor, NewClassProfessorDTO>>(sp =>
+
+        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>>(sp =>
+            sp.GetRequiredService<ClassProfessorMAPIMapper>());
+
+        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>>(sp =>
             sp.GetRequiredService<ClassProfessorMAPIMapper>());
 
         // CLASS STUDENTS
-        s.AddSingleton<StudentClassEFMapper>();
+        s.AddSingleton<ClassStudentEFMapper>();
 
-        s.AddSingleton<IMapper<EnrollClassDTO, ClassStudent>>(sp =>
-            sp.GetRequiredService<StudentClassEFMapper>());
+        s.AddSingleton<IMapper<NewClassStudentDTO, ClassStudent>>(sp =>
+            sp.GetRequiredService<ClassStudentEFMapper>());
 
-        s.AddSingleton<IMapper<ClassStudent, StudentClassRelationDTO>>(sp =>
-            sp.GetRequiredService<StudentClassEFMapper>());
+        s.AddSingleton<IMapper<ClassStudent, ClassStudentDomain>>(sp =>
+            sp.GetRequiredService<ClassStudentEFMapper>());
 
-        s.AddSingleton<IUpdateMapper<StudentClassRelationDTO, ClassStudent>>(sp =>
-            sp.GetRequiredService<StudentClassEFMapper>());
-
-        s.AddSingleton<IMapper<EnrollClassMAPI, Executor, EnrollClassDTO>>(sp =>
-            sp.GetRequiredService<ClassStudentsMAPIMapper>());
-
-        s.AddSingleton<IMapper<string, ulong, Executor, UnenrollClassDTO>>(sp =>
-            sp.GetRequiredService<ClassStudentsMAPIMapper>());
-
-        s.AddSingleton<IMapper<string, ulong, Executor, ToggleClassVisibilityDTO>>(sp =>
-            sp.GetRequiredService<ClassStudentsMAPIMapper>());
-
+        s.AddSingleton<IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>>(sp =>
+            sp.GetRequiredService<ClassStudentEFMapper>());
 
         // NOTIFICATIONS
         s.AddSingleton<NotificationEFMapper>();

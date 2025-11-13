@@ -1,5 +1,5 @@
-using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
+using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
@@ -10,16 +10,17 @@ namespace EntityFramework.Application.DAOs.ClassStudents;
 
 public class ClassStudentsEFUpdater(
     EduZasDotnetContext ctx,
-    IMapper<ClassStudent, StudentClassRelationDTO> domainMapper,
-    IUpdateMapper<StudentClassRelationDTO, ClassStudent> updateMapper
+    IMapper<ClassStudent, ClassStudentDomain> domainMapper,
+    IUpdateMapper<ClassStudentUpdateDTO, ClassStudent> updateMapper
 )
-    : RelationEFUpdater<ClassUserRelationIdDTO, StudentClassRelationDTO, ClassStudent>(
-        ctx,
-        domainMapper,
-        updateMapper
-    )
+    : CompositeKeyEFUpdater<
+        UserClassRelationId,
+        ClassStudentDomain,
+        ClassStudentUpdateDTO,
+        ClassStudent
+    >(ctx, domainMapper, updateMapper)
 {
-    protected override async Task<ClassStudent?> GetTrackedById(ClassUserRelationIdDTO id) =>
+    protected override async Task<ClassStudent?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

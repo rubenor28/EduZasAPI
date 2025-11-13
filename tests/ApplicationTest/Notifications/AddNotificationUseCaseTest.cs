@@ -1,10 +1,11 @@
 using Application.DTOs.Notifications;
 using Application.UseCases.Notifications;
-using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.UserNotifications;
+using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
+using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,6 @@ public class AddNotificationUseCaseTest : IDisposable
 
         var notificationMapper = new NotificationEFMapper();
         var userNotificationMapper = new UserNotificationEFMapper();
-        var studentClassMapper = new StudentClassEFMapper();
 
         var notificationCreator = new NotificationEFCreator(
             _ctx,
@@ -43,7 +43,9 @@ public class AddNotificationUseCaseTest : IDisposable
             userNotificationMapper
         );
 
-        var classStudentsQuerier = new ClassStudentEFQuerier(_ctx, studentClassMapper, 10);
+        var roleMapper = new UserTypeMapper();
+        var userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var classStudentsQuerier = new UserEFQuerier(_ctx, userMapper, 10);
 
         _useCase = new AddNotificationUseCase(
             notificationCreator,

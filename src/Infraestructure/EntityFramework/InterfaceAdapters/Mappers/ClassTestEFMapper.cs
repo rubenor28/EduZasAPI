@@ -1,4 +1,3 @@
-using Application.DTOs.Classes;
 using Application.DTOs.ClassTests;
 using Domain.Entities;
 using EntityFramework.Application.DTOs;

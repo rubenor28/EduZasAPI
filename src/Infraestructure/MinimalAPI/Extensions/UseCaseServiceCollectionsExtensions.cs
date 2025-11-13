@@ -41,12 +41,14 @@ public static class UseCaseServiceCollectionExtensions
         services.AddTransient<DeleteClassUseCase>();
 
         // Class Students
-        services.AddTransient<EnrollClassUseCase>();
-        services.AddTransient<UnenrollClassUseCase>();
-        services.AddTransient<ToggleClassVisibilityUseCase>();
+        services.AddTransient<AddClassStudentUseCase>();
+        services.AddTransient<DeleteClassStudentUseCase>();
+        services.AddTransient<UpdateClassStudentUseCase>();
 
         // Class professors
-        services.AddTransient<AddProfessorToClassUseCase>();
+        services.AddTransient<AddClassProfessorUseCase>();
+        services.AddTransient<UpdateClassProfessorUseCase>();
+        services.AddTransient<DeleteClassProfessorUseCase>();
 
         // Notifications
         services.AddTransient<AddNotificationUseCase>();

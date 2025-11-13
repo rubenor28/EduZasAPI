@@ -30,7 +30,7 @@ public class UpdateClassUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var classMapper = new ClassEFMapper();
-        var professorRelationMapper = new ProfessorClassEFMapper();
+        var professorRelationMapper = new ClassProfessorEFMapper();
 
         var classUpdateValidator = new ClassUpdateFluentValidator();
 

@@ -1,4 +1,3 @@
-using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using InterfaceAdapters.Mappers.Common;
@@ -7,11 +6,11 @@ using MinimalAPI.Application.DTOs.ClassStudents;
 namespace MinimalAPI.Presentation.Mappers;
 
 public sealed record ClassStudentsMAPIMapper
-    : IMapper<EnrollClassMAPI, Executor, EnrollClassDTO>,
-        IMapper<string, ulong, Executor, UnenrollClassDTO>,
-        IMapper<string, ulong, Executor, ToggleClassVisibilityDTO>
+    : IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>,
+        IMapper<string, ulong, Executor, DeleteClassStudentDTO>,
+        IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>
 {
-    EnrollClassDTO IMapper<EnrollClassMAPI, Executor, EnrollClassDTO>.Map(
+    NewClassStudentDTO IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>.Map(
         EnrollClassMAPI input,
         Executor ex
     ) =>
@@ -22,7 +21,7 @@ public sealed record ClassStudentsMAPIMapper
             Executor = ex,
         };
 
-    UnenrollClassDTO IMapper<string, ulong, Executor, UnenrollClassDTO>.Map(
+    DeleteClassStudentDTO IMapper<string, ulong, Executor, DeleteClassStudentDTO>.Map(
         string classId,
         ulong studentId,
         Executor ex
@@ -33,15 +32,14 @@ public sealed record ClassStudentsMAPIMapper
             Executor = ex,
         };
 
-    ToggleClassVisibilityDTO IMapper<string, ulong, Executor, ToggleClassVisibilityDTO>.Map(
-        string classId,
-        ulong studentId,
+    ClassStudentUpdateDTO IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>.Map(
+        ClassStudentUpdateMAPI request,
         Executor ex
     ) =>
         new()
         {
-            ClassId = classId,
-            UserId = studentId,
+            Id = new() { ClassId = request.ClassId, UserId = request.UserId },
+            Hidden = request.Hidden,
             Executor = ex,
         };
 }
