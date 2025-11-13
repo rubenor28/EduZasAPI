@@ -49,6 +49,19 @@ public class QueryUseCase<C, E>(
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
 
+        var validation = ExtraValidation(criteria);
+        if (validation.IsErr)
+            return validation.UnwrapErr();
+
+        var validationAsync = await ExtraValidationAsync(criteria);
+        if (validationAsync.IsErr)
+            return validationAsync.UnwrapErr();
+
         return await _querier.GetByAsync(criteria);
     }
+
+    protected virtual Result<Unit, UseCaseError> ExtraValidation(C criteria) => Unit.Value;
+
+    protected virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(C criteria) =>
+        Task.FromResult(Result<Unit, UseCaseError>.Ok(Unit.Value));
 }
