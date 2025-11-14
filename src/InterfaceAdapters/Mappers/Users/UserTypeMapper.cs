@@ -14,7 +14,8 @@ public class UserTypeMapper
         IMapper<UserType, string>,
         IMapper<string, Result<UserType, Unit>>,
         IMapper<uint, Result<UserType, Unit>>,
-        IMapper<UserType, uint>
+        IMapper<UserType, uint>,
+        IMapper<Optional<UserType>, int?>
 {
     Result<UserType, Unit> IMapper<uint, Result<UserType, Unit>>.Map(uint input) =>
         input switch
@@ -105,4 +106,6 @@ public class UserTypeMapper
             "ADMIN" => UserType.ADMIN,
             _ => Unit.Value,
         };
+
+    public int? Map(Optional<UserType> input) => input.IsNone ? null : Map(input.Unwrap());
 }

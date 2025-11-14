@@ -20,19 +20,34 @@ namespace MinimalAPI.Presentation.Mappers;
 /// </remarks>
 public sealed class UserMAPIMapper(
     IMapper<UserType, ulong> roleFromDomainMapper,
+    IMapper<uint, Result<UserType, Unit>> roleUintToDomainMapper,
+    IMapper<Optional<UserType>, int?> optRoleFromDomainMapper,
     IMapper<int, Result<UserType, Unit>> roleToDomainMapper,
-    IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper
+    IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper,
+    IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> strqFromDomainMapper
 )
     : IMapper<UserDomain, UserMAPI>,
         IMapper<Executor, ReadUserDTO>,
         IMapper<UserDomain, PublicUserMAPI>,
         IMapper<PublicUserDTO, PublicUserMAPI>,
+        IMapper<ulong, Executor, DeleteUserDTO>,
         IMapper<NewUserMAPI, Executor, NewUserDTO>,
-        IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>
+        IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>,
+        IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
+        IMapper<UserCriteriaDTO, UserCriteriaMAPI>,
+        IMapper<
+            PaginatedQuery<UserDomain, UserCriteriaDTO>,
+            PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>
+        >
 {
     private readonly IMapper<UserType, ulong> _roleFromDomainMapper = roleFromDomainMapper;
+    private readonly IMapper<uint, Result<UserType, Unit>> _roleUintToDomainMapper =
+        roleUintToDomainMapper;
     private readonly IMapper<int, Result<UserType, Unit>> _roleToDomainMapper = roleToDomainMapper;
-
+    private readonly IMapper<Optional<UserType>, int?> _optRoleFromDomainMapper =
+        optRoleFromDomainMapper;
+    private readonly IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> _strqFromDomainMapper =
+        strqFromDomainMapper;
     private readonly IMapper<
         StringQueryMAPI?,
         Result<Optional<StringQueryDTO>, Unit>
@@ -172,4 +187,57 @@ public sealed class UserMAPIMapper(
             MotherLastname = input.MotherLastname.ToNullable(),
             Password = input.Password,
         };
+
+    public UserCriteriaMAPI Map(UserCriteriaDTO input) =>
+        new()
+        {
+            Page = input.Page,
+            Role = _optRoleFromDomainMapper.Map(input.Role),
+            Active = input.Active.ToNullable(),
+            Email = _strqFromDomainMapper.Map(input.Email),
+            Password = _strqFromDomainMapper.Map(input.Password),
+            FirstName = _strqFromDomainMapper.Map(input.FirstName),
+            FatherLastname = _strqFromDomainMapper.Map(input.FatherLastName),
+            MidName = _strqFromDomainMapper.Map(input.MidName),
+            MotherLastname = _strqFromDomainMapper.Map(input.MotherLastname),
+            CreatedAt = input.CreatedAt.ToNullable(),
+            ModifiedAt = input.ModifiedAt.ToNullable(),
+        };
+
+    public PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI> Map(
+        PaginatedQuery<UserDomain, UserCriteriaDTO> input
+    ) =>
+        new()
+        {
+            Page = input.Page,
+            TotalPages = input.TotalPages,
+            Criteria = Map(input.Criteria),
+            Results = input.Results.Select(Map),
+        };
+
+    public Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>> Map(UserUpdateMAPI input, Executor ex)
+    {
+        var errs = new List<FieldErrorDTO>();
+        var roleValidation = _roleUintToDomainMapper.Map(input.Role);
+        roleValidation.IfErr(_ => errs.Add(new() { Field = "role" }));
+
+        if (errs.Count > 0)
+            return errs;
+
+        return new UserUpdateDTO
+        {
+            Id = input.Id,
+            Active = input.Active,
+            Role = roleValidation.Unwrap(),
+            Email = input.Email,
+            Password = input.Password,
+            FirstName = input.FirstName,
+            FatherLastName = input.FatherLastName,
+            MidName = input.MidName.ToOptional(),
+            MotherLastname = input.MotherLastname.ToOptional(),
+            Executor = ex,
+        };
+    }
+
+    public DeleteUserDTO Map(ulong userId, Executor ex) => new() { Id = userId, Executor = ex };
 }

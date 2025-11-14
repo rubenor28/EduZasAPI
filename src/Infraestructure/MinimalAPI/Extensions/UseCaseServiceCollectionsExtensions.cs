@@ -1,15 +1,16 @@
-using Application.DTOs.Classes;
 using Application.UseCases.Auth;
 using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
-using Application.UseCases.Common;
 using Application.UseCases.Contacts;
+using Application.UseCases.ContactTags;
 using Application.UseCases.Database;
 using Application.UseCases.Notifications;
+using Application.UseCases.Resources;
 using Application.UseCases.Tags;
 using Application.UseCases.Tests;
 using Application.UseCases.UserNotifications;
+using Application.UseCases.Users;
 using Domain.Entities;
 
 namespace MinimalAPI.Extensions;
@@ -22,57 +23,71 @@ public static class UseCaseServiceCollectionExtensions
     /// <summary>
     /// Registra las implementaciones de los casos de uso relacionados con <see cref="UserDomain"/>.
     /// </summary>
-    /// <param name="services">La colección de servicios donde se registrarán los casos de uso.</param>
+    /// <param name="s">La colección de servicios donde se registrarán los casos de uso.</param>
     /// <returns>La colección de servicios con los casos de uso registrados.</returns>
-    public static IServiceCollection AddUseCases(this IServiceCollection services)
+    public static IServiceCollection AddUseCases(this IServiceCollection s)
     {
         // Backup and restore
-        services.AddScoped<BackupUseCase>();
-        services.AddScoped<RestoreUseCase>();
+        s.AddScoped<BackupUseCase>();
+        s.AddScoped<RestoreUseCase>();
 
         // Auth use cases
-        services.AddTransient<AddUserUseCase>();
-        services.AddTransient<LoginUseCase>();
+        s.AddTransient<AddUserUseCase>();
+        s.AddTransient<LoginUseCase>();
+
+        // Users
+        s.AddTransient<UserQueryUseCase>();
+        s.AddTransient<UpdateUserUseCase>();
 
         // Class use cases
-        services.AddTransient<AddClassUseCase>();
-        services.AddTransient<QueryUseCase<ClassCriteriaDTO, ClassDomain>>();
-        services.AddTransient<UpdateClassUseCase>();
-        services.AddTransient<DeleteClassUseCase>();
+        s.AddTransient<AddClassUseCase>();
+        s.AddTransient<QueryClassUseCase>();
+        s.AddTransient<UpdateClassUseCase>();
+        s.AddTransient<DeleteClassUseCase>();
 
         // Class Students
-        services.AddTransient<AddClassStudentUseCase>();
-        services.AddTransient<DeleteClassStudentUseCase>();
-        services.AddTransient<UpdateClassStudentUseCase>();
+        s.AddTransient<AddClassStudentUseCase>();
+        s.AddTransient<DeleteClassStudentUseCase>();
+        s.AddTransient<UpdateClassStudentUseCase>();
 
         // Class professors
-        services.AddTransient<AddClassProfessorUseCase>();
-        services.AddTransient<UpdateClassProfessorUseCase>();
-        services.AddTransient<DeleteClassProfessorUseCase>();
+        s.AddTransient<AddClassProfessorUseCase>();
+        s.AddTransient<UpdateClassProfessorUseCase>();
+        s.AddTransient<DeleteClassProfessorUseCase>();
 
         // Notifications
-        services.AddTransient<AddNotificationUseCase>();
-        services.AddTransient<SearchNotificationUseCase>();
+        s.AddTransient<SearchNotificationUseCase>();
 
         // User notifications
-        services.AddTransient<UpdateUserNotificationUseCase>();
+        s.AddTransient<UpdateUserNotificationUseCase>();
 
         // Contact
-        services.AddTransient<AddContactUseCase>();
-        services.AddTransient<ContactQueryUseCase>();
-        services.AddTransient<DeleteContactUseCase>();
-        services.AddTransient<UpdateContactUseCase>();
+        s.AddTransient<AddContactUseCase>();
+        s.AddTransient<ContactQueryUseCase>();
+        s.AddTransient<DeleteContactUseCase>();
+        s.AddTransient<UpdateContactUseCase>();
 
         // Tags
-        services.AddTransient<TagQueryUseCase>();
+        s.AddTransient<TagQueryUseCase>();
+
+        // Contact Tag
+        s.AddTransient<AddContactTagUseCase>();
+        s.AddTransient<DeleteContactTagUseCase>();
 
         // Tests
-        services.AddTransient<AddTestUseCase>();
-        services.AddTransient<DeleteTestUseCase>();
-        services.AddTransient<QueryTestUseCase>();
-        services.AddTransient<ReadTestUseCase>();
-        services.AddTransient<UpdateTestUseCase>();
+        s.AddTransient<AddTestUseCase>();
+        s.AddTransient<DeleteTestUseCase>();
+        s.AddTransient<QueryTestUseCase>();
+        s.AddTransient<ReadTestUseCase>();
+        s.AddTransient<UpdateTestUseCase>();
 
-        return services;
+        // Resource
+        s.AddTransient<AddResourceUseCase>();
+        s.AddTransient<ReadResourceUseCase>();
+        s.AddTransient<ResourceQueryUseCase>();
+        s.AddTransient<DeleteResourceUseCase>();
+        s.AddTransient<UpdateResourceUseCase>();
+
+        return s;
     }
 }

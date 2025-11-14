@@ -14,6 +14,9 @@ public class ULongFluentValidator : FluentValidator<ulong>
     /// </summary>
     public ULongFluentValidator()
     {
-        RuleFor(x => x).Must(x => x >= 1).WithMessage("El valor debe ser mayor o igual a 1");
+        RuleFor(x => x)
+            .Must(x => x >= 1)
+            .WithMessage("Id debe ser mayor a 0")
+            .WithName("id");
     }
 }

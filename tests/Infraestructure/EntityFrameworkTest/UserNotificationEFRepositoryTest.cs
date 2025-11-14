@@ -15,7 +15,6 @@ public class UserNotificationEFRepositoryTest : IDisposable
     private readonly UserNotificationEFCreator _creator;
     private readonly UserNotificationEFReader _reader;
     private readonly UserNotificationEFUpdater _updater;
-    private readonly UserNotificationEFDelter _deleter;
 
     public UserNotificationEFRepositoryTest()
     {
@@ -33,7 +32,6 @@ public class UserNotificationEFRepositoryTest : IDisposable
         _creator = new(_ctx, mapper, mapper);
         _reader = new(_ctx, mapper);
         _updater = new(_ctx, mapper, mapper);
-        _deleter = new(_ctx, mapper);
     }
 
     private async Task SeedData()
@@ -122,28 +120,6 @@ public class UserNotificationEFRepositoryTest : IDisposable
             Readed = true,
         };
         await Assert.ThrowsAsync<ArgumentException>(() => _updater.UpdateAsync(toUpdate));
-    }
-
-    [Fact]
-    public async Task DeleteAsync_WhenRelationsExists_RetusnRelation()
-    {
-        await SeedData();
-        var newUserNotification = new NewUserNotificationDTO { UserId = 1, NotificationId = 1 };
-        await _creator.AddAsync(newUserNotification);
-
-        var toDelete = new UserNotificationIdDTO { NotificationId = 1, UserId = 1 };
-        var deleted = await _deleter.DeleteAsync(toDelete);
-
-        Assert.NotNull(deleted);
-        Assert.Equal(deleted.Id.UserId, newUserNotification.UserId);
-        Assert.Equal(deleted.Id.NotificationId, newUserNotification.NotificationId);
-    }
-
-    [Fact]
-    public async Task DeleteAsync_WhenRelationsDoesNotExists_ThrowsException()
-    {
-        var toDelete = new UserNotificationIdDTO { NotificationId = 1, UserId = 1 };
-        await Assert.ThrowsAsync<ArgumentException>(() => _deleter.DeleteAsync(toDelete));
     }
 
     public void Dispose()

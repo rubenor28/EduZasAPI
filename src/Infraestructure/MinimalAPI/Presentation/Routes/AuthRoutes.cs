@@ -3,6 +3,7 @@ using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Domain.Entities;
 using InterfaceAdapters.Mappers.Common;
+using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Users;
 using MinimalAPI.Application.Services;
@@ -30,19 +31,48 @@ public static class AuthRoutes
             .MapPost("/sign-in", AddUser)
             .WithName("Registrar usuario")
             .Produces<PublicUserMAPI>(StatusCodes.Status201Created)
-            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Registrar un nuevo usuario en el sistema.";
+                op.Description = "Crea una cuenta de usuario con la información proporcionada.";
+                op.Responses["201"].Description = "El usuario fue creado exitosamente.";
+                op.Responses["400"].Description =
+                    "Los datos proporcionados son inválidos (ej. email duplicado, formato incorrecto).";
+                return op;
+            });
 
         group
             .MapPost("/login", Login)
             .WithName("Iniciar sesión")
             .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
-            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest);
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Iniciar sesión en el sistema.";
+                op.Description =
+                    "Autentica a un usuario y, si tiene éxito, establece una cookie de sesión.";
+                op.Responses["200"].Description = "Inicio de sesión exitoso.";
+                op.Responses["400"].Description =
+                    "Credenciales inválidas (email o contraseña incorrectos).";
+                return op;
+            });
 
         group
             .MapDelete("/logout", Logout)
             .WithName("Cerrar sesión")
             .RequireAuthorization("RequireAuthenticated")
-            .Produces(StatusCodes.Status200OK);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Cerrar la sesión del usuario actual.";
+                op.Description =
+                    "Invalida la sesión del usuario eliminando la cookie de autenticación.";
+                op.Responses["204"].Description = "La sesión se cerró exitosamente.";
+                op.Responses["401"].Description = "El usuario no está autenticado.";
+                return op;
+            });
 
         group
             .MapGet("/me", UserData)
@@ -50,8 +80,19 @@ public static class AuthRoutes
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<UserIdFilter>()
             .Produces<WithDataResponse<PublicUserMAPI>>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Obtener los datos del usuario autenticado.";
+                op.Description =
+                    "Devuelve la información del usuario correspondiente a la sesión activa.";
+                op.Responses["200"].Description = "Datos del usuario obtenidos exitosamente.";
+                op.Responses["401"].Description = "El usuario no está autenticado.";
+                op.Responses["404"].Description =
+                    "El usuario asociado al token de sesión no fue encontrado.";
+                return op;
+            });
 
         return group;
     }
@@ -154,9 +195,9 @@ public static class AuthRoutes
 
     public static async Task<IResult> UserData(
         HttpContext ctx,
-        RoutesUtils utils,
-        ReadUserUseCase useCase,
-        IMapper<UserDomain, PublicUserMAPI> userMapper
+        [FromServices] RoutesUtils utils,
+        [FromServices] ReadUserUseCase useCase,
+        [FromServices] IMapper<UserDomain, PublicUserMAPI> userMapper
     )
     {
         return await utils.HandleUseCaseAsync(

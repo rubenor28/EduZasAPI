@@ -9,6 +9,5 @@ public sealed record ResourceUpdateDTO : IIdentifiable<ulong>
     public required bool Active { get; set; }
     public required string Title { get; set; }
     public required string Content { get; set; }
-    public required ulong ProfessorId { get; set; }
     public required Executor Executor { get; set; }
 }

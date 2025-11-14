@@ -5,7 +5,7 @@ using MinimalAPI.Application.DTOs.ClassProfessors;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-public sealed record ClassProfessorMAPIMapper
+public sealed record ClassProfessorsMAPIMapper
     : IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>,
         IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>
 {

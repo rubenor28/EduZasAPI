@@ -20,8 +20,6 @@ public sealed class AddNotificationUseCase(
 
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuerier = userQuerier;
 
-    // TODO: Crear una interfaz IBulkAdderAsync para paralelizar la creacion de
-    // las relaciones de forma thread-safety
     protected override async Task ExtraTaskAsync(
         NewNotificationDTO newE,
         NotificationDomain created

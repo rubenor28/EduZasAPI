@@ -2,6 +2,7 @@ using Application.DTOs.Common;
 using Application.DTOs.Database;
 using Application.UseCases.Database;
 using InterfaceAdapters.Mappers.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -13,14 +14,38 @@ public static class DatabaseRoutes
 
         group
             .MapGet("/backup", CreateBackup)
-            .WithName("Crear respaldo")
-            .RequireAuthorization("Admin");
+            .RequireAuthorization("Admin")
+            .Produces<FileStreamResult>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Crear un respaldo de la base de datos.";
+                op.Description = "Genera un archivo .sql con el estado actual de la base de datos. Requiere privilegios de administrador.";
+                op.Responses["200"].Description = "Respaldo generado exitosamente. El cuerpo de la respuesta es el archivo .sql.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description = "El usuario no es administrador.";
+                return op;
+            });
 
         group
             .MapPost("/restore", RestoreFromBackup)
-            .WithName("Restaurar desde respaldo")
             .RequireAuthorization("Admin")
-            .Accepts<IFormFile>("multipart/form-data");
+            .Accepts<IFormFile>("multipart/form-data")
+            .Produces<string>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Restaurar la base de datos desde un respaldo.";
+                op.Description = "Carga un archivo .sql para restaurar el estado de la base de datos. Esta operación es destructiva. Requiere privilegios de administrador.";
+                op.Responses["200"].Description = "Restauración completada con éxito.";
+                op.Responses["400"].Description = "No se proporcionó un archivo o el archivo está vacío.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description = "El usuario no es administrador.";
+                return op;
+            });
 
         return group;
     }

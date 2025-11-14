@@ -23,7 +23,7 @@ public class UseCaseErrorMAPIMapper : IMapper<UseCaseError, IResult>
             ),
             UnauthorizedError => Results.Forbid(),
             NotFoundError => Results.NotFound(),
-            AlreadyExistsError => Results.Conflict(),
+            AlreadyExistsError => Results.Conflict("El elemento ya existe"),
             _ => throw new NotImplementedException(),
         };
     }

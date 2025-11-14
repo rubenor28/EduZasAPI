@@ -5,7 +5,6 @@ using Application.DTOs.Common;
 using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
-using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
@@ -224,70 +223,6 @@ public static class ClassRoutes
         );
     }
 
-    public static Task<IResult> ProfessorClasses(
-        ClassCriteriaMAPI criteria,
-        HttpContext ctx,
-        RoutesUtils utils,
-        QueryClassUseCase useCase,
-        IMapper<
-            ClassCriteriaMAPI,
-            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > requestMapper,
-        IMapper<
-            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
-            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
-        > responseMapper
-    )
-    {
-        return utils.HandleUseCaseAsync(
-            useCase,
-            mapRequest: () =>
-                requestMapper.Map(
-                    criteria with
-                    {
-                        WithProfessor = new()
-                        {
-                            Id = utils.GetIdFromContext(ctx),
-                            IsOwner = criteria.WithProfessor?.IsOwner,
-                        },
-                    }
-                ),
-            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
-        );
-    }
-
-    public static Task<IResult> EnrolledClasses(
-        ClassCriteriaMAPI request,
-        QueryUseCase<ClassCriteriaDTO, ClassDomain> useCase,
-        IMapper<
-            ClassCriteriaMAPI,
-            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > requestMapper,
-        IMapper<
-            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
-            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
-        > responseMapper,
-        HttpContext ctx,
-        RoutesUtils utils
-    )
-    {
-        return utils.HandleUseCaseAsync(
-            useCase,
-            mapRequest: () =>
-                requestMapper.Map(
-                    request with
-                    {
-                        WithStudent = new()
-                        {
-                            Id = utils.GetIdFromContext(ctx),
-                            Hidden = request.WithStudent?.Hidden,
-                        },
-                    }
-                ),
-            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
-        );
-    }
-
     public static Task<IResult> UpdateClass(
         ClassUpdateMAPI request,
         UpdateClassUseCase useCase,
@@ -319,17 +254,49 @@ public static class ClassRoutes
         );
     }
 
+    public static Task<IResult> EnrolledClasses(
+        ClassCriteriaMAPI request,
+        QueryClassUseCase useCase,
+        IMapper<
+            ClassCriteriaMAPI,
+            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
+        > requestMapper,
+        IMapper<
+            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
+            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+        > responseMapper,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () =>
+                requestMapper.Map(
+                    request with
+                    {
+                        WithStudent = new()
+                        {
+                            Id = utils.GetIdFromContext(ctx),
+                            Hidden = request.WithStudent?.Hidden,
+                        },
+                    }
+                ),
+            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
+        );
+    }
+
     public static Task<IResult> EnrollClass(
         EnrollClassMAPI data,
         HttpContext ctx,
         RoutesUtils utils,
         AddClassStudentUseCase useCase,
-        IMapper<EnrollClassMAPI, ulong, NewClassStudentDTO> requestMapper
+        IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO> requestMapper
     )
     {
         return utils.HandleUseCaseAsync(
             useCase,
-            mapRequest: () => requestMapper.Map(data, utils.GetIdFromContext(ctx)),
+            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
             mapResponse: (_) => Results.Created()
         );
     }
@@ -360,8 +327,7 @@ public static class ClassRoutes
     {
         return utils.HandleUseCaseAsync(
             useCase,
-            mapRequest: () =>
-                requestMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => requestMapper.Map(request, utils.GetExecutorFromContext(ctx)),
             mapResponse: (_) => Results.NoContent()
         );
     }
@@ -393,6 +359,38 @@ public static class ClassRoutes
             useCase,
             mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
             mapResponse: _ => Results.NoContent()
+        );
+    }
+
+    public static Task<IResult> ProfessorClasses(
+        ClassCriteriaMAPI criteria,
+        HttpContext ctx,
+        RoutesUtils utils,
+        QueryClassUseCase useCase,
+        IMapper<
+            ClassCriteriaMAPI,
+            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
+        > requestMapper,
+        IMapper<
+            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
+            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+        > responseMapper
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () =>
+                requestMapper.Map(
+                    criteria with
+                    {
+                        WithProfessor = new()
+                        {
+                            Id = utils.GetIdFromContext(ctx),
+                            IsOwner = criteria.WithProfessor?.IsOwner,
+                        },
+                    }
+                ),
+            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
         );
     }
 }

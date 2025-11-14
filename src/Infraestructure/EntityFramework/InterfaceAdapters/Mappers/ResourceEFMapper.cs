@@ -7,7 +7,8 @@ namespace EntityFramework.InterfaceAdapters.Mappers;
 
 public sealed class ResourceEFMapper
     : IMapper<Resource, ResourceDomain>,
-        IMapper<NewResourceDTO, Resource>
+        IMapper<NewResourceDTO, Resource>,
+        IUpdateMapper<ResourceUpdateDTO, Resource>
 {
     public ResourceDomain Map(Resource input) =>
         new()
@@ -28,4 +29,11 @@ public sealed class ResourceEFMapper
             Content = input.Content,
             ProfessorId = input.ProfessorId,
         };
+
+    public void Map(ResourceUpdateDTO s, Resource d)
+    {
+      d.Active = s.Active;
+      d.Title = s.Title;
+      d.Content = s.Content;
+    }
 }

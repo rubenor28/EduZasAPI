@@ -5,6 +5,7 @@ using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
+using Application.DTOs.Resources;
 using Application.DTOs.Tags;
 using Application.DTOs.Tests;
 using Application.DTOs.UserNotifications;
@@ -12,7 +13,6 @@ using Application.DTOs.Users;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
-using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using InterfaceAdapters.Mappers.Common;
@@ -21,6 +21,10 @@ using MinimalAPI.Application.DTOs.Classes;
 using MinimalAPI.Application.DTOs.ClassProfessors;
 using MinimalAPI.Application.DTOs.ClassStudents;
 using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs.Contacts;
+using MinimalAPI.Application.DTOs.Notifications;
+using MinimalAPI.Application.DTOs.Resources;
+using MinimalAPI.Application.DTOs.Tags;
 using MinimalAPI.Application.DTOs.Users;
 using MinimalAPI.Presentation.Mappers;
 
@@ -43,186 +47,165 @@ public static class MapperServiceCollectionExtensions
 
         // String Query DTO
         s.AddSingleton<StringSearchMapper>();
-
-        s.AddSingleton<IMapper<string, Result<StringSearchType, Unit>>>(sp =>
-            sp.GetRequiredService<StringSearchMapper>());
-
-        s.AddSingleton<IMapper<StringSearchType, string>>(sp =>
-            sp.GetRequiredService<StringSearchMapper>());
+        s.AddSingleton<IMapper<StringSearchType, string>>(sp => sp.GetRequiredService<StringSearchMapper>());
+        s.AddSingleton<IMapper<string, Result<StringSearchType, Unit>>>(sp => sp.GetRequiredService<StringSearchMapper>());
 
         s.AddSingleton<StringQueryMAPIMapper>();
-
-        s.AddSingleton<IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>>(sp =>
-            sp.GetRequiredService<StringQueryMAPIMapper>());
-
-        s.AddSingleton<IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>>(sp =>
-            sp.GetRequiredService<StringQueryMAPIMapper>());
-
-        s.AddSingleton<IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>>(sp =>
-            sp.GetRequiredService<StringQueryMAPIMapper>());
+        s.AddSingleton<IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>>(sp => sp.GetRequiredService<StringQueryMAPIMapper>());
+        s.AddSingleton<IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>>(sp => sp.GetRequiredService<StringQueryMAPIMapper>());
+        s.AddSingleton<IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>>(sp => sp.GetRequiredService<StringQueryMAPIMapper>());
 
         // USERS
         // EF
         s.AddSingleton<UserTypeMapper>();
-
-        s.AddSingleton<IMapper<string, Result<UserType, Unit>>>(sp =>
-            sp.GetRequiredService<UserTypeMapper>());
-
-        s.AddSingleton<IMapper<int, Result<UserType, Unit>>>(sp =>
-            sp.GetRequiredService<UserTypeMapper>());
-
-        s.AddSingleton<IMapper<uint, Result<UserType, Unit>>>(sp =>
-            sp.GetRequiredService<UserTypeMapper>());
-
+        s.AddSingleton<IMapper<string, Result<UserType, Unit>>>(sp => sp.GetRequiredService<UserTypeMapper>());
+        s.AddSingleton<IMapper<int, Result<UserType, Unit>>>(sp => sp.GetRequiredService<UserTypeMapper>());
+        s.AddSingleton<IMapper<uint, Result<UserType, Unit>>>(sp => sp.GetRequiredService<UserTypeMapper>());
+        s.AddSingleton<IMapper<Optional<UserType>, int?>>(sp => sp.GetRequiredService<UserTypeMapper>());
         s.AddSingleton<IMapper<UserType, uint>>(sp => sp.GetRequiredService<UserTypeMapper>());
-
         s.AddSingleton<IMapper<UserType, ulong>>(sp => sp.GetRequiredService<UserTypeMapper>());
+        s.AddSingleton<IMapper<Optional<UserType>, int?>>(sp => sp.GetRequiredService<UserTypeMapper>());
 
         s.AddSingleton<UserEFMapper>();
-
         s.AddSingleton<IMapper<User, UserDomain>>(sp => sp.GetRequiredService<UserEFMapper>());
-
         s.AddSingleton<IMapper<NewUserDTO, User>>(sp => sp.GetRequiredService<UserEFMapper>());
-
-        s.AddSingleton<IUpdateMapper<UserUpdateDTO, User>>(sp =>
-            sp.GetRequiredService<UserEFMapper>());
+        s.AddSingleton<IUpdateMapper<UserUpdateDTO, User>>(sp => sp.GetRequiredService<UserEFMapper>());
 
         // Minimal API
         s.AddSingleton<UserMAPIMapper>();
-
-        s.AddSingleton<IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(sp => 
-            sp.GetRequiredService<UserMAPIMapper>());
-
-        s.AddSingleton<IMapper<NewUserMAPI, Executor, NewUserDTO>>(sp =>
-            sp.GetRequiredService<UserMAPIMapper>());
-
-        s.AddSingleton<IMapper<UserDomain, PublicUserMAPI>>(sp =>
-            sp.GetRequiredService<UserMAPIMapper>());
+        s.AddSingleton<IMapper<UserDomain, PublicUserMAPI>>(sp => sp.GetRequiredService<UserMAPIMapper>());
+        s.AddSingleton<IMapper<ulong, Executor, DeleteUserDTO>>(sp => sp.GetRequiredService<UserMAPIMapper>());
+        s.AddSingleton<IMapper<NewUserMAPI, Executor, NewUserDTO>>(sp => sp.GetRequiredService<UserMAPIMapper>());
+        s.AddSingleton<IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(
+            sp =>  sp.GetRequiredService<UserMAPIMapper>());
+        s.AddSingleton<IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>>(
+            sp => sp.GetRequiredService<UserMAPIMapper>());
+        s.AddSingleton<IMapper<PaginatedQuery<UserDomain, UserCriteriaDTO>, PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>>>(
+            sp => sp.GetRequiredService<UserMAPIMapper>());
 
         // CLASSES
         // EF
         s.AddSingleton<ClassEFMapper>();
-
         s.AddSingleton<IMapper<NewClassDTO, Class>>(sp => sp.GetRequiredService<ClassEFMapper>());
-
         s.AddSingleton<IMapper<Class, ClassDomain>>(sp => sp.GetRequiredService<ClassEFMapper>());
-
-        s.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>>(sp =>
-            sp.GetRequiredService<ClassEFMapper>());
+        s.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>>(sp => sp.GetRequiredService<ClassEFMapper>());
 
         //Minimal API
         s.AddSingleton<ClassMAPIMapper>();
-
-        s.AddSingleton<IMapper<ClassDomain, PublicClassMAPI>>(sp =>
-            sp.GetRequiredService<ClassMAPIMapper>());
-
-        s.AddSingleton<IMapper<NewClassMAPI, Executor, NewClassDTO>>(sp =>
-            sp.GetRequiredService<ClassMAPIMapper>());
-
-        s.AddSingleton<IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO>>(sp =>
-            sp.GetRequiredService<ClassMAPIMapper>());
-
-        s.AddSingleton<IMapper<string, Executor, DeleteClassDTO>>(sp =>
-            sp.GetRequiredService<ClassMAPIMapper>());
-
-        s.AddSingleton<IMapper<ClassCriteriaMAPI, Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(sp =>
-            sp.GetRequiredService<ClassMAPIMapper>());
-
-        s.AddSingleton<IMapper<PaginatedQuery<ClassDomain, ClassCriteriaDTO>,PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>>(sp =>
-            sp.GetRequiredService<ClassMAPIMapper>());
+        s.AddSingleton<IMapper<ClassDomain, PublicClassMAPI>>(sp => sp.GetRequiredService<ClassMAPIMapper>());
+        s.AddSingleton<IMapper<NewClassMAPI, Executor, NewClassDTO>>(sp => sp.GetRequiredService<ClassMAPIMapper>());
+        s.AddSingleton<IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO>>(sp => sp.GetRequiredService<ClassMAPIMapper>());
+        s.AddSingleton<IMapper<string, Executor, DeleteClassDTO>>(sp => sp.GetRequiredService<ClassMAPIMapper>());
+        s.AddSingleton<IMapper<ClassCriteriaMAPI, Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(sp => sp.GetRequiredService<ClassMAPIMapper>());
+        s.AddSingleton<IMapper<PaginatedQuery<ClassDomain, ClassCriteriaDTO>,PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>>(sp => sp.GetRequiredService<ClassMAPIMapper>());
 
         // CLASS PROFESSOR
         // EF
         s.AddSingleton<ClassProfessorEFMapper>();
-
-        s.AddSingleton<IMapper<NewClassProfessorDTO, ClassProfessor>>(sp =>
-            sp.GetRequiredService<ClassProfessorEFMapper>());
-
-        s.AddSingleton<IMapper<ClassProfessor, ClassProfessorDomain>>(sp =>
-            sp.GetRequiredService<ClassProfessorEFMapper>());
-
-        s.AddSingleton<IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>>(sp =>
-            sp.GetRequiredService<ClassProfessorEFMapper>());
+        s.AddSingleton<IMapper<NewClassProfessorDTO, ClassProfessor>>(sp => sp.GetRequiredService<ClassProfessorEFMapper>());
+        s.AddSingleton<IMapper<ClassProfessor, ClassProfessorDomain>>(sp => sp.GetRequiredService<ClassProfessorEFMapper>());
+        s.AddSingleton<IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>>(sp => sp.GetRequiredService<ClassProfessorEFMapper>());
 
         // Minimal API
-        s.AddSingleton<ClassProfessorMAPIMapper>();
-
-        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>>(sp =>
-            sp.GetRequiredService<ClassProfessorMAPIMapper>());
-
-        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>>(sp =>
-            sp.GetRequiredService<ClassProfessorMAPIMapper>());
+        s.AddSingleton<ClassProfessorsMAPIMapper>();
+        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>>(sp => sp.GetRequiredService<ClassProfessorsMAPIMapper>());
+        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>>(sp => sp.GetRequiredService<ClassProfessorsMAPIMapper>());
 
         // CLASS STUDENTS
+        // EF
         s.AddSingleton<ClassStudentEFMapper>();
+        s.AddSingleton<IMapper<NewClassStudentDTO, ClassStudent>>(sp => sp.GetRequiredService<ClassStudentEFMapper>());
+        s.AddSingleton<IMapper<ClassStudent, ClassStudentDomain>>(sp => sp.GetRequiredService<ClassStudentEFMapper>());
+        s.AddSingleton<IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>>(sp => sp.GetRequiredService<ClassStudentEFMapper>());
 
-        s.AddSingleton<IMapper<NewClassStudentDTO, ClassStudent>>(sp =>
-            sp.GetRequiredService<ClassStudentEFMapper>());
-
-        s.AddSingleton<IMapper<ClassStudent, ClassStudentDomain>>(sp =>
-            sp.GetRequiredService<ClassStudentEFMapper>());
-
-        s.AddSingleton<IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>>(sp =>
-            sp.GetRequiredService<ClassStudentEFMapper>());
+        // Minimal API
+        s.AddSingleton<ClassStudentsMAPIMapper>();
+        s.AddSingleton<IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>>(sp => sp.GetRequiredService<ClassStudentsMAPIMapper>());
+        s.AddSingleton<IMapper<string, ulong, Executor, DeleteClassStudentDTO>>(sp => sp.GetRequiredService<ClassStudentsMAPIMapper>());
+        s.AddSingleton<IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>>(sp => sp.GetRequiredService<ClassStudentsMAPIMapper>());
 
         // NOTIFICATIONS
+        // EF
         s.AddSingleton<NotificationEFMapper>();
+        s.AddSingleton<IMapper<Notification, NotificationDomain>>(sp => sp.GetRequiredService<NotificationEFMapper>());
+        s.AddSingleton<IMapper<NewNotificationDTO, Notification>>(sp => sp.GetRequiredService<NotificationEFMapper>());
 
-        s.AddSingleton<IMapper<Notification, NotificationDomain>>(sp =>
-            sp.GetRequiredService<NotificationEFMapper>());
-
-        s.AddSingleton<IMapper<NewNotificationDTO, Notification>>(sp =>
-            sp.GetRequiredService<NotificationEFMapper>());
+        // Minimal API
+        s.AddSingleton<NotificationMAPIMapper>();
+        s.AddSingleton<IMapper<int, ulong, NotificationCriteriaDTO>>(sp => sp.GetRequiredService<NotificationMAPIMapper>());
+        s.AddSingleton<IMapper<PaginatedQuery<NotificationDomain, NotificationCriteriaDTO>, PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>>>(
+            sp => sp.GetRequiredService<NotificationMAPIMapper>());
 
         // USER NOTIFICATIONS
         s.AddSingleton<UserNotificationEFMapper>();
-
-        s.AddSingleton<IMapper<NotificationPerUser, UserNotificationDomain>>(sp =>
-            sp.GetRequiredService<UserNotificationEFMapper>());
-
-        s.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>>(sp =>
-            sp.GetRequiredService<UserNotificationEFMapper>());
-
-        s.AddSingleton<IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>>(sp =>
-            sp.GetRequiredService<UserNotificationEFMapper>());
+        s.AddSingleton<IMapper<NotificationPerUser, UserNotificationDomain>>(sp => sp.GetRequiredService<UserNotificationEFMapper>());
+        s.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>>(sp => sp.GetRequiredService<UserNotificationEFMapper>());
+        s.AddSingleton<IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>>(sp => sp.GetRequiredService<UserNotificationEFMapper>());
 
         // TAGS
+        // EF
         s.AddSingleton<TagEFMapper>();
-
         s.AddSingleton<IMapper<Tag, TagDomain>>(sp => sp.GetRequiredService<TagEFMapper>());
-
         s.AddSingleton<IMapper<NewTagDTO, Tag>>(sp => sp.GetRequiredService<TagEFMapper>());
+        
+        // Minimal API
+        s.AddSingleton<TagMAPIMapper>();
+        s.AddSingleton<IMapper<TagCriteriaMAPI, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(
+            sp => sp.GetRequiredService<TagMAPIMapper>());
+        s.AddSingleton<IMapper<PaginatedQuery<TagDomain, TagCriteriaDTO>, PaginatedQuery<string, TagCriteriaMAPI>>>(
+            sp => sp.GetRequiredService<TagMAPIMapper>());
 
         // CONTACTS
+        // EF
         s.AddSingleton<ContactEFMapper>();
+        s.AddSingleton<IMapper<AgendaContact, ContactDomain>>(sp => sp.GetRequiredService<ContactEFMapper>());
+        s.AddSingleton<IMapper<NewContactDTO, AgendaContact>>(sp => sp.GetRequiredService<ContactEFMapper>());
+        s.AddSingleton<IUpdateMapper<ContactUpdateDTO, AgendaContact>>(sp => sp.GetRequiredService<ContactEFMapper>());
 
-        s.AddSingleton<IMapper<AgendaContact, ContactDomain>>(sp =>
-            sp.GetRequiredService<ContactEFMapper>());
-
-        s.AddSingleton<IMapper<NewContactDTO, AgendaContact>>(sp =>
-            sp.GetRequiredService<ContactEFMapper>());
-
-        s.AddSingleton<IUpdateMapper<ContactUpdateDTO, AgendaContact>>(sp =>
-            sp.GetRequiredService<ContactEFMapper>());
+        // Minimal API
+        s.AddSingleton<ContactMAPIMapper>();
+        s.AddSingleton<IMapper<NewContactMAPI, Executor, NewContactDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
+        s.AddSingleton<IMapper<ContactDomain, PublicContactMAPI>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
+        s.AddSingleton<IMapper<ContactCriteriaMAPI, ContactCriteriaDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
+        s.AddSingleton<IMapper<ulong, ulong, Executor, DeleteContactDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
+        s.AddSingleton<IMapper<ContactUpdateMAPI, ContactUpdateDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
+        s.AddSingleton<IMapper<PaginatedQuery<ContactDomain, ContactCriteriaDTO>, PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>>>(
+            sp => sp.GetRequiredService<ContactMAPIMapper>());
 
         // CONTACT TAGS
+        // EF
         s.AddSingleton<ContactTagEFMapper>();
+        s.AddSingleton<IMapper<ContactTag, ContactTagDomain>>(sp => sp.GetRequiredService<ContactTagEFMapper>());
+        s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>>(sp => sp.GetRequiredService<ContactTagEFMapper>());
 
-        s.AddSingleton<IMapper<ContactTag, ContactTagDomain>>(sp =>
-            sp.GetRequiredService<ContactTagEFMapper>());
-
-        s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>>(sp =>
-            sp.GetRequiredService<ContactTagEFMapper>());
+        // Minimal API
+        s.AddSingleton<ContactTagMAPIMapper>();
+        s.AddSingleton<IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>>(sp => sp.GetRequiredService<ContactTagMAPIMapper>());
+        s.AddSingleton<IMapper<ulong, ulong, string, Executor, DeleteContactTagDTO>>(sp => sp.GetRequiredService<ContactTagMAPIMapper>());
 
         // TESTS
         s.AddSingleton<TestEFMapper>();
-
         s.AddSingleton<IMapper<Test, TestDomain>>(sp => sp.GetRequiredService<TestEFMapper>());
-
         s.AddSingleton<IMapper<NewTestDTO, Test>>(sp => sp.GetRequiredService<TestEFMapper>());
+        s.AddSingleton<IUpdateMapper<TestUpdateDTO, Test>>(sp => sp.GetRequiredService<TestEFMapper>());
 
-        s.AddSingleton<IUpdateMapper<TestUpdateDTO, Test>>(sp =>
-            sp.GetRequiredService<TestEFMapper>());
+        // Resource
+        // EF
+        s.AddSingleton<ResourceEFMapper>();
+        s.AddSingleton<IMapper<Resource, ResourceDomain>>(sp => sp.GetRequiredService<ResourceEFMapper>());
+        s.AddSingleton<IMapper<NewResourceDTO, Resource>>(sp => sp.GetRequiredService<ResourceEFMapper>());
+        s.AddSingleton<IUpdateMapper<ResourceUpdateDTO, Resource>>(sp => sp.GetRequiredService<ResourceEFMapper>());
+
+        // Minimal API
+        s.AddSingleton<ResourceMAPIMapper>();
+        s.AddSingleton<IMapper<NewResourceMAPI, Executor, NewResourceDTO>>(sp => sp.GetRequiredService<ResourceMAPIMapper>());
+        s.AddSingleton<IMapper<ResourceDomain, PublicResourceMAPI>>(sp => sp.GetRequiredService<ResourceMAPIMapper>());
+        s.AddSingleton<IMapper<ulong, Executor, DeleteResourceDTO>>(sp => sp.GetRequiredService<ResourceMAPIMapper>());
+        s.AddSingleton<IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>>(sp => sp.GetRequiredService<ResourceMAPIMapper>());
+        s.AddSingleton<IMapper<ResourceCriteriaMAPI, Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(
+            sp => sp.GetRequiredService<ResourceMAPIMapper>());
+        s.AddSingleton<IMapper<PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>, PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>>(
+            sp => sp.GetRequiredService<ResourceMAPIMapper>());
 
         return s;
     }

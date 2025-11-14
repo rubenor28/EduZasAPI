@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTest.ClassStudents;
 
-public class EnrollClassUseCaseTest : IDisposable
+public class AddClassStudentUseCaseTest : IDisposable
 {
     private readonly AddClassStudentUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
@@ -26,7 +26,7 @@ public class EnrollClassUseCaseTest : IDisposable
 
     private readonly Random _rdm = new();
 
-    public EnrollClassUseCaseTest()
+    public AddClassStudentUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
         _conn = new SqliteConnection($"Data Source={dbName};Mode=Memory;Cache=Shared");

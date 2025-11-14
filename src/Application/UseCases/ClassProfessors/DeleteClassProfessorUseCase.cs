@@ -41,6 +41,10 @@ public sealed class DeleteClassProfessorUseCase(
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
+        var record = await _reader.GetAsync(value.Id);
+        if (record.IsNone)
+            return UseCaseErrors.NotFound();
+
         return Unit.Value;
     }
 }

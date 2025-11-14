@@ -16,11 +16,11 @@ public static class NotificationRoutes
     {
         var group = app.MapGroup("/notifications").WithTags("Notifications");
 
-        app.MapGet("/{page:int}", GetUserNotifications)
+        group.MapGet("/{page:int}", GetUserNotifications)
             .WithName("Obtener notificaciones por usuario")
             .AddEndpointFilter<UserIdFilter>()
             .RequireAuthorization("RequireAuthenticated")
-            .Produces<PaginatedQuery<NotificationDomain, NotificationCriteriaMAPI>>(
+            .Produces<PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>>(
                 StatusCodes.Status200OK
             )
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)

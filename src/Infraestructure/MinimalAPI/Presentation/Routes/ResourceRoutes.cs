@@ -2,7 +2,9 @@ using Application.DTOs.Common;
 using Application.DTOs.Resources;
 using Application.UseCases.Resources;
 using Domain.Entities;
+using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
+using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Resources;
 
 namespace MinimalAPI.Presentation.Routes;
@@ -11,21 +13,90 @@ public static class ResourceRoutes
 {
     public static RouteGroupBuilder MapResourceRoutes(this WebApplication app)
     {
-        var group = app.MapGroup("/").WithTags("Recursos académicos");
+        var group = app.MapGroup("/resources").WithTags("Recursos académicos");
 
-        group.MapPost("/resource", AddResource).RequireAuthorization("ProfessorOrAdmin");
+        group.MapPost("/", AddResource)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<PublicResourceMAPI>(StatusCodes.Status201Created)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Crear un nuevo recurso académico.";
+                op.Description = "Añade un nuevo recurso y lo asocia a un profesor.";
+                op.Responses["201"].Description = "Recurso creado exitosamente.";
+                op.Responses["400"].Description = "El ID del profesor no es válido o no se encontró.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description = "El usuario no tiene permisos para crear recursos para el profesor especificado.";
+                return op;
+            });
 
-        group
-            .MapGet("/resources/{resourceId:ulong}", GetResources)
-            .RequireAuthorization("ProfessorOrAdmin");
+        group.MapGet("/{resourceId:ulong}", GetResources)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Obtener un recurso por ID.";
+                op.Description = "Recupera la información de un recurso académico específico.";
+                op.Responses["200"].Description = "Recurso obtenido exitosamente.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                return op;
+            });
 
-        group.MapPost("/resources", SearchResource).RequireAuthorization("ProfessorOrAdmin");
+        group.MapPost("/search", SearchResource)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Buscar recursos académicos.";
+                op.Description = "Realiza una búsqueda paginada de recursos con filtros.";
+                op.Responses["200"].Description = "Búsqueda completada exitosamente.";
+                op.Responses["400"].Description = "Los criterios de búsqueda son inválidos.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                return op;
+            });
 
-        group
-            .MapDelete("/resources/{resourceId:ulong}", DeleteResource)
-            .RequireAuthorization("ProfessorOrAdmin");
+        group.MapDelete("/{resourceId:ulong}", DeleteResource)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Eliminar un recurso académico.";
+                op.Description = "Elimina un recurso específico por su ID.";
+                op.Responses["204"].Description = "Recurso eliminado exitosamente.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description = "El usuario no tiene permisos para eliminar este recurso.";
+                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                return op;
+            });
 
-        group.MapGet("/resources", UpdateResource).RequireAuthorization("ProfessorOrAdmin");
+        group.MapPut("/", UpdateResource)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Actualizar un recurso académico.";
+                op.Description = "Modifica los datos de un recurso existente.";
+                op.Responses["200"].Description = "Recurso actualizado exitosamente.";
+                op.Responses["400"].Description = "Los datos para la actualización son inválidos.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description = "El usuario no tiene permisos para modificar este recurso.";
+                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                return op;
+            });
 
         return group;
     }
@@ -64,7 +135,7 @@ public static class ResourceRoutes
     public static Task<IResult> SearchResource(
         ResourceCriteriaMAPI request,
         ResourceQueryUseCase useCase,
-        IMapper<ResourceCriteriaMAPI, ResourceCriteriaDTO> reqMapper,
+        IMapper<ResourceCriteriaMAPI, Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
         IMapper<
             PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>,
             PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>
