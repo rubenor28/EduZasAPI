@@ -51,7 +51,7 @@ public class LoginUseCaseTest : IDisposable
         var newUser = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),
@@ -92,7 +92,7 @@ public class LoginUseCaseTest : IDisposable
         var newUser = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),

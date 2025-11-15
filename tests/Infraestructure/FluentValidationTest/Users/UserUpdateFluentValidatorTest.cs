@@ -15,7 +15,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 1,
             FirstName = "JOHN",
-            FatherLastName = "LUKE",
+            FatherLastname = "LUKE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = "FITZGERALD",
@@ -37,7 +37,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 0,
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             Active = true,
@@ -61,7 +61,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 1,
             FirstName = firstName,
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             Active = true,
@@ -79,13 +79,13 @@ public class UserUpdateFluentValidatorTest
     [InlineData("")]
     [InlineData("DO")]
     [InlineData("doe")]
-    public void IsValid_WithInvalidFatherLastName_ReturnsError(string fatherLastName)
+    public void IsValid_WithInvalidFatherLastname_ReturnsError(string fatherLastname)
     {
         var dto = new UserUpdateDTO
         {
             Id = 1,
             FirstName = "JOHN",
-            FatherLastName = fatherLastName,
+            FatherLastname = fatherLastname,
             Email = "john.doe@example.com",
             Password = "Password123!",
             Active = true,
@@ -96,7 +96,7 @@ public class UserUpdateFluentValidatorTest
         var result = _validator.IsValid(dto);
 
         Assert.True(result.IsErr);
-        Assert.Contains(result.UnwrapErr(), e => e.Field == "fatherLastName");
+        Assert.Contains(result.UnwrapErr(), e => e.Field == "fatherLastname");
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 1,
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = email,
             Password = "Password123!",
             Active = true,
@@ -134,7 +134,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 1,
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = password,
             Active = true,
@@ -157,7 +157,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 1,
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = midName,
@@ -181,7 +181,7 @@ public class UserUpdateFluentValidatorTest
         {
             Id = 1,
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MotherLastname = motherLastname,

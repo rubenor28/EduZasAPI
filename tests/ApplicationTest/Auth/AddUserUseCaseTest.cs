@@ -46,7 +46,7 @@ public class AddUserUseCaseTest : IDisposable
         var newUser = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),
@@ -64,7 +64,7 @@ public class AddUserUseCaseTest : IDisposable
         var existingUser = new NewUserDTO
         {
             FirstName = "JANE",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "jane.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),
@@ -75,7 +75,7 @@ public class AddUserUseCaseTest : IDisposable
         var newUser = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "jane.doe@example.com", // Duplicate email
             Password = "Password123!",
             MidName = Optional.None<string>(),
@@ -97,7 +97,7 @@ public class AddUserUseCaseTest : IDisposable
         var newUser = new NewUserDTO
         {
             FirstName = "", // Invalid first name
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),

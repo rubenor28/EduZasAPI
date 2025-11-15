@@ -25,7 +25,7 @@ public sealed record NewUserDTO
     /// Obtiene o establece el apellido paterno del usuario.
     /// </summary>
     /// <value>Apellido paterno del usuario. Campo obligatorio. Se normaliza automáticamente a mayúsculas invariables.</value>
-    public required string FatherLastName { get; set; }
+    public required string FatherLastname { get; set; }
 
     /// <summary>
     /// Obtiene o establece la dirección de correo electrónico del usuario.

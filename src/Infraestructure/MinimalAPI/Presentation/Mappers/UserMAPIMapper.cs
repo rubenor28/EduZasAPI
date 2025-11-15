@@ -26,10 +26,8 @@ public sealed class UserMAPIMapper(
     IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper,
     IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> strqFromDomainMapper
 )
-    : IMapper<UserDomain, UserMAPI>,
-        IMapper<Executor, ReadUserDTO>,
+    : IMapper<Executor, ReadUserDTO>,
         IMapper<UserDomain, PublicUserMAPI>,
-        IMapper<PublicUserDTO, PublicUserMAPI>,
         IMapper<ulong, Executor, DeleteUserDTO>,
         IMapper<NewUserMAPI, Executor, NewUserDTO>,
         IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>,
@@ -63,28 +61,11 @@ public sealed class UserMAPIMapper(
         new()
         {
             FirstName = input.FirstName,
-            FatherLastName = input.FatherLastName,
+            FatherLastname = input.FatherLastname,
             Email = input.Email,
             Password = input.Password,
             MotherLastname = input.MotherLastname.ToOptional(),
             MidName = input.MidName.ToOptional(),
-        };
-
-    /// <summary>
-    /// Mapea un DTO público de la capa de aplicación a un DTO público para la API.
-    /// </summary>
-    /// <param name="source">El DTO de la capa de aplicación.</param>
-    /// <returns>Un <see cref="PublicUserMAPI"/> con datos públicos del usuario.</returns>
-    public PublicUserMAPI Map(PublicUserDTO source) =>
-        new()
-        {
-            Id = source.Id,
-            FirstName = source.FirstName,
-            FatherLastName = source.FatherLastName,
-            Email = source.Email,
-            MotherLastname = source.MotherLastname.ToNullable(),
-            MidName = source.MidName.ToNullable(),
-            Role = _roleFromDomainMapper.Map(source.Role),
         };
 
     /// <summary>
@@ -97,7 +78,7 @@ public sealed class UserMAPIMapper(
         {
             Id = source.Id,
             FirstName = source.FirstName,
-            FatherLastName = source.FatherLastname,
+            FatherLastname = source.FatherLastname,
             Email = source.Email,
             MotherLastname = source.MotherLastname.ToNullable(),
             MidName = source.MidName.ToNullable(),
@@ -125,8 +106,8 @@ public sealed class UserMAPIMapper(
         var midNameValidation = _strqToDomainMapper.Map(source.MidName);
         midNameValidation.IfErr(_ => errs.Add(new() { Field = "midName" }));
 
-        var fatherLastNameValidation = _strqToDomainMapper.Map(source.FatherLastname);
-        fatherLastNameValidation.IfErr(_ => errs.Add(new() { Field = "fatherLastname" }));
+        var fatherLastnameValidation = _strqToDomainMapper.Map(source.FatherLastname);
+        fatherLastnameValidation.IfErr(_ => errs.Add(new() { Field = "fatherLastname" }));
 
         var motherLastnameValidation = _strqToDomainMapper.Map(source.MotherLastname);
         motherLastnameValidation.IfErr(_ => errs.Add(new() { Field = "motherLastname" }));
@@ -150,7 +131,7 @@ public sealed class UserMAPIMapper(
         {
             FirstName = firstNameValidation.Unwrap(),
             MidName = midNameValidation.Unwrap(),
-            FatherLastName = fatherLastNameValidation.Unwrap(),
+            FatherLastname = fatherLastnameValidation.Unwrap(),
             MotherLastname = motherLastnameValidation.Unwrap(),
             Email = emailValidation.Unwrap(),
             Password = passwordValidation.Unwrap(),
@@ -169,25 +150,6 @@ public sealed class UserMAPIMapper(
     /// <returns>Un <see cref="ReadUserDTO"/> que encapsula al ejecutor.</returns>
     public ReadUserDTO Map(Executor input) => new() { Id = input.Id, Executor = input };
 
-    /// <summary>
-    /// Mapea una entidad de dominio <see cref="UserDomain"/> a su representación completa para la API.
-    /// </summary>
-    /// <param name="input">La entidad de dominio del usuario.</param>
-    /// <returns>Un DTO <see cref="UserMAPI"/> con todos los datos del usuario.</returns>
-    UserMAPI IMapper<UserDomain, UserMAPI>.Map(UserDomain input) =>
-        new()
-        {
-            Id = input.Id,
-            Active = input.Active,
-            Email = input.Email,
-            Role = _roleFromDomainMapper.Map(input.Role),
-            FirstName = input.FirstName,
-            FatherLastName = input.FatherLastname,
-            MidName = input.MidName.ToNullable(),
-            MotherLastname = input.MotherLastname.ToNullable(),
-            Password = input.Password,
-        };
-
     public UserCriteriaMAPI Map(UserCriteriaDTO input) =>
         new()
         {
@@ -197,7 +159,7 @@ public sealed class UserMAPIMapper(
             Email = _strqFromDomainMapper.Map(input.Email),
             Password = _strqFromDomainMapper.Map(input.Password),
             FirstName = _strqFromDomainMapper.Map(input.FirstName),
-            FatherLastname = _strqFromDomainMapper.Map(input.FatherLastName),
+            FatherLastname = _strqFromDomainMapper.Map(input.FatherLastname),
             MidName = _strqFromDomainMapper.Map(input.MidName),
             MotherLastname = _strqFromDomainMapper.Map(input.MotherLastname),
             CreatedAt = input.CreatedAt.ToNullable(),
@@ -232,7 +194,7 @@ public sealed class UserMAPIMapper(
             Email = input.Email,
             Password = input.Password,
             FirstName = input.FirstName,
-            FatherLastName = input.FatherLastName,
+            FatherLastname = input.FatherLastname,
             MidName = input.MidName.ToOptional(),
             MotherLastname = input.MotherLastname.ToOptional(),
             Executor = ex,

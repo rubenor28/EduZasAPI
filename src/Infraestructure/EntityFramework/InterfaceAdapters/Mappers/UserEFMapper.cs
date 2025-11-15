@@ -42,7 +42,7 @@ public class UserEFMapper(
             Password = source.Password,
             Role = _userTypeFromDomainMapper.Map(UserType.STUDENT),
             FirstName = source.FirstName,
-            FatherLastname = source.FatherLastName,
+            FatherLastname = source.FatherLastname,
             MidName = source.MidName.ToNullable(),
             MotherLastname = source.MotherLastname.ToNullable(),
         };
@@ -51,7 +51,7 @@ public class UserEFMapper(
     {
         destination.UserId = source.Id;
         destination.FirstName = source.FirstName;
-        destination.FatherLastname = source.FatherLastName;
+        destination.FatherLastname = source.FatherLastname;
         destination.Email = source.Email;
         destination.Password = source.Password;
         destination.MidName = source.MidName.ToNullable();

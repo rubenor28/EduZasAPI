@@ -91,6 +91,6 @@ public sealed class AddClassTestUseCase(
             new() { ClassId = classId, UserId = professorId }
         );
 
-        return professorSearch.IsNone && test.ProfessorId == professorId;
+        return professorSearch.IsSome && test.ProfessorId == professorId;
     }
 }

@@ -16,7 +16,7 @@ public sealed record UserUpdateMAPI
     public required bool Active { get; set; }
     public required uint Role { get; set; }
     public required string FirstName { get; set; }
-    public required string FatherLastName { get; set; }
+    public required string FatherLastname { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
     public required string? MidName { get; set; }

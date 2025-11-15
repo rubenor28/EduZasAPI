@@ -70,7 +70,7 @@ public class AddUserUseCase(
         new()
         {
             FirstName = value.FirstName.ToUpperInvariant(),
-            FatherLastName = value.FatherLastName.ToUpperInvariant(),
+            FatherLastname = value.FatherLastname.ToUpperInvariant(),
             MidName = value.MidName.Match(
                 name => name.ToUpperInvariant().ToOptional(),
                 () => Optional<string>.None()

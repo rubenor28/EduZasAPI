@@ -67,7 +67,7 @@ public class AddContactUseCaseTest : IDisposable
         var user = new NewUserDTO
         {
             FirstName = "Test",
-            FatherLastName = "User",
+            FatherLastname = "User",
             Email = email,
             Password = "Password123!",
         };

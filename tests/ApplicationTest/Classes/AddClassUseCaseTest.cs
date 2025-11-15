@@ -151,7 +151,7 @@ public class AddClassUseCaseTest : IDisposable
         var result = await _useCase.ExecuteAsync(newClass);
 
         Assert.True(result.IsErr);
-        Assert.Equal(typeof(UnauthorizedError), result.UnwrapErr().GetType());
+        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
 
     [Fact]

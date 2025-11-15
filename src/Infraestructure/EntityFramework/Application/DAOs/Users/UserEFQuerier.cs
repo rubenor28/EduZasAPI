@@ -28,7 +28,7 @@ public class UserEFQuerier : EFQuerier<UserDomain, UserCriteriaDTO, User>
             .WhereOptional(c.ModifiedAt, d => u => u.ModifiedAt == d)
             .WhereStringQuery(c.FirstName, u => u.FirstName)
             .WhereStringQuery(c.MidName, u => u.MidName)
-            .WhereStringQuery(c.FatherLastName, u => u.FatherLastname)
+            .WhereStringQuery(c.FatherLastname, u => u.FatherLastname)
             .WhereStringQuery(c.MotherLastname, u => u.MotherLastname)
             .WhereStringQuery(c.Email, u => u.Email)
             .WhereOptional(

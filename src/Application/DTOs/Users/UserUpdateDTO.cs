@@ -30,7 +30,7 @@ public sealed record UserUpdateDTO : IIdentifiable<ulong>
     /// Obtiene o establece el apellido paterno del usuario.
     /// </summary>
     /// <value>Apellido paterno del usuario. Campo obligatorio.</value>
-    public required string FatherLastName { get; set; }
+    public required string FatherLastname { get; set; }
 
     /// <summary>
     /// Obtiene o establece la dirección de correo electrónico del usuario.

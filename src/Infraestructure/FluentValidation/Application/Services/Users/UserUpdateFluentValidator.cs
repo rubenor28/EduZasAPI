@@ -29,7 +29,7 @@ public class UserUpdateFluentValidator : FluentValidator<UserUpdateDTO>
             .Matches(UserRegexs.SimpleName)
             .WithMessage("Formato inválido");
 
-        RuleFor(x => x.FatherLastName)
+        RuleFor(x => x.FatherLastname)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .WithMessage("Campo requerido")

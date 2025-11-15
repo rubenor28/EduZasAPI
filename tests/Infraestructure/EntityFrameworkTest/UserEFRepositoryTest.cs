@@ -53,7 +53,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test@test.com",
             Password = "securepwd1234",
             FirstName = "test",
-            FatherLastName = "test",
+            FatherLastname = "test",
         };
 
         var created = await _creator.AddAsync(newUser);
@@ -71,7 +71,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test@test.com",
             Password = "securepwd1234",
             FirstName = "test",
-            FatherLastName = "test",
+            FatherLastname = "test",
         };
         await _creator.AddAsync(newUser);
 
@@ -80,7 +80,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test@test.com", // Same email
             Password = "othersecurepwd1234",
             FirstName = "test2",
-            FatherLastName = "test2",
+            FatherLastname = "test2",
         };
 
         await Assert.ThrowsAsync<DbUpdateException>(() => _creator.AddAsync(duplicateUser));
@@ -94,7 +94,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test@test.com",
             Password = "securepwd1234",
             FirstName = "test",
-            FatherLastName = "test",
+            FatherLastname = "test",
         };
         var created = await _creator.AddAsync(newUser);
 
@@ -104,7 +104,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "update@test.com",
             FirstName = "update",
             Password = "update",
-            FatherLastName = "update",
+            FatherLastname = "update",
             Active = false,
             MidName = "update",
             MotherLastname = "update",
@@ -118,7 +118,7 @@ public class UserEFRepositoryTest : IDisposable
         Assert.Equal(update.Email, updatedUser.Email);
         Assert.Equal(update.FirstName, updatedUser.FirstName);
         Assert.Equal(update.Password, updatedUser.Password);
-        Assert.Equal(update.FatherLastName, updatedUser.FatherLastname);
+        Assert.Equal(update.FatherLastname, updatedUser.FatherLastname);
         Assert.Equal(update.Active, updatedUser.Active);
         Assert.Equal(update.MidName.Unwrap(), updatedUser.MidName.Unwrap());
         Assert.Equal(update.MotherLastname.Unwrap(), updatedUser.MotherLastname.Unwrap());
@@ -132,7 +132,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test@test.com",
             Password = "securepwd1234",
             FirstName = "test",
-            FatherLastName = "test",
+            FatherLastname = "test",
         };
 
         var otherUser = new NewUserDTO
@@ -140,7 +140,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test2@test.com",
             Password = "securepwd1234",
             FirstName = "test",
-            FatherLastName = "test",
+            FatherLastname = "test",
         };
 
         await _creator.AddAsync(otherUser);
@@ -152,7 +152,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test2@test.com",
             FirstName = "update",
             Password = "update",
-            FatherLastName = "update",
+            FatherLastname = "update",
             Active = false,
             MidName = "update",
             MotherLastname = "update",
@@ -173,7 +173,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test@test.com",
             Password = "securepwd1234",
             FirstName = "test",
-            FatherLastName = "test",
+            FatherLastname = "test",
         };
         var created = await _creator.AddAsync(newUser);
 
@@ -199,7 +199,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test@test.com",
             Password = "securepwd1234",
             FirstName = "test",
-            FatherLastName = "test",
+            FatherLastname = "test",
         };
         var created = await _creator.AddAsync(newUser);
 
@@ -226,7 +226,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test1@test.com",
             Password = "securepwd1234",
             FirstName = "test1",
-            FatherLastName = "test1",
+            FatherLastname = "test1",
         };
         await _creator.AddAsync(newUser1);
 
@@ -235,7 +235,7 @@ public class UserEFRepositoryTest : IDisposable
             Email = "test2@test.com",
             Password = "securepwd1234",
             FirstName = "test2",
-            FatherLastName = "test2",
+            FatherLastname = "test2",
         };
         await _creator.AddAsync(newUser2);
 

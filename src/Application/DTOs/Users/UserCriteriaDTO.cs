@@ -58,7 +58,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el apellido paterno para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<StringQueryDTO> FatherLastName { get; set; } = Optional<StringQueryDTO>.None();
+    public Optional<StringQueryDTO> FatherLastname { get; set; } = Optional<StringQueryDTO>.None();
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido materno del usuario.

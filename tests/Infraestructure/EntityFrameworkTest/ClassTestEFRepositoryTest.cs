@@ -64,7 +64,7 @@ public class ClassTestEFRepositoryTest : IDisposable
         var newUser = new NewUserDTO
         {
             FirstName = "Test",
-            FatherLastName = "Professor",
+            FatherLastname = "Professor",
             Email = "test.professor@email.com",
             Password = "password",
         };

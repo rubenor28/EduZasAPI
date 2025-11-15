@@ -15,7 +15,7 @@ public class NewUserFluentValidatorTest
         var dto = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = "FITZGERALD",
@@ -36,7 +36,7 @@ public class NewUserFluentValidatorTest
         var dto = new NewUserDTO
         {
             FirstName = firstName,
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),
@@ -53,12 +53,12 @@ public class NewUserFluentValidatorTest
     [InlineData("")]
     [InlineData("DO")]
     [InlineData("doe")]
-    public void IsValid_WithInvalidFatherLastName_ReturnsError(string fatherLastName)
+    public void IsValid_WithInvalidFatherLastname_ReturnsError(string fatherLastname)
     {
         var dto = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = fatherLastName,
+            FatherLastname = fatherLastname,
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),
@@ -68,7 +68,7 @@ public class NewUserFluentValidatorTest
         var result = _validator.IsValid(dto);
 
         Assert.True(result.IsErr);
-        Assert.Contains(result.UnwrapErr(), e => e.Field == "fatherLastName");
+        Assert.Contains(result.UnwrapErr(), e => e.Field == "fatherLastname");
     }
 
     [Theory]
@@ -79,7 +79,7 @@ public class NewUserFluentValidatorTest
         var dto = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = email,
             Password = "Password123!",
             MidName = Optional.None<string>(),
@@ -103,7 +103,7 @@ public class NewUserFluentValidatorTest
         var dto = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = password,
             MidName = Optional.None<string>(),
@@ -124,7 +124,7 @@ public class NewUserFluentValidatorTest
         var dto = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.Some(midName),
@@ -145,7 +145,7 @@ public class NewUserFluentValidatorTest
         var dto = new NewUserDTO
         {
             FirstName = "JOHN",
-            FatherLastName = "DOE",
+            FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
             MidName = Optional.None<string>(),
