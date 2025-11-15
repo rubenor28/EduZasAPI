@@ -1,5 +1,6 @@
 using DotNetEnv;
 using MinimalAPI.Extensions;
+using MinimalAPI.Presentation.Constraints;
 using MinimalAPI.Presentation.Routes;
 
 var environment = Environment.GetEnvironmentVariable("ServerOptions__Environment");
@@ -20,7 +21,14 @@ builder.Services.AddOpenApi();
 // Agregar dependencias del proyecto de Extensions/
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.ConstraintMap.Add("ulong", typeof(UlongRouteConstraint));
+});
+
 var app = builder.Build();
+
+// ... (rest of the file is unchanged)
 app.UseCors("AllowFrontend");
 
 // Activar rutas protegidas y políticas establecidas
