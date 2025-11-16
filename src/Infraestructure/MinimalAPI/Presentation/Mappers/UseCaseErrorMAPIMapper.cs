@@ -18,12 +18,10 @@ public class UseCaseErrorMAPIMapper : IMapper<UseCaseError, IResult>
     {
         return err switch
         {
-            InputError errs => Results.BadRequest(
-                new FieldErrorResponse { Message = "Formato inválido", Errors = errs.Errors }
-            ),
+            InputError errs => Results.BadRequest(new FieldErrorResponse { Message = "Formato inválido", Errors = errs.Errors }),
             UnauthorizedError => Results.Forbid(),
             NotFoundError => Results.NotFound(),
-            AlreadyExistsError => Results.Conflict("El elemento ya existe"),
+            AlreadyExistsError => Results.Conflict(new MessageResponse { Message = "El elemento ya existe" }),
             _ => throw new NotImplementedException(),
         };
     }

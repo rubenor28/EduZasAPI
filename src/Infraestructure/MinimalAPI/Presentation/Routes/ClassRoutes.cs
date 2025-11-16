@@ -126,6 +126,7 @@ public static class ClassRoutes
             .Produces(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
+            .Produces<MessageResponse>(StatusCodes.Status409Conflict)
             .WithOpenApi(op =>
             {
                 op.Summary = "Inscribirse a una clase";
@@ -135,6 +136,7 @@ public static class ClassRoutes
                 op.Responses["401"].Description = "Si el usuario no está autenticado";
                 op.Responses["404"].Description =
                     "Si no se encontró una clase con el código proporcionado";
+                op.Responses["409"].Description = "Si el usuario ya está inscrito en la clase";
                 return op;
             });
 
@@ -187,6 +189,7 @@ public static class ClassRoutes
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
+            .Produces<MessageResponse>(StatusCodes.Status409Conflict)
             .WithOpenApi(op =>
             {
                 op.Summary = "Asignar un profesor a una clase";
@@ -200,6 +203,7 @@ public static class ClassRoutes
                     "Si el usuario no tiene permisos para asignar profesores (ej. no es dueño de la clase).";
                 op.Responses["404"].Description =
                     "Si no se encontró la clase o el usuario a asignar.";
+                op.Responses["409"].Description = "Si el profesor ya está asignado a esa clase.";
                 return op;
             });
 

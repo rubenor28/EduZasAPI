@@ -57,11 +57,7 @@ public class AddUserUseCase(
             throw new InvalidDataException($"Repeated email {usr.Email} stored");
 
         if (results == 1)
-        {
-            var error = new FieldErrorDTO { Field = "email", Message = "Email ya registrado" };
-            errs.Add(error);
-            return Result.Err(UseCaseErrors.Input(errs));
-        }
+            return UseCaseErrors.AlreadyExists();
 
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }

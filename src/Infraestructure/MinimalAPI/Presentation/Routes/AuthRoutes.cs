@@ -32,13 +32,15 @@ public static class AuthRoutes
             .WithName("Registrar usuario")
             .Produces<PublicUserMAPI>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<MessageResponse>(StatusCodes.Status409Conflict)
             .WithOpenApi(op =>
             {
                 op.Summary = "Registrar un nuevo usuario en el sistema.";
                 op.Description = "Crea una cuenta de usuario con la información proporcionada.";
                 op.Responses["201"].Description = "El usuario fue creado exitosamente.";
                 op.Responses["400"].Description =
-                    "Los datos proporcionados son inválidos (ej. email duplicado, formato incorrecto).";
+                    "Los datos proporcionados tienen un formato incorrecto.";
+                op.Responses["409"].Description = "El email proporcionado ya está registrado.";
                 return op;
             });
 
