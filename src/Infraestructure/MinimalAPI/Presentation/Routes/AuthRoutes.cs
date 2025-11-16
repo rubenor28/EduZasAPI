@@ -81,7 +81,7 @@ public static class AuthRoutes
             .WithName("Verificar autenticado")
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<UserIdFilter>()
-            .Produces<WithDataResponse<PublicUserMAPI>>(StatusCodes.Status200OK)
+            .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi(op =>
