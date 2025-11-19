@@ -29,7 +29,7 @@ public sealed class UserMAPIMapper(
     : IMapper<Executor, ReadUserDTO>,
         IMapper<UserDomain, PublicUserMAPI>,
         IMapper<ulong, Executor, DeleteUserDTO>,
-        IMapper<NewUserMAPI, Executor, NewUserDTO>,
+        IMapper<NewUserMAPI, NewUserDTO>,
         IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>,
         IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
         IMapper<UserCriteriaDTO, UserCriteriaMAPI>,
@@ -57,7 +57,7 @@ public sealed class UserMAPIMapper(
     /// <param name="input">El DTO de la API con los datos del nuevo usuario.</param>
     /// <param name="ex">El <see cref="Executor"/> que realiza la operación.</param>
     /// <returns>Un <see cref="NewUserDTO"/> para la capa de aplicación.</returns>
-    public NewUserDTO Map(NewUserMAPI input, Executor ex) =>
+    public NewUserDTO Map(NewUserMAPI input) =>
         new()
         {
             FirstName = input.FirstName,

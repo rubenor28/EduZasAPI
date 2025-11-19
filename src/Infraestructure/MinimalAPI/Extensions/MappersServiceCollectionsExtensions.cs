@@ -75,7 +75,7 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<UserMAPIMapper>();
         s.AddSingleton<IMapper<UserDomain, PublicUserMAPI>>(sp => sp.GetRequiredService<UserMAPIMapper>());
         s.AddSingleton<IMapper<ulong, Executor, DeleteUserDTO>>(sp => sp.GetRequiredService<UserMAPIMapper>());
-        s.AddSingleton<IMapper<NewUserMAPI, Executor, NewUserDTO>>(sp => sp.GetRequiredService<UserMAPIMapper>());
+        s.AddSingleton<IMapper<NewUserMAPI, NewUserDTO>>(sp => sp.GetRequiredService<UserMAPIMapper>());
         s.AddSingleton<IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(
             sp =>  sp.GetRequiredService<UserMAPIMapper>());
         s.AddSingleton<IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>>(

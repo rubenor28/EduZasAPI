@@ -39,14 +39,9 @@ public class AddUserUseCase(
     /// Si encuentra exactamente un usuario con el mismo email, retorna un error de validación.
     /// Si encuentra más de uno, lanza una excepción indicando inconsistencia en los datos.
     /// </remarks>
-    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        NewUserDTO usr
-    )
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(NewUserDTO usr)
     {
-        var errs = new List<FieldErrorDTO>();
-
         var emailSearch = new StringQueryDTO { Text = usr.Email, SearchType = StringSearchType.EQ };
-
         var search = await querier.GetByAsync(
             new UserCriteriaDTO { Email = Optional.Some(emailSearch) }
         );
@@ -62,22 +57,23 @@ public class AddUserUseCase(
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }
 
-    protected override NewUserDTO PreValidationFormat(NewUserDTO value) =>
-        new()
-        {
-            FirstName = value.FirstName.ToUpperInvariant(),
-            FatherLastname = value.FatherLastname.ToUpperInvariant(),
-            MidName = value.MidName.Match(
-                name => name.ToUpperInvariant().ToOptional(),
-                () => Optional<string>.None()
-            ),
-            MotherLastname = value.MotherLastname.Match(
-                name => name.ToUpperInvariant().ToOptional(),
-                () => Optional<string>.None()
-            ),
-            Email = value.Email,
-            Password = value.Password,
-        };
+    protected override NewUserDTO PreValidationFormat(NewUserDTO value)
+    {
+        value.FirstName = value.FirstName.ToUpperInvariant();
+        value.FatherLastname = value.FatherLastname.ToUpperInvariant();
+        value.MidName = value.MidName.Match(
+            name => name.ToUpperInvariant().ToOptional(),
+            () => Optional<string>.None()
+        );
+        value.MotherLastname = value.MotherLastname.Match(
+            name => name.ToUpperInvariant().ToOptional(),
+            () => Optional<string>.None()
+        );
+        value.Email = value.Email;
+        value.Password = value.Password;
+
+        return value;
+    }
 
     /// <summary>
     /// Aplica formato final a los datos del usuario antes de la persistencia.

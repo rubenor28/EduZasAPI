@@ -94,7 +94,7 @@ public static class ServiceCollectionExtensions
             .AddAuthorizationBuilder()
             .AddPolicy("RequireAuthenticated", policy => policy.RequireAuthenticatedUser())
             .AddPolicy("ProfessorOrAdmin", policy => policy.RequireRole("PROFESSOR", "ADMIN"))
-            .AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
+            .AddPolicy("Admin", policy => policy.RequireRole("ADMIN"));
 
         services.AddAuthorization();
 
