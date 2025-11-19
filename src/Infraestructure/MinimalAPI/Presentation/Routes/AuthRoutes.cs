@@ -110,14 +110,14 @@ public static class AuthRoutes
         NewUserMAPI request,
         AddUserUseCase useCase,
         RoutesUtils utils,
-        IMapper<NewUserMAPI, Executor, NewUserDTO> newUserMapper,
+        IMapper<NewUserMAPI, NewUserDTO> newUserMapper,
         IMapper<UserDomain, PublicUserMAPI> userMapper,
         HttpContext ctx
     )
     {
         return await utils.HandleUseCaseAsync(
             useCase,
-            mapRequest: () => newUserMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => newUserMapper.Map(request),
             mapResponse: (user) => Results.Created($"/users/{user.Id}", userMapper.Map(user))
         );
     }
