@@ -41,6 +41,17 @@ public class AddClassStudentUseCase(
         NewClassStudentDTO value
     )
     {
+        var authorized = value.Executor.Role switch
+        {
+            UserType.ADMIN => true,
+            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.ClassId),
+            UserType.STUDENT => value.UserId == value.Executor.Id,
+            _ => throw new NotImplementedException(),
+        };
+
+        if (!authorized)
+            return UseCaseErrors.Unauthorized();
+
         var errors = new List<FieldErrorDTO>();
 
         (await _classReader.GetAsync(value.ClassId)).IfNone(() =>
@@ -67,17 +78,6 @@ public class AddClassStudentUseCase(
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
 
-        var authorized = value.Executor.Role switch
-        {
-            UserType.ADMIN => true,
-            UserType.PROFESSOR => value.UserId == value.Executor.Id,
-            UserType.STUDENT => false,
-            _ => throw new NotImplementedException(),
-        };
-
-        if (!authorized)
-            return UseCaseErrors.Unauthorized();
-
         var relationSearch = await _studentReader.GetAsync(
             new() { ClassId = value.ClassId, UserId = value.UserId }
         );
@@ -86,5 +86,14 @@ public class AddClassStudentUseCase(
             return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
+    }
+
+    private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
+    {
+        var professorSearch = await _professorReader.GetAsync(
+            new() { ClassId = classId, UserId = professorId }
+        );
+
+        return professorSearch.IsSome && professorSearch.Unwrap().IsOwner;
     }
 }

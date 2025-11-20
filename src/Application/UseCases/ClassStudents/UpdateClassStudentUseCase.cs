@@ -21,18 +21,6 @@ public sealed class UpdateClassStudentUseCase(
         validator
     )
 {
-    private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
-        professorReader;
-
-    private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
-    {
-        var professor = await _professorReader.GetAsync(
-            new() { UserId = professorId, ClassId = classId }
-        );
-
-        return professor.IsSome;
-    }
-
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         ClassStudentUpdateDTO value
     )
@@ -40,9 +28,7 @@ public sealed class UpdateClassStudentUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.Id.ClassId),
-            UserType.STUDENT => false,
-            _ => throw new NotImplementedException(),
+            _ => value.Executor.Id == value.Id.UserId,
         };
 
         if (!authorized)

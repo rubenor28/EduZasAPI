@@ -132,10 +132,17 @@ public class ClassMAPIMapper(
             ? new WithStudentDTO { Id = input.Id, Hidden = input.Hidden.ToOptional() }
             : Optional<WithStudentDTO>.None();
 
-    public NewClassDTO Map(NewClassMAPI in1, Executor in2)
-    {
-        throw new NotImplementedException();
-    }
+    public NewClassDTO Map(NewClassMAPI input, Executor ex) =>
+        new()
+        {
+            Id = "",
+            ClassName = input.ClassName,
+            Subject = input.Subject.ToOptional(),
+            Section = input.Section.ToOptional(),
+            Color = input.Color,
+            OwnerId = input.OwnerId,
+            Executor = ex,
+        };
 
     /// <summary>
     /// Mapea una entidad de dominio <see cref="ClassDomain"/> a la representación de la API.

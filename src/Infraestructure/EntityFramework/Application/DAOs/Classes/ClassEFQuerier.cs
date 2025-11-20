@@ -40,5 +40,5 @@ public class ClassEFQuerier(
                             sl.StudentId == student.Id
                             && (student.Hidden.IsNone || sl.Hidden == student.Hidden.Unwrap())
                         )
-            );
+            ).OrderByDescending(c => c.CreatedAt);
 }

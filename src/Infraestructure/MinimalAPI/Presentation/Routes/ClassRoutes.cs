@@ -25,7 +25,7 @@ public static class ClassRoutes
         app.MapPost("/classes", AddClass)
             .WithName("Crear clases")
             .RequireAuthorization("ProfessorOrAdmin")
-            .AddEndpointFilter<UserIdFilter>()
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces<PublicClassMAPI>(StatusCodes.Status201Created)
@@ -43,7 +43,7 @@ public static class ClassRoutes
 
         app.MapPut("/classes", UpdateClass)
             .RequireAuthorization("ProfessorOrAdmin")
-            .AddEndpointFilter<UserIdFilter>()
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces<PublicClassMAPI>(StatusCodes.Status200OK)
@@ -120,7 +120,7 @@ public static class ClassRoutes
 
         app.MapPost("/classes/enroll", EnrollClass)
             .RequireAuthorization("RequireAuthenticated")
-            .AddEndpointFilter<UserIdFilter>()
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status201Created)
@@ -146,32 +146,32 @@ public static class ClassRoutes
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent)
             .WithOpenApi(op =>
             {
                 op.Summary = "Abandonar una clase";
                 op.Description = "El usuario que realiza la solicitud abandona una clase";
-                op.Responses["200"].Description = "Si la opreación fue exitosa";
+                op.Responses["204"].Description = "Si la opreación fue exitosa";
                 op.Responses["401"].Description = "Si el usuario no está autenticado";
                 op.Responses["404"].Description =
                     "Si el usuario no está inscrito a la clase en cuestión";
                 return op;
             });
 
-        app.MapPatch("/classes", UpdateClass)
+        app.MapPut("/classes/students/relationship", UpdateClassStudent)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent)
             .WithOpenApi(op =>
             {
                 op.Summary = "Alternar la visibilidad de una clase";
                 op.Description =
                     "El usuario que realiza la solicitud alterna la visibilidad de una clase en la que está inscrito.";
-                op.Responses["200"].Description = "Si la operación fue exitosa";
+                op.Responses["204"].Description = "Si la operación fue exitosa";
                 op.Responses["400"].Description = "Si el usuario o clase no son válidos";
                 op.Responses["401"].Description = "Si el usuario no está autenticado";
                 op.Responses["403"].Description =

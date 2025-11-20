@@ -97,6 +97,7 @@ public static class ServiceCollectionExtensions
             .AddPolicy("Admin", policy => policy.RequireRole("ADMIN"));
 
         services.AddAuthorization();
+        services.AddAntiforgery();
 
         return services;
     }

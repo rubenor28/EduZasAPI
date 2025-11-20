@@ -39,7 +39,7 @@ public static class DatabaseServiceCollectionExtensions
         );
 
         services.AddScoped<IDatabaseExporter>(s => new MariaDbDumpExporter(connStr, dumpPath));
-        services.AddScoped<IDatabaseImporter>(s => new MariaDbImporter(connStr, dumpPath));
+        services.AddScoped<IDatabaseImporter>(s => new MariaDbImporter(connStr, mariadbPath));
 
         return services;
     }

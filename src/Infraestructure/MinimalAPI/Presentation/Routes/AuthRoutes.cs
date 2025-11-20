@@ -3,6 +3,7 @@ using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Domain.Entities;
 using InterfaceAdapters.Mappers.Common;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Users;
@@ -95,6 +96,16 @@ public static class AuthRoutes
                     "El usuario asociado al token de sesión no fue encontrado.";
                 return op;
             });
+
+        group
+            .MapGet("/antiforgery/token", (IAntiforgery antiforgery, HttpContext context) =>
+            {
+                var tokens = antiforgery.GetAndStoreTokens(context);
+                return Results.Ok(new { tokens.HeaderName, tokens.RequestToken });
+            })
+            .WithName("Obtener token antifalsificación")
+            .ExcludeFromDescription();
+
 
         return group;
     }

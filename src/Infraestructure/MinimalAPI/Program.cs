@@ -35,6 +35,8 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseAntiforgery();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

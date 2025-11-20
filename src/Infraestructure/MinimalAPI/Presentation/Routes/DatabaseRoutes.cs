@@ -3,6 +3,7 @@ using Application.DTOs.Database;
 using Application.UseCases.Database;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
+using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -15,6 +16,7 @@ public static class DatabaseRoutes
         group
             .MapGet("/backup", CreateBackup)
             .RequireAuthorization("Admin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<FileStreamResult>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -31,6 +33,7 @@ public static class DatabaseRoutes
         group
             .MapPost("/restore", RestoreFromBackup)
             .RequireAuthorization("Admin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Accepts<IFormFile>("multipart/form-data")
             .Produces<string>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
