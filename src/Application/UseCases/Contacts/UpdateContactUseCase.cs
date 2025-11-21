@@ -10,4 +10,8 @@ public sealed class UpdateContactUseCase(
     IUpdaterAsync<ContactDomain, ContactUpdateDTO> updater,
     IReaderAsync<ContactIdDTO, ContactDomain> reader,
     IBusinessValidationService<ContactUpdateDTO>? validator = null
-) : UpdateUseCase<ContactIdDTO, ContactUpdateDTO, ContactDomain>(updater, reader, validator) { }
+) : UpdateUseCase<ContactIdDTO, ContactUpdateDTO, ContactDomain>(updater, reader, validator)
+{
+    protected override ContactIdDTO GetId(ContactUpdateDTO dto) =>
+        new() { UserId = dto.UserId, AgendaOwnerId = dto.AgendaOwnerId };
+}

@@ -1,5 +1,3 @@
-using Domain.ValueObjects;
-
 namespace Domain.Entities;
 
 public sealed record UserNotificationIdDTO
@@ -8,7 +6,7 @@ public sealed record UserNotificationIdDTO
     public required ulong UserId { get; set; }
 }
 
-public sealed record UserNotificationDomain : IIdentifiable<UserNotificationIdDTO>
+public sealed record UserNotificationDomain
 {
     /// <summary>
     /// Identificador únido de la notificación

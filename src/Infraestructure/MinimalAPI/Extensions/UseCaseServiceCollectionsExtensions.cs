@@ -35,6 +35,7 @@ public static class UseCaseServiceCollectionExtensions
         s.AddTransient<AddUserUseCase>();
         s.AddTransient<LoginUseCase>();
         s.AddTransient<ReadUserUseCase>();
+        s.AddTransient<ReadUserEmailUseCase>();
 
         // Users
         s.AddTransient<UserQueryUseCase>();

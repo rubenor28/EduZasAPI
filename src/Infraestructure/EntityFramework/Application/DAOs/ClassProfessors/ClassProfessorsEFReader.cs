@@ -10,7 +10,7 @@ public class ClassProfessorsEFReader(
     EduZasDotnetContext ctx,
     IMapper<ClassProfessor, ClassProfessorDomain> domainMapper
 )
-    : CompositeKeyEFReader<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(
+    : EFReader<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(
         ctx,
         domainMapper
     )

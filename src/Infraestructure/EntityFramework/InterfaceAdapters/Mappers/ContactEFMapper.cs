@@ -34,7 +34,7 @@ public sealed class ContactEFMapper
     {
         destination.Alias = source.Alias;
         destination.Notes = source.Notes.ToNullable();
-        destination.AgendaOwnerId = source.Id.AgendaOwnerId;
-        destination.UserId = source.Id.UserId;
+        destination.AgendaOwnerId = source.AgendaOwnerId;
+        destination.UserId = source.UserId;
     }
 }

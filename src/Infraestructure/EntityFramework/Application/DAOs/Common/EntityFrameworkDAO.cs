@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public abstract class EntityFrameworkDAO<EFEntity, DomainEntity>(
+public abstract class EntityFrameworkDAO<DomainEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> domainMapper
 )

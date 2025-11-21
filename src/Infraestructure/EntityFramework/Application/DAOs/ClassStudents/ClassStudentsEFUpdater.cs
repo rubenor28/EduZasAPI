@@ -13,18 +13,17 @@ public class ClassStudentsEFUpdater(
     IMapper<ClassStudent, ClassStudentDomain> domainMapper,
     IUpdateMapper<ClassStudentUpdateDTO, ClassStudent> updateMapper
 )
-    : CompositeKeyEFUpdater<
-        UserClassRelationId,
-        ClassStudentDomain,
-        ClassStudentUpdateDTO,
-        ClassStudent
-    >(ctx, domainMapper, updateMapper)
+    : EFUpdater<ClassStudentDomain, ClassStudentUpdateDTO, ClassStudent>(
+        ctx,
+        domainMapper,
+        updateMapper
+    )
 {
-    protected override async Task<ClassStudent?> GetTrackedById(UserClassRelationId id) =>
+    protected override async Task<ClassStudent?> GetTrackedByDTO(ClassStudentUpdateDTO value) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()
-            .Where(cs => cs.StudentId == id.UserId)
-            .Where(cs => cs.ClassId == id.ClassId)
+            .Where(cs => cs.StudentId == value.UserId)
+            .Where(cs => cs.ClassId == value.ClassId)
             .FirstOrDefaultAsync();
 }

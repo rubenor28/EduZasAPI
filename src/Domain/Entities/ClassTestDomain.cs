@@ -1,5 +1,3 @@
-using Domain.ValueObjects;
-
 namespace Domain.Entities;
 
 public sealed record ClassTestIdDTO
@@ -8,7 +6,7 @@ public sealed record ClassTestIdDTO
     public required string ClassId { get; set; }
 }
 
-public sealed class ClassTestDomain : IIdentifiable<ClassTestIdDTO>
+public sealed class ClassTestDomain
 {
     public required ClassTestIdDTO Id { get; set; }
     public required bool Visible { get; set; }

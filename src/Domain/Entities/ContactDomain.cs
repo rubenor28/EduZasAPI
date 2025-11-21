@@ -8,7 +8,7 @@ public sealed record ContactIdDTO
     public required ulong UserId { get; set; }
 }
 
-public sealed record ContactDomain : IIdentifiable<ContactIdDTO>
+public sealed record ContactDomain
 {
     public required ContactIdDTO Id { get; set; }
     public required string Alias { get; set; }

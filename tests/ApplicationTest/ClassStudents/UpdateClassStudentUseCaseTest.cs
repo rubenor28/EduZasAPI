@@ -3,10 +3,7 @@ using Application.DTOs.Common;
 using Application.UseCases.ClassStudents;
 using Domain.Entities;
 using Domain.Enums;
-using EntityFramework.Application.DAOs.Classes;
-using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassStudents;
-using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using InterfaceAdapters.Mappers.Users;
@@ -38,21 +35,24 @@ public class UpdateClassStudentUseCaseTest : IDisposable
         var roleMapper = new UserTypeMapper();
         _userMapper = new UserEFMapper(roleMapper, roleMapper);
 
-        var professorClassMapper = new ClassProfessorEFMapper();
-
-        var userReader = new UserEFReader(_ctx, _userMapper);
-        var classReader = new ClassEFReader(_ctx, _classMapper);
         var studentReader = new ClassStudentsEFReader(_ctx, _classStudentMapper);
-        var professorReader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
         var updater = new ClassStudentsEFUpdater(_ctx, _classStudentMapper, _classStudentMapper);
 
-        _useCase = new UpdateClassStudentUseCase(updater, studentReader, professorReader, null);
+        _useCase = new UpdateClassStudentUseCase(updater, studentReader, null);
     }
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.STUDENT)
     {
         var id = (ulong)_rdm.NextInt64(1, 100_000);
-        var user = new User { UserId = id, Email = $"user-{id}@test.com", FirstName = "test", FatherLastname = "test", Password = "test", Role = (uint)role };
+        var user = new User
+        {
+            UserId = id,
+            Email = $"user-{id}@test.com",
+            FirstName = "test",
+            FatherLastname = "test",
+            Password = "test",
+            Role = (uint)role,
+        };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
         return _userMapper.Map(user);
@@ -67,9 +67,18 @@ public class UpdateClassStudentUseCaseTest : IDisposable
         return _classMapper.Map(cls);
     }
 
-    private async Task<ClassStudent> SeedClassStudent(string classId, ulong studentId, bool hidden = false)
+    private async Task<ClassStudent> SeedClassStudent(
+        string classId,
+        ulong studentId,
+        bool hidden = false
+    )
     {
-        var relation = new ClassStudent { ClassId = classId, StudentId = studentId, Hidden = hidden };
+        var relation = new ClassStudent
+        {
+            ClassId = classId,
+            StudentId = studentId,
+            Hidden = hidden,
+        };
         _ctx.ClassStudents.Add(relation);
         await _ctx.SaveChangesAsync();
         return relation;
@@ -77,12 +86,18 @@ public class UpdateClassStudentUseCaseTest : IDisposable
 
     private async Task SeedClassProfessor(string classId, ulong professorId)
     {
-        var relation = new ClassProfessor { ClassId = classId, ProfessorId = professorId, IsOwner = false };
+        var relation = new ClassProfessor
+        {
+            ClassId = classId,
+            ProfessorId = professorId,
+            IsOwner = false,
+        };
         _ctx.ClassProfessors.Add(relation);
         await _ctx.SaveChangesAsync();
     }
 
-    private static Executor AsExecutor(UserDomain value) => new() { Id = value.Id, Role = value.Role };
+    private static Executor AsExecutor(UserDomain value) =>
+        new() { Id = value.Id, Role = value.Role };
 
     [Fact]
     public async Task ExecuteAsync_AsAdmin_UpdatesSuccessfully()
@@ -94,9 +109,10 @@ public class UpdateClassStudentUseCaseTest : IDisposable
 
         var dto = new ClassStudentUpdateDTO
         {
-            Id = new() { ClassId = cls.Id, UserId = student.Id },
+            ClassId = cls.Id,
+            UserId = student.Id,
             Hidden = true,
-            Executor = AsExecutor(admin)
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -113,20 +129,20 @@ public class UpdateClassStudentUseCaseTest : IDisposable
         var student = await SeedUser();
         var cls = await SeedClass();
         await SeedClassProfessor(cls.Id, professor.Id);
-        var relation = await SeedClassStudent(cls.Id, student.Id, false);
+        await SeedClassStudent(cls.Id, student.Id, false);
 
         var dto = new ClassStudentUpdateDTO
         {
-            Id = new() { ClassId = cls.Id, UserId = student.Id },
+            ClassId = cls.Id,
+            UserId = student.Id,
             Hidden = true,
-            Executor = AsExecutor(professor)
+            Executor = AsExecutor(professor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
 
-        Assert.True(result.IsOk);
-        await _ctx.Entry(relation).ReloadAsync();
-        Assert.True(relation.Hidden);
+        Assert.True(result.IsErr);
+        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
 
     [Fact]
@@ -141,9 +157,10 @@ public class UpdateClassStudentUseCaseTest : IDisposable
 
         var dto = new ClassStudentUpdateDTO
         {
-            Id = new() { ClassId = classA.Id, UserId = student.Id },
+            ClassId = classA.Id,
+            UserId = student.Id,
             Hidden = true,
-            Executor = AsExecutor(professor)
+            Executor = AsExecutor(professor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -162,9 +179,10 @@ public class UpdateClassStudentUseCaseTest : IDisposable
 
         var dto = new ClassStudentUpdateDTO
         {
-            Id = new() { ClassId = cls.Id, UserId = studentToUpdate.Id },
+            ClassId = cls.Id,
+            UserId = studentToUpdate.Id,
             Hidden = true,
-            Executor = AsExecutor(studentExecutor)
+            Executor = AsExecutor(studentExecutor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -179,9 +197,10 @@ public class UpdateClassStudentUseCaseTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var dto = new ClassStudentUpdateDTO
         {
-            Id = new() { ClassId = "non-existent", UserId = 999 },
+            ClassId = "non-existent",
+            UserId = 999,
             Hidden = true,
-            Executor = AsExecutor(admin)
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);

@@ -60,6 +60,10 @@ public sealed class DeleteContactUseCase(
         return Unit.Value;
     }
 
+    protected override ContactIdDTO GetId(DeleteContactDTO value) => value.Id;
+
+    protected override ContactIdDTO GetId(ContactDomain value) => value.Id;
+
     /// <inheritdoc>
     protected override async Task PrevTaskAsync(DeleteContactDTO deleteDTO)
     {
@@ -74,9 +78,7 @@ public sealed class DeleteContactUseCase(
         // Obtener todas las etiquetas del contacto a eliminar
         do
         {
-            contactTags = await _tagQuerier.GetByAsync(
-                new() { ContactId = deleteDTO.Id.UserId }
-            );
+            contactTags = await _tagQuerier.GetByAsync(new() { ContactId = deleteDTO.Id.UserId });
 
             var listOfTagText = contactTags.Results.Select(t => t.Text);
             tags.AddRange(listOfTagText);

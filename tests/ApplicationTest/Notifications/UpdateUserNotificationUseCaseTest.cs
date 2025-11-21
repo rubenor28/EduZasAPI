@@ -81,7 +81,8 @@ public class UpdateUserNotificationUseCaseTest : IDisposable
         var (userId, notificationId) = await SeedNotification(isRead: false);
         var inputDto = new UserNotificationUpdateDTO
         {
-            Id = new() { UserId = userId, NotificationId = notificationId },
+            UserId = userId,
+            NotificationId = notificationId,
             Readed = true,
         };
 
@@ -101,7 +102,8 @@ public class UpdateUserNotificationUseCaseTest : IDisposable
         ulong nonExistentNotificationId = 100;
         var inputDto = new UserNotificationUpdateDTO
         {
-            Id = new() { UserId = 1, NotificationId = nonExistentNotificationId },
+            UserId = 1,
+            NotificationId = nonExistentNotificationId,
             Readed = true,
         };
 
@@ -117,7 +119,8 @@ public class UpdateUserNotificationUseCaseTest : IDisposable
         var (userId, notificationId) = await SeedNotification(isRead: true);
         var inputDto = new UserNotificationUpdateDTO
         {
-            Id = new() { UserId = userId, NotificationId = notificationId },
+            UserId = userId,
+            NotificationId = notificationId,
             Readed = true,
         };
 

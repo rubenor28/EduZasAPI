@@ -9,7 +9,7 @@ namespace EntityFramework.Application.DAOs.ClassTests;
 public sealed class ClassTestEFReader(
     EduZasDotnetContext ctx,
     IMapper<TestPerClass, ClassTestDomain> domainMapper
-) : CompositeKeyEFReader<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, domainMapper)
+) : EFReader<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, domainMapper)
 {
     public override async Task<TestPerClass?> GetTrackedById(ClassTestIdDTO id) =>
         await _dbSet

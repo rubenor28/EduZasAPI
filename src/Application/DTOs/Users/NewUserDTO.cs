@@ -1,4 +1,3 @@
-using Application.DTOs.Common;
 using Domain.ValueObjects;
 
 namespace Application.DTOs.Users;

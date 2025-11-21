@@ -9,7 +9,7 @@ namespace EntityFramework.Application.DAOs.ClassTests;
 public sealed class ClassTestEFDeleter(
     EduZasDotnetContext ctx,
     IMapper<TestPerClass, ClassTestDomain> domainMapper
-) : CompositeKeyEFDeleter<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, domainMapper)
+) : EFDeleter<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, domainMapper)
 {
     public override async Task<TestPerClass?> GetTrackedById(ClassTestIdDTO id) =>
         await _dbSet

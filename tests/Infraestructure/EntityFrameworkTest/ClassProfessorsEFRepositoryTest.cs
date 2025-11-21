@@ -188,7 +188,8 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
 
         var updateDto = new ClassProfessorUpdateDTO
         {
-            Id = created.Id,
+            UserId = created.Id.UserId,
+            ClassId = created.Id.ClassId,
             IsOwner = true,
             Executor = AsExecutor(admin),
         };
@@ -196,7 +197,10 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
         var updated = await _updater.UpdateAsync(updateDto);
 
         Assert.NotNull(updated);
-        Assert.Equal(updateDto.Id, updated.Id);
+        Assert.Equal(
+            new UserClassRelationId { ClassId = updateDto.ClassId, UserId = updateDto.UserId },
+            updated.Id
+        );
         Assert.Equal(updateDto.IsOwner, updated.IsOwner);
     }
 
@@ -206,7 +210,7 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var updateDto = new ClassProfessorUpdateDTO
         {
-            Id = new() { ClassId = "non-existent", UserId = 99 },
+             ClassId = "non-existent", UserId = 99,
             IsOwner = true,
             Executor = AsExecutor(admin),
         };

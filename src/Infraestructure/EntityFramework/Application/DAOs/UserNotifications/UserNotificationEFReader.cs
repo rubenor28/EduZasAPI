@@ -10,7 +10,7 @@ public class UserNotificationEFReader(
     EduZasDotnetContext ctx,
     IMapper<NotificationPerUser, UserNotificationDomain> domainMapper
 )
-    : CompositeKeyEFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(
+    : EFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(
         ctx,
         domainMapper
     )

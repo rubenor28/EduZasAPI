@@ -25,7 +25,7 @@ public sealed class UpdateClassProfessorUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.Id.UserId == value.Executor.Id,
+            UserType.PROFESSOR => value.UserId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -35,4 +35,7 @@ public sealed class UpdateClassProfessorUseCase(
 
         return Unit.Value;
     }
+
+    protected override UserClassRelationId GetId(ClassProfessorUpdateDTO dto) =>
+        new() { UserId = dto.UserId, ClassId = dto.ClassId };
 }

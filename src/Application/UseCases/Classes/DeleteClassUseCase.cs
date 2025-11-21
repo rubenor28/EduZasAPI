@@ -45,4 +45,8 @@ public class DeleteClassUseCase(
 
         return professorSearch.IsSome && professorSearch.Unwrap().IsOwner;
     }
+
+    protected override string GetId(DeleteClassDTO value) => value.Id;
+
+    protected override string GetId(ClassDomain value) => value.Id;
 }

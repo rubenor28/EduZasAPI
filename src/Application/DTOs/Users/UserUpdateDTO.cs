@@ -12,7 +12,7 @@ namespace Application.DTOs.Users;
 /// incluyendo datos personales, credenciales y estado. Todos los campos principales
 /// son obligatorios para garantizar la integridad de la actualización.
 /// </remarks>
-public sealed record UserUpdateDTO : IIdentifiable<ulong>
+public sealed record UserUpdateDTO
 {
     /// <summary>
     /// Obtiene o establece el identificador único del usuario a actualizar.

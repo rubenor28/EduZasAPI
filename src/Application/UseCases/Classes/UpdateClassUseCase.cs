@@ -57,4 +57,6 @@ public class UpdateClassUseCase(
 
         return professorSearch.IsSome && professorSearch.Unwrap().IsOwner;
     }
+
+    protected override string GetId(ClassUpdateDTO dto) => dto.Id;
 }

@@ -47,4 +47,8 @@ public sealed class DeleteClassProfessorUseCase(
 
         return Unit.Value;
     }
+
+    protected override UserClassRelationId GetId(DeleteClassProfessorDTO value) => value.Id;
+
+    protected override UserClassRelationId GetId(ClassProfessorDomain value) => value.Id;
 }

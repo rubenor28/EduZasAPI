@@ -1,6 +1,5 @@
 using Application.DTOs.Common;
 using Domain.Entities;
-using Domain.ValueObjects;
 
 namespace Application.DTOs.Contacts;
 
@@ -13,7 +12,7 @@ namespace Application.DTOs.Contacts;
 ///Implementa <see cref="IIdentifiable{T}"> para la obtencion del
 ///ID del registro
 ///</remarks>
-public sealed record DeleteContactDTO : IIdentifiable<ContactIdDTO>
+public sealed record DeleteContactDTO
 {
 
     /// <summary>

@@ -10,7 +10,7 @@ namespace Application.DTOs.Users;
 /// Contiene la información necesaria para procesar la solicitud de eliminación de un usuario,
 /// incluyendo el ID del usuario a eliminar y los datos del usuario que ejecuta la operación.
 /// </remarks>
-public sealed record DeleteUserDTO : IIdentifiable<ulong>
+public sealed record DeleteUserDTO
 {
     /// <summary>
     /// Obtiene o establece el ID del usuario que se va a eliminar.

@@ -6,7 +6,7 @@ namespace Application.DTOs.Classes;
 /// <summary>
 /// Representa los datos para actualizar la información de una clase existente en el sistema.
 /// </summary>
-public sealed record ClassUpdateDTO : IIdentifiable<string>
+public sealed record ClassUpdateDTO
 {
     /// <summary>
     /// Obtiene o establece el identificador único de la clase a actualizar.

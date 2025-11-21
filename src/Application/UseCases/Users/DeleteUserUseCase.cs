@@ -21,4 +21,8 @@ public sealed class DeleteUserUseCase(
             UserType.ADMIN => Unit.Value,
             _ => UseCaseErrors.Unauthorized(),
         };
+
+    protected override ulong GetId(DeleteUserDTO value) => value.Id;
+
+    protected override ulong GetId(UserDomain value) => value.Id;
 }

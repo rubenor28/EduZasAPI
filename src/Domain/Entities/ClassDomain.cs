@@ -9,7 +9,7 @@ namespace Domain.Entities;
 /// Esta clase implementa la interfaz <see cref="IIdentifiable{T}"/> para garantizar que cada
 /// instancia tenga un identificador único.
 /// </remarks>
-public class ClassDomain : IIdentifiable<string>, ISoftDeletable
+public class ClassDomain
 {
     /// <summary>
     /// Obtiene o establece el identificador único de la clase.

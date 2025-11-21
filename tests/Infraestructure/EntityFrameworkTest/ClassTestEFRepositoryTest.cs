@@ -141,7 +141,8 @@ public class ClassTestEFRepositoryTest : IDisposable
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = new() { ClassId = createdClass.Id, TestId = createdTest.Id },
+            ClassId = createdClass.Id,
+            TestId = createdTest.Id,
             Visible = false,
             Executor = AsExecutor(professor),
         };

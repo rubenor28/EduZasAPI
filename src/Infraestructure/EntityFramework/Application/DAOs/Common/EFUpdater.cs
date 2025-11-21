@@ -1,29 +1,27 @@
 using Application.DAOs;
-using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers;
 using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public class SimpleKeyEFUpdater<I, DomainEntity, UpdateDTO, EFEntity>(
+public abstract class EFUpdater<DomainEntity, UpdateEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> domainMapper,
-    IUpdateMapper<UpdateDTO, EFEntity> updateMapper
+    IUpdateMapper<UpdateEntity, EFEntity> updateMapper
 )
-    : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper),
-        IUpdaterAsync<DomainEntity, UpdateDTO>
-    where I : notnull
-    where UpdateDTO : IIdentifiable<I>
+    : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, domainMapper),
+        IUpdaterAsync<DomainEntity, UpdateEntity>
     where EFEntity : class
     where DomainEntity : notnull
+    where UpdateEntity : notnull
 {
-    protected readonly IUpdateMapper<UpdateDTO, EFEntity> _updateMapper = updateMapper;
+    protected readonly IUpdateMapper<UpdateEntity, EFEntity> _updateMapper = updateMapper;
 
-    public async Task<DomainEntity> UpdateAsync(UpdateDTO updateData)
+    public async Task<DomainEntity> UpdateAsync(UpdateEntity updateData)
     {
         var tracked =
-            await _dbSet.FindAsync(updateData.Id)
+            await GetTrackedByDTO(updateData)
             ?? throw new ArgumentException($"Entity with the provided id not found");
 
         _updateMapper.Map(updateData, tracked);
@@ -31,4 +29,6 @@ public class SimpleKeyEFUpdater<I, DomainEntity, UpdateDTO, EFEntity>(
         await _ctx.SaveChangesAsync();
         return _domainMapper.Map(tracked);
     }
+
+    protected abstract Task<EFEntity?> GetTrackedByDTO(UpdateEntity value);
 }

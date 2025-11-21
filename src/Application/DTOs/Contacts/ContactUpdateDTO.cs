@@ -1,19 +1,22 @@
-using Domain.Entities;
 using Domain.ValueObjects;
 
 namespace Application.DTOs.Contacts;
 
 ///<summary>
-/// DTO que representa los campos obligatorios y opcionales para 
+/// DTO que representa los campos obligatorios y opcionales para
 /// la actualizacion de un contacto
 ///</summary>
-public sealed record ContactUpdateDTO : IIdentifiable<ContactIdDTO>
+public sealed record ContactUpdateDTO
 {
-    /// <summary>
-    /// Obtiene o establece el identificador único.
-    /// </summary>
-    /// <value>Identificador numérico del contacto. Campo obligatorio.</value>
-    public required ContactIdDTO Id { get; set; }
+    ///<summary>
+    /// Id del dueño de la agenda
+    ///</summary>
+    public required ulong AgendaOwnerId { get; set; }
+
+    ///<summary>
+    /// Id del contacto
+    ///</summary>
+    public required ulong UserId { get; set; }
 
     ///<summary>
     /// Alias del contacto

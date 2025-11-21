@@ -1,5 +1,6 @@
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
+using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Contacts;
@@ -151,7 +152,8 @@ public class AgendaContactEFRepositoryTest : IDisposable
 
         var update = new ContactUpdateDTO
         {
-            Id = created.Id,
+            AgendaOwnerId = created.Id.AgendaOwnerId,
+            UserId = created.Id.UserId,
             Alias = "Updated Alias",
             Notes = "Updated notes".ToOptional(),
         };
@@ -159,7 +161,10 @@ public class AgendaContactEFRepositoryTest : IDisposable
         var updated = await _updater.UpdateAsync(update);
 
         Assert.NotNull(updated);
-        Assert.Equal(update.Id, updated.Id);
+        Assert.Equal(
+            new ContactIdDTO { UserId = update.UserId, AgendaOwnerId = update.AgendaOwnerId },
+            updated.Id
+        );
         Assert.Equal(update.Alias, updated.Alias);
         Assert.Equal(update.Notes.Unwrap(), updated.Notes.Unwrap());
     }

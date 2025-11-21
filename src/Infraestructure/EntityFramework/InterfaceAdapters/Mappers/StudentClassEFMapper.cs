@@ -20,8 +20,8 @@ public class ClassStudentEFMapper
 
     public void Map(ClassStudentUpdateDTO uProps, ClassStudent entity)
     {
-        entity.ClassId = uProps.Id.ClassId;
-        entity.StudentId = uProps.Id.UserId;
+        entity.ClassId = uProps.ClassId;
+        entity.StudentId = uProps.UserId;
         entity.Hidden = uProps.Hidden;
     }
 

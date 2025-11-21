@@ -9,7 +9,7 @@ public sealed record ContactTagIdDTO
     public required ulong UserId { get; set; }
 }
 
-public sealed record ContactTagDomain : IIdentifiable<ContactTagIdDTO>
+public sealed record ContactTagDomain
 {
     public required ContactTagIdDTO Id { get; set; }
     public required DateTime CreatedAt { get; set; }

@@ -1,6 +1,6 @@
-using Application.UseCases.ClassProfessors;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.Common;
+using Application.UseCases.ClassProfessors;
 using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
@@ -39,7 +39,11 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
         var professorClassMapper = new ClassProfessorEFMapper();
 
         var reader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
-        var updater = new ClassProfessorsEFUpdater(_ctx, professorClassMapper, professorClassMapper);
+        var updater = new ClassProfessorsEFUpdater(
+            _ctx,
+            professorClassMapper,
+            professorClassMapper
+        );
 
         _useCase = new UpdateClassProfessorUseCase(updater, reader, null);
     }
@@ -47,7 +51,15 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
         var id = (ulong)_rdm.NextInt64(1, 1_000_000);
-        var user = new User { UserId = id, Email = $"user-{id}@test.com", FirstName = "test", FatherLastname = "test", Password = "test", Role = (uint)role };
+        var user = new User
+        {
+            UserId = id,
+            Email = $"user-{id}@test.com",
+            FirstName = "test",
+            FatherLastname = "test",
+            Password = "test",
+            Role = (uint)role,
+        };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
         return _userMapper.Map(user);
@@ -62,15 +74,25 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
         return _classMapper.Map(cls);
     }
 
-    private async Task<ClassProfessor> SeedClassProfessor(string classId, ulong professorId, bool isOwner)
+    private async Task<ClassProfessor> SeedClassProfessor(
+        string classId,
+        ulong professorId,
+        bool isOwner
+    )
     {
-        var relation = new ClassProfessor { ClassId = classId, ProfessorId = professorId, IsOwner = isOwner };
+        var relation = new ClassProfessor
+        {
+            ClassId = classId,
+            ProfessorId = professorId,
+            IsOwner = isOwner,
+        };
         _ctx.ClassProfessors.Add(relation);
         await _ctx.SaveChangesAsync();
         return relation;
     }
 
-    private static Executor AsExecutor(UserDomain value) => new() { Id = value.Id, Role = value.Role };
+    private static Executor AsExecutor(UserDomain value) =>
+        new() { Id = value.Id, Role = value.Role };
 
     [Fact]
     public async Task ExecuteAsync_AsAdmin_UpdatesSuccessfully()
@@ -82,9 +104,10 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
 
         var dto = new ClassProfessorUpdateDTO
         {
-            Id = new() { ClassId = cls.Id, UserId = professor.Id },
+            ClassId = cls.Id,
+            UserId = professor.Id,
             IsOwner = true,
-            Executor = AsExecutor(admin)
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -103,9 +126,10 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
 
         var dto = new ClassProfessorUpdateDTO
         {
-            Id = new() { ClassId = cls.Id, UserId = professor.Id },
+            ClassId = cls.Id,
+            UserId = professor.Id,
             IsOwner = true,
-            Executor = AsExecutor(professor)
+            Executor = AsExecutor(professor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -126,9 +150,10 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
 
         var dto = new ClassProfessorUpdateDTO
         {
-            Id = new() { ClassId = cls.Id, UserId = professorToUpdate.Id },
+            ClassId = cls.Id,
+            UserId = professorToUpdate.Id,
             IsOwner = true,
-            Executor = AsExecutor(professorExecutor)
+            Executor = AsExecutor(professorExecutor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -143,9 +168,10 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var dto = new ClassProfessorUpdateDTO
         {
-            Id = new() { ClassId = "non-existent", UserId = 999 },
+            ClassId = "non-existent",
+            UserId = 999,
             IsOwner = true,
-            Executor = AsExecutor(admin)
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);

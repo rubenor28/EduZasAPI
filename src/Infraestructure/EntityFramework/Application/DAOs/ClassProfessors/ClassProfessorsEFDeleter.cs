@@ -9,17 +9,13 @@ namespace EntityFramework.Application.DAOs.ClassProfessors;
 public class ClassProfessorsEFDeleter(
     EduZasDotnetContext ctx,
     IMapper<ClassProfessor, ClassProfessorDomain> domainMapper
-)
-    : CompositeKeyEFDeleter<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(
-        ctx,
-        domainMapper
-    )
+) : EFDeleter<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(ctx, domainMapper)
 {
     public override async Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()
-            .Where(cs => cs.ProfessorId == id.UserId)
-            .Where(cs => cs.ClassId == id.ClassId)
+            .Where(cp => cp.ProfessorId == id.UserId)
+            .Where(cp => cp.ClassId == id.ClassId)
             .FirstOrDefaultAsync();
 }

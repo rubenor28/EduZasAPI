@@ -1,5 +1,3 @@
-using Domain.ValueObjects;
-
 namespace Domain.Entities;
 
 /// <summary>
@@ -10,7 +8,7 @@ namespace Domain.Entities;
 /// incluyendo si es el propietario y la fecha de creación de la relación.
 /// Al ser un registro inmutable, sus propiedades solo pueden ser asignadas durante la inicialización.
 /// </remarks>
-public sealed record ClassProfessorDomain : IIdentifiable<UserClassRelationId>
+public sealed record ClassProfessorDomain
 {
     /// <summary>
     /// Obtiene el identificador de la relación entre el usuario (profesor) y la clase.
@@ -36,3 +34,4 @@ public sealed record ClassProfessorDomain : IIdentifiable<UserClassRelationId>
     /// </value>
     public required DateTime CreatedAt { get; init; }
 }
+

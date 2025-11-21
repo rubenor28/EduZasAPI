@@ -16,7 +16,7 @@ public abstract class ReadUseCase<I, E>(
     IBusinessValidationService<I> validator
 ) : IUseCaseAsync<I, E>
     where I : notnull
-    where E : notnull, IIdentifiable<I>
+    where E : notnull
 {
     /// <summary>
     /// Entidad encargada de recuperar una entidad por ID

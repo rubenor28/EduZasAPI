@@ -1,14 +1,16 @@
-using Domain.Entities;
-using Domain.ValueObjects;
-
 namespace Application.DTOs.UserNotifications;
 
-public sealed record UserNotificationUpdateDTO : IIdentifiable<UserNotificationIdDTO>
+public sealed record UserNotificationUpdateDTO
 {
     /// <summary>
     /// Identificador únido de la notificación
     /// </summary>
-    public required UserNotificationIdDTO Id { get; set; }
+    public required ulong NotificationId { get; set; }
+
+    /// <summary>
+    /// Identificador únido del usuario
+    /// </summary>
+    public required ulong UserId { get; set; }
 
     /// <summary>
     /// Indicador de lectura de la notificación por parte del usuario

@@ -27,7 +27,8 @@ public sealed record ClassProfessorsMAPIMapper
     ) =>
         new()
         {
-            Id = new() { ClassId = value.ClassId, UserId = value.UserId },
+            ClassId = value.ClassId,
+            UserId = value.UserId,
             IsOwner = value.IsOwner,
             Executor = ex,
         };

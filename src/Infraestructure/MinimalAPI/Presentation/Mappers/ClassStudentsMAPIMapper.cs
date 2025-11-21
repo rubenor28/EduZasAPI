@@ -38,7 +38,8 @@ public sealed record ClassStudentsMAPIMapper
     ) =>
         new()
         {
-            Id = new() { ClassId = request.ClassId, UserId = request.UserId },
+            ClassId = request.ClassId,
+            UserId = request.UserId,
             Hidden = request.Hidden,
             Executor = ex,
         };

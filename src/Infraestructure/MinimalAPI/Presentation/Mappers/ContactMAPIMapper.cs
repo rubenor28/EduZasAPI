@@ -49,7 +49,7 @@ public class ContactMAPIMapper
     public ContactUpdateDTO Map(ContactUpdateMAPI source) =>
         new()
         {
-            Id = new() { AgendaOwnerId = source.AgendaOwnerId, UserId = source.UserId },
+             AgendaOwnerId = source.AgendaOwnerId, UserId = source.UserId ,
             Alias = source.Alias,
             Notes = source.Notes.ToOptional(),
         };

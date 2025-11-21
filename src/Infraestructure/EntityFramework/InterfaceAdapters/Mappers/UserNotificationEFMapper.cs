@@ -27,8 +27,8 @@ public class UserNotificationEFMapper
 
     public void Map(UserNotificationUpdateDTO s, NotificationPerUser d)
     {
-        d.UserId = s.Id.UserId;
-        d.NotificationId = s.Id.NotificationId;
+        d.UserId = s.UserId;
+        d.NotificationId = s.NotificationId;
         d.Readed = s.Readed;
     }
 }

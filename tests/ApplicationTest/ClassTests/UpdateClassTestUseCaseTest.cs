@@ -125,7 +125,8 @@ public class UpdateClassTestUseCaseTest : IDisposable
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = classTest.Id,
+            ClassId = classTest.Id.ClassId,
+            TestId = classTest.Id.TestId,
             Visible = true,
             Executor = AsExecutor(admin),
         };
@@ -145,7 +146,8 @@ public class UpdateClassTestUseCaseTest : IDisposable
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = classTest.Id,
+            ClassId = classTest.Id.ClassId,
+            TestId = classTest.Id.TestId,
             Visible = true,
             Executor = AsExecutor(professor),
         };
@@ -162,7 +164,8 @@ public class UpdateClassTestUseCaseTest : IDisposable
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = new ClassTestIdDTO { ClassId = "non-existend", TestId = 999 },
+            ClassId = "non-existend",
+            TestId = 999,
             Visible = true,
             Executor = AsExecutor(admin),
         };
@@ -184,7 +187,8 @@ public class UpdateClassTestUseCaseTest : IDisposable
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = classTest.Id,
+            ClassId = classTest.Id.ClassId,
+            TestId = classTest.Id.TestId,
             Visible = true,
             Executor = AsExecutor(student),
         };
@@ -206,7 +210,8 @@ public class UpdateClassTestUseCaseTest : IDisposable
 
         var updateDto = new ClassTestUpdateDTO
         {
-            Id = classTest.Id,
+            ClassId = classTest.Id.ClassId,
+            TestId = classTest.Id.TestId,
             Visible = true,
             Executor = AsExecutor(professor2),
         };

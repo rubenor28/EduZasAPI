@@ -9,7 +9,7 @@ namespace EntityFramework.Application.DAOs.Contacts;
 public class ContactEFReader(
     EduZasDotnetContext ctx,
     IMapper<AgendaContact, ContactDomain> domainMapper
-) : CompositeKeyEFReader<ContactIdDTO, ContactDomain, AgendaContact>(ctx, domainMapper)
+) : EFReader<ContactIdDTO, ContactDomain, AgendaContact>(ctx, domainMapper)
 {
     public override async Task<AgendaContact?> GetTrackedById(ContactIdDTO id) =>
         await _dbSet

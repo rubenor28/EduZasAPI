@@ -85,10 +85,7 @@ public class AddUserUseCaseTest : IDisposable
         var result = await _useCase.ExecuteAsync(newUser);
 
         Assert.True(result.IsErr);
-        var error = result.UnwrapErr();
-
-        Assert.Equal(typeof(InputError), error.GetType());
-        Assert.Contains(((InputError)error).Errors, e => e.Field == "email");
+        Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
     }
 
     [Fact]

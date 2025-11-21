@@ -9,7 +9,7 @@ namespace EntityFramework.Application.DAOs.ClassStudents;
 public class ClassStudentsEFDeleter(
     EduZasDotnetContext ctx,
     IMapper<ClassStudent, ClassStudentDomain> domainMapper
-) : CompositeKeyEFDeleter<UserClassRelationId, ClassStudentDomain, ClassStudent>(ctx, domainMapper)
+) : EFDeleter<UserClassRelationId, ClassStudentDomain, ClassStudent>(ctx, domainMapper)
 {
     public override async Task<ClassStudent?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet

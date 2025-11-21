@@ -9,7 +9,7 @@ namespace Application.DAOs;
 /// <typeparam name="E">Tipo de la entidad que se va a eliminar, debe implementar <see cref="IIdentifiable{I}"/>.</typeparam>
 public interface IDeleterAsync<I, E>
     where I : notnull
-    where E : notnull, IIdentifiable<I>
+    where E : notnull
 {
     /// <summary>
     /// Elimina la entidad identificada por el ID proporcionado.

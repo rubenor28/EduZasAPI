@@ -13,18 +13,17 @@ public class UserNotificationEFUpdater(
     IMapper<NotificationPerUser, UserNotificationDomain> domainMapper,
     IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser> updateMapper
 )
-    : CompositeKeyEFUpdater<
-        UserNotificationIdDTO,
+    : EFUpdater<
         UserNotificationDomain,
         UserNotificationUpdateDTO,
         NotificationPerUser
     >(ctx, domainMapper, updateMapper)
 {
-    protected override async Task<NotificationPerUser?> GetTrackedById(UserNotificationIdDTO id) =>
+    protected override async Task<NotificationPerUser?> GetTrackedByDTO(UserNotificationUpdateDTO dto) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()
-            .Where(n => n.NotificationId == id.NotificationId)
-            .Where(n => n.UserId == id.UserId)
+            .Where(n => n.NotificationId == dto.NotificationId)
+            .Where(n => n.UserId == dto.UserId)
             .FirstOrDefaultAsync();
 }

@@ -16,8 +16,8 @@ public abstract class UpdateUseCase<I, UE, E>(
     IBusinessValidationService<UE>? validator = null
 ) : IUseCaseAsync<UE, E>
     where I : notnull
-    where UE : notnull, IIdentifiable<I>
-    where E : notnull, IIdentifiable<I>
+    where UE : notnull
+    where E : notnull
 {
     /// <summary>
     /// Entidad encargada de actualizar un registro
@@ -137,7 +137,7 @@ public abstract class UpdateUseCase<I, UE, E>(
     /// </remarks>
     protected async virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(UE value)
     {
-        var record = await _reader.GetAsync(value.Id);
+        var record = await _reader.GetAsync(GetId(value));
         if (record.IsNone)
             return UseCaseErrors.NotFound();
 
@@ -165,4 +165,6 @@ public abstract class UpdateUseCase<I, UE, E>(
     /// </remarks>
     protected virtual Task ExtraTaskAsync(UE newEntity, E createdEntity) =>
         Task.FromResult(Unit.Value);
+
+    protected abstract I GetId(UE dto);
 }

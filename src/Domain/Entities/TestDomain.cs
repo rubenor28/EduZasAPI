@@ -2,7 +2,7 @@ using Domain.ValueObjects;
 
 namespace Domain.Entities;
 
-public sealed record TestDomain : IIdentifiable<ulong>
+public sealed record TestDomain
 {
     public required ulong Id { get; set; }
     public required string Title { get; set; }

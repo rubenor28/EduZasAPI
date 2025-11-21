@@ -1,16 +1,15 @@
 using Application.DAOs;
-using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Common;
 
-public abstract class CompositeKeyEFDeleter<I, DomainEntity, EFEntity>(
+public abstract class EFDeleter<I, DomainEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> domainMapper
-) : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper), IDeleterAsync<I, DomainEntity>
+) : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, domainMapper), IDeleterAsync<I, DomainEntity>
     where I : notnull
-    where DomainEntity : IIdentifiable<I>
+    where DomainEntity : notnull
     where EFEntity : class
 {
     public async Task<DomainEntity> DeleteAsync(I id)

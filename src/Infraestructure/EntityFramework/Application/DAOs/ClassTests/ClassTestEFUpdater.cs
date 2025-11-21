@@ -13,13 +13,13 @@ public sealed class ClassTestEFUpdater(
     IMapper<TestPerClass, ClassTestDomain> domainMapper,
     IUpdateMapper<ClassTestUpdateDTO, TestPerClass> updateMapper
 )
-    : CompositeKeyEFUpdater<ClassTestIdDTO, ClassTestDomain, ClassTestUpdateDTO, TestPerClass>(
+    : EFUpdater<ClassTestDomain, ClassTestUpdateDTO, TestPerClass>(
         ctx,
         domainMapper,
         updateMapper
     )
 {
-    protected override async Task<TestPerClass?> GetTrackedById(ClassTestIdDTO id) =>
+    protected override async Task<TestPerClass?> GetTrackedByDTO(ClassTestUpdateDTO id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

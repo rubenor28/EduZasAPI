@@ -12,18 +12,13 @@ public sealed class ContactEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<AgendaContact, ContactDomain> domainMapper,
     IUpdateMapper<ContactUpdateDTO, AgendaContact> updateMapper
-)
-    : CompositeKeyEFUpdater<ContactIdDTO, ContactDomain, ContactUpdateDTO, AgendaContact>(
-        ctx,
-        domainMapper,
-        updateMapper
-    )
+) : EFUpdater<ContactDomain, ContactUpdateDTO, AgendaContact>(ctx, domainMapper, updateMapper)
 {
-    protected override async Task<AgendaContact?> GetTrackedById(ContactIdDTO id) =>
+    protected override async Task<AgendaContact?> GetTrackedByDTO(ContactUpdateDTO value) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()
-            .Where(c => c.AgendaOwnerId == id.AgendaOwnerId)
-            .Where(c => c.UserId == id.UserId)
+            .Where(c => c.AgendaOwnerId == value.AgendaOwnerId)
+            .Where(c => c.UserId == value.UserId)
             .FirstOrDefaultAsync();
 }

@@ -9,7 +9,7 @@ namespace Application.DAOs;
 /// <typeparam name="E">Tipo de la entidad a recuperar, debe implementar <see cref="IIdentifiable{I}"/>.</typeparam>
 public interface IReaderAsync<I, E>
     where I : notnull
-    where E : notnull, IIdentifiable<I>
+    where E : notnull
 {
     /// <summary>
     /// Recupera una entidad por su identificador.

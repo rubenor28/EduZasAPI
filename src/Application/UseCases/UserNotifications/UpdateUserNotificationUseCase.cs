@@ -15,4 +15,8 @@ public sealed class UpdateUserNotificationUseCase(
         updater,
         reader,
         validator
-    );
+    )
+{
+    protected override UserNotificationIdDTO GetId(UserNotificationUpdateDTO dto) =>
+        new() { UserId = dto.UserId, NotificationId = dto.NotificationId };
+}

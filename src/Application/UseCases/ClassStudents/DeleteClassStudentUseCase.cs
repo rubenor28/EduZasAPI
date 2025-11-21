@@ -75,6 +75,10 @@ public class DeleteClassStudentUseCase(
         return Unit.Value;
     }
 
+    protected override UserClassRelationId GetId(DeleteClassStudentDTO value) => value.Id;
+
+    protected override UserClassRelationId GetId(ClassStudentDomain value) => value.Id;
+
     /// <summary>
     /// Funcion que determina si un profesor puede desincribir a un alumno
     /// </summary>

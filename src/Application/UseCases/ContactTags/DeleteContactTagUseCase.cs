@@ -67,4 +67,8 @@ public sealed class DeleteContactTagUseCase(
         if (!otherContactsUseTag)
             await _tagDeleter.DeleteAsync(deleteDTO.Id.Tag);
     }
+
+    protected override ContactTagIdDTO GetId(DeleteContactTagDTO value) => value.Id;
+
+    protected override ContactTagIdDTO GetId(ContactTagDomain value) => value.Id;
 }

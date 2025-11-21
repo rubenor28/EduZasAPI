@@ -12,7 +12,6 @@ namespace Application.UseCases.ClassStudents;
 public sealed class UpdateClassStudentUseCase(
     IUpdaterAsync<ClassStudentDomain, ClassStudentUpdateDTO> updater,
     IReaderAsync<UserClassRelationId, ClassStudentDomain> reader,
-    IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader,
     IBusinessValidationService<ClassStudentUpdateDTO>? validator = null
 )
     : UpdateUseCase<UserClassRelationId, ClassStudentUpdateDTO, ClassStudentDomain>(
@@ -28,16 +27,19 @@ public sealed class UpdateClassStudentUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            _ => value.Executor.Id == value.Id.UserId,
+            _ => value.Executor.Id == value.UserId,
         };
 
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
-        var student = await _reader.GetAsync(value.Id);
+        var student = await _reader.GetAsync(GetId(value));
         if (student.IsNone)
             return UseCaseErrors.NotFound();
 
         return Unit.Value;
     }
+
+    protected override UserClassRelationId GetId(ClassStudentUpdateDTO dto) =>
+        new() { UserId = dto.UserId, ClassId = dto.ClassId };
 }

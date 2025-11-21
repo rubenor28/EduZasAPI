@@ -34,4 +34,6 @@ public sealed class UpdateUserUseCase(
 
         return Unit.Value;
     }
+
+    protected override ulong GetId(UserUpdateDTO dto) => dto.Id;
 }

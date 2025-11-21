@@ -37,4 +37,8 @@ public sealed class DeleteResourceUseCase(
 
         return Unit.Value;
     }
+
+    protected override ulong GetId(DeleteResourceDTO value) => value.Id;
+
+    protected override ulong GetId(ResourceDomain value) => value.Id;
 }

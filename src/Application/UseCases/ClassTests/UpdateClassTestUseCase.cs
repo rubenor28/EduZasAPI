@@ -22,7 +22,7 @@ public sealed class UpdateClassTestUseCase(
         ClassTestUpdateDTO value
     )
     {
-        var recordSearch = await _reader.GetAsync(value.Id);
+        var recordSearch = await _reader.GetAsync(GetId(value));
 
         if (recordSearch.IsNone)
             return UseCaseErrors.NotFound();
@@ -57,4 +57,7 @@ public sealed class UpdateClassTestUseCase(
 
         return test.ProfessorId == executor.Id;
     }
+
+    protected override ClassTestIdDTO GetId(ClassTestUpdateDTO dto) =>
+        new() { ClassId = dto.ClassId, TestId = dto.TestId };
 }

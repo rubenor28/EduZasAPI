@@ -9,7 +9,7 @@ namespace EntityFramework.Application.DAOs.ClassStudents;
 public class ClassStudentsEFReader(
     EduZasDotnetContext ctx,
     IMapper<ClassStudent, ClassStudentDomain> domainMapper
-) : CompositeKeyEFReader<UserClassRelationId, ClassStudentDomain, ClassStudent>(ctx, domainMapper)
+) : EFReader<UserClassRelationId, ClassStudentDomain, ClassStudent>(ctx, domainMapper)
 {
     public override async Task<ClassStudent?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet

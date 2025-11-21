@@ -9,7 +9,7 @@ namespace EntityFramework.Application.DAOs.Contacts;
 public sealed class ContactEFDeleter(
     EduZasDotnetContext ctx,
     IMapper<AgendaContact, ContactDomain> domainMapper
-) : CompositeKeyEFDeleter<ContactIdDTO, ContactDomain, AgendaContact>(ctx, domainMapper)
+) : EFDeleter<ContactIdDTO, ContactDomain, AgendaContact>(ctx, domainMapper)
 {
     public override async Task<AgendaContact?> GetTrackedById(ContactIdDTO id) =>
         await _dbSet

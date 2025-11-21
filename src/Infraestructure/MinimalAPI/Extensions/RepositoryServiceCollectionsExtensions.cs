@@ -45,6 +45,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<ICreatorAsync<UserDomain, NewUserDTO>, UserEFCreator>();
         s.AddScoped<IUpdaterAsync<UserDomain, UserUpdateDTO>, UserEFUpdater>();
         s.AddScoped<IReaderAsync<ulong, UserDomain>, UserEFReader>();
+        s.AddScoped<IReaderAsync<string, UserDomain>, UserEmailEFReader>();
         s.AddScoped<IDeleterAsync<ulong, UserDomain>, UserEFDeleter>();
         s.AddScoped<IQuerierAsync<UserDomain, UserCriteriaDTO>>(
             sp => new UserEFQuerier(

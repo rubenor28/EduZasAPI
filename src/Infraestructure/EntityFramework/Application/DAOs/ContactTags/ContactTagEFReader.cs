@@ -9,7 +9,7 @@ namespace EntityFramework.Application.DAOs.ContactTags;
 public sealed class ContactTagEFReader(
     EduZasDotnetContext ctx,
     IMapper<ContactTag, ContactTagDomain> domainMapper
-) : CompositeKeyEFReader<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, domainMapper)
+) : EFReader<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, domainMapper)
 {
     public override async Task<ContactTag?> GetTrackedById(ContactTagIdDTO id) =>
         await _dbSet

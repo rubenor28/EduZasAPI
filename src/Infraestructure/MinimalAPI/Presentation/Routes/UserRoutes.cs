@@ -69,6 +69,9 @@ public static class UserRoutes
                 return op;
             });
 
+        group.MapGet("/{email}", GetUserByEmail)
+          .RequireAuthorization("ProfessorOrAdmin");
+
         return group;
     }
 

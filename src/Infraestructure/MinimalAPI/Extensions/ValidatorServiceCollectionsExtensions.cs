@@ -6,7 +6,6 @@ using FluentValidationProj.Application.Services.Classes;
 using FluentValidationProj.Application.Services.Common;
 using FluentValidationProj.Application.Services.Users;
 
-
 namespace MinimalAPI.Extensions;
 
 /// <summary>
@@ -22,6 +21,7 @@ public static class ValidatorServiceCollectionExtensions
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddSingleton<IBusinessValidationService<ulong>, ULongFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<string>, EmailFluentValidator>();
 
         // Auth validators
         services.AddSingleton<

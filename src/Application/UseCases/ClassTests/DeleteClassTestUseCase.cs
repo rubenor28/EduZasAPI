@@ -66,4 +66,8 @@ public sealed class DeleteClassTestUseCase(
         // TODO: Eliminar respuestas
         return Task.FromResult(Unit.Value);
     }
+
+    protected override ClassTestIdDTO GetId(DeleteClassTestDTO value) => value.Id;
+
+    protected override ClassTestIdDTO GetId(ClassTestDomain value) => value.Id;
 }

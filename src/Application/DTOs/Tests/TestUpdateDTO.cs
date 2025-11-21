@@ -3,7 +3,7 @@ using Domain.ValueObjects;
 
 namespace Application.DTOs.Tests;
 
-public sealed record TestUpdateDTO : IIdentifiable<ulong>
+public sealed record TestUpdateDTO
 {
     public required ulong Id { get; set; }
     public required string Title { get; set; }

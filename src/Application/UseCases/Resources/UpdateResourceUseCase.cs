@@ -10,4 +10,7 @@ public sealed class UpdateResourceUseCase(
     IUpdaterAsync<ResourceDomain, ResourceUpdateDTO> updater,
     IReaderAsync<ulong, ResourceDomain> reader,
     IBusinessValidationService<ResourceUpdateDTO>? validator = null
-) : UpdateUseCase<ulong, ResourceUpdateDTO, ResourceDomain>(updater, reader, validator) { }
+) : UpdateUseCase<ulong, ResourceUpdateDTO, ResourceDomain>(updater, reader, validator)
+{
+    protected override ulong GetId(ResourceUpdateDTO dto) => dto.Id;
+}

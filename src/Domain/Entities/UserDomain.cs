@@ -12,7 +12,7 @@ namespace Domain.Entities;
 /// estado, rol y metadatos de auditoría. Utiliza campos requeridos para garantizar
 /// la integridad de los datos esenciales.
 /// </remarks>
-public class UserDomain : IIdentifiable<ulong>, ISoftDeletable
+public class UserDomain
 {
     /// <summary>
     /// Obtiene o establece el identificador único del usuario.

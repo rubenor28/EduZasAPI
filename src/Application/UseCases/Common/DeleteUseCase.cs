@@ -17,8 +17,8 @@ public abstract class DeleteUseCase<I, DE, E>(
     IBusinessValidationService<DE>? validator = null
 ) : IUseCaseAsync<DE, E>
     where I : notnull
-    where E : notnull, IIdentifiable<I>
-    where DE : notnull, IIdentifiable<I>
+    where E : notnull
+    where DE : notnull
 {
     /// <summary>
     /// Entidad encargada de eliminar una entidad de un medio persistente
@@ -60,7 +60,7 @@ public abstract class DeleteUseCase<I, DE, E>(
         PrevTask(data);
         await PrevTaskAsync(data);
 
-        var recordDeleted = await _deleter.DeleteAsync(data.Id);
+        var recordDeleted = await _deleter.DeleteAsync(GetId(data));
 
         ExtraTask(data, recordDeleted);
         await ExtraTaskAsync(data, recordDeleted);
@@ -92,7 +92,7 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// </remarks>
     protected async virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(DE value)
     {
-        var record = await _reader.GetAsync(value.Id);
+        var record = await _reader.GetAsync(GetId(value));
         if (record.IsNone)
             return UseCaseErrors.NotFound();
 
@@ -141,4 +141,14 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
     /// </remarks>
     protected virtual Task PrevTaskAsync(DE deleteDTO) => Task.FromResult(Unit.Value);
+
+    /// <summary>
+    /// Metodo abstracto para obtener el ID del DTO.
+    /// </summary>
+    protected abstract I GetId(DE value);
+
+    /// <summary>
+    /// Metodo abstracto para obtener el ID del registro.
+    /// </summary>
+    protected abstract I GetId(E value);
 }

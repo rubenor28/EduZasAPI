@@ -28,8 +28,8 @@ public class ClassProfessorEFMapper
 
     public void Map(ClassProfessorUpdateDTO uProps, ClassProfessor entity)
     {
-        entity.ClassId = uProps.Id.ClassId;
-        entity.ProfessorId = uProps.Id.UserId;
+        entity.ClassId = uProps.ClassId;
+        entity.ProfessorId = uProps.UserId;
         entity.IsOwner = uProps.IsOwner;
     }
 }

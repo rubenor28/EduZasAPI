@@ -11,7 +11,7 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
     IMapper<EFEntity, DomainEntity> domainMapper,
     int pageSize
 )
-    : EntityFrameworkDAO<EFEntity, DomainEntity>(ctx, domainMapper),
+    : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, domainMapper),
         IQuerierAsync<DomainEntity, EntityCriteria>
     where EFEntity : class
     where EntityCriteria : CriteriaDTO

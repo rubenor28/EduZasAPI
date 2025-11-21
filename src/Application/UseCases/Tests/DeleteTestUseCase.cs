@@ -14,4 +14,7 @@ public sealed class DeleteTestUseCase(
 {
     // TODO: Eliminar las respuestas asociadas a una evaluacion
     // TODO: Eliminar asociaciones clase, test
+    protected override ulong GetId(DeleteTestDTO value) => value.Id;
+
+    protected override ulong GetId(TestDomain value) => value.Id;
 }

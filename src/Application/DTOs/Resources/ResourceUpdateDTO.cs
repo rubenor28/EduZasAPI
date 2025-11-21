@@ -1,9 +1,8 @@
 using Application.DTOs.Common;
-using Domain.ValueObjects;
 
 namespace Application.DTOs.Resources;
 
-public sealed record ResourceUpdateDTO : IIdentifiable<ulong>
+public sealed record ResourceUpdateDTO
 {
     public required ulong Id { get; set; }
     public required bool Active { get; set; }

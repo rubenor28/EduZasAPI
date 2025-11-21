@@ -103,7 +103,12 @@ public class UserNotificationEFRepositoryTest : IDisposable
         var newUserNotification = new NewUserNotificationDTO { UserId = 1, NotificationId = 1 };
         var created = await _creator.AddAsync(newUserNotification);
 
-        var toUpdate = new UserNotificationUpdateDTO { Id = created.Id, Readed = true };
+        var toUpdate = new UserNotificationUpdateDTO
+        {
+            UserId = created.Id.UserId,
+            NotificationId = created.Id.NotificationId,
+            Readed = true,
+        };
 
         var updated = await _updater.UpdateAsync(toUpdate);
 
@@ -116,7 +121,8 @@ public class UserNotificationEFRepositoryTest : IDisposable
     {
         var toUpdate = new UserNotificationUpdateDTO
         {
-            Id = new UserNotificationIdDTO { UserId = 123, NotificationId = 456 },
+            UserId = 123,
+            NotificationId = 456,
             Readed = true,
         };
         await Assert.ThrowsAsync<ArgumentException>(() => _updater.UpdateAsync(toUpdate));

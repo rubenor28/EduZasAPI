@@ -36,4 +36,6 @@ public sealed class UpdateTestUseCase(
 
         return Unit.Value;
     }
+
+    protected override ulong GetId(TestUpdateDTO dto) => dto.Id;
 }

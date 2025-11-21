@@ -156,7 +156,8 @@ public class StudentPerClassEFRepositoryTest : IDisposable
 
         var toUpdate = new ClassStudentUpdateDTO
         {
-            Id = created.Id,
+            ClassId = created.Id.ClassId,
+            UserId = created.Id.UserId,
             Hidden = true,
             Executor = AsExecutor(user),
         };
@@ -172,7 +173,8 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     {
         var toUpdate = new ClassStudentUpdateDTO
         {
-            Id = new() { ClassId = "non-existent", UserId = 99 },
+            ClassId = "non-existent",
+            UserId = 99,
             Hidden = true,
             Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
