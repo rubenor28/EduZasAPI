@@ -45,6 +45,8 @@ public sealed class AddContactUseCase(
 
         (await SearchUser(request.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
         (await SearchUser(request.UserId, "userId")).IfErr(errors.Add);
+        if (request.UserId == request.Executor.Id)
+            errors.Add(new() { Field = "userId", Message = "No puedes agregarte a ti mismo" });
 
         if (errors.Count != 0)
             return UseCaseErrors.Input(errors);

@@ -1,5 +1,6 @@
 using Application.DTOs.Common;
 using Application.DTOs.Users;
+using Application.UseCases.Auth;
 using Application.UseCases.Users;
 using Domain.Entities;
 using Domain.ValueObjects;
@@ -16,7 +17,8 @@ public static class UserRoutes
     {
         var group = app.MapGroup("/users").WithTags("Usuarios");
 
-        group.MapPost("/", SearchUsers)
+        group
+            .MapPost("/", SearchUsers)
             .RequireAuthorization("Admin")
             .Produces<PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
@@ -25,7 +27,8 @@ public static class UserRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Buscar usuarios por criterios.";
-                op.Description = "Realiza una búsqueda paginada de usuarios con filtros. Requiere privilegios de administrador.";
+                op.Description =
+                    "Realiza una búsqueda paginada de usuarios con filtros. Requiere privilegios de administrador.";
                 op.Responses["200"].Description = "Búsqueda completada exitosamente.";
                 op.Responses["400"].Description = "Los criterios de búsqueda son inválidos.";
                 op.Responses["401"].Description = "El usuario no está autenticado.";
@@ -33,7 +36,8 @@ public static class UserRoutes
                 return op;
             });
 
-        group.MapPut("/", UpdateUser)
+        group
+            .MapPut("/", UpdateUser)
             .RequireAuthorization("Admin")
             .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
@@ -43,16 +47,20 @@ public static class UserRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Actualizar un usuario.";
-                op.Description = "Modifica los datos de un usuario existente. Requiere privilegios de administrador.";
+                op.Description =
+                    "Modifica los datos de un usuario existente. Requiere privilegios de administrador.";
                 op.Responses["200"].Description = "El usuario fue actualizado exitosamente.";
-                op.Responses["400"].Description = "Los datos proporcionados para la actualización son inválidos.";
+                op.Responses["400"].Description =
+                    "Los datos proporcionados para la actualización son inválidos.";
                 op.Responses["401"].Description = "El usuario no está autenticado.";
                 op.Responses["403"].Description = "El usuario no tiene permisos de administrador.";
-                op.Responses["404"].Description = "No se encontró un usuario con el ID proporcionado.";
+                op.Responses["404"].Description =
+                    "No se encontró un usuario con el ID proporcionado.";
                 return op;
             });
 
-        group.MapDelete("/{userId:ulong}", DeleteUser)
+        group
+            .MapDelete("/{userId:ulong}", DeleteUser)
             .RequireAuthorization("Admin")
             .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -61,16 +69,60 @@ public static class UserRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Eliminar un usuario.";
-                op.Description = "Elimina un usuario de forma lógica (soft delete). Requiere privilegios de administrador.";
-                op.Responses["200"].Description = "El usuario fue marcado como inactivo exitosamente.";
+                op.Description =
+                    "Elimina un usuario de forma lógica (soft delete). Requiere privilegios de administrador.";
+                op.Responses["200"].Description =
+                    "El usuario fue marcado como inactivo exitosamente.";
                 op.Responses["401"].Description = "El usuario no está autenticado.";
                 op.Responses["403"].Description = "El usuario no tiene permisos de administrador.";
-                op.Responses["404"].Description = "No se encontró un usuario con el ID proporcionado.";
+                op.Responses["404"].Description =
+                    "No se encontró un usuario con el ID proporcionado.";
                 return op;
             });
 
-        group.MapGet("/{email}", GetUserByEmail)
-          .RequireAuthorization("ProfessorOrAdmin");
+        group
+            .MapGet("/{email}", GetUserByEmail)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<PublicUserMAPI>()
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Obtiene un usuario mediante un email.";
+                op.Description = "Busca un usuario mediante el email proporcionado";
+                op.Responses["200"].Description = "El usuario.";
+                op.Responses["400"].Description = "El el formato del email no es apropiado.";
+                op.Responses["401"].Description = "El usuario no está autenticado.";
+                op.Responses["403"].Description = "El usuario no tiene permisos de administrador.";
+                op.Responses["404"].Description =
+                    "No se encontró un usuario con el email proporcionado.";
+
+                return op;
+            });
+
+        group
+            .MapGet("/{userId:ulong}", GetUserById)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<PublicUserMAPI>()
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Obtiene un usuario mediante un ID.";
+                op.Description = "Busca un usuario mediante el ID proporcionado";
+                op.Responses["200"].Description = "El usuario.";
+                op.Responses["400"].Description = "El el formato del ID no es apropiado.";
+                op.Responses["401"].Description = "El usuario no está autenticado.";
+                op.Responses["403"].Description = "El usuario no tiene permisos de administrador.";
+                op.Responses["404"].Description =
+                    "No se encontró un usuario con el ID proporcionado.";
+
+                return op;
+            });
 
         return group;
     }
@@ -99,7 +151,11 @@ public static class UserRoutes
         UpdateUserUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils,
-        IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
+        IMapper<
+            UserUpdateMAPI,
+            Executor,
+            Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>
+        > reqMapper,
         IMapper<UserDomain, PublicUserMAPI> resMapper
     )
     {
@@ -122,6 +178,34 @@ public static class UserRoutes
         return utils.HandleUseCaseAsync(
             useCase,
             mapRequest: () => reqMapper.Map(userId, utils.GetExecutorFromContext(ctx)),
+            mapResponse: (user) => Results.Ok(resMapper.Map(user))
+        );
+    }
+
+    public static Task<IResult> GetUserByEmail(
+        string email,
+        ReadUserEmailUseCase useCase,
+        IMapper<UserDomain, PublicUserMAPI> resMapper,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => email,
+            mapResponse: (user) => Results.Ok(resMapper.Map(user))
+        );
+    }
+
+    public static Task<IResult> GetUserById(
+        ulong userId,
+        ReadUserUseCase useCase,
+        IMapper<UserDomain, PublicUserMAPI> resMapper,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => userId,
             mapResponse: (user) => Results.Ok(resMapper.Map(user))
         );
     }

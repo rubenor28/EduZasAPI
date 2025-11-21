@@ -166,9 +166,10 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<ContactMAPIMapper>();
         s.AddSingleton<IMapper<NewContactMAPI, Executor, NewContactDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
         s.AddSingleton<IMapper<ContactDomain, PublicContactMAPI>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
-        s.AddSingleton<IMapper<ContactCriteriaMAPI, ContactCriteriaDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
         s.AddSingleton<IMapper<ulong, ulong, Executor, DeleteContactDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
         s.AddSingleton<IMapper<ContactUpdateMAPI, ContactUpdateDTO>>(sp => sp.GetRequiredService<ContactMAPIMapper>());
+        s.AddSingleton<IMapper<ContactCriteriaMAPI, Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>>>(
+            sp => sp.GetRequiredService<ContactMAPIMapper>());
         s.AddSingleton<IMapper<PaginatedQuery<ContactDomain, ContactCriteriaDTO>, PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>>>(
             sp => sp.GetRequiredService<ContactMAPIMapper>());
 

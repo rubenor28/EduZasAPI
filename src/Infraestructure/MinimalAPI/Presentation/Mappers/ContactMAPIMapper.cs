@@ -3,14 +3,18 @@ using Application.DTOs.Contacts;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
+using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Contacts;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-public class ContactMAPIMapper
+public class ContactMAPIMapper(
+    IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> strqFromDomainMapper,
+    IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper
+)
     : IMapper<ContactDomain, PublicContactMAPI>,
-        IMapper<ContactCriteriaMAPI, ContactCriteriaDTO>,
         IMapper<ContactCriteriaDTO, ContactCriteriaMAPI>,
+        IMapper<ContactCriteriaMAPI, Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
         IMapper<ContactUpdateMAPI, ContactUpdateDTO>,
         IMapper<
             PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
@@ -19,6 +23,14 @@ public class ContactMAPIMapper
         IMapper<NewContactMAPI, Executor, NewContactDTO>,
         IMapper<ulong, ulong, Executor, DeleteContactDTO>
 {
+    private readonly IMapper<
+        StringQueryMAPI?,
+        Result<Optional<StringQueryDTO>, Unit>
+    > _strqToDomainMapper = strqToDomainMapper;
+
+    private readonly IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> _strqFromDomainMapper =
+        strqFromDomainMapper;
+
     public PublicContactMAPI Map(ContactDomain source) =>
         new()
         {
@@ -32,24 +44,16 @@ public class ContactMAPIMapper
         new()
         {
             Page = source.Page,
-            Alias = source.Alias.ToNullable(),
+            Alias = _strqFromDomainMapper.Map(source.Alias),
             UserId = source.UserId.ToNullable(),
             AgendaOwnerId = source.AgendaOwnerId.ToNullable(),
-        };
-
-    public ContactCriteriaDTO Map(ContactCriteriaMAPI source) =>
-        new()
-        {
-            Page = source.Page,
-            Alias = source.Alias.ToOptional(),
-            UserId = source.UserId.ToOptional(),
-            AgendaOwnerId = source.AgendaOwnerId.ToOptional(),
         };
 
     public ContactUpdateDTO Map(ContactUpdateMAPI source) =>
         new()
         {
-             AgendaOwnerId = source.AgendaOwnerId, UserId = source.UserId ,
+            AgendaOwnerId = source.AgendaOwnerId,
+            UserId = source.UserId,
             Alias = source.Alias,
             Notes = source.Notes.ToOptional(),
         };
@@ -82,4 +86,25 @@ public class ContactMAPIMapper
             Id = new() { AgendaOwnerId = agendaOwnerId, UserId = contactId },
             Executor = ex,
         };
+
+    Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>> IMapper<
+        ContactCriteriaMAPI,
+        Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>
+    >.Map(ContactCriteriaMAPI input)
+    {
+        List<FieldErrorDTO> errors = [];
+        var alias = _strqToDomainMapper.Map(input.Alias);
+        alias.IfErr(_ => errors.Add(new() { Field = "alias" }));
+
+        if(errors.Count > 0)return errors;
+
+        return new ContactCriteriaDTO
+        {
+            Alias = alias.Unwrap(),
+            Page = input.Page,
+            UserId = input.UserId.ToOptional(),
+            Tags = input.Tags.ToOptional(),
+            AgendaOwnerId = input.AgendaOwnerId.ToOptional(),
+        };
+    }
 }

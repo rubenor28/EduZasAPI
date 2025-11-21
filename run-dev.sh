@@ -1,1 +1,1 @@
-dotnet run --project src/Infraestructure/MinimalAPI
+dotnet watch --project src/Infraestructure/MinimalAPI
