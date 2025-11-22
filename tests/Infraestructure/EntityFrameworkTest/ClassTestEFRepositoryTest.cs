@@ -4,7 +4,6 @@ using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.DTOs.Users;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassTests;
@@ -83,6 +82,7 @@ public class ClassTestEFRepositoryTest : IDisposable
             Section = Optional.Some("A"),
             Subject = Optional.Some("Math"),
             OwnerId = professor.Id,
+            Professors = [],
             Executor = AsExecutor(professor),
         };
 

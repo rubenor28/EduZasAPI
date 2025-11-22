@@ -141,6 +141,7 @@ public class ClassMAPIMapper(
             Section = input.Section.ToOptional(),
             Color = input.Color,
             OwnerId = input.OwnerId,
+            Professors = input.Professors,
             Executor = ex,
         };
 

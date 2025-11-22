@@ -1,3 +1,4 @@
+using System.Text;
 using Application.DAOs;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
@@ -24,7 +25,7 @@ public class AddClassUseCase(
     IReaderAsync<ulong, UserDomain> userReader,
     IReaderAsync<string, ClassDomain> reader,
     IRandomStringGeneratorService idGenerator,
-    ICreatorAsync<ClassProfessorDomain, NewClassProfessorDTO> professorRelationCreator
+    IBulkCreatorAsync<ClassProfessorDomain, NewClassProfessorDTO> professorRelationCreator
 ) : AddUseCase<NewClassDTO, ClassDomain>(creator, validator)
 {
     /// <summary>
@@ -45,7 +46,7 @@ public class AddClassUseCase(
     /// <summary>
     /// Servicio para crear la relación entre un profesor y una clase.
     /// </summary>
-    private readonly ICreatorAsync<
+    private readonly IBulkCreatorAsync<
         ClassProfessorDomain,
         NewClassProfessorDTO
     > _professorRelationCreator = professorRelationCreator;
@@ -87,12 +88,45 @@ public class AddClassUseCase(
         NewClassDTO value
     )
     {
-        var usrSearch = await userReader.GetAsync(value.OwnerId);
+        List<FieldErrorDTO> errors = [];
 
-        if (usrSearch.IsNone)
-            return UseCaseErrors.Input(
-                [new() { Field = "ownerId", Message = "No se encontró el usuario" }]
+        (await userReader.GetAsync(value.OwnerId)).IfNone(() =>
+            errors.Add(new() { Field = "ownerId", Message = "No se encontró el usuario" })
+        );
+
+        StringBuilder strBuilder = new("Usuarios invalidos: [");
+        bool searchUserError = false;
+        foreach (var professor in value.Professors)
+        {
+            (await userReader.GetAsync(professor.UserId)).Match(
+                (user) =>
+                {
+                    if (user.Role == UserType.STUDENT)
+                        strBuilder.Append(
+                            searchUserError ? $", {professor.UserId}" : $"{professor.UserId}"
+                        );
+
+                    if (searchUserError)
+                        searchUserError = true;
+                },
+                () =>
+                {
+                    strBuilder.Append(
+                        searchUserError ? $", {professor.UserId}" : $"{professor.UserId}"
+                    );
+
+                    if (searchUserError)
+                        searchUserError = true;
+                }
             );
+        }
+        strBuilder.Append(']');
+
+        if (searchUserError)
+            errors.Add(new() { Field = "professors", Message = strBuilder.ToString() });
+
+        if (errors.Count > 0)
+            return UseCaseErrors.Input(errors);
 
         return Unit.Value;
     }
@@ -133,14 +167,16 @@ public class AddClassUseCase(
     /// <returns>Una tarea que representa la operación asíncrona.</returns>
     protected override async Task ExtraTaskAsync(NewClassDTO newEntity, ClassDomain createdEntity)
     {
-        await _professorRelationCreator.AddAsync(
-            new()
-            {
-                ClassId = createdEntity.Id,
-                UserId = newEntity.OwnerId,
-                IsOwner = true,
-                Executor = new() { Id = 1, Role = UserType.ADMIN },
-            }
-        );
+        newEntity.Professors.Add(new() { UserId = newEntity.OwnerId, IsOwner = true });
+
+        var professors = newEntity.Professors.Select(p => new NewClassProfessorDTO()
+        {
+            ClassId = createdEntity.Id,
+            UserId = p.UserId,
+            IsOwner = p.IsOwner,
+            Executor = newEntity.Executor, // NO se realiza alguna validacion en el repositorio
+        });
+
+        await _professorRelationCreator.AddRangeAsync(professors);
     }
 }

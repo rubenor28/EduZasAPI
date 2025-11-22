@@ -3,6 +3,12 @@ using Domain.ValueObjects;
 
 namespace Application.DTOs.Classes;
 
+public sealed record Professor
+{
+    public required ulong UserId { get; set; }
+    public required bool IsOwner { get; set; }
+};
+
 /// <summary>
 /// Representa los datos requeridos para crear una nueva clase en el sistema.
 /// </summary>
@@ -34,6 +40,11 @@ public sealed record NewClassDTO
     /// Id del profesor dueño de la clase nueva
     /// </summary>
     public required ulong OwnerId { get; set; }
+
+    /// <summary>
+    /// Informacion para agregar profesores durante la creacion
+    /// </summary>
+    public required ICollection<Professor> Professors { get; set; }
 
     /// <summary>
     /// Ejecutor de la accion

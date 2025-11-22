@@ -96,7 +96,8 @@ public class ContactMAPIMapper(
         var alias = _strqToDomainMapper.Map(input.Alias);
         alias.IfErr(_ => errors.Add(new() { Field = "alias" }));
 
-        if(errors.Count > 0)return errors;
+        if (errors.Count > 0)
+            return errors;
 
         return new ContactCriteriaDTO
         {

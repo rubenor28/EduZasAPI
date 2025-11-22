@@ -19,6 +19,7 @@ public class NewClassFluentValidatorTest
             Section = "Section A",
             Subject = "Subject B",
             OwnerId = 1,
+            Professors = [],
             Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 
@@ -40,6 +41,7 @@ public class NewClassFluentValidatorTest
             Section = "Section A",
             Subject = "Subject B",
             OwnerId = 1,
+            Professors = [],
             Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 
@@ -60,6 +62,7 @@ public class NewClassFluentValidatorTest
             Section = "Section A",
             Subject = "S",
             OwnerId = 1,
+            Professors = [],
             Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 
@@ -80,6 +83,7 @@ public class NewClassFluentValidatorTest
             Section = "S",
             Subject = "Subject B",
             OwnerId = 1,
+            Professors = [],
             Executor = new() { Id = 1, Role = UserType.ADMIN}
         };
 

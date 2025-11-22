@@ -1,3 +1,5 @@
+using Application.DTOs.Classes;
+
 namespace MinimalAPI.Application.DTOs.Classes;
 
 /// <summary>
@@ -29,4 +31,6 @@ public sealed record NewClassMAPI
     /// Id dueño de la clase.
     /// </summary>
     public required ulong OwnerId { get; set; }
+
+    public required ICollection<Professor> Professors { get; set; }
 }
