@@ -138,6 +138,8 @@ public sealed class UserMAPIMapper(
             Role = roleValidation.Unwrap(),
             Page = source.Page,
             Active = source.Active.ToOptional(),
+            EnrolledInClass = source.EnrolledInClass.ToOptional(),
+            TeachingInClass = source.TeachingInClass.ToOptional(),
             CreatedAt = source.CreatedAt.ToOptional(),
             ModifiedAt = source.CreatedAt.ToOptional(),
         };

@@ -87,6 +87,16 @@ public sealed record UserCriteriaMAPI : CriteriaDTO
     public StringQueryMAPI? Password { get; set; } = null;
 
     /// <summary>
+    /// Obtiene o establece el filtro opcional para usuarios inscritos en una clase específica.
+    /// </summary>
+    public string? EnrolledInClass { get; set; } = null;
+
+    /// <summary>
+    /// Obtiene o establece el filtro opcional para usuarios que enseñan en una clase específica.
+    /// </summary>
+    public string? TeachingInClass { get; set; } = null;
+
+    /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de creación del usuario.
     /// </summary>
     /// <value>

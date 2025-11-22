@@ -19,7 +19,7 @@ public static class UserRoutes
 
         group
             .MapPost("/", SearchUsers)
-            .RequireAuthorization("Admin")
+            .RequireAuthorization("AdminOrProfessor")
             .Produces<PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
