@@ -30,6 +30,7 @@ public class AddClassUseCaseTest : IDisposable
     private readonly SqliteConnection _conn;
 
     private readonly UserEFMapper _userMapper;
+    private readonly Random _rdm = new();
 
     public AddClassUseCaseTest()
     {
@@ -77,10 +78,11 @@ public class AddClassUseCaseTest : IDisposable
 
     private async Task<UserDomain> SeedUser(UserType role)
     {
+      var id = (ulong)_rdm.NextInt64();
         var user = new User
         {
-            UserId = 1,
-            Email = "test@test.com",
+            UserId = id,
+            Email = $"user{id}@test.com",
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
@@ -103,7 +105,8 @@ public class AddClassUseCaseTest : IDisposable
             Color = "#ffffff",
             Section = "ABC",
             Subject = "Math",
-            OwnerId = 1,
+            OwnerId = user.Id,
+            Professors = [],
             Executor = AsExecutor(user),
         };
 
@@ -122,6 +125,7 @@ public class AddClassUseCaseTest : IDisposable
             Section = "ABC",
             Subject = "Math",
             OwnerId = 1000,
+            Professors = [],
             Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
@@ -144,7 +148,8 @@ public class AddClassUseCaseTest : IDisposable
             Color = "#ffffff",
             Section = "ABC",
             Subject = "Math",
-            OwnerId = 1,
+            OwnerId = user.Id,
+            Professors = [],
             Executor = AsExecutor(user)
         };
 
@@ -164,7 +169,8 @@ public class AddClassUseCaseTest : IDisposable
             Color = "#ffffff",
             Section = "ABC",
             Subject = "Math",
-            OwnerId = 1,
+            OwnerId = user.Id,
+            Professors = [],
             Executor = AsExecutor(user)
         };
 
@@ -187,7 +193,8 @@ public class AddClassUseCaseTest : IDisposable
             Color = "#ffffff",
             Section = "A",
             Subject = "Math",
-            OwnerId = 1,
+            OwnerId = user.Id,
+            Professors = [],
             Executor = AsExecutor(user)
         };
 
@@ -210,7 +217,8 @@ public class AddClassUseCaseTest : IDisposable
             Color = "#ffffff",
             Section = "ABC",
             Subject = "T",
-            OwnerId = 1,
+            OwnerId = user.Id,
+            Professors = [],
             Executor = AsExecutor(user)
         };
 
@@ -221,6 +229,79 @@ public class AddClassUseCaseTest : IDisposable
         var err = result.UnwrapErr();
         Assert.Equal(typeof(InputError), err.GetType());
         Assert.Contains(((InputError)err).Errors, e => e.Field == "subject");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithProfessors_CreatesProfessors()
+    {
+        // Arrange
+        var owner = await SeedUser(UserType.PROFESSOR);
+        var prof2 = await SeedUser(UserType.PROFESSOR);
+        var prof3 = await SeedUser(UserType.PROFESSOR);
+
+        var newClass = new NewClassDTO
+        {
+            ClassName = "Multi-Professor Class",
+            Color = "#123456",
+            Section = "101",
+            Subject = "Advanced Testing",
+            OwnerId = owner.Id,
+            Professors =
+            [
+                new() { UserId = prof2.Id, IsOwner = false },
+                new() { UserId = prof3.Id, IsOwner = false }
+            ],
+            Executor = AsExecutor(owner),
+        };
+
+        // Act
+        var result = await _useCase.ExecuteAsync(newClass);
+
+        // Assert
+        if (result.IsErr)
+        {
+            Assert.Fail($"Test failed with an unexpected error: {result.UnwrapErr()}");
+        }
+        Assert.True(result.IsOk);
+
+        var createdClass = result.Unwrap();
+        var professorRelations = await _ctx.ClassProfessors
+            .Where(cp => cp.ClassId == createdClass.Id)
+            .ToListAsync();
+
+        Assert.Equal(3, professorRelations.Count);
+        Assert.Contains(professorRelations, pr => pr.ProfessorId == owner.Id && (bool)pr.IsOwner!);
+        Assert.Contains(professorRelations, pr => pr.ProfessorId == prof2.Id && (bool)!pr.IsOwner!);
+        Assert.Contains(professorRelations, pr => pr.ProfessorId == prof3.Id && (bool)!pr.IsOwner!);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithStudentAsProfessor_ReturnsError()
+    {
+        // Arrange
+        var owner = await SeedUser(UserType.PROFESSOR);
+        var student = await SeedUser(UserType.STUDENT);
+
+        var newClass = new NewClassDTO
+        {
+            ClassName = "Class with Invalid Professor",
+            Color = "#123456",
+            Section = "101",
+            Subject = "Error Handling",
+            OwnerId = owner.Id,
+            Professors = [new() { UserId = student.Id, IsOwner = false }],
+            Executor = AsExecutor(owner),
+        };
+
+        // Act
+        var result = await _useCase.ExecuteAsync(newClass);
+
+        // Assert
+        Assert.True(result.IsErr);
+
+        var err = result.UnwrapErr();
+        Assert.IsType<InputError>(err);
+        Assert.Contains(((InputError)err).Errors, e => e.Field == "professors");
     }
 
     public void Dispose()

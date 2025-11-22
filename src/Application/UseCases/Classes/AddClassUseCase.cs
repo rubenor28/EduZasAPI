@@ -94,36 +94,23 @@ public class AddClassUseCase(
             errors.Add(new() { Field = "ownerId", Message = "No se encontró el usuario" })
         );
 
-        StringBuilder strBuilder = new("Usuarios invalidos: [");
-        bool searchUserError = false;
-        foreach (var professor in value.Professors)
+        var validationTasks = value.Professors.Select(async professor =>
         {
-            (await userReader.GetAsync(professor.UserId)).Match(
-                (user) =>
-                {
-                    if (user.Role == UserType.STUDENT)
-                        strBuilder.Append(
-                            searchUserError ? $", {professor.UserId}" : $"{professor.UserId}"
-                        );
-
-                    if (searchUserError)
-                        searchUserError = true;
-                },
-                () =>
-                {
-                    strBuilder.Append(
-                        searchUserError ? $", {professor.UserId}" : $"{professor.UserId}"
-                    );
-
-                    if (searchUserError)
-                        searchUserError = true;
-                }
+            var userResult = await userReader.GetAsync(professor.UserId);
+            return userResult.Match(
+                user => user.Role == UserType.STUDENT ? professor.UserId : (ulong?)null, // Return ID if student
+                () => professor.UserId // Return ID if not found
             );
-        }
-        strBuilder.Append(']');
+        });
 
-        if (searchUserError)
-            errors.Add(new() { Field = "professors", Message = strBuilder.ToString() });
+        var invalidIdResults = await Task.WhenAll(validationTasks);
+        var invalidProfessorIds = invalidIdResults.Where(id => id is not null).Select(id => id!.Value).ToList();
+
+        if (invalidProfessorIds.Count > 0)
+        {
+            var idList = string.Join(", ", invalidProfessorIds);
+            errors.Add(new() { Field = "professors", Message = $"Los siguientes usuarios no son válidos o son estudiantes: [{idList}]" });
+        }
 
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
