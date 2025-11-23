@@ -38,8 +38,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
 
         var mapper = new ClassStudentEFMapper();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         _creator = new(_ctx, mapper, mapper);
         _reader = new(_ctx, mapper);

@@ -33,8 +33,8 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        _userMapper = new UserEFMapper(roleMapper);
 
         var professorClassMapper = new ClassProfessorEFMapper();
 

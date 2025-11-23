@@ -34,8 +34,7 @@ public class DeleteTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         var testDeleter = new TestEFDeleter(_ctx, _testMapper);
         var testReader = new TestEFReader(_ctx, _testMapper);

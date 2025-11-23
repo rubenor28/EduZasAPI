@@ -1,41 +1,38 @@
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
+using Domain.Entities;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.ClassStudents;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-public sealed record ClassStudentsMAPIMapper
-    : IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>,
-        IMapper<string, ulong, Executor, DeleteClassStudentDTO>,
-        IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>
+public sealed class NewClassStudentMAPIMapper
+    : IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>
 {
-    NewClassStudentDTO IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>.Map(
-        EnrollClassMAPI input,
-        Executor ex
-    ) =>
+    public NewClassStudentDTO Map(EnrollClassMAPI input, Executor ex) =>
         new()
         {
             ClassId = input.ClassId,
             UserId = input.UserId,
             Executor = ex,
         };
+}
 
-    DeleteClassStudentDTO IMapper<string, ulong, Executor, DeleteClassStudentDTO>.Map(
-        string classId,
-        ulong studentId,
-        Executor ex
-    ) =>
+public sealed class DeleteClassStudentMAPIMapper
+    : IMapper<string, ulong, Executor, DeleteClassStudentDTO>
+{
+    public DeleteClassStudentDTO Map(string classId, ulong studentId, Executor ex) =>
         new()
         {
-            Id = new() { ClassId = classId, UserId = studentId },
+            Id = new UserClassRelationId { ClassId = classId, UserId = studentId },
             Executor = ex,
         };
+}
 
-    ClassStudentUpdateDTO IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>.Map(
-        ClassStudentUpdateMAPI request,
-        Executor ex
-    ) =>
+public sealed class UpdateClassStudentMAPIMapper
+    : IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>
+{
+    public ClassStudentUpdateDTO Map(ClassStudentUpdateMAPI request, Executor ex) =>
         new()
         {
             ClassId = request.ClassId,

@@ -9,48 +9,34 @@ using MinimalAPI.Application.DTOs.Users;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-/// <summary>
-/// Mapeador centralizado para la entidad de Usuario en la capa de la API.
-/// </summary>
-/// <remarks>
-/// Esta clase implementa múltiples interfaces <see cref="IMapper{TIn, TOut}"/> para manejar
-/// las diversas transformaciones entre los DTOs de la API (Minimal API), los DTOs de la capa de aplicación
-/// y las entidades de dominio relacionadas con el usuario.
-/// Su rol es actuar como un "Adaptador" en el contexto de Clean Architecture.
-/// </remarks>
-public sealed class UserMAPIMapper(
-    IMapper<UserType, ulong> roleFromDomainMapper,
-    IMapper<uint, Result<UserType, Unit>> roleUintToDomainMapper,
-    IMapper<Optional<UserType>, int?> optRoleFromDomainMapper,
-    IMapper<int, Result<UserType, Unit>> roleToDomainMapper,
-    IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper,
-    IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> strqFromDomainMapper
-)
-    : IMapper<Executor, ReadUserDTO>,
-        IMapper<UserDomain, PublicUserMAPI>,
-        IMapper<ulong, Executor, DeleteUserDTO>,
-        IMapper<NewUserMAPI, NewUserDTO>,
-        IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>,
-        IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
-        IMapper<UserCriteriaDTO, UserCriteriaMAPI>,
-        IMapper<
-            PaginatedQuery<UserDomain, UserCriteriaDTO>,
-            PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>
-        >
+public sealed class UserReadMAPIMapper : IMapper<Executor, ReadUserDTO>
 {
-    private readonly IMapper<UserType, ulong> _roleFromDomainMapper = roleFromDomainMapper;
-    private readonly IMapper<uint, Result<UserType, Unit>> _roleUintToDomainMapper =
-        roleUintToDomainMapper;
-    private readonly IMapper<int, Result<UserType, Unit>> _roleToDomainMapper = roleToDomainMapper;
-    private readonly IMapper<Optional<UserType>, int?> _optRoleFromDomainMapper =
-        optRoleFromDomainMapper;
-    private readonly IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> _strqFromDomainMapper =
-        strqFromDomainMapper;
-    private readonly IMapper<
-        StringQueryMAPI?,
-        Result<Optional<StringQueryDTO>, Unit>
-    > _strqToDomainMapper = strqToDomainMapper;
+    public ReadUserDTO Map(Executor input) => new() { Id = input.Id, Executor = input };
+}
 
+public sealed class UserMAPIMapper(IMapper<UserType, uint> roleMapper)
+    : IMapper<UserDomain, PublicUserMAPI>
+{
+    /// <summary>
+    /// Mapea una entidad de dominio de usuario a un DTO público para la API.
+    /// </summary>
+    /// <param name="source">La entidad <see cref="UserDomain"/>.</param>
+    /// <returns>Un <see cref="PublicUserMAPI"/> con datos públicos del usuario.</returns>
+    public PublicUserMAPI Map(UserDomain source) =>
+        new()
+        {
+            Id = source.Id,
+            FirstName = source.FirstName,
+            FatherLastname = source.FatherLastname,
+            Email = source.Email,
+            MotherLastname = source.MotherLastname.ToNullable(),
+            MidName = source.MidName.ToNullable(),
+            Role = roleMapper.Map(source.Role),
+        };
+}
+
+public sealed class NewUserMAPIMapper : IMapper<NewUserMAPI, NewUserDTO>
+{
     /// <summary>
     /// Mapea los datos de un nuevo usuario desde la API y el ejecutor de la acción a un DTO para el caso de uso de creación.
     /// </summary>
@@ -67,24 +53,48 @@ public sealed class UserMAPIMapper(
             MotherLastname = input.MotherLastname.ToOptional(),
             MidName = input.MidName.ToOptional(),
         };
+}
 
-    /// <summary>
-    /// Mapea una entidad de dominio de usuario a un DTO público para la API.
-    /// </summary>
-    /// <param name="source">La entidad <see cref="UserDomain"/>.</param>
-    /// <returns>Un <see cref="PublicUserMAPI"/> con datos públicos del usuario.</returns>
-    public PublicUserMAPI Map(UserDomain source) =>
-        new()
+public sealed class UserUpdateMAPIMapper(IMapper<uint, Result<UserType, Unit>> roleMapper)
+    : IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>
+{
+    public Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>> Map(UserUpdateMAPI input, Executor ex)
+    {
+        var errs = new List<FieldErrorDTO>();
+        var roleValidation = roleMapper.Map(input.Role);
+        roleValidation.IfErr(_ => errs.Add(new() { Field = "role" }));
+
+        if (errs.Count > 0)
+            return errs;
+
+        return new UserUpdateDTO
         {
-            Id = source.Id,
-            FirstName = source.FirstName,
-            FatherLastname = source.FatherLastname,
-            Email = source.Email,
-            MotherLastname = source.MotherLastname.ToNullable(),
-            MidName = source.MidName.ToNullable(),
-            Role = _roleFromDomainMapper.Map(source.Role),
+            Id = input.Id,
+            Active = input.Active,
+            Role = roleValidation.Unwrap(),
+            Email = input.Email,
+            Password = input.Password,
+            FirstName = input.FirstName,
+            FatherLastname = input.FatherLastname,
+            MidName = input.MidName.ToOptional(),
+            MotherLastname = input.MotherLastname.ToOptional(),
+            Executor = ex,
         };
+    }
+}
 
+public sealed class DeleteUserMAPIMapper : IMapper<ulong, Executor, DeleteUserDTO>
+{
+    public DeleteUserDTO Map(ulong userId, Executor ex) => new() { Id = userId, Executor = ex };
+}
+
+public sealed class UserCriteriaMAPIMapper(
+    IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit> strqMapper,
+    IBidirectionalResultMapper<uint?, Optional<UserType>, Unit> roleMapper
+)
+    : IBidirectionalResultMapper<UserCriteriaMAPI, UserCriteriaDTO, IEnumerable<FieldErrorDTO>>,
+        IMapper<UserCriteriaDTO, UserCriteriaMAPI>
+{
     /// <summary>
     /// Valida y mapea los criterios de búsqueda de usuarios desde la API a un DTO para la capa de aplicación.
     /// </summary>
@@ -100,28 +110,20 @@ public sealed class UserMAPIMapper(
     public Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>> Map(UserCriteriaMAPI source)
     {
         var errs = new List<FieldErrorDTO>();
-        var firstNameValidation = _strqToDomainMapper.Map(source.FirstName);
+        var firstNameValidation = strqMapper.Map(source.FirstName);
+        var midNameValidation = strqMapper.Map(source.MidName);
+        var fatherLastnameValidation = strqMapper.Map(source.FatherLastname);
+        var motherLastnameValidation = strqMapper.Map(source.MotherLastname);
+        var emailValidation = strqMapper.Map(source.Email);
+        var passwordValidation = strqMapper.Map(source.Password);
+        var roleValidation = roleMapper.Map(source.Role);
+
         firstNameValidation.IfErr(_ => errs.Add(new() { Field = "fistName" }));
-
-        var midNameValidation = _strqToDomainMapper.Map(source.MidName);
         midNameValidation.IfErr(_ => errs.Add(new() { Field = "midName" }));
-
-        var fatherLastnameValidation = _strqToDomainMapper.Map(source.FatherLastname);
         fatherLastnameValidation.IfErr(_ => errs.Add(new() { Field = "fatherLastname" }));
-
-        var motherLastnameValidation = _strqToDomainMapper.Map(source.MotherLastname);
         motherLastnameValidation.IfErr(_ => errs.Add(new() { Field = "motherLastname" }));
-
-        var emailValidation = _strqToDomainMapper.Map(source.Email);
         emailValidation.IfErr(_ => errs.Add(new() { Field = "email" }));
-
-        var passwordValidation = _strqToDomainMapper.Map(source.Password);
         passwordValidation.IfErr(_ => errs.Add(new() { Field = "password" }));
-
-        var roleValidation = source.Role is null
-            ? Unit.Value
-            : _roleToDomainMapper.Map((int)source.Role);
-
         roleValidation.IfErr(_ => errs.Add(new() { Field = "role" }));
 
         if (errs.Count > 0)
@@ -145,29 +147,34 @@ public sealed class UserMAPIMapper(
         };
     }
 
-    /// <summary>
-    /// Mapea un <see cref="Executor"/> a un <see cref="ReadUserDTO"/> para casos de uso de lectura.
-    /// </summary>
-    /// <param name="input">El <see cref="Executor"/> que realiza la acción.</param>
-    /// <returns>Un <see cref="ReadUserDTO"/> que encapsula al ejecutor.</returns>
-    public ReadUserDTO Map(Executor input) => new() { Id = input.Id, Executor = input };
+    public UserCriteriaMAPI Map(UserCriteriaDTO input) => MapFrom(input);
 
-    public UserCriteriaMAPI Map(UserCriteriaDTO input) =>
+    public UserCriteriaMAPI MapFrom(UserCriteriaDTO input) =>
         new()
         {
             Page = input.Page,
-            Role = _optRoleFromDomainMapper.Map(input.Role),
+            Role = roleMapper.MapFrom(input.Role),
             Active = input.Active.ToNullable(),
-            Email = _strqFromDomainMapper.Map(input.Email),
-            Password = _strqFromDomainMapper.Map(input.Password),
-            FirstName = _strqFromDomainMapper.Map(input.FirstName),
-            FatherLastname = _strqFromDomainMapper.Map(input.FatherLastname),
-            MidName = _strqFromDomainMapper.Map(input.MidName),
-            MotherLastname = _strqFromDomainMapper.Map(input.MotherLastname),
+            Email = strqMapper.MapFrom(input.Email),
+            Password = strqMapper.MapFrom(input.Password),
+            FirstName = strqMapper.MapFrom(input.FirstName),
+            FatherLastname = strqMapper.MapFrom(input.FatherLastname),
+            MidName = strqMapper.MapFrom(input.MidName),
+            MotherLastname = strqMapper.MapFrom(input.MotherLastname),
             CreatedAt = input.CreatedAt.ToNullable(),
             ModifiedAt = input.ModifiedAt.ToNullable(),
         };
+}
 
+public sealed class UserSearchMAPIMapper(
+    IMapper<UserDomain, PublicUserMAPI> usrMapper,
+    IMapper<UserCriteriaDTO, UserCriteriaMAPI> cMapper
+)
+    : IMapper<
+        PaginatedQuery<UserDomain, UserCriteriaDTO>,
+        PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>
+    >
+{
     public PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI> Map(
         PaginatedQuery<UserDomain, UserCriteriaDTO> input
     ) =>
@@ -175,33 +182,7 @@ public sealed class UserMAPIMapper(
         {
             Page = input.Page,
             TotalPages = input.TotalPages,
-            Criteria = Map(input.Criteria),
-            Results = input.Results.Select(Map),
+            Criteria = cMapper.Map(input.Criteria),
+            Results = input.Results.Select(usrMapper.Map),
         };
-
-    public Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>> Map(UserUpdateMAPI input, Executor ex)
-    {
-        var errs = new List<FieldErrorDTO>();
-        var roleValidation = _roleUintToDomainMapper.Map(input.Role);
-        roleValidation.IfErr(_ => errs.Add(new() { Field = "role" }));
-
-        if (errs.Count > 0)
-            return errs;
-
-        return new UserUpdateDTO
-        {
-            Id = input.Id,
-            Active = input.Active,
-            Role = roleValidation.Unwrap(),
-            Email = input.Email,
-            Password = input.Password,
-            FirstName = input.FirstName,
-            FatherLastname = input.FatherLastname,
-            MidName = input.MidName.ToOptional(),
-            MotherLastname = input.MotherLastname.ToOptional(),
-            Executor = ex,
-        };
-    }
-
-    public DeleteUserDTO Map(ulong userId, Executor ex) => new() { Id = userId, Executor = ex };
 }

@@ -48,8 +48,8 @@ public class AddClassUseCaseTest : IDisposable
             20
         );
 
-        var userTypeMapper = new UserTypeMapper();
-        _userMapper = new UserEFMapper(userTypeMapper, userTypeMapper);
+        var userTypeMapper = new UserTypeUintMapper();
+        _userMapper = new UserEFMapper(userTypeMapper);
 
         var classMapper = new ClassEFMapper();
         var professorClassMapper = new ClassProfessorEFMapper();

@@ -4,20 +4,11 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace InterfaceAdapters.Mappers.Users;
 
-public class UserTypeMapper
-    : IMapper<UserType, int>,
-        IMapper<int, Result<UserType, Unit>>,
-        IMapper<UserType, long>,
-        IMapper<long, Result<UserType, Unit>>,
-        IMapper<UserType, ulong>,
-        IMapper<ulong, Result<UserType, Unit>>,
-        IMapper<UserType, string>,
-        IMapper<string, Result<UserType, Unit>>,
-        IMapper<uint, Result<UserType, Unit>>,
-        IMapper<UserType, uint>,
-        IMapper<Optional<UserType>, int?>
+public class UserTypeIntMapper
+    : IBidirectionalResultMapper<int, UserType, Unit>,
+        IMapper<UserType, int>
 {
-    Result<UserType, Unit> IMapper<uint, Result<UserType, Unit>>.Map(uint input) =>
+    public Result<UserType, Unit> Map(int input) =>
         input switch
         {
             0 => UserType.STUDENT,
@@ -26,7 +17,9 @@ public class UserTypeMapper
             _ => Unit.Value,
         };
 
-    uint IMapper<UserType, uint>.Map(UserType input) =>
+    public int Map(UserType input) => MapFrom(input);
+
+    public int MapFrom(UserType input) =>
         input switch
         {
             UserType.STUDENT => 0,
@@ -34,17 +27,13 @@ public class UserTypeMapper
             UserType.ADMIN => 2,
             _ => throw new NotImplementedException(),
         };
+}
 
-    int IMapper<UserType, int>.Map(UserType input) =>
-        input switch
-        {
-            UserType.STUDENT => 0,
-            UserType.PROFESSOR => 1,
-            UserType.ADMIN => 2,
-            _ => throw new NotImplementedException(),
-        };
-
-    Result<UserType, Unit> IMapper<int, Result<UserType, Unit>>.Map(int input) =>
+public class UserTypeUintMapper
+    : IBidirectionalResultMapper<uint, UserType, Unit>,
+        IMapper<UserType, uint>
+{
+    public Result<UserType, Unit> Map(uint input) =>
         input switch
         {
             0 => UserType.STUDENT,
@@ -53,7 +42,9 @@ public class UserTypeMapper
             _ => Unit.Value,
         };
 
-    long IMapper<UserType, long>.Map(UserType input) =>
+    public uint Map(UserType input) => MapFrom(input);
+
+    public uint MapFrom(UserType input) =>
         input switch
         {
             UserType.STUDENT => 0,
@@ -61,8 +52,13 @@ public class UserTypeMapper
             UserType.ADMIN => 2,
             _ => throw new NotImplementedException(),
         };
+}
 
-    Result<UserType, Unit> IMapper<long, Result<UserType, Unit>>.Map(long input) =>
+public class UserTypeLongMapper
+    : IBidirectionalResultMapper<long, UserType, Unit>,
+        IMapper<UserType, long>
+{
+    public Result<UserType, Unit> Map(long input) =>
         input switch
         {
             0 => UserType.STUDENT,
@@ -71,7 +67,9 @@ public class UserTypeMapper
             _ => Unit.Value,
         };
 
-    ulong IMapper<UserType, ulong>.Map(UserType input) =>
+    public long Map(UserType input) => MapFrom(input);
+
+    public long MapFrom(UserType input) =>
         input switch
         {
             UserType.STUDENT => 0,
@@ -79,8 +77,13 @@ public class UserTypeMapper
             UserType.ADMIN => 2,
             _ => throw new NotImplementedException(),
         };
+}
 
-    Result<UserType, Unit> IMapper<ulong, Result<UserType, Unit>>.Map(ulong input) =>
+public class UserTypeUlongMapper
+    : IBidirectionalResultMapper<ulong, UserType, Unit>,
+        IMapper<UserType, ulong>
+{
+    public Result<UserType, Unit> Map(ulong input) =>
         input switch
         {
             0 => UserType.STUDENT,
@@ -89,16 +92,23 @@ public class UserTypeMapper
             _ => Unit.Value,
         };
 
-    string IMapper<UserType, string>.Map(UserType input) =>
+    public ulong Map(UserType input) => MapFrom(input);
+
+    public ulong MapFrom(UserType input) =>
         input switch
         {
-            UserType.STUDENT => "STUDENT",
-            UserType.PROFESSOR => "PROFESSOR",
-            UserType.ADMIN => "ADMIN",
+            UserType.STUDENT => 0,
+            UserType.PROFESSOR => 1,
+            UserType.ADMIN => 2,
             _ => throw new NotImplementedException(),
         };
+}
 
-    Result<UserType, Unit> IMapper<string, Result<UserType, Unit>>.Map(string input) =>
+public class UserTypeStringMapper
+    : IBidirectionalResultMapper<string, UserType, Unit>,
+        IMapper<UserType, string>
+{
+    public Result<UserType, Unit> Map(string input) =>
         input switch
         {
             "STUDENT" => UserType.STUDENT,
@@ -107,5 +117,47 @@ public class UserTypeMapper
             _ => Unit.Value,
         };
 
-    public int? Map(Optional<UserType> input) => input.IsNone ? null : Map(input.Unwrap());
+    public string Map(UserType input) => MapFrom(input);
+
+    public string MapFrom(UserType input) =>
+        input switch
+        {
+            UserType.STUDENT => "STUDENT",
+            UserType.PROFESSOR => "PROFESSOR",
+            UserType.ADMIN => "ADMIN",
+            _ => throw new NotImplementedException(),
+        };
+}
+
+public class OptionalUserTypeUintMapper
+    : IBidirectionalResultMapper<uint?, Optional<UserType>, Unit>,
+        IMapper<Optional<UserType>, uint?>
+{
+    private readonly IBidirectionalResultMapper<uint, UserType, Unit> _mapper;
+
+    public OptionalUserTypeUintMapper(IBidirectionalResultMapper<uint, UserType, Unit> mapper)
+    {
+        _mapper = mapper;
+    }
+
+    public Result<Optional<UserType>, Unit> Map(uint? input)
+    {
+        if (input is null)
+        {
+            return Optional<UserType>.None();
+        }
+
+        return _mapper.Map(input.Value).Match<Result<Optional<UserType>, Unit>>(
+            ok => Optional<UserType>.Some(ok),
+            err => err
+        );
+    }
+
+    public uint? Map(Optional<UserType> input) => MapFrom(input);
+
+    public uint? MapFrom(Optional<UserType> input) =>
+        input.Match<uint?>(
+            some => _mapper.MapFrom(some),
+            () => null
+        );
 }

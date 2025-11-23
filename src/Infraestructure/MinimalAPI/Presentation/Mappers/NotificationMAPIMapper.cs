@@ -7,37 +7,50 @@ using MinimalAPI.Application.DTOs.Notifications;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-public class NotificationMAPIMapper
-    : IMapper<NotificationCriteriaMAPI, NotificationCriteriaDTO>,
-        IMapper<NotificationCriteriaDTO, NotificationCriteriaMAPI>,
-        IMapper<int, ulong, NotificationCriteriaDTO>,
-        IMapper<NotificationDomain, PublicNotificationMAPI>,
-        IMapper<
-            PaginatedQuery<NotificationDomain, NotificationCriteriaDTO>,
-            PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>
-        >
+public sealed class NotificationCriteriaMAPIMapper
+    : IBidirectionalMapper<NotificationCriteriaMAPI, NotificationCriteriaDTO>,
+        IMapper<NotificationCriteriaDTO, NotificationCriteriaMAPI>
+{
+    public NotificationCriteriaMAPI Map(NotificationCriteriaDTO input) => MapFrom(input);
+
+    public NotificationCriteriaDTO Map(NotificationCriteriaMAPI input) =>
+        new()
+        {
+            Page = input.Page,
+            UserId = input.UserId.ToOptional(),
+            ClassId = input.ClassId.ToOptional(),
+        };
+
+    public NotificationCriteriaMAPI MapFrom(NotificationCriteriaDTO input) =>
+        new()
+        {
+            Page = input.Page,
+            UserId = input.UserId.ToNullable(),
+            ClassId = input.ClassId.ToNullable(),
+        };
+}
+
+public sealed class UserNotificationCriteriaMAPIMapper
+    : IMapper<int, ulong, NotificationCriteriaDTO>
 {
     public NotificationCriteriaDTO Map(int page, ulong userId) =>
         new() { Page = page, UserId = userId };
+}
 
-    public NotificationCriteriaDTO Map(NotificationCriteriaMAPI s) =>
-        new()
-        {
-            Page = s.Page,
-            UserId = s.UserId.ToOptional(),
-            ClassId = s.ClassId.ToOptional(),
-        };
-
-    public NotificationCriteriaMAPI Map(NotificationCriteriaDTO s) =>
-        new()
-        {
-            Page = s.Page,
-            UserId = s.UserId.ToNullable(),
-            ClassId = s.ClassId.ToNullable(),
-        };
-
+public sealed class PublicNotificationMAPIMapper : IMapper<NotificationDomain, PublicNotificationMAPI>
+{
     public PublicNotificationMAPI Map(NotificationDomain input) => new() { Title = input.Title };
+}
 
+public sealed class NotificationSearchMAPIMapper(
+    IMapper<NotificationDomain, PublicNotificationMAPI> mapper,
+    IMapper<NotificationCriteriaDTO, NotificationCriteriaMAPI> cMapper
+)
+    : IMapper<
+        PaginatedQuery<NotificationDomain, NotificationCriteriaDTO>,
+        PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>
+    >
+{
     public PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI> Map(
         PaginatedQuery<NotificationDomain, NotificationCriteriaDTO> input
     ) =>
@@ -45,7 +58,7 @@ public class NotificationMAPIMapper
         {
             Page = input.Page,
             TotalPages = input.TotalPages,
-            Criteria = Map(input.Criteria),
-            Results = input.Results.Select(Map),
+            Criteria = cMapper.Map(input.Criteria),
+            Results = input.Results.Select(mapper.Map),
         };
 }

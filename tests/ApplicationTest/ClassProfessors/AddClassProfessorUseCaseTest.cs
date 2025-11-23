@@ -37,8 +37,8 @@ public class AddClassProfessorUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
 
-        var userTypeMapper = new UserTypeMapper();
-        _userMapper = new(userTypeMapper, userTypeMapper);
+        var userTypeMapper = new UserTypeUintMapper();
+        _userMapper = new(userTypeMapper);
 
 
         var userReader = new UserEFReader(_ctx, _userMapper);

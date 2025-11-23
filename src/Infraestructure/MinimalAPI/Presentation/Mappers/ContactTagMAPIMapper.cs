@@ -5,9 +5,21 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-public sealed class ContactTagMAPIMapper
-    : IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>,
-        IMapper<ulong, ulong, string, Executor, DeleteContactTagDTO>
+public sealed class NewContactTagMAPIMapper
+    : IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>
+{
+    public NewContactTagDTO Map(ContactTagIdDTO ct, Executor ex) =>
+        new()
+        {
+            UserId = ct.UserId,
+            AgendaOwnerId = ct.AgendaOwnerId,
+            Tag = ct.Tag,
+            Executor = ex,
+        };
+}
+
+public sealed class DeleteContactTagMAPIMapper
+    : IMapper<ulong, ulong, string, Executor, DeleteContactTagDTO>
 {
     public DeleteContactTagDTO Map(ulong agendaOwnerId, ulong userId, string tag, Executor ex) =>
         new()
@@ -18,18 +30,6 @@ public sealed class ContactTagMAPIMapper
                 AgendaOwnerId = agendaOwnerId,
                 Tag = tag,
             },
-            Executor = ex,
-        };
-
-    NewContactTagDTO IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>.Map(
-        ContactTagIdDTO ct,
-        Executor ex
-    ) =>
-        new()
-        {
-            UserId = ct.UserId,
-            AgendaOwnerId = ct.AgendaOwnerId,
-            Tag = ct.Tag,
             Executor = ex,
         };
 }

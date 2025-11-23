@@ -37,8 +37,8 @@ public class DeleteClassStudentUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        _userMapper = new UserEFMapper(roleMapper);
 
         var studentClassMapper = new ClassStudentEFMapper();
         var professorClassMapper = new ClassProfessorEFMapper();

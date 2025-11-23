@@ -37,8 +37,7 @@ public class AddTestUseCaseTest : IDisposable
 
         var testMapper = new TestEFMapper();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         var testCreator = new TestEFCreator(_ctx, testMapper, testMapper);
         var userReader = new UserEFReader(_ctx, _userMapper);

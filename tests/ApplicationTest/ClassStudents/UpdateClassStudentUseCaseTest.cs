@@ -32,8 +32,8 @@ public class UpdateClassStudentUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        _userMapper = new UserEFMapper(roleMapper);
 
         var studentReader = new ClassStudentsEFReader(_ctx, _classStudentMapper);
         var updater = new ClassStudentsEFUpdater(_ctx, _classStudentMapper, _classStudentMapper);

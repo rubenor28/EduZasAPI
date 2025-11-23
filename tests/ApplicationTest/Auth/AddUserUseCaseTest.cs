@@ -31,8 +31,8 @@ public class AddUserUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var hasher = new BCryptHasher();
-        var roleMapper = new UserTypeMapper();
-        var mapper = new UserEFMapper(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        var mapper = new UserEFMapper(roleMapper);
         var creator = new UserEFCreator(_ctx, mapper, mapper);
         var querier = new UserEFQuerier(_ctx, mapper, 10);
         var validator = new NewUserFluentValidator();

@@ -33,8 +33,7 @@ public class UserEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        var mapper = new UserEFMapper(roleMapper, roleMapper);
+        var mapper = new UserEFMapper(new UserTypeUintMapper());
 
         _creator = new(_ctx, mapper, mapper);
         _updater = new(_ctx, mapper, mapper);

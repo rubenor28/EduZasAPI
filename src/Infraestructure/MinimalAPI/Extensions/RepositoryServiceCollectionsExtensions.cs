@@ -70,6 +70,7 @@ public static class RepositoryServiceCollectionExtensions
 
         // CLASS PROFESSORS
         s.AddScoped<ICreatorAsync<ClassProfessorDomain, NewClassProfessorDTO>, ClassProfessorsEFCreator>();
+        s.AddScoped<IBulkCreatorAsync<ClassProfessorDomain, NewClassProfessorDTO>, ClassProfessorsEFCreator>();
         s.AddScoped<IUpdaterAsync<ClassProfessorDomain, ClassProfessorUpdateDTO>, ClassProfessorsEFUpdater>();
         s.AddScoped<IReaderAsync<UserClassRelationId, ClassProfessorDomain>, ClassProfessorsEFReader>();
         s.AddScoped<IDeleterAsync<UserClassRelationId, ClassProfessorDomain>, ClassProfessorsEFDeleter>();

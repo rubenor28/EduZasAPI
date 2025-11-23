@@ -34,8 +34,8 @@ public class DeleteContactTagUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        _userMapper = new(roleMapper);
 
         var contactMapper = new ContactEFMapper();
         var contactQuerier = new ContactEFQuerier(_ctx, contactMapper, 10);

@@ -38,8 +38,7 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
 
         _classMapper = new();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         var mapper = new ClassProfessorEFMapper();
 

@@ -30,7 +30,7 @@ public sealed record UserCriteriaMAPI : CriteriaDTO
     /// Optional que contiene el <see cref="UserType"/> para filtrar por rol,
     /// o null si no se desea filtrar por este campo.
     /// </value>
-    public int? Role { get; set; } = null;
+    public uint? Role { get; set; } = null;
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el primer nombre del usuario.

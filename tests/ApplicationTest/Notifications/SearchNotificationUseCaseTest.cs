@@ -51,8 +51,8 @@ public class SearchNotificationUseCaseTest
             userNotificationMapper
         );
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        _userMapper = new UserEFMapper(roleMapper);
         var userQuerier = new UserEFQuerier(_ctx, _userMapper, 10);
 
         _addNotificationUseCase = new AddNotificationUseCase(

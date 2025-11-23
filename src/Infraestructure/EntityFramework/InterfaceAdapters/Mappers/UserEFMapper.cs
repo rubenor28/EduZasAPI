@@ -7,14 +7,12 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers;
 
-public class UserEFMapper(
-    IMapper<uint, Result<UserType, Unit>> userTypeToDomainMapper,
-    IMapper<UserType, uint> userTypeFromDomainMapper
-) : IMapper<User, UserDomain>, IMapper<NewUserDTO, User>, IUpdateMapper<UserUpdateDTO, User>
+public class UserEFMapper(IMapper<UserType, uint> usrtMapper)
+    : IMapper<User, UserDomain>,
+        IMapper<NewUserDTO, User>,
+        IUpdateMapper<UserUpdateDTO, User>
 {
-    private readonly IMapper<uint, Result<UserType, Unit>> _userTypeToDomainMapper =
-        userTypeToDomainMapper;
-    private readonly IMapper<UserType, uint> _userTypeFromDomainMapper = userTypeFromDomainMapper;
+    private readonly IMapper<UserType, uint> _usrtMapper = usrtMapper;
 
     public UserDomain Map(User source) =>
         new()
@@ -29,9 +27,12 @@ public class UserEFMapper(
             CreatedAt = source.CreatedAt,
             ModifiedAt = source.ModifiedAt,
             Password = source.Password,
-            Role = source.Role is null
-                ? UserType.STUDENT
-                : _userTypeToDomainMapper.Map((uint)source.Role).Unwrap(),
+            Role = source.Role switch
+            {
+                1 => UserType.PROFESSOR,
+                2 => UserType.ADMIN,
+                _ => UserType.STUDENT,
+            },
         };
 
     public User Map(NewUserDTO source) =>
@@ -40,7 +41,7 @@ public class UserEFMapper(
             Active = true,
             Email = source.Email,
             Password = source.Password,
-            Role = _userTypeFromDomainMapper.Map(UserType.STUDENT),
+            Role = _usrtMapper.Map(UserType.STUDENT),
             FirstName = source.FirstName,
             FatherLastname = source.FatherLastname,
             MidName = source.MidName.ToNullable(),
@@ -57,6 +58,6 @@ public class UserEFMapper(
         destination.MidName = source.MidName.ToNullable();
         destination.MotherLastname = source.MotherLastname.ToNullable();
         destination.Active = source.Active;
-        destination.Role = _userTypeFromDomainMapper.Map(source.Role);
+        destination.Role = _usrtMapper.Map(source.Role);
     }
 }

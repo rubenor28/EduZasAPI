@@ -43,8 +43,8 @@ public class AddNotificationUseCaseTest : IDisposable
             userNotificationMapper
         );
 
-        var roleMapper = new UserTypeMapper();
-        var userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        var userMapper = new UserEFMapper(roleMapper);
         var classStudentsQuerier = new UserEFQuerier(_ctx, userMapper, 10);
 
         _useCase = new AddNotificationUseCase(

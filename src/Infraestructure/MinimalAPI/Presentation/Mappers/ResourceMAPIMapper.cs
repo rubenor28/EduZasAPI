@@ -8,56 +8,23 @@ using MinimalAPI.Application.DTOs.Resources;
 
 namespace MinimalAPI.Presentation.Mappers;
 
-public sealed class ResourceMAPIMapper(
-    IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>> strqToDomainMapper,
-    IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> strqFromDomainMapper
+public sealed class ResourceCriteriaMAPIMapper(
+    IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit> strqMapper
 )
-    : IMapper<NewResourceMAPI, Executor, NewResourceDTO>,
-        IMapper<ResourceDomain, PublicResourceMAPI>,
-        IMapper<ulong, Executor, DeleteResourceDTO>,
-        IMapper<ResourceCriteriaDTO, ResourceCriteriaMAPI>,
-        IMapper<Optional<ResourceCriteriaDTO>, ResourceCriteriaMAPI?>,
-        IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>,
-        IMapper<ResourceCriteriaMAPI, Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>>,
-        IMapper<PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>, PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>
-{
-    private readonly IMapper<
-        StringQueryMAPI?,
-        Result<Optional<StringQueryDTO>, Unit>
-    > _strqToDomainMapper = strqToDomainMapper;
-
-    private readonly IMapper<Optional<StringQueryDTO>, StringQueryMAPI?> _strqFromDomainMapper =
-        strqFromDomainMapper;
-
-    NewResourceDTO IMapper<NewResourceMAPI, Executor, NewResourceDTO>.Map(
-        NewResourceMAPI value,
-        Executor ex
-    ) =>
-        new()
-        {
-            Title = value.Title,
-            Content = value.Content,
-            ProfessorId = value.ProfessorId,
-            Executor = ex,
-        };
-
-    public PublicResourceMAPI Map(ResourceDomain input) =>
-        new()
-        {
-            Id = input.Id,
-            Active = input.Active,
-            Title = input.Title,
-            Content = input.Content,
-            ProfessorId = input.ProfessorId,
-        };
-
-    Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>> IMapper<
+    : IBidirectionalResultMapper<
         ResourceCriteriaMAPI,
-        Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>
-    >.Map(ResourceCriteriaMAPI input)
+        ResourceCriteriaDTO,
+        IEnumerable<FieldErrorDTO>
+    >,
+        IMapper<ResourceCriteriaDTO, ResourceCriteriaMAPI>
+{
+    private readonly IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit> _strqMapper =
+        strqMapper;
+
+    public Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>> Map(ResourceCriteriaMAPI input)
     {
         var errors = new List<FieldErrorDTO>();
-        var titleValidation = _strqToDomainMapper.Map(input.Title);
+        var titleValidation = _strqMapper.Map(input.Title);
         titleValidation.IfErr(_ => errors.Add(new() { Field = "title" }));
 
         if (errors.Count > 0)
@@ -73,27 +40,54 @@ public sealed class ResourceMAPIMapper(
         };
     }
 
-    PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI> IMapper<
-        PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>,
-        PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>
-    >.Map(PaginatedQuery<ResourceDomain, ResourceCriteriaDTO> input) =>
+    public ResourceCriteriaMAPI Map(ResourceCriteriaDTO input) => MapFrom(input);
+
+    public ResourceCriteriaMAPI MapFrom(ResourceCriteriaDTO input) =>
         new()
         {
+            ClassId = input.ClassId.ToNullable(),
+            ProfessorId = input.ProfessorId.ToNullable(),
             Page = input.Page,
-            TotalPages = input.TotalPages,
-            Criteria = Map(input.Criteria),
-            Results = input.Results.Select(Map),
+            Active = input.Active.ToNullable(),
+            Title = _strqMapper.MapFrom(input.Title),
         };
+}
 
-    DeleteResourceDTO IMapper<ulong, Executor, DeleteResourceDTO>.Map(
-        ulong resourceId,
-        Executor ex
-    ) => new() { Id = resourceId, Executor = ex };
+public sealed class NewResourceMAPIMapper : IMapper<NewResourceMAPI, Executor, NewResourceDTO>
+{
+    public NewResourceDTO Map(NewResourceMAPI value, Executor ex) =>
+        new()
+        {
+            Title = value.Title,
+            Content = value.Content,
+            ProfessorId = value.ProfessorId,
+            Executor = ex,
+        };
+}
 
-    ResourceUpdateDTO IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>.Map(
-        ResourceUpdateMAPI value,
-        Executor ex
-    ) =>
+public sealed class PublicResourceMAPIMapper : IMapper<ResourceDomain, PublicResourceMAPI>
+{
+    public PublicResourceMAPI Map(ResourceDomain input) =>
+        new()
+        {
+            Id = input.Id,
+            Active = input.Active,
+            Title = input.Title,
+            Content = input.Content,
+            ProfessorId = input.ProfessorId,
+        };
+}
+
+public sealed class DeleteResourceMAPIMapper : IMapper<ulong, Executor, DeleteResourceDTO>
+{
+    public DeleteResourceDTO Map(ulong resourceId, Executor ex) =>
+        new() { Id = resourceId, Executor = ex };
+}
+
+public sealed class ResourceUpdateMAPIMapper
+    : IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>
+{
+    public ResourceUpdateDTO Map(ResourceUpdateMAPI value, Executor ex) =>
         new()
         {
             Id = value.Id,
@@ -102,17 +96,25 @@ public sealed class ResourceMAPIMapper(
             Content = value.Content,
             Executor = ex,
         };
+}
 
-    public ResourceCriteriaMAPI Map(ResourceCriteriaDTO input) =>
+public sealed class ResourceSearchMAPIMapper(
+    IMapper<ResourceDomain, PublicResourceMAPI> mapper,
+    IMapper<ResourceCriteriaDTO, ResourceCriteriaMAPI> cMapper
+)
+    : IMapper<
+        PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>,
+        PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>
+    >
+{
+    public PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI> Map(
+        PaginatedQuery<ResourceDomain, ResourceCriteriaDTO> input
+    ) =>
         new()
         {
-            ClassId = input.ClassId.ToNullable(),
-            ProfessorId = input.ProfessorId.ToNullable(),
             Page = input.Page,
-            Active = input.Active.ToNullable(),
-            Title = _strqFromDomainMapper.Map(input.Title),
+            TotalPages = input.TotalPages,
+            Criteria = cMapper.Map(input.Criteria),
+            Results = input.Results.Select(mapper.Map),
         };
-
-    public ResourceCriteriaMAPI? Map(Optional<ResourceCriteriaDTO> input) =>
-        input.IsSome ? Map(input.Unwrap()) : null;
 }

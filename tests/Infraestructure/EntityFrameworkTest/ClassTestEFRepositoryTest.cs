@@ -43,10 +43,9 @@ public class ClassTestEFRepositoryTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var classTestMapper = new ClassTestEFMapper();
-        var userTypeMapper = new UserTypeMapper();
         var classMapper = new ClassEFMapper();
         var testMapper = new TestEFMapper();
-        var userMapper = new UserEFMapper(userTypeMapper, userTypeMapper);
+        var userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         _creator = new(_ctx, classTestMapper, classTestMapper);
         _updater = new(_ctx, classTestMapper, classTestMapper);

@@ -43,8 +43,7 @@ public class TestEFRepositoryTest : IDisposable
         _querier = new(_ctx, testMapper, 10);
         _deleter = new(_ctx, testMapper);
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
     }
 
     private async Task<UserDomain> CreateUser(UserType role = UserType.STUDENT)

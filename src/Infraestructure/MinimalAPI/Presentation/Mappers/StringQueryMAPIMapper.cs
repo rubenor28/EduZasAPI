@@ -7,55 +7,49 @@ using MinimalAPI.Application.DTOs.Common;
 namespace MinimalAPI.Presentation.Mappers;
 
 public class StringQueryMAPIMapper(
-    IMapper<string, Result<StringSearchType, Unit>> searchTypeToDomainMapper,
-    IMapper<StringSearchType, string> searchTypeFromDomainMapper
+    IBidirectionalResultMapper<string, StringSearchType, Unit> stypeMapper
 )
-    : IMapper<StringQueryMAPI, Result<StringQueryDTO, Unit>>,
-        IMapper<StringQueryDTO, StringQueryMAPI>,
-        IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>,
-        IMapper<StringQueryMAPI?, Result<Optional<StringQueryDTO>, Unit>>
+    : IBidirectionalResultMapper<StringQueryMAPI, StringQueryDTO, Unit>,
+        IMapper<StringQueryDTO, StringQueryMAPI>
 {
-    private readonly IMapper<string, Result<StringSearchType, Unit>> _searchTypeToDomainMapper =
-        searchTypeToDomainMapper;
+    private readonly IBidirectionalResultMapper<string, StringSearchType, Unit> _stypeMapper =
+        stypeMapper;
 
-    private readonly IMapper<StringSearchType, string> _searchTypeFromDomainMapper =
-        searchTypeFromDomainMapper;
+    public Result<StringQueryDTO, Unit> Map(StringQueryMAPI input) =>
+        _stypeMapper
+            .Map(input.SearchType)
+            .Match<Result<StringQueryDTO, Unit>>(
+                stype => new StringQueryDTO { SearchType = stype, Text = input.Text },
+                _ => Unit.Value
+            );
 
-    public Result<StringQueryDTO, Unit> Map(StringQueryMAPI source)
-    {
-        ushort errors = 0;
+    public StringQueryMAPI Map(StringQueryDTO input) => MapFrom(input);
 
-        var searchType = _searchTypeToDomainMapper.Map(source.SearchType);
-        searchType.IfErr((_) => errors++);
+    public StringQueryMAPI MapFrom(StringQueryDTO input) =>
+        new() { Text = input.Text, SearchType = _stypeMapper.MapFrom(input.SearchType) };
+}
 
-        if (errors > 0)
-            return Unit.Value;
+public class OptionalStringQueryMAPIMapper(
+    IBidirectionalResultMapper<StringQueryMAPI, StringQueryDTO, Unit> strqMapper
+)
+    : IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit>,
+        IMapper<Optional<StringQueryDTO>, StringQueryMAPI?>
+{
+    private readonly IBidirectionalResultMapper<StringQueryMAPI, StringQueryDTO, Unit> _strqMapper =
+        strqMapper;
 
-        return new StringQueryDTO { SearchType = searchType.Unwrap(), Text = source.Text };
-    }
+    public Result<Optional<StringQueryDTO>, Unit> Map(StringQueryMAPI? input) =>
+        input is null
+            ? Optional<StringQueryDTO>.None()
+            : _strqMapper
+                .Map(input)
+                .Match<Result<Optional<StringQueryDTO>, Unit>>(
+                    input => Optional.Some(input),
+                    _ => Unit.Value
+                );
 
-    public StringQueryMAPI Map(StringQueryDTO source) =>
-        new()
-        {
-            SearchType = _searchTypeFromDomainMapper.Map(source.SearchType),
-            Text = source.Text,
-        };
+    public StringQueryMAPI? Map(Optional<StringQueryDTO> input) => MapFrom(input);
 
-    public StringQueryMAPI? Map(Optional<StringQueryDTO> input) =>
-        input.Match<StringQueryMAPI?>((strQuery) => Map(strQuery), () => null);
-
-    Result<Optional<StringQueryDTO>, Unit> IMapper<
-        StringQueryMAPI?,
-        Result<Optional<StringQueryDTO>, Unit>
-    >.Map(StringQueryMAPI? input)
-    {
-        if (input is null)
-            return Optional<StringQueryDTO>.None();
-
-        var parse = Map(input);
-        if (parse.IsErr)
-            return Unit.Value;
-
-        return Optional<StringQueryDTO>.Some(parse.Unwrap());
-    }
+    public StringQueryMAPI? MapFrom(Optional<StringQueryDTO> input) =>
+        input.Match<StringQueryMAPI?>(value => _strqMapper.MapFrom(value), () => null);
 }

@@ -61,8 +61,7 @@ public class UpdateTestUseCaseTest : IDisposable
 
         _useCase = new UpdateTestUseCase(testUpdater, testReader, testValidator);
 
-        var userTypeMapper = new UserTypeMapper();
-        _userMapper = new(userTypeMapper, userTypeMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
     }
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)

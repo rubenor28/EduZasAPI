@@ -34,8 +34,7 @@ public class QueryTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         var testQuerier = new TestEFQuerier(_ctx, _testMapper, 10);
 

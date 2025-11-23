@@ -33,8 +33,8 @@ public class LoginUseCaseTest : IDisposable
 
         var hasher = new BCryptHasher();
 
-        var roleMapper = new UserTypeMapper();
-        var userMapper = new UserEFMapper(roleMapper, roleMapper);
+        var roleMapper = new UserTypeUintMapper();
+        var userMapper = new UserEFMapper(roleMapper);
 
         var querier = new UserEFQuerier(_ctx, userMapper, 10);
         var credentialsValidator = new UserCredentialsFluentValidator();

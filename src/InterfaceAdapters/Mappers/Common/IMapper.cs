@@ -72,7 +72,6 @@ public interface IMapper<T1, T2, T3, T4, TOut>
     public TOut Map(T1 in1, T2 in2, T3 in3, T4 in4);
 }
 
-
 /// <summary>
 /// Define un contrato para un mapeador que combina tres objetos de entrada en un único objeto de salida.
 /// </summary>

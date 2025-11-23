@@ -49,8 +49,7 @@ public class ReadTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeMapper();
-        _userMapper = new(roleMapper, roleMapper);
+        _userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         var testMapper = new TestEFMapper();
         var testReader = new TestEFReader(_ctx, testMapper);

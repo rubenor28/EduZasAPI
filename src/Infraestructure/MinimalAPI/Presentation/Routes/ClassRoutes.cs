@@ -181,7 +181,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/classes/professors", AddProfessor)
+        app.MapPost("/classes/professor", AddProfessor)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status201Created)
@@ -204,6 +204,24 @@ public static class ClassRoutes
                 op.Responses["404"].Description =
                     "Si no se encontró la clase o el usuario a asignar.";
                 op.Responses["409"].Description = "Si el profesor ya está asignado a esa clase.";
+                return op;
+            });
+
+        app.MapPost("/classes/professors", EnrolledClasses)
+            .WithName("Buscar relaciones clase-professor")
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<UserIdFilter>()
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces<PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Búsqueda de clases inscritas por filtros";
+                op.Description =
+                    "Obtener las clases inscritas de un usuario, la búsuqeda considera el usuario activo como el profesor a considerar para la búsqueda";
+                op.Responses["200"].Description = "Si la búsqueda fue exitosa";
+                op.Responses["400"].Description = "Si el formato de entrada no es adecuado";
+                op.Responses["401"].Description = "Si el usuario no está autenticado";
                 return op;
             });
 
@@ -396,5 +414,17 @@ public static class ClassRoutes
                 ),
             mapResponse: (search) => Results.Ok(responseMapper.Map(search))
         );
+    }
+
+    public static Task<IResult> SearchClassProfessors(
+        ClassProfessorCriteriaMAPI request,
+        SearchClassProfessorUseCase useCase,
+        IMapper<ClassProfessorCriteriaMAPI, ClassProfessorCriteriaDTO> reqMapper,
+        IMapper<PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>, PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>> resMapper,
+        RoutesUtils utils
+        ) {
+      return utils.HandleUseCaseAsync(useCase,
+          mapRequest: () => reqMapper.Map(request),
+          mapResponse: (search) => Results.Ok(resMapper.Map(search)));
     }
 }
