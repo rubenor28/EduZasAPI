@@ -20,9 +20,9 @@ public static class ClassRoutes
 {
     public static RouteGroupBuilder MapClassRoutes(this WebApplication app)
     {
-        var group = app.MapGroup("/").WithTags("Clases");
+        var group = app.MapGroup("/classes").WithTags("Clases");
 
-        app.MapPost("/classes", AddClass)
+        app.MapPost("/", AddClass)
             .WithName("Crear clases")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
@@ -41,7 +41,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPut("/classes", UpdateClass)
+        app.MapPut("/", UpdateClass)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -61,7 +61,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapDelete("/classes/{id}", DeleteClass)
+        app.MapDelete("/{id}", DeleteClass)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -80,7 +80,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/classes/assigned", ProfessorClasses)
+        app.MapPost("/assigned", ProfessorClasses)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<UserIdFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -100,7 +100,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/classes/enrolled", EnrolledClasses)
+        app.MapPost("/enrolled", EnrolledClasses)
             .WithName("Obtener clases inscritas")
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<UserIdFilter>()
@@ -118,7 +118,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/classes/enroll", EnrollClass)
+        app.MapPost("/enroll", EnrollClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -140,7 +140,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapDelete("/classes/enroll/{classId}/{userId:ulong}", UnenrollClass)
+        app.MapDelete("/enroll/{classId}/{userId:ulong}", UnenrollClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -158,7 +158,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPut("/classes/students/relationship", UpdateClassStudent)
+        app.MapPut("/students/relationship", UpdateClassStudent)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -222,6 +222,23 @@ public static class ClassRoutes
                 op.Responses["200"].Description = "Si la búsqueda fue exitosa";
                 op.Responses["400"].Description = "Si el formato de entrada no es adecuado";
                 op.Responses["401"].Description = "Si el usuario no está autenticado";
+
+                return op;
+            });
+
+        app.MapGet("/professor/{classId}/{userId:ulong}", ReadProfessor)
+            .WithName("Leer relacion usuario professor - clase")
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<ClassProfessorDomain>()
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Búsqueda de relacion clase - profesor";
+                op.Responses["200"].Description = "Si la búsqueda fue exitosa";
+                op.Responses["401"].Description = "Si el usuario no está autenticado";
+                op.Responses["403"].Description =
+                    "Si el usuario no cuenta con los permisos adecuados";
+                op.Responses["404"].Description = "Si no se encontró la relación";
+
                 return op;
             });
 
@@ -420,11 +437,47 @@ public static class ClassRoutes
         ClassProfessorCriteriaMAPI request,
         SearchClassProfessorUseCase useCase,
         IMapper<ClassProfessorCriteriaMAPI, ClassProfessorCriteriaDTO> reqMapper,
-        IMapper<PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>, PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>> resMapper,
+        IMapper<
+            PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>,
+            PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>
+        > resMapper,
         RoutesUtils utils
-        ) {
-      return utils.HandleUseCaseAsync(useCase,
-          mapRequest: () => reqMapper.Map(request),
-          mapResponse: (search) => Results.Ok(resMapper.Map(search)));
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(request),
+            mapResponse: (search) => Results.Ok(resMapper.Map(search))
+        );
+    }
+
+    public static Task<IResult> ReadProfessor(
+        string classId,
+        ulong userId,
+        ReadClasspProfessorUseCase useCase,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => new UserClassRelationId { ClassId = classId, UserId = userId },
+            mapResponse: professor => Results.Ok(professor)
+        );
+    }
+
+    public static Task<IResult> RemoveProfessorFromClass(
+        string classId,
+        ulong userId,
+        IMapper<string, ulong, Executor, DeleteClassProfessorDTO> reqMapper,
+        DeleteClassProfessorUseCase useCase,
+        RoutesUtils utils,
+        HttpContext ctx
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(classId, userId, utils.GetExecutorFromContext(ctx)),
+            mapResponse: _ => Results.NoContent()
+        );
     }
 }
