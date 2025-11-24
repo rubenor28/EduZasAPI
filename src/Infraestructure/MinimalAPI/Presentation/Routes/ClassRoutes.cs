@@ -23,7 +23,7 @@ public static class ClassRoutes
     {
         var group = app.MapGroup("/classes").WithTags("Clases");
 
-        app.MapPost("/", AddClass)
+        group.MapPost("/", AddClass)
             .WithName("Crear clases")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
@@ -42,7 +42,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPut("/", UpdateClass)
+        group.MapPut("/", UpdateClass)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -62,7 +62,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapDelete("/{id}", DeleteClass)
+        group.MapDelete("/{id}", DeleteClass)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -81,7 +81,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/assigned", ProfessorClasses)
+        group.MapPost("/assigned", ProfessorClasses)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<UserIdFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -101,7 +101,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/enrolled", EnrolledClasses)
+        group.MapPost("/enrolled", EnrolledClasses)
             .WithName("Obtener clases inscritas")
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<UserIdFilter>()
@@ -119,7 +119,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/enroll", EnrollClass)
+        group.MapPost("/enroll", EnrollClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -141,7 +141,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapDelete("/enroll/{classId}/{userId:ulong}", UnenrollClass)
+        group.MapDelete("/enroll/{classId}/{userId:ulong}", UnenrollClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -159,7 +159,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPut("/students/relationship", UpdateClassStudent)
+        group.MapPut("/students/relationship", UpdateClassStudent)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -182,7 +182,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/classes/professor", AddProfessor)
+        group.MapPost("/professor", AddProfessor)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status201Created)
@@ -208,7 +208,7 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapPost("/classes/professors", EnrolledClasses)
+        group.MapPost("/professors", EnrolledClasses)
             .WithName("Buscar relaciones clase-professor")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<UserIdFilter>()
@@ -227,10 +227,13 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapGet("/professor/{classId}/{userId:ulong}", ReadProfessor)
+        group.MapGet("/professors/{classId}/{userId:ulong}", ReadProfessor)
             .WithName("Leer relacion usuario professor - clase")
             .RequireAuthorization("ProfessorOrAdmin")
             .Produces<ClassProfessorDomain>()
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi(op =>
             {
                 op.Summary = "Búsqueda de relacion clase - profesor";
@@ -243,10 +246,35 @@ public static class ClassRoutes
                 return op;
             });
 
-        app.MapDelete("/professor/{classId}/{userId:ulong}", RemoveProfessorFromClass)
+        group.MapPut("/professors", UpdateProfessor)
+            .WithName("Actualizar la relacion usuario professor - clase")
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<ClassProfessorDomain>(StatusCodes.Status200OK)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Actualizar un la relación profesor - clase.";
+                op.Description = "Modifica los datos de una relación profesor - clase.";
+                op.Responses["200"].Description = "Recurso actualizado exitosamente.";
+                op.Responses["400"].Description = "Los datos para la actualización son inválidos.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description = "El usuario no tiene permisos para modificar este recurso.";
+                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                return op;
+            });
+
+        group.MapDelete("/professors/{classId}/{userId:ulong}", RemoveProfessorFromClass)
             .WithName("Eliminar relacion usuario professor - clase")
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi(op =>
             {
                 op.Summary = "Eliminacion de relacion clase - profesor";
@@ -471,7 +499,7 @@ public static class ClassRoutes
     public static Task<IResult> ReadProfessor(
         string classId,
         ulong userId,
-        [FromServices] ReadClasspProfessorUseCase useCase,
+        [FromServices] ReadClassProfessorUseCase useCase,
         [FromServices] RoutesUtils utils
     )
     {

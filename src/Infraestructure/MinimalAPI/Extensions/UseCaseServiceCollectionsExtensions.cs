@@ -56,6 +56,7 @@ public static class UseCaseServiceCollectionExtensions
         s.AddTransient<AddClassProfessorUseCase>();
         s.AddTransient<UpdateClassProfessorUseCase>();
         s.AddTransient<DeleteClassProfessorUseCase>();
+        s.AddTransient<ReadClassProfessorUseCase>();
 
         // Notifications
         s.AddTransient<SearchNotificationUseCase>();
