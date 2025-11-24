@@ -89,3 +89,15 @@ public sealed class ClassProfessorsCriteriaMAPIMapper
             UserId = input.UserId.ToOptional(),
         };
 }
+
+public sealed class DeleteClassProfessorMAPIMapper :
+    IMapper<string, ulong, Executor, DeleteClassProfessorDTO>
+{
+    public DeleteClassProfessorDTO Map(string classId, ulong userId, Executor ex)
+        => new()
+        {
+            Id = new()
+            { ClassId = classId, UserId = userId },
+            Executor = ex
+        };
+}

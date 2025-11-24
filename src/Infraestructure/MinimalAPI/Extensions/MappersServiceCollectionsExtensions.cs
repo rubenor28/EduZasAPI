@@ -168,6 +168,7 @@ public static class MapperServiceCollectionExtensions
         // Minimal API
         s.AddSingleton<IMapper<ClassProfessorDomain, ClassProfessorMAPI>, ClassProfessorMAPIMapper>();
         s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>, NewClassProfessorMAPIMapper>();
+        s.AddSingleton<IMapper<string, ulong, Executor, DeleteClassProfessorDTO>, DeleteClassProfessorMAPIMapper>();
         s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>, ClassProfessorUpdateMAPIMapper>();
         s.AddSingleton<IMapper<PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>, PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>>, ClassProfessorSearchMAPIMapper>();
         s.RegisterBidirectionalMapper<ClassProfessorsCriteriaMAPIMapper, ClassProfessorCriteriaMAPI, ClassProfessorCriteriaDTO>();
@@ -233,7 +234,7 @@ public static class MapperServiceCollectionExtensions
         // TESTS
         // EF
         s.RegisterEFMapper<TestEFMapper, NewTestDTO, TestUpdateDTO, TestDomain, Test>();
-        
+
         // Resource
         // EF
         s.RegisterEFMapper<ResourceEFMapper, NewResourceDTO, ResourceUpdateDTO, ResourceDomain, Resource>();

@@ -8,6 +8,7 @@ using Application.UseCases.ClassStudents;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
+using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Classes;
 using MinimalAPI.Application.DTOs.ClassProfessors;
 using MinimalAPI.Application.DTOs.ClassStudents;
@@ -242,6 +243,22 @@ public static class ClassRoutes
                 return op;
             });
 
+        app.MapDelete("/professor/{classId}/{userId:ulong}", RemoveProfessorFromClass)
+            .WithName("Eliminar relacion usuario professor - clase")
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces(StatusCodes.Status204NoContent)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Eliminacion de relacion clase - profesor";
+                op.Responses["204"].Description = "Si la eliminacion fue exitosa";
+                op.Responses["401"].Description = "Si el usuario no está autenticado";
+                op.Responses["403"].Description =
+                    "Si el usuario no cuenta con los permisos adecuados";
+                op.Responses["404"].Description = "Si no se encontró la relación";
+
+                return op;
+            });
+
         return group;
     }
 
@@ -454,8 +471,8 @@ public static class ClassRoutes
     public static Task<IResult> ReadProfessor(
         string classId,
         ulong userId,
-        ReadClasspProfessorUseCase useCase,
-        RoutesUtils utils
+        [FromServices] ReadClasspProfessorUseCase useCase,
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
