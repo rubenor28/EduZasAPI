@@ -6,6 +6,7 @@ using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Resources;
+using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -17,6 +18,7 @@ public static class ResourceRoutes
 
         group.MapPost("/", AddResource)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicResourceMAPI>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -34,6 +36,7 @@ public static class ResourceRoutes
 
         group.MapGet("/{resourceId:guid}", GetResources)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
@@ -49,6 +52,7 @@ public static class ResourceRoutes
 
         group.MapPost("/search", SearchResource)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -64,6 +68,7 @@ public static class ResourceRoutes
 
         group.MapDelete("/{resourceId:guid}", DeleteResource)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -81,6 +86,7 @@ public static class ResourceRoutes
 
         group.MapPut("/", UpdateResource)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)

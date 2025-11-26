@@ -439,11 +439,11 @@ public partial class EduZasDotnetContext : DbContext
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 resourceBuilder.UseCollation("utf8mb4_unicode_ci");
-                resourceBuilder
-                    .Property(e => e.ResourceId)
-                    .HasColumnType("char(36)")
-                    .HasColumnName("resource_id");
-                resourceBuilder
+                                        var resourceIdProperty = resourceBuilder
+                                            .Property(e => e.ResourceId)
+                                            .HasColumnType("char(36)")
+                                            .HasColumnName("resource_id");
+                                                        resourceBuilder
                     .Property(e => e.ProfessorId)
                     .HasColumnType("bigint(20) unsigned")
                     .HasColumnName("professor_id");
