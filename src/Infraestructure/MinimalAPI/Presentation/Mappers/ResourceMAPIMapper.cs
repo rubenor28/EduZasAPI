@@ -78,9 +78,9 @@ public sealed class PublicResourceMAPIMapper : IMapper<ResourceDomain, PublicRes
         };
 }
 
-public sealed class DeleteResourceMAPIMapper : IMapper<ulong, Executor, DeleteResourceDTO>
+public sealed class DeleteResourceMAPIMapper : IMapper<Guid, Executor, DeleteResourceDTO>
 {
-    public DeleteResourceDTO Map(ulong resourceId, Executor ex) =>
+    public DeleteResourceDTO Map(Guid resourceId, Executor ex) =>
         new() { Id = resourceId, Executor = ex };
 }
 

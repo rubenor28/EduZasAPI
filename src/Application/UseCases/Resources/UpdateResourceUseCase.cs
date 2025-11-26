@@ -8,9 +8,9 @@ namespace Application.UseCases.Resources;
 
 public sealed class UpdateResourceUseCase(
     IUpdaterAsync<ResourceDomain, ResourceUpdateDTO> updater,
-    IReaderAsync<ulong, ResourceDomain> reader,
+    IReaderAsync<Guid, ResourceDomain> reader,
     IBusinessValidationService<ResourceUpdateDTO>? validator = null
-) : UpdateUseCase<ulong, ResourceUpdateDTO, ResourceDomain>(updater, reader, validator)
+) : UpdateUseCase<Guid, ResourceUpdateDTO, ResourceDomain>(updater, reader, validator)
 {
-    protected override ulong GetId(ResourceUpdateDTO dto) => dto.Id;
+    protected override Guid GetId(ResourceUpdateDTO dto) => dto.Id;
 }

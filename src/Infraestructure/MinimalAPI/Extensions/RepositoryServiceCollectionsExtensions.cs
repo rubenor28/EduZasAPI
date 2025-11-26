@@ -147,8 +147,8 @@ public static class RepositoryServiceCollectionExtensions
         // Resource
         s.AddScoped<ICreatorAsync<ResourceDomain, NewResourceDTO>, ResourceEFCreator>();
         s.AddScoped<IUpdaterAsync<ResourceDomain, ResourceUpdateDTO>, ResourceEFUpdater>();
-        s.AddScoped<IDeleterAsync<ulong, ResourceDomain>, ResourceEFDeleter>();
-        s.AddScoped<IReaderAsync<ulong, ResourceDomain>, ResourceEFReader>();
+        s.AddScoped<IDeleterAsync<Guid, ResourceDomain>, ResourceEFDeleter>();
+        s.AddScoped<IReaderAsync<Guid, ResourceDomain>, ResourceEFReader>();
         s.AddScoped<IQuerierAsync<ResourceDomain, ResourceCriteriaDTO>>(
             sp => new ResourceEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),

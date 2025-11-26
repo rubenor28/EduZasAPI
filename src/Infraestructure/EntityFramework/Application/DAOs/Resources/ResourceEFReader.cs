@@ -9,9 +9,9 @@ namespace EntityFramework.Application.DAOs.Resources;
 public sealed class ResourceEFReader(
     EduZasDotnetContext ctx,
     IMapper<Resource, ResourceDomain> domainMapper
-) : EFReader<ulong, ResourceDomain, Resource>(ctx, domainMapper)
+) : EFReader<Guid, ResourceDomain, Resource>(ctx, domainMapper)
 {
-    public override async Task<Resource?> GetTrackedById(ulong id) =>
+    public override async Task<Resource?> GetTrackedById(Guid id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

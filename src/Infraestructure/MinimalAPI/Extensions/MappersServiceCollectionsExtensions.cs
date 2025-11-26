@@ -243,7 +243,7 @@ public static class MapperServiceCollectionExtensions
         s.RegisterBidirectionalResultMapper<ResourceCriteriaMAPIMapper, ResourceCriteriaMAPI, ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>();
         s.AddSingleton<IMapper<NewResourceMAPI, Executor, NewResourceDTO>, NewResourceMAPIMapper>();
         s.AddSingleton<IMapper<ResourceDomain, PublicResourceMAPI>, PublicResourceMAPIMapper>();
-        s.AddSingleton<IMapper<ulong, Executor, DeleteResourceDTO>, DeleteResourceMAPIMapper>();
+        s.AddSingleton<IMapper<Guid, Executor, DeleteResourceDTO>, DeleteResourceMAPIMapper>();
         s.AddSingleton<IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>, ResourceUpdateMAPIMapper>();
         s.AddSingleton<IMapper<PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>, PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>, ResourceSearchMAPIMapper>();
 

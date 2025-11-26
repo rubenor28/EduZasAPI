@@ -434,7 +434,7 @@ public partial class EduZasDotnetContext : DbContext
                 resourceBuilder.UseCollation("utf8mb4_unicode_ci");
                 resourceBuilder
                     .Property(e => e.ResourceId)
-                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnType("char(36)")
                     .HasColumnName("resource_id");
                 resourceBuilder
                     .Property(e => e.ProfessorId)
@@ -488,7 +488,7 @@ public partial class EduZasDotnetContext : DbContext
                 resourcePerClassBuilder.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
                 resourcePerClassBuilder.Property(e => e.ResourceId)
-                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnType("char(36)")
                     .HasColumnName("resource_id");
 
                 resourcePerClassBuilder.Property(e => e.CreatedAt)

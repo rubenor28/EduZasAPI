@@ -1,10 +1,8 @@
-using Domain.ValueObjects;
-
 namespace Domain.Entities;
 
 public sealed record ResourceDomain
 {
-    public required ulong Id { get; set; }
+    public required Guid Id { get; set; }
     public required bool Active { get; set; }
     public required string Title { get; set; }
     public required string Content { get; set; }

@@ -32,7 +32,7 @@ public static class ResourceRoutes
                 return op;
             });
 
-        group.MapGet("/{resourceId:ulong}", GetResources)
+        group.MapGet("/{resourceId:guid}", GetResources)
             .RequireAuthorization("ProfessorOrAdmin")
             .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -62,7 +62,7 @@ public static class ResourceRoutes
                 return op;
             });
 
-        group.MapDelete("/{resourceId:ulong}", DeleteResource)
+        group.MapDelete("/{resourceId:guid}", DeleteResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -118,7 +118,7 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> GetResources(
-        ulong resourceId,
+        Guid resourceId,
         ReadResourceUseCase useCase,
         IMapper<ResourceDomain, PublicResourceMAPI> resMapper,
         HttpContext ctx,
@@ -151,9 +151,9 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> DeleteResource(
-        ulong resourceId,
+        Guid resourceId,
         DeleteResourceUseCase useCase,
-        IMapper<ulong, Executor, DeleteResourceDTO> reqMapper,
+        IMapper<Guid, Executor, DeleteResourceDTO> reqMapper,
         IMapper<ResourceDomain, PublicResourceMAPI> resMapper,
         HttpContext ctx,
         RoutesUtils utils

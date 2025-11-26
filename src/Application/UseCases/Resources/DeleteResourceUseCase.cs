@@ -10,10 +10,10 @@ using Domain.ValueObjects;
 namespace Application.UseCases.Resources;
 
 public sealed class DeleteResourceUseCase(
-    IDeleterAsync<ulong, ResourceDomain> deleter,
-    IReaderAsync<ulong, ResourceDomain> reader,
+    IDeleterAsync<Guid, ResourceDomain> deleter,
+    IReaderAsync<Guid, ResourceDomain> reader,
     IBusinessValidationService<DeleteResourceDTO>? validator = null
-) : DeleteUseCase<ulong, DeleteResourceDTO, ResourceDomain>(deleter, reader, validator)
+) : DeleteUseCase<Guid, DeleteResourceDTO, ResourceDomain>(deleter, reader, validator)
 {
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         DeleteResourceDTO value
@@ -38,7 +38,7 @@ public sealed class DeleteResourceUseCase(
         return Unit.Value;
     }
 
-    protected override ulong GetId(DeleteResourceDTO value) => value.Id;
+    protected override Guid GetId(DeleteResourceDTO value) => value.Id;
 
-    protected override ulong GetId(ResourceDomain value) => value.Id;
+    protected override Guid GetId(ResourceDomain value) => value.Id;
 }

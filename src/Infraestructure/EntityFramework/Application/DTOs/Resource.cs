@@ -2,7 +2,7 @@
 
 public partial class Resource
 {
-    public ulong ResourceId { get; set; }
+    public Guid ResourceId { get; set; }
 
     public bool? Active { get; set; }
 
