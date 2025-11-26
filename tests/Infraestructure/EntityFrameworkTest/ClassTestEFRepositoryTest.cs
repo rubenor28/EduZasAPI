@@ -10,7 +10,10 @@ using EntityFramework.Application.DAOs.ClassTests;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassTests;
+using EntityFramework.InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -42,19 +45,19 @@ public class ClassTestEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classTestMapper = new ClassTestEFMapper();
-        var classMapper = new ClassEFMapper();
-        var testMapper = new TestEFMapper();
-        var userMapper = new UserEFMapper(new UserTypeUintMapper());
+        var classTestMapper = new ClassTestProjector();
+        var classMapper = new ClassProjector();
+        var testMapper = new TestProjector();
+        var userMapper = new UserProjector();
 
-        _creator = new(_ctx, classTestMapper, classTestMapper);
-        _updater = new(_ctx, classTestMapper, classTestMapper);
+        _creator = new(_ctx, classTestMapper, new NewClassTestEFMapper());
+        _updater = new(_ctx, classTestMapper, new UpdateClassTestEFMapper());
         _deleter = new(_ctx, classTestMapper);
         _reader = new(_ctx, classTestMapper);
 
-        _classCreator = new(_ctx, classMapper, classMapper);
-        _testCreator = new(_ctx, testMapper, testMapper);
-        _userCreator = new(_ctx, userMapper, userMapper);
+        _classCreator = new(_ctx, classMapper, new NewClassEFMapper());
+        _testCreator = new(_ctx, testMapper, new NewTestEFMapper());
+        _userCreator = new(_ctx, userMapper, new NewUserEFMapper(new UserTypeUintMapper()));
     }
 
     private async Task<UserDomain> CreateSampleProfessor()

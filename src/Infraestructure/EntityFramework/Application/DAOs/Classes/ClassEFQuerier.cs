@@ -3,16 +3,16 @@ using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using EntityFramework.Extensions;
-using InterfaceAdapters.Mappers.Common;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Classes;
 
 public class ClassEFQuerier(
     EduZasDotnetContext ctx,
-    IMapper<Class, ClassDomain> domainMapper,
+    IEFProjector<Class, ClassDomain> projector,
     int pageSize
-) : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>(ctx, domainMapper, pageSize)
+) : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>(ctx, projector, pageSize)
 {
     public override IQueryable<Class> BuildQuery(ClassCriteriaDTO cr) =>
         _dbSet
@@ -40,5 +40,6 @@ public class ClassEFQuerier(
                             sl.StudentId == student.Id
                             && (student.Hidden.IsNone || sl.Hidden == student.Hidden.Unwrap())
                         )
-            ).OrderByDescending(c => c.CreatedAt);
+            )
+            .OrderByDescending(c => c.CreatedAt);
 }

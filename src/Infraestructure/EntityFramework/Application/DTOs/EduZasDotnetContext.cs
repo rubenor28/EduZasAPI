@@ -434,7 +434,7 @@ public partial class EduZasDotnetContext : DbContext
             else
             {
                 resourceBuilder.Property(e => e.Content)
-                    .HasConversion(new JsonElementToStringConverter())
+                    .HasConversion(new JsonNodeToStringConverter())
                     .HasColumnName("content");
             }
             resourceBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
@@ -605,7 +605,7 @@ public partial class EduZasDotnetContext : DbContext
             else
             {
                 testBuilder.Property(e => e.Content)
-                    .HasConversion(new JsonElementToStringConverter())
+                    .HasConversion(new JsonNodeToStringConverter())
                     .HasColumnName("content");
             }
             testBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");

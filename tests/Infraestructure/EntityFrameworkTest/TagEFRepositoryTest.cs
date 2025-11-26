@@ -3,7 +3,7 @@ using Application.DTOs.Tags;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Tags;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,9 +27,9 @@ public class TagEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new TagEFMapper();
+        var mapper = new TagProjector();
 
-        _creator = new(_ctx, mapper, mapper);
+        _creator = new(_ctx, mapper, new NewTagEFMapper());
         _querier = new(_ctx, mapper, 10);
     }
 

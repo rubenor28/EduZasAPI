@@ -6,9 +6,9 @@ using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using FluentValidationProj.Application.Services.Tests;
-using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +20,7 @@ public class AddTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserEFMapper _userMapper;
+    private readonly UserProjector _userMapper;
 
     private readonly Random _random = new();
 
@@ -35,11 +35,11 @@ public class AddTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testMapper = new TestEFMapper();
+        var testMapper = new TestProjector();
 
-        _userMapper = new UserEFMapper(new UserTypeUintMapper());
+        _userMapper = new UserProjector();
 
-        var testCreator = new TestEFCreator(_ctx, testMapper, testMapper);
+        var testCreator = new TestEFCreator(_ctx, testMapper, new NewTestEFMapper());
         var userReader = new UserEFReader(_ctx, _userMapper);
         var testValidator = new NewTestFluentValidator();
 

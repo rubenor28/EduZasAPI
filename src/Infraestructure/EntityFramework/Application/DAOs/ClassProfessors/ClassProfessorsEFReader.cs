@@ -1,25 +1,17 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
-using Microsoft.EntityFrameworkCore;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
 public class ClassProfessorsEFReader(
     EduZasDotnetContext ctx,
-    IMapper<ClassProfessor, ClassProfessorDomain> domainMapper
-)
-    : EFReader<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(
-        ctx,
-        domainMapper
-    )
+    IEFProjector<ClassProfessor, ClassProfessorDomain> projector
+) : EFReader<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(ctx, projector)
 {
-    public override async Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
-        await _dbSet
-            .AsTracking()
-            .AsQueryable()
-            .Where(cs => cs.ProfessorId == id.UserId)
-            .Where(cs => cs.ClassId == id.ClassId)
-            .FirstOrDefaultAsync();
+    protected override Expression<Func<ClassProfessor, bool>> GetIdPredicate(
+        UserClassRelationId id
+    ) => cs => cs.ProfessorId == id.UserId && cs.ClassId == id.ClassId;
 }

@@ -2,7 +2,7 @@ using Application.DTOs.Tests;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.EntityFrameworkCore;
 

@@ -3,12 +3,11 @@ using Application.DTOs.Common;
 using Application.UseCases.ClassProfessors;
 using Domain.Entities;
 using Domain.Enums;
-using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
-using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,8 +18,8 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
     private readonly UpdateClassProfessorUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper = new();
+    private readonly UserProjector _userMapper = new();
+    private readonly ClassProjector _classMapper = new();
     private readonly Random _rdm = new();
 
     public UpdateClassProfessorUseCaseTest()
@@ -33,16 +32,13 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
-
-        var professorClassMapper = new ClassProfessorEFMapper();
+        var professorClassMapper = new ClassProfessorProjector();
 
         var reader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
         var updater = new ClassProfessorsEFUpdater(
             _ctx,
             professorClassMapper,
-            professorClassMapper
+            new UpdateClassProfessorEFMapper()
         );
 
         _useCase = new UpdateClassProfessorUseCase(updater, reader, null);

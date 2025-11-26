@@ -7,8 +7,9 @@ using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +21,8 @@ public class AddClassProfessorUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper = new();
+    private readonly UserProjector _userMapper = new();
+    private readonly ClassProjector _classMapper = new();
 
     private readonly Random _random = new();
 
@@ -36,22 +37,17 @@ public class AddClassProfessorUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-
-        var userTypeMapper = new UserTypeUintMapper();
-        _userMapper = new(userTypeMapper);
-
-
         var userReader = new UserEFReader(_ctx, _userMapper);
         var classReader = new ClassEFReader(_ctx, _classMapper);
 
-        var classProfessorMapper = new ClassProfessorEFMapper();
+        var classProfessorMapper = new ClassProfessorProjector();
 
         var professorReader = new ClassProfessorsEFReader(_ctx, classProfessorMapper);
 
         var professorCreator = new ClassProfessorsEFCreator(
             _ctx,
             classProfessorMapper,
-            classProfessorMapper
+            new NewClassProfessorEFMapper()
         );
 
         _useCase = new AddClassProfessorUseCase(

@@ -3,21 +3,16 @@ using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using EntityFramework.Extensions;
-using InterfaceAdapters.Mappers.Common;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Notifications;
 
 public class NotificationEFQuerier(
     EduZasDotnetContext ctx,
-    IMapper<Notification, NotificationDomain> domainMapper,
+    IEFProjector<Notification, NotificationDomain> projector,
     int pageSize
-)
-    : EFQuerier<NotificationDomain, NotificationCriteriaDTO, Notification>(
-        ctx,
-        domainMapper,
-        pageSize
-    )
+) : EFQuerier<NotificationDomain, NotificationCriteriaDTO, Notification>(ctx, projector, pageSize)
 {
     public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO cr) =>
         _dbSet

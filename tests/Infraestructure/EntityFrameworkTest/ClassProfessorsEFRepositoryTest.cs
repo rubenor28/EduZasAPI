@@ -4,8 +4,9 @@ using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +21,8 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
     private readonly ClassProfessorsEFUpdater _updater;
     private readonly ClassProfessorsEFDeleter _deleter;
 
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper;
+    private readonly UserProjector _userMapper = new();
+    private readonly ClassProjector _classMapper = new();
 
     private readonly Random _rdm = new();
 
@@ -38,13 +39,11 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
 
         _classMapper = new();
 
-        _userMapper = new UserEFMapper(new UserTypeUintMapper());
+        var mapper = new ClassProfessorProjector();
 
-        var mapper = new ClassProfessorEFMapper();
-
-        _creator = new(_ctx, mapper, mapper);
+        _creator = new(_ctx, mapper, new NewClassProfessorEFMapper());
         _reader = new(_ctx, mapper);
-        _updater = new(_ctx, mapper, mapper);
+        _updater = new(_ctx, mapper, new UpdateClassProfessorEFMapper());
         _deleter = new(_ctx, mapper);
     }
 
@@ -209,7 +208,8 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var updateDto = new ClassProfessorUpdateDTO
         {
-             ClassId = "non-existent", UserId = 99,
+            ClassId = "non-existent",
+            UserId = 99,
             IsOwner = true,
             Executor = AsExecutor(admin),
         };

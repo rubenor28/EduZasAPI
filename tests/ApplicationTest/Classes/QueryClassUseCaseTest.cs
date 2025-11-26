@@ -1,13 +1,10 @@
-using Application.DAOs;
 using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using Application.UseCases.Classes;
-using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,8 +15,7 @@ public class QueryClassUseCaseTest : IDisposable
     private readonly QueryClassUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper = new();
+    private readonly ClassProjector _classMapper = new();
     private readonly Random _rdm = new();
 
     public QueryClassUseCaseTest()
@@ -32,9 +28,6 @@ public class QueryClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
-
         var querier = new ClassEFQuerier(_ctx, _classMapper, pageSize: 10);
 
         _useCase = new QueryClassUseCase(querier, null);
@@ -43,7 +36,15 @@ public class QueryClassUseCaseTest : IDisposable
     private async Task<User> SeedUser(UserType role = UserType.STUDENT)
     {
         var id = (ulong)_rdm.NextInt64(1, 1_000_000);
-        var user = new User { UserId = id, Email = $"user-{id}@test.com", FirstName = "test", FatherLastname = "test", Password = "test", Role = (uint)role };
+        var user = new User
+        {
+            UserId = id,
+            Email = $"user-{id}@test.com",
+            FirstName = "test",
+            FatherLastname = "test",
+            Password = "test",
+            Role = (uint)role,
+        };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
         return user;
@@ -52,22 +53,37 @@ public class QueryClassUseCaseTest : IDisposable
     private async Task<Class> SeedClass(string name)
     {
         var id = (ulong)_rdm.NextInt64(1, 1_000_000);
-        var cls = new Class { ClassId = $"class-{id}", ClassName = name, Active = true };
+        var cls = new Class
+        {
+            ClassId = $"class-{id}",
+            ClassName = name,
+            Active = true,
+        };
         _ctx.Classes.Add(cls);
         await _ctx.SaveChangesAsync();
         return cls;
     }
-    
+
     private async Task SeedClassProfessor(string classId, ulong professorId, bool isOwner)
     {
-        var relation = new ClassProfessor { ClassId = classId, ProfessorId = professorId, IsOwner = isOwner };
+        var relation = new ClassProfessor
+        {
+            ClassId = classId,
+            ProfessorId = professorId,
+            IsOwner = isOwner,
+        };
         _ctx.ClassProfessors.Add(relation);
         await _ctx.SaveChangesAsync();
     }
 
     private async Task SeedClassStudent(string classId, ulong studentId)
     {
-        var relation = new ClassStudent { ClassId = classId, StudentId = studentId, Hidden = false };
+        var relation = new ClassStudent
+        {
+            ClassId = classId,
+            StudentId = studentId,
+            Hidden = false,
+        };
         _ctx.ClassStudents.Add(relation);
         await _ctx.SaveChangesAsync();
     }
@@ -94,9 +110,9 @@ public class QueryClassUseCaseTest : IDisposable
 
         var criteria = new ClassCriteriaDTO
         {
-            ClassName = new StringQueryDTO { Text = "Class B", SearchType = StringSearchType.EQ }
+            ClassName = new StringQueryDTO { Text = "Class B", SearchType = StringSearchType.EQ },
         };
-        
+
         var result = await _useCase.ExecuteAsync(criteria);
 
         Assert.True(result.IsOk);
@@ -104,7 +120,7 @@ public class QueryClassUseCaseTest : IDisposable
         Assert.Single(classes);
         Assert.Equal(classB.ClassId, classes.First().Id);
     }
-    
+
     [Fact]
     public async Task ExecuteAsync_FilterWithProfessor_ReturnsMatchingClasses()
     {
@@ -117,9 +133,9 @@ public class QueryClassUseCaseTest : IDisposable
 
         var criteria = new ClassCriteriaDTO
         {
-            WithProfessor = new WithProfessorDTO { Id = profA.UserId }
+            WithProfessor = new WithProfessorDTO { Id = profA.UserId },
         };
-        
+
         var result = await _useCase.ExecuteAsync(criteria);
 
         Assert.True(result.IsOk);
@@ -127,7 +143,7 @@ public class QueryClassUseCaseTest : IDisposable
         Assert.Single(classes);
         Assert.Equal(classA.ClassId, classes.First().Id);
     }
-    
+
     [Fact]
     public async Task ExecuteAsync_FilterWithStudent_ReturnsMatchingClasses()
     {
@@ -140,9 +156,9 @@ public class QueryClassUseCaseTest : IDisposable
 
         var criteria = new ClassCriteriaDTO
         {
-            WithStudent = new WithStudentDTO { Id = studentB.UserId }
+            WithStudent = new WithStudentDTO { Id = studentB.UserId },
         };
-        
+
         var result = await _useCase.ExecuteAsync(criteria);
 
         Assert.True(result.IsOk);
@@ -150,17 +166,21 @@ public class QueryClassUseCaseTest : IDisposable
         Assert.Single(classes);
         Assert.Equal(classB.ClassId, classes.First().Id);
     }
-    
+
     [Fact]
     public async Task ExecuteAsync_WithNoMatches_ReturnsEmptyList()
     {
         await SeedClass("Class A");
-        
+
         var criteria = new ClassCriteriaDTO
         {
-            ClassName = new StringQueryDTO { Text = "Non Existent", SearchType = StringSearchType.EQ }
+            ClassName = new StringQueryDTO
+            {
+                Text = "Non Existent",
+                SearchType = StringSearchType.EQ,
+            },
         };
-        
+
         var result = await _useCase.ExecuteAsync(criteria);
 
         Assert.True(result.IsOk);

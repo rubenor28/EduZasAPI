@@ -3,16 +3,16 @@ using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using EntityFramework.Extensions;
-using InterfaceAdapters.Mappers.Common;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Contacts;
 
 public sealed class ContactEFQuerier(
     EduZasDotnetContext ctx,
-    IMapper<AgendaContact, ContactDomain> domainMapper,
+    IEFProjector<AgendaContact, ContactDomain> projector,
     int pageSize
-) : EFQuerier<ContactDomain, ContactCriteriaDTO, AgendaContact>(ctx, domainMapper, pageSize)
+) : EFQuerier<ContactDomain, ContactCriteriaDTO, AgendaContact>(ctx, projector, pageSize)
 {
     public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO criteria)
     {

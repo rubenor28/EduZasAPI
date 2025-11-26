@@ -1,10 +1,9 @@
 using Application.DTOs.Common;
 using Application.DTOs.UserNotifications;
 using Application.UseCases.UserNotifications;
-using Domain.Entities;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,13 +26,13 @@ public class UpdateUserNotificationUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var userNotificationMapper = new UserNotificationEFMapper();
+        var userNotificationMapper = new UserNotificationProjector();
 
         var reader = new UserNotificationEFReader(_ctx, userNotificationMapper);
         var updater = new UserNotificationEFUpdater(
             _ctx,
             userNotificationMapper,
-            userNotificationMapper
+            new UpdateUserNotificationEFMapper()
         );
 
         _useCase = new UpdateUserNotificationUseCase(updater, reader);

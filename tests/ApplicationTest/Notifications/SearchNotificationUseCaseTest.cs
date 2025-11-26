@@ -1,13 +1,14 @@
 ﻿using Application.DTOs.Notifications;
 using Application.UseCases.Notifications;
 using Domain.Entities;
-using Domain.Enums;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.Notifications;
+using EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,8 +23,8 @@ public class SearchNotificationUseCaseTest
 
     private readonly Random _rdm = new();
 
-    private readonly ClassEFMapper _classMapper = new();
-    private readonly UserEFMapper _userMapper;
+    private readonly ClassProjector _classMapper = new();
+    private readonly UserProjector _userMapper;
 
     public SearchNotificationUseCaseTest()
     {
@@ -36,23 +37,22 @@ public class SearchNotificationUseCaseTest
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var notificationMapper = new NotificationEFMapper();
-        var userNotificationMapper = new UserNotificationEFMapper();
+        var notificationMapper = new NotificationProjector();
+        var userNotificationMapper = new UserNotificationProjector();
 
         var notificationCreator = new NotificationEFCreator(
             _ctx,
             notificationMapper,
-            notificationMapper
+            new NewNotificationEFMapper()
         );
 
         var userNotificationCreator = new UserNotificationEFCreator(
             _ctx,
             userNotificationMapper,
-            userNotificationMapper
+            new NewUserNotificationEFMapper()
         );
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
+        _userMapper = new UserProjector();
         var userQuerier = new UserEFQuerier(_ctx, _userMapper, 10);
 
         _addNotificationUseCase = new AddNotificationUseCase(

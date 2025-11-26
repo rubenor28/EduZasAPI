@@ -8,8 +8,11 @@ using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassTests;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.ClassTests;
+using EntityFramework.InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,9 +23,9 @@ public class AddClassTestUseCaseTest : IDisposable
     private readonly AddClassTestUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper = new();
-    private readonly TestEFMapper _testMapper = new();
+    private readonly UserProjector _userMapper = new();
+    private readonly ClassProjector _classMapper = new();
+    private readonly TestProjector _testMapper = new();
     private readonly Random _rdm = new();
 
     public AddClassTestUseCaseTest()
@@ -35,13 +38,10 @@ public class AddClassTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
+        var classTestMapper = new ClassTestProjector();
+        var professorClassMapper = new ClassProfessorProjector();
 
-        var classTestMapper = new ClassTestEFMapper();
-        var professorClassMapper = new ClassProfessorEFMapper();
-
-        var creator = new ClassTestEFCreator(_ctx, classTestMapper, classTestMapper);
+        var creator = new ClassTestEFCreator(_ctx, classTestMapper, new NewClassTestEFMapper());
         var testReader = new TestEFReader(_ctx, _testMapper);
         var classReader = new ClassEFReader(_ctx, _classMapper);
         var classTestReader = new ClassTestEFReader(_ctx, classTestMapper);

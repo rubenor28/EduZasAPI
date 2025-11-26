@@ -3,7 +3,7 @@ using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.ContactTags;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Tag = EntityFramework.Application.DTOs.Tag;
@@ -30,9 +30,9 @@ public class ContactTagEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new ContactTagEFMapper();
+        var mapper = new ContactTagProjector();
 
-        _creator = new(_ctx, mapper, mapper);
+        _creator = new(_ctx, mapper, new NewContactTagEFMapper());
         _reader = new(_ctx, mapper);
         _deleter = new(_ctx, mapper);
     }

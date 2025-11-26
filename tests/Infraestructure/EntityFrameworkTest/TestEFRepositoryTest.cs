@@ -4,8 +4,8 @@ using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +22,7 @@ public class TestEFRepositoryTest : IDisposable
     private readonly TestEFQuerier _querier;
     private readonly TestEFDeleter _deleter;
 
-    private readonly UserEFMapper _userMapper;
+    private readonly UserProjector _userMapper = new();
 
     public TestEFRepositoryTest()
     {
@@ -35,15 +35,13 @@ public class TestEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testMapper = new TestEFMapper();
+        var testMapper = new TestProjector();
 
-        _creator = new(_ctx, testMapper, testMapper);
-        _updater = new(_ctx, testMapper, testMapper);
+        _creator = new(_ctx, testMapper, new NewTestEFMapper());
+        _updater = new(_ctx, testMapper, new UpdateTestEFMapper());
         _reader = new(_ctx, testMapper);
         _querier = new(_ctx, testMapper, 10);
         _deleter = new(_ctx, testMapper);
-
-        _userMapper = new UserEFMapper(new UserTypeUintMapper());
     }
 
     private async Task<UserDomain> CreateUser(UserType role = UserType.STUDENT)
@@ -81,7 +79,7 @@ public class TestEFRepositoryTest : IDisposable
 
         Assert.NotNull(created);
         Assert.Equal(newTest.Title, created.Title);
-        Assert.Equal(newTest.Content, created.Content);
+        Assert.Equal(newTest.Content, created.Content.GetValue<string>());
     }
 
     [Fact]
@@ -112,7 +110,7 @@ public class TestEFRepositoryTest : IDisposable
 
         Assert.NotNull(updatedTest);
         Assert.Equal(update.Title, updatedTest.Title);
-        Assert.Equal(update.Content, updatedTest.Content);
+        Assert.Equal(update.Content, updatedTest.Content.GetValue<string>());
     }
 
     [Fact]

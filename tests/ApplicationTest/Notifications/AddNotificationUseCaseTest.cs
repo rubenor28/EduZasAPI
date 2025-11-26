@@ -4,8 +4,9 @@ using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Notifications;
+using EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,24 +29,22 @@ public class AddNotificationUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var notificationMapper = new NotificationEFMapper();
-        var userNotificationMapper = new UserNotificationEFMapper();
+        var notificationMapper = new NotificationProjector();
+        var userNotificationMapper = new UserNotificationProjector();
 
         var notificationCreator = new NotificationEFCreator(
             _ctx,
             notificationMapper,
-            notificationMapper
+            new NewNotificationEFMapper()
         );
 
         var userNotificationCreator = new UserNotificationEFCreator(
             _ctx,
             userNotificationMapper,
-            userNotificationMapper
+            new NewUserNotificationEFMapper()
         );
 
-        var roleMapper = new UserTypeUintMapper();
-        var userMapper = new UserEFMapper(roleMapper);
-        var classStudentsQuerier = new UserEFQuerier(_ctx, userMapper, 10);
+        var classStudentsQuerier = new UserEFQuerier(_ctx, new UserProjector(), 10);
 
         _useCase = new AddNotificationUseCase(
             notificationCreator,

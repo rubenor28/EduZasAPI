@@ -1,12 +1,12 @@
-using Application.DTOs.Classes;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,8 +22,8 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     private readonly ClassStudentsEFUpdater _updater;
     private readonly ClassStudentsEFDeleter _deleter;
 
-    private readonly ClassEFMapper _classMapper = new();
-    private readonly UserEFMapper _userMapper;
+    private readonly ClassProjector _classMapper = new();
+    private readonly UserProjector _userMapper = new();
 
     public StudentPerClassEFRepositoryTest()
     {
@@ -36,13 +36,11 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new ClassStudentEFMapper();
+        var mapper = new ClassStudentProjector();
 
-        _userMapper = new UserEFMapper(new UserTypeUintMapper());
-
-        _creator = new(_ctx, mapper, mapper);
+        _creator = new(_ctx, mapper, new NewClassStudentEFMapper());
         _reader = new(_ctx, mapper);
-        _updater = new(_ctx, mapper, mapper);
+        _updater = new(_ctx, mapper, new UpdateClassStudentEFMapper());
         _deleter = new(_ctx, mapper);
     }
 

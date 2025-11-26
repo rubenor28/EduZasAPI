@@ -1,20 +1,16 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
-using Microsoft.EntityFrameworkCore;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Notifications;
 
 public class NotificationEFReader(
     EduZasDotnetContext ctx,
-    IMapper<Notification, NotificationDomain> domainMapper
-) : EFReader<ulong, NotificationDomain, Notification>(ctx, domainMapper)
+    IEFProjector<Notification, NotificationDomain> projector
+) : EFReader<ulong, NotificationDomain, Notification>(ctx, projector)
 {
-    public override async Task<Notification?> GetTrackedById(ulong id) =>
-        await _dbSet
-            .AsTracking()
-            .AsQueryable()
-            .Where(n => n.NotificationId == id)
-            .FirstOrDefaultAsync();
+    protected override Expression<Func<Notification, bool>> GetIdPredicate(ulong id) =>
+        n => n.NotificationId == id;
 }

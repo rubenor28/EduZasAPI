@@ -1,14 +1,14 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
-using Microsoft.EntityFrameworkCore;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Classes;
 
-public class ClassEFReader(EduZasDotnetContext ctx, IMapper<Class, ClassDomain> domainMapper)
-    : EFReader<string, ClassDomain, Class>(ctx, domainMapper)
+public class ClassEFReader(EduZasDotnetContext ctx, IEFProjector<Class, ClassDomain> projector)
+    : EFReader<string, ClassDomain, Class>(ctx, projector)
 {
-    public override Task<Class?> GetTrackedById(string id) =>
-        _dbSet.AsTracking().AsQueryable().Where(c => c.ClassId == id).FirstOrDefaultAsync();
+    protected override Expression<Func<Class, bool>> GetIdPredicate(string id) =>
+        c => c.ClassId == id;
 }

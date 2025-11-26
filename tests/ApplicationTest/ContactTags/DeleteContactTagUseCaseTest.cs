@@ -7,12 +7,14 @@ using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Contacts;
+using EntityFramework.InterfaceAdapters.Mappers.ContactTags;
+using EntityFramework.InterfaceAdapters.Mappers.Tags;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationTest.Tags;
+namespace ApplicationTest.ContactTags;
 
 public class DeleteContactTagUseCaseTest : IDisposable
 {
@@ -20,8 +22,8 @@ public class DeleteContactTagUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly DeleteContactTagUseCase _useCase;
 
-    private readonly UserEFMapper _userMapper;
-    private readonly ContactEFMapper _contactMapper = new();
+    private readonly UserProjector _userMapper = new();
+    private readonly ContactProjector _contactMapper = new();
 
     public DeleteContactTagUseCaseTest()
     {
@@ -34,16 +36,12 @@ public class DeleteContactTagUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new(roleMapper);
+        var contactQuerier = new ContactEFQuerier(_ctx, _contactMapper, 10);
 
-        var contactMapper = new ContactEFMapper();
-        var contactQuerier = new ContactEFQuerier(_ctx, contactMapper, 10);
-
-        var tagMapper = new TagEFMapper();
+        var tagMapper = new TagProjector();
         var tagDeleter = new TagEFDeleter(_ctx, tagMapper);
 
-        var contactTagMapper = new ContactTagEFMapper();
+        var contactTagMapper = new ContactTagProjector();
         var contactTagDeleter = new ContactTagEFDeleter(_ctx, contactTagMapper);
         var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
 

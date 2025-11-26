@@ -9,8 +9,10 @@ using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Contacts;
+using EntityFramework.InterfaceAdapters.Mappers.ContactTags;
+using EntityFramework.InterfaceAdapters.Mappers.Tags;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +24,8 @@ public class AddTagToContactUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly AddContactTagUseCase _useCase;
     private readonly ContactEFCreator _contactCreator;
-    private readonly UserEFMapper _userMapper;
+
+    private readonly UserProjector _userMapper = new();
 
     public AddTagToContactUseCaseTest()
     {
@@ -35,21 +38,18 @@ public class AddTagToContactUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new(roleMapper);
-
         var userReader = new UserEFReader(_ctx, _userMapper);
 
-        var contactMapper = new ContactEFMapper();
-        _contactCreator = new ContactEFCreator(_ctx, contactMapper, contactMapper);
+        var contactMapper = new ContactProjector();
+        _contactCreator = new ContactEFCreator(_ctx, contactMapper, new NewContactEFMapper());
         var contactReader = new ContactEFReader(_ctx, contactMapper);
 
-        var tagMapper = new TagEFMapper();
+        var tagMapper = new TagProjector();
         var tagReader = new TagEFReader(_ctx, tagMapper);
-        var tagCreator = new TagEFCreator(_ctx, tagMapper, tagMapper);
+        var tagCreator = new TagEFCreator(_ctx, tagMapper, new NewTagEFMapper());
 
-        var contactTagMapper = new ContactTagEFMapper();
-        var contactTagCreator = new ContactTagEFCreator(_ctx, contactTagMapper, contactTagMapper);
+        var contactTagMapper = new ContactTagProjector();
+        var contactTagCreator = new ContactTagEFCreator(_ctx, contactTagMapper, new NewContactTagEFMapper());
         var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
 
         _useCase = new AddContactTagUseCase(

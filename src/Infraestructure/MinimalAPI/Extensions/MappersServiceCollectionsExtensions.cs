@@ -14,7 +14,18 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
+using EntityFramework.InterfaceAdapters.Mappers.Contacts;
+using EntityFramework.InterfaceAdapters.Mappers.ContactTags;
+using EntityFramework.InterfaceAdapters.Mappers.Notifications;
+using EntityFramework.InterfaceAdapters.Mappers.Resources;
+using EntityFramework.InterfaceAdapters.Mappers.Tags;
+using EntityFramework.InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Common;
 using InterfaceAdapters.Mappers.Users;
 using MinimalAPI.Application.DTOs.Classes;
@@ -95,22 +106,16 @@ public static class MapperServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection RegisterEFMapper<TImp, TNew, TUpdate, TEntity, TEF>(
+    public static IServiceCollection RegisterEFProjector<TImp, TEntity, TEF>(
         this IServiceCollection services
     )
-        where TImp : class, IMapper<TEF, TEntity>, IMapper<TNew, TEF>, IUpdateMapper<TUpdate, TEF>
+        where TImp : class, IEFProjector<TEF, TEntity>
     {
         // 1. Clase Concreta
         services.AddSingleton<TImp>();
 
-        // 2. Interfaz de EF a Dominio.
         services.AddSingleton<IMapper<TEF, TEntity>>(sp => sp.GetRequiredService<TImp>());
-
-        // 3. Interfaz de NewDTO a EF.
-        services.AddSingleton<IMapper<TNew, TEF>>(sp => sp.GetRequiredService<TImp>());
-
-        // 4. Interfaz de UpdateDTO a EF
-        services.AddSingleton<IUpdateMapper<TUpdate, TEF>>(sp => sp.GetRequiredService<TImp>());
+        services.AddSingleton<IEFProjector<TEF, TEntity>>(sp => sp.GetRequiredService<TImp>());
 
         return services;
     }
@@ -136,7 +141,10 @@ public static class MapperServiceCollectionExtensions
         s.RegisterBidirectionalResultMapper<UserTypeUlongMapper, ulong, UserType, Unit>();
         s.RegisterBidirectionalResultMapper<UserTypeStringMapper, string, UserType, Unit>();
         s.RegisterBidirectionalResultMapper<OptionalUserTypeUintMapper, uint?, Optional<UserType>, Unit>();
-        s.RegisterEFMapper<UserEFMapper, NewUserDTO, UserUpdateDTO, UserDomain, User>();
+        s.AddSingleton<IMapper<NewUserDTO, User>, NewUserEFMapper>();
+        s.AddSingleton<IUpdateMapper<UserUpdateDTO, User>, UpdateUserEFMapper>();
+        s.RegisterEFProjector<UserProjector, UserDomain, User>();
+
 
         // Minimal API
         s.AddSingleton<IMapper<Executor, ReadUserDTO>, UserReadMAPIMapper>();
@@ -149,7 +157,9 @@ public static class MapperServiceCollectionExtensions
 
         // CLASSES
         // EF
-        s.RegisterEFMapper<ClassEFMapper, NewClassDTO, ClassUpdateDTO, ClassDomain, Class>();
+        s.AddSingleton<IMapper<NewClassDTO, Class>, NewClassEFMapper>();
+        s.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>, UpdateClassEFMapper>();
+        s.RegisterEFProjector<ClassProjector, ClassDomain, Class>();
 
         //Minimal API
         s.AddSingleton<IMapper<ClassDomain, PublicClassMAPI>, ClassMAPIMapper>();
@@ -163,7 +173,9 @@ public static class MapperServiceCollectionExtensions
 
         // CLASS PROFESSOR
         // EF
-        s.RegisterEFMapper<ClassProfessorEFMapper, NewClassProfessorDTO, ClassProfessorUpdateDTO, ClassProfessorDomain, ClassProfessor>();
+        s.AddSingleton<IMapper<NewClassProfessorDTO, ClassProfessor>, NewClassProfessorEFMapper>();
+        s.AddSingleton<IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>, UpdateClassProfessorEFMapper>();
+        s.RegisterEFProjector<ClassProfessorProjector, ClassProfessorDomain, ClassProfessor>();
 
         // Minimal API
         s.AddSingleton<IMapper<ClassProfessorDomain, ClassProfessorMAPI>, ClassProfessorMAPIMapper>();
@@ -175,7 +187,9 @@ public static class MapperServiceCollectionExtensions
 
         // CLASS STUDENTS
         // EF
-        s.RegisterEFMapper<ClassStudentEFMapper, NewClassStudentDTO, ClassStudentUpdateDTO, ClassStudentDomain, ClassStudent>();
+        s.AddSingleton<IMapper<NewClassStudentDTO, ClassStudent>, NewClassStudentEFMapper>();
+        s.AddSingleton<IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>, UpdateClassStudentEFMapper>();
+        s.RegisterEFProjector<ClassStudentProjector, ClassStudentDomain, ClassStudent>();
 
         // Minimal API
         s.AddSingleton<IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>, NewClassStudentMAPIMapper>();
@@ -184,9 +198,8 @@ public static class MapperServiceCollectionExtensions
 
         // NOTIFICATIONS
         // EF
-        s.AddSingleton<NotificationEFMapper>();
-        s.AddSingleton<IMapper<Notification, NotificationDomain>>(sp => sp.GetRequiredService<NotificationEFMapper>());
-        s.AddSingleton<IMapper<NewNotificationDTO, Notification>>(sp => sp.GetRequiredService<NotificationEFMapper>());
+        s.RegisterEFProjector<NotificationProjector, NotificationDomain, Notification>();
+        s.AddSingleton<IMapper<NewNotificationDTO, Notification>, NewNotificationEFMapper>();
 
         // Minimal API
         s.RegisterBidirectionalMapper<NotificationCriteriaMAPIMapper, NotificationCriteriaMAPI, NotificationCriteriaDTO>();
@@ -196,13 +209,14 @@ public static class MapperServiceCollectionExtensions
 
         // USER NOTIFICATIONS
         // EF
-        s.RegisterEFMapper<UserNotificationEFMapper, NewUserNotificationDTO, UserNotificationUpdateDTO, UserNotificationDomain, NotificationPerUser>();
+        s.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>, NewUserNotificationEFMapper>();
+        s.AddSingleton<IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>, UpdateUserNotificationEFMapper>();
+        s.RegisterEFProjector<UserNotificationProjector, UserNotificationDomain, NotificationPerUser>();
 
         // TAGS
         // EF
-        s.AddSingleton<TagEFMapper>();
-        s.AddSingleton<IMapper<Tag, TagDomain>>(sp => sp.GetRequiredService<TagEFMapper>());
-        s.AddSingleton<IMapper<NewTagDTO, Tag>>(sp => sp.GetRequiredService<TagEFMapper>());
+        s.RegisterEFProjector<TagProjector, TagDomain, Tag>();
+        s.AddSingleton<IMapper<NewTagDTO, Tag>, NewTagEFMapper>();
 
         // Minimal API
         s.RegisterBidirectionalResultMapper<TagCriteriaMAPIMapper, TagCriteriaMAPI, TagCriteriaDTO, IEnumerable<FieldErrorDTO>>();
@@ -211,7 +225,9 @@ public static class MapperServiceCollectionExtensions
 
         // CONTACTS
         // EF
-        s.RegisterEFMapper<ContactEFMapper, NewContactDTO, ContactUpdateDTO, ContactDomain, AgendaContact>();
+        s.AddSingleton<IMapper<NewContactDTO, AgendaContact>, NewContactEFMapper>();
+        s.AddSingleton<IUpdateMapper<ContactUpdateDTO, AgendaContact>, UpdateContactEFMapper>();
+        s.RegisterEFProjector<ContactProjector, ContactDomain, AgendaContact>();
 
         // Minimal API
         s.AddSingleton<IMapper<ContactDomain, PublicContactMAPI>, PublicContactMAPIMapper>();
@@ -223,9 +239,8 @@ public static class MapperServiceCollectionExtensions
 
         // CONTACT TAGS
         // EF
-        s.AddSingleton<ContactTagEFMapper>();
-        s.AddSingleton<IMapper<ContactTag, ContactTagDomain>>(sp => sp.GetRequiredService<ContactTagEFMapper>());
-        s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>>(sp => sp.GetRequiredService<ContactTagEFMapper>());
+        s.RegisterEFProjector<ContactTagProjector, ContactTagDomain, ContactTag>();
+        s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>, NewContactTagEFMapper>();
 
         // Minimal API
         s.AddSingleton<IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>, NewContactTagMAPIMapper>();
@@ -233,11 +248,15 @@ public static class MapperServiceCollectionExtensions
 
         // TESTS
         // EF
-        s.RegisterEFMapper<TestEFMapper, NewTestDTO, TestUpdateDTO, TestDomain, Test>();
+        s.AddSingleton<IMapper<NewTestDTO, Test>, NewTestEFMapper>();
+        s.AddSingleton<IUpdateMapper<TestUpdateDTO, Test>, UpdateTestEFMapper>();
+        s.RegisterEFProjector<TestProjector, TestDomain, Test>();
 
         // Resource
         // EF
-        s.RegisterEFMapper<ResourceEFMapper, NewResourceDTO, ResourceUpdateDTO, ResourceDomain, Resource>();
+        s.AddSingleton<IMapper<NewResourceDTO, Resource>, NewResourceEFMapper>();
+        s.AddSingleton<IUpdateMapper<ResourceUpdateDTO, Resource>, UpdateResourceEFMapper>();
+        s.RegisterEFProjector<ResourceProjector, ResourceDomain, Resource>();
 
         // Minimal API
         s.RegisterBidirectionalResultMapper<ResourceCriteriaMAPIMapper, ResourceCriteriaMAPI, ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>();

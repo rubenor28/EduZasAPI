@@ -23,7 +23,7 @@ using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace MinimalAPI.Extensions;
 
@@ -50,7 +50,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<UserDomain, UserCriteriaDTO>>(
             sp => new UserEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IMapper<User, UserDomain>>(),
+                sp.GetRequiredService<IEFProjector<User, UserDomain>>(),
                 pageSize
             )
         );
@@ -63,7 +63,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ClassDomain, ClassCriteriaDTO>>(
             sp => new ClassEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IMapper<Class, ClassDomain>>(),
+                sp.GetRequiredService<IEFProjector<Class, ClassDomain>>(),
                 pageSize
              )
         );
@@ -89,7 +89,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<NotificationDomain, NotificationCriteriaDTO>>(
             sp => new NotificationEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IMapper<Notification, NotificationDomain>>(),
+                sp.GetRequiredService<IEFProjector<Notification, NotificationDomain>>(),
                 pageSize
             )
         );
@@ -108,7 +108,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>>(
             sp => new TagEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IMapper<Tag, TagDomain>>(),
+                sp.GetRequiredService<IEFProjector<Tag, TagDomain>>(),
                 pageSize
             )
         );
@@ -121,7 +121,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>>(
             sp => new ContactEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IMapper<AgendaContact, ContactDomain>>(),
+                sp.GetRequiredService<IEFProjector<AgendaContact, ContactDomain>>(),
                 pageSize
             )
         );
@@ -139,7 +139,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<TestDomain, TestCriteriaDTO>>(
             sp => new TestEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IMapper<Test, TestDomain>>(),
+                sp.GetRequiredService<IEFProjector<Test, TestDomain>>(),
                 pageSize
             )
         );
@@ -152,7 +152,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ResourceDomain, ResourceCriteriaDTO>>(
             sp => new ResourceEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IMapper<Resource, ResourceDomain>>(),
+                sp.GetRequiredService<IEFProjector<Resource, ResourceDomain>>(),
                 pageSize
             )
         );

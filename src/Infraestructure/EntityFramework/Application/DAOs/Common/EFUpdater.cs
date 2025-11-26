@@ -1,6 +1,6 @@
 using Application.DAOs;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Common;

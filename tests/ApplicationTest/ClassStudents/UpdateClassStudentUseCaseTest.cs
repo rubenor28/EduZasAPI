@@ -5,8 +5,9 @@ using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,9 +18,9 @@ public class UpdateClassStudentUseCaseTest : IDisposable
     private readonly UpdateClassStudentUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper = new();
-    private readonly ClassStudentEFMapper _classStudentMapper = new();
+    private readonly UserProjector _userMapper = new();
+    private readonly ClassProjector _classMapper = new();
+    private readonly ClassStudentProjector _classStudentMapper = new();
     private readonly Random _rdm = new();
 
     public UpdateClassStudentUseCaseTest()
@@ -32,11 +33,8 @@ public class UpdateClassStudentUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
-
         var studentReader = new ClassStudentsEFReader(_ctx, _classStudentMapper);
-        var updater = new ClassStudentsEFUpdater(_ctx, _classStudentMapper, _classStudentMapper);
+        var updater = new ClassStudentsEFUpdater(_ctx, _classStudentMapper, new UpdateClassStudentEFMapper());
 
         _useCase = new UpdateClassStudentUseCase(updater, studentReader, null);
     }

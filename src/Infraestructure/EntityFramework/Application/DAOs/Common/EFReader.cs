@@ -1,23 +1,32 @@
+using System.Linq.Expressions;
 using Application.DAOs;
 using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Common;
 
 public abstract class EFReader<I, DomainEntity, EFEntity>(
     EduZasDotnetContext ctx,
-    IMapper<EFEntity, DomainEntity> domainMapper
-) : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, domainMapper), IReaderAsync<I, DomainEntity>
+    IEFProjector<EFEntity, DomainEntity> projector
+) : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, projector), IReaderAsync<I, DomainEntity>
     where I : notnull
     where EFEntity : class
     where DomainEntity : notnull
 {
+    private readonly IEFProjector<EFEntity, DomainEntity> _projector = projector;
+
     public async Task<Optional<DomainEntity>> GetAsync(I id)
     {
-        var record = await GetTrackedById(id);
-        return record is not null ? _domainMapper.Map(record) : Optional<DomainEntity>.None();
+        var record = await _dbSet
+            .AsNoTracking()
+            .Where(GetIdPredicate(id))
+            .Select(_projector.Projection)
+            .FirstOrDefaultAsync();
+
+        return record is not null ? record : Optional<DomainEntity>.None();
     }
 
-    public abstract Task<EFEntity?> GetTrackedById(I id);
+    protected abstract Expression<Func<EFEntity, bool>> GetIdPredicate(I id);
 }

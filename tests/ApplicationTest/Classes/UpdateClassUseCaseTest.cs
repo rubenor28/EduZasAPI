@@ -5,7 +5,8 @@ using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 using FluentValidationProj.Application.Services.Classes;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -29,14 +30,14 @@ public class UpdateClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classMapper = new ClassEFMapper();
-        var professorRelationMapper = new ClassProfessorEFMapper();
+        var classMapper = new ClassProjector();
+        var professorRelationMapper = new ClassProfessorProjector();
 
         var classUpdateValidator = new ClassUpdateFluentValidator();
 
         var classReader = new ClassEFReader(_ctx, classMapper);
         var professorRelationReader = new ClassProfessorsEFReader(_ctx, professorRelationMapper);
-        var classUpdater = new ClassEFUpdater(_ctx, classMapper, classMapper);
+        var classUpdater = new ClassEFUpdater(_ctx, classMapper, new UpdateClassEFMapper());
 
         _useCase = new UpdateClassUseCase(
             classUpdater,

@@ -5,7 +5,8 @@ using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +19,8 @@ public class QueryTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly TestEFMapper _testMapper = new();
-    private readonly UserEFMapper _userMapper;
+    private readonly TestProjector _testMapper = new();
+    private readonly UserProjector _userMapper = new();
 
     private readonly Random _random = new();
 
@@ -33,8 +34,6 @@ public class QueryTestUseCaseTest : IDisposable
 
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
-
-        _userMapper = new UserEFMapper(new UserTypeUintMapper());
 
         var testQuerier = new TestEFQuerier(_ctx, _testMapper, 10);
 

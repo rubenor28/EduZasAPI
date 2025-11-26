@@ -5,7 +5,8 @@ using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,8 +29,8 @@ public class DeleteClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classMapper = new ClassEFMapper();
-        var classProfessorMapper = new ClassProfessorEFMapper();
+        var classMapper = new ClassProjector();
+        var classProfessorMapper = new ClassProfessorProjector();
 
         var classDeleter = new ClassEFDeleter(_ctx, classMapper);
         var classReader = new ClassEFReader(_ctx, classMapper);

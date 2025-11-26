@@ -1,4 +1,3 @@
-
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.Users;
@@ -11,7 +10,10 @@ using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Contacts;
+using EntityFramework.InterfaceAdapters.Mappers.ContactTags;
+using EntityFramework.InterfaceAdapters.Mappers.Tags;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +25,7 @@ public class AddContactUseCaseTest : IDisposable
     private readonly SqliteConnection _conn;
     private readonly EduZasDotnetContext _ctx;
     private readonly AddContactUseCase _useCase;
-    private readonly UserEFMapper _userMapper;
+    private readonly UserProjector _userMapper = new();
     private readonly UserEFCreator _userCreator;
 
     public AddContactUseCaseTest()
@@ -37,20 +39,22 @@ public class AddContactUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
-
-        var contactMapper = new ContactEFMapper();
-        var contactCreator = new ContactEFCreator(_ctx, contactMapper, contactMapper);
+        var contactMapper = new ContactProjector();
+        var contactCreator = new ContactEFCreator(_ctx, contactMapper, new NewContactEFMapper());
         var userReader = new UserEFReader(_ctx, _userMapper);
         var contactQuerier = new ContactEFQuerier(_ctx, contactMapper, 10);
-        var tagMapper = new TagEFMapper();
+        var tagMapper = new TagProjector();
         var tagReader = new TagEFReader(_ctx, tagMapper);
-        var tagCreator = new TagEFCreator(_ctx, tagMapper, tagMapper);
-        var contactTagMapper = new ContactTagEFMapper();
-        var contactTagCreator = new ContactTagEFCreator(_ctx, contactTagMapper, contactTagMapper);
+        var tagCreator = new TagEFCreator(_ctx, tagMapper, new NewTagEFMapper());
+        var contactTagMapper = new ContactTagProjector();
+        var contactTagCreator = new ContactTagEFCreator(
+            _ctx,
+            contactTagMapper,
+            new NewContactTagEFMapper()
+        );
 
-        _userCreator = new UserEFCreator(_ctx, _userMapper, _userMapper);
+        var newUsrMapper = new NewUserEFMapper(new UserTypeUintMapper());
+        _userCreator = new UserEFCreator(_ctx, _userMapper, newUsrMapper);
 
         _useCase = new AddContactUseCase(
             contactCreator,
@@ -196,7 +200,7 @@ public class AddContactUseCaseTest : IDisposable
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
-    
+
     [Fact]
     public async Task ExecuteAsync_AuthorizedNonAdminExecutor_ReturnsOk()
     {
@@ -248,7 +252,7 @@ public class AddContactUseCaseTest : IDisposable
     {
         var agendaOwner = await CreateUser("owner@example.com");
         var contactUser = await CreateUser("contact@example.com");
-        
+
         // Pre-existing tag
         _ctx.Tags.Add(new Tag { Text = "existing-tag", CreatedAt = DateTime.UtcNow });
         await _ctx.SaveChangesAsync();
@@ -329,4 +333,3 @@ public class AddContactUseCaseTest : IDisposable
         _ctx.Dispose();
     }
 }
-

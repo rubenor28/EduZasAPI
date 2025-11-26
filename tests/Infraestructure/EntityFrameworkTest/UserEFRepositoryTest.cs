@@ -4,7 +4,7 @@ using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -33,10 +33,11 @@ public class UserEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new UserEFMapper(new UserTypeUintMapper());
+        var mapper = new UserProjector();
 
-        _creator = new(_ctx, mapper, mapper);
-        _updater = new(_ctx, mapper, mapper);
+        var roleMapper = new UserTypeUintMapper();
+        _creator = new(_ctx, mapper, new NewUserEFMapper(roleMapper));
+        _updater = new(_ctx, mapper, new UpdateUserEFMapper(roleMapper));
         _reader = new(_ctx, mapper);
         _deleter = new(_ctx, mapper);
         _querier = new(_ctx, mapper, 10);

@@ -1,22 +1,19 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
-using Microsoft.EntityFrameworkCore;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ContactTags;
 
 public sealed class ContactTagEFReader(
     EduZasDotnetContext ctx,
-    IMapper<ContactTag, ContactTagDomain> domainMapper
-) : EFReader<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, domainMapper)
+    IEFProjector<ContactTag, ContactTagDomain> projector
+) : EFReader<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, projector)
 {
-    public override async Task<ContactTag?> GetTrackedById(ContactTagIdDTO id) =>
-        await _dbSet
-            .AsTracking()
-            .AsQueryable()
-            .Where(tpu => tpu.TagText == id.Tag)
-            .Where(tpu => tpu.AgendaOwnerId == id.AgendaOwnerId)
-            .Where(tpu => tpu.UserId == id.UserId)
-            .FirstOrDefaultAsync();
+    protected override Expression<Func<ContactTag, bool>> GetIdPredicate(ContactTagIdDTO id) =>
+        tpu =>
+            tpu.TagText == id.Tag
+            && tpu.AgendaOwnerId == id.AgendaOwnerId
+            && tpu.UserId == id.UserId;
 }

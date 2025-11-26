@@ -1,20 +1,16 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
-using Microsoft.EntityFrameworkCore;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Resources;
 
 public sealed class ResourceEFReader(
     EduZasDotnetContext ctx,
-    IMapper<Resource, ResourceDomain> domainMapper
-) : EFReader<Guid, ResourceDomain, Resource>(ctx, domainMapper)
+    IEFProjector<Resource, ResourceDomain> projector
+) : EFReader<Guid, ResourceDomain, Resource>(ctx, projector)
 {
-    public override async Task<Resource?> GetTrackedById(Guid id) =>
-        await _dbSet
-            .AsTracking()
-            .AsQueryable()
-            .Where(r => r.ResourceId == id)
-            .FirstOrDefaultAsync();
+    protected override Expression<Func<Resource, bool>> GetIdPredicate(Guid id) =>
+        r => r.ResourceId == id;
 }

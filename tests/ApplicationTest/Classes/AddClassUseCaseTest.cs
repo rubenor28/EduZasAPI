@@ -8,9 +8,10 @@ using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using FluentValidationProj.Application.Services.Classes;
-using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,7 @@ public class AddClassUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserEFMapper _userMapper;
+    private readonly UserProjector _userMapper = new();
     private readonly Random _rdm = new();
 
     public AddClassUseCaseTest()
@@ -48,17 +49,14 @@ public class AddClassUseCaseTest : IDisposable
             20
         );
 
-        var userTypeMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(userTypeMapper);
-
-        var classMapper = new ClassEFMapper();
-        var professorClassMapper = new ClassProfessorEFMapper();
-        var classCreator = new ClassEFCreator(_ctx, classMapper, classMapper);
+        var classMapper = new ClassProjector();
+        var professorClassMapper = new ClassProfessorProjector();
+        var classCreator = new ClassEFCreator(_ctx, classMapper, new NewClassEFMapper());
 
         var professorClassCreator = new ClassProfessorsEFCreator(
             _ctx,
             professorClassMapper,
-            professorClassMapper
+            new NewClassProfessorEFMapper()
         );
 
         var classValidator = new NewClassFluentValidator();

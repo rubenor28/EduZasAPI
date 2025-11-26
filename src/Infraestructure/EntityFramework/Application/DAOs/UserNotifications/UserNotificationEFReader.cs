@@ -1,25 +1,17 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
-using Microsoft.EntityFrameworkCore;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.UserNotifications;
 
 public class UserNotificationEFReader(
     EduZasDotnetContext ctx,
-    IMapper<NotificationPerUser, UserNotificationDomain> domainMapper
-)
-    : EFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(
-        ctx,
-        domainMapper
-    )
+    IEFProjector<NotificationPerUser, UserNotificationDomain> projector
+) : EFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(ctx, projector)
 {
-    public override Task<NotificationPerUser?> GetTrackedById(UserNotificationIdDTO id) =>
-        _dbSet
-            .AsTracking()
-            .AsQueryable()
-            .Where(n => n.UserId == id.UserId)
-            .Where(n => n.NotificationId == id.NotificationId)
-            .FirstOrDefaultAsync();
+    protected override Expression<Func<NotificationPerUser, bool>> GetIdPredicate(
+        UserNotificationIdDTO id
+    ) => n => n.UserId == id.UserId && n.NotificationId == id.NotificationId;
 }

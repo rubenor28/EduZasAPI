@@ -7,8 +7,8 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,8 +39,8 @@ public class UpdateTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly TestEFMapper _testMapper = new();
-    private readonly UserEFMapper _userMapper;
+    private readonly TestProjector _testMapper = new();
+    private readonly UserProjector _userMapper = new();
 
     private readonly Random _random = new();
 
@@ -55,13 +55,11 @@ public class UpdateTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testUpdater = new TestEFUpdater(_ctx, _testMapper, _testMapper);
+        var testUpdater = new TestEFUpdater(_ctx, _testMapper, new UpdateTestEFMapper());
         var testReader = new TestEFReader(_ctx, _testMapper);
         var testValidator = new MockTestUpdateValidator();
 
         _useCase = new UpdateTestUseCase(testUpdater, testReader, testValidator);
-
-        _userMapper = new UserEFMapper(new UserTypeUintMapper());
     }
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)

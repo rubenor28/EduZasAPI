@@ -1,21 +1,16 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using InterfaceAdapters.Mappers.Common;
-using Microsoft.EntityFrameworkCore;
+using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassTests;
 
 public sealed class ClassTestEFReader(
     EduZasDotnetContext ctx,
-    IMapper<TestPerClass, ClassTestDomain> domainMapper
-) : EFReader<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, domainMapper)
+    IEFProjector<TestPerClass, ClassTestDomain> projector
+) : EFReader<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, projector)
 {
-    public override async Task<TestPerClass?> GetTrackedById(ClassTestIdDTO id) =>
-        await _dbSet
-            .AsTracking()
-            .AsQueryable()
-            .Where(ct => ct.ClassId == id.ClassId)
-            .Where(ct => ct.TestId == id.TestId)
-            .FirstOrDefaultAsync();
+    protected override Expression<Func<TestPerClass, bool>> GetIdPredicate(ClassTestIdDTO id) =>
+        ct => ct.ClassId == id.ClassId && ct.TestId == id.TestId;
 }

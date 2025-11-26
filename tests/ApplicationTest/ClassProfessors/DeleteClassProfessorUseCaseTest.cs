@@ -5,8 +5,9 @@ using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +18,8 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
     private readonly DeleteClassProfessorUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper = new();
+    private readonly UserProjector _userMapper = new();
+    private readonly ClassProjector _classMapper = new();
     private readonly Random _rdm = new();
 
     public DeleteClassProfessorUseCaseTest()
@@ -31,10 +32,7 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
-
-        var professorClassMapper = new ClassProfessorEFMapper();
+        var professorClassMapper = new ClassProfessorProjector();
 
         var reader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
         var deleter = new ClassProfessorsEFDeleter(_ctx, professorClassMapper);
@@ -45,7 +43,15 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
     {
         var id = (ulong)_rdm.NextInt64(1, 100_000);
-        var user = new User { UserId = id, Email = $"user-{id}@test.com", FirstName = "test", FatherLastname = "test", Password = "test", Role = (uint)role };
+        var user = new User
+        {
+            UserId = id,
+            Email = $"user-{id}@test.com",
+            FirstName = "test",
+            FatherLastname = "test",
+            Password = "test",
+            Role = (uint)role,
+        };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
         return _userMapper.Map(user);
@@ -62,12 +68,18 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
 
     private async Task SeedClassProfessor(string classId, ulong professorId, bool isOwner)
     {
-        var relation = new ClassProfessor { ClassId = classId, ProfessorId = professorId, IsOwner = isOwner };
+        var relation = new ClassProfessor
+        {
+            ClassId = classId,
+            ProfessorId = professorId,
+            IsOwner = isOwner,
+        };
         _ctx.ClassProfessors.Add(relation);
         await _ctx.SaveChangesAsync();
     }
 
-    private static Executor AsExecutor(UserDomain value) => new() { Id = value.Id, Role = value.Role };
+    private static Executor AsExecutor(UserDomain value) =>
+        new() { Id = value.Id, Role = value.Role };
 
     [Fact]
     public async Task ExecuteAsync_AsAdmin_DeletesSuccessfully()
@@ -80,7 +92,7 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var dto = new DeleteClassProfessorDTO
         {
             Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(admin)
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -102,7 +114,7 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var dto = new DeleteClassProfessorDTO
         {
             Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(ownerProfessor)
+            Executor = AsExecutor(ownerProfessor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -124,7 +136,7 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var dto = new DeleteClassProfessorDTO
         {
             Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(nonOwnerProfessor)
+            Executor = AsExecutor(nonOwnerProfessor),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -144,7 +156,7 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var dto = new DeleteClassProfessorDTO
         {
             Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(student)
+            Executor = AsExecutor(student),
         };
 
         var result = await _useCase.ExecuteAsync(dto);
@@ -162,7 +174,7 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var dto = new DeleteClassProfessorDTO
         {
             Id = new() { ClassId = cls.Id, UserId = 999 },
-            Executor = AsExecutor(admin)
+            Executor = AsExecutor(admin),
         };
 
         var result = await _useCase.ExecuteAsync(dto);

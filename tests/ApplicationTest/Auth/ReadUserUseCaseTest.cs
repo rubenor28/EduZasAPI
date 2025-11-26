@@ -1,15 +1,13 @@
+using Application.DTOs.Common;
 using Application.UseCases.Auth;
 using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using FluentValidationProj.Application.Services.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Application.DTOs.Common;
-using Application.Services;
 
 namespace ApplicationTest.Auth;
 
@@ -18,7 +16,7 @@ public class ReadUserUseCaseTest : IDisposable
     private readonly ReadUserUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserEFMapper _userMapper;
+    private readonly UserProjector _userMapper = new();
     private readonly Random _rdm = new();
 
     public ReadUserUseCaseTest()
@@ -30,9 +28,6 @@ public class ReadUserUseCaseTest : IDisposable
         var opts = new DbContextOptionsBuilder<EduZasDotnetContext>().UseSqlite(_conn).Options;
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
-
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new UserEFMapper(roleMapper);
 
         var userReader = new UserEFReader(_ctx, _userMapper);
         var validator = new ULongFluentValidator();

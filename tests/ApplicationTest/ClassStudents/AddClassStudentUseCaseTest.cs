@@ -8,8 +8,10 @@ using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
-using InterfaceAdapters.Mappers.Users;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,8 +23,8 @@ public class AddClassStudentUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserEFMapper _userMapper;
-    private readonly ClassEFMapper _classMapper = new();
+    private readonly UserProjector _userMapper = new();
+    private readonly ClassProjector _classMapper = new();
 
     private readonly Random _rdm = new();
 
@@ -37,17 +39,18 @@ public class AddClassStudentUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var roleMapper = new UserTypeUintMapper();
-        _userMapper = new(roleMapper);
-
-        var studentClassMapper = new ClassStudentEFMapper();
-        var professorClassMapper = new ClassProfessorEFMapper();
+        var studentClassMapper = new ClassStudentProjector();
+        var professorClassMapper = new ClassProfessorProjector();
 
         var userReader = new UserEFReader(_ctx, _userMapper);
         var classReader = new ClassEFReader(_ctx, _classMapper);
         var studentReader = new ClassStudentsEFReader(_ctx, studentClassMapper);
         var professorReader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
-        var creator = new ClassStudentEFCreator(_ctx, studentClassMapper, studentClassMapper);
+        var creator = new ClassStudentEFCreator(
+            _ctx,
+            studentClassMapper,
+            new NewClassStudentEFMapper()
+        );
 
         _useCase = new AddClassStudentUseCase(
             creator,

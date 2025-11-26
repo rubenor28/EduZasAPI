@@ -5,7 +5,7 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Contacts;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,11 +33,11 @@ public class AgendaContactEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new ContactEFMapper();
+        var mapper = new ContactProjector();
 
-        _creator = new(_ctx, mapper, mapper);
+        _creator = new(_ctx, mapper, new NewContactEFMapper());
         _reader = new(_ctx, mapper);
-        _updater = new(_ctx, mapper, mapper);
+        _updater = new(_ctx, mapper, new UpdateContactEFMapper());
         _querier = new(_ctx, mapper, 10);
 
         _user1 = new User

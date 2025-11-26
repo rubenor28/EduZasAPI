@@ -4,7 +4,7 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Classes;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,12 +32,12 @@ public class ClassEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classMapper = new ClassEFMapper();
+        var classMapper = new ClassProjector();
 
         _querier = new(_ctx, classMapper, 10);
         _reader = new(_ctx, classMapper);
-        _creator = new(_ctx, classMapper, classMapper);
-        _updater = new(_ctx, classMapper, classMapper);
+        _creator = new(_ctx, classMapper, new NewClassEFMapper());
+        _updater = new(_ctx, classMapper, new UpdateClassEFMapper());
         _deleter = new(_ctx, classMapper);
     }
 

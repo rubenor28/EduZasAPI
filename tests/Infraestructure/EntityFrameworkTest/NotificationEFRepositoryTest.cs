@@ -1,7 +1,7 @@
 using Application.DTOs.Notifications;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.Notifications;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,9 +26,9 @@ public class NotificationEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new NotificationEFMapper();
+        var mapper = new NotificationProjector();
 
-        _creator = new(_ctx, mapper, mapper);
+        _creator = new(_ctx, mapper, new NewNotificationEFMapper());
         _reader = new(_ctx, mapper);
         _querier = new(_ctx, mapper, 10);
     }

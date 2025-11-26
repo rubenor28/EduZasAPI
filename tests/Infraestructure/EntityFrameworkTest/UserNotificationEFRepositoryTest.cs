@@ -2,7 +2,7 @@ using Application.DTOs.UserNotifications;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers;
+using EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,11 +27,11 @@ public class UserNotificationEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new UserNotificationEFMapper();
+        var mapper = new UserNotificationProjector();
 
-        _creator = new(_ctx, mapper, mapper);
+        _creator = new(_ctx, mapper, new NewUserNotificationEFMapper());
         _reader = new(_ctx, mapper);
-        _updater = new(_ctx, mapper, mapper);
+        _updater = new(_ctx, mapper, new UpdateUserNotificationEFMapper());
     }
 
     private async Task SeedData()

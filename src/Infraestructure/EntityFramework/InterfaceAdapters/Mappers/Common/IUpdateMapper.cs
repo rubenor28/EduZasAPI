@@ -1,4 +1,4 @@
-namespace EntityFramework.InterfaceAdapters.Mappers;
+namespace EntityFramework.InterfaceAdapters.Mappers.Common;
 
 public interface IUpdateMapper<in TSource, in TDestination>
 {
