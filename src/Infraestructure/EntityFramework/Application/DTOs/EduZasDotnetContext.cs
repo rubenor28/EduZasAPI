@@ -1,4 +1,5 @@
 using DotNetEnv;
+using EntityFramework.InterfaceAdapters.ValueConverters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -426,7 +427,16 @@ public partial class EduZasDotnetContext : DbContext
                 .IsRequired()
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("active");
-            resourceBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                resourceBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
+            }
+            else
+            {
+                resourceBuilder.Property(e => e.Content)
+                    .HasConversion(new JsonElementToStringConverter())
+                    .HasColumnName("content");
+            }
             resourceBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
@@ -588,7 +598,16 @@ public partial class EduZasDotnetContext : DbContext
             testBuilder.HasKey(e => e.TestId).HasName("PRIMARY");
             testBuilder.ToTable("tests");
             testBuilder.HasIndex(e => e.ProfessorId, "idx_tests_professor_id");
-            testBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                testBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
+            }
+            else
+            {
+                testBuilder.Property(e => e.Content)
+                    .HasConversion(new JsonElementToStringConverter())
+                    .HasColumnName("content");
+            }
             testBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")

@@ -1,4 +1,6 @@
-﻿namespace EntityFramework.Application.DTOs;
+﻿using System.Text.Json.Nodes;
+
+namespace EntityFramework.Application.DTOs;
 
 public partial class Test
 {
@@ -6,7 +8,7 @@ public partial class Test
 
     public string Title { get; set; } = null!;
 
-    public string Content { get; set; } = null!;
+    public JsonNode Content { get; set; } = null!;
 
     public uint? TimeLimitMinutes { get; set; }
 

@@ -1,4 +1,6 @@
-﻿namespace EntityFramework.Application.DTOs;
+﻿using System.Text.Json.Nodes;
+
+namespace EntityFramework.Application.DTOs;
 
 public partial class Resource
 {
@@ -8,7 +10,7 @@ public partial class Resource
 
     public string Title { get; set; } = null!;
 
-    public string Content { get; set; } = null!;
+    public JsonNode Content { get; set; } = null!;
 
     public ulong ProfessorId { get; set; }
 
