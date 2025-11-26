@@ -137,8 +137,8 @@ public static class ResourceRoutes
         ResourceQueryUseCase useCase,
         IMapper<ResourceCriteriaMAPI, Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
         IMapper<
-            PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>,
-            PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>
+            PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
+            PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
         > resMapper,
         RoutesUtils utils
     )

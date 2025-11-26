@@ -13,7 +13,7 @@ public sealed record ResourceDomain
     public required DateTime ModifiedAt { get; set; }
 }
 
-public sealed record ResourceSummaryDomain
+public sealed record ResourceSummary
 {
     public required Guid Id { get; set; }
     public required bool Active { get; set; }

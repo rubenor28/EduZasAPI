@@ -7,6 +7,6 @@ using Domain.Entities;
 namespace Application.UseCases.Resources;
 
 public sealed class ResourceQueryUseCase(
-    IQuerierAsync<ResourceDomain, ResourceCriteriaDTO> querier,
+    IQuerierAsync<ResourceSummary, ResourceCriteriaDTO> querier,
     IBusinessValidationService<ResourceCriteriaDTO>? validator = null
-) : QueryUseCase<ResourceCriteriaDTO, ResourceDomain>(querier, validator);
+) : QueryUseCase<ResourceCriteriaDTO, ResourceSummary>(querier, validator);

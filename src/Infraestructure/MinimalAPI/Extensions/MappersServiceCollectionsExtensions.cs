@@ -257,6 +257,7 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewResourceDTO, Resource>, NewResourceEFMapper>();
         s.AddSingleton<IUpdateMapper<ResourceUpdateDTO, Resource>, UpdateResourceEFMapper>();
         s.RegisterEFProjector<ResourceProjector, ResourceDomain, Resource>();
+        s.RegisterEFProjector<ResourceSummaryProjector, ResourceSummary, Resource>();
 
         // Minimal API
         s.RegisterBidirectionalResultMapper<ResourceCriteriaMAPIMapper, ResourceCriteriaMAPI, ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>();
@@ -264,7 +265,7 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<ResourceDomain, PublicResourceMAPI>, PublicResourceMAPIMapper>();
         s.AddSingleton<IMapper<Guid, Executor, DeleteResourceDTO>, DeleteResourceMAPIMapper>();
         s.AddSingleton<IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>, ResourceUpdateMAPIMapper>();
-        s.AddSingleton<IMapper<PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>, PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>, ResourceSearchMAPIMapper>();
+        s.AddSingleton<IMapper<PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>, PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>>, ResourceSearchMAPIMapper>();
 
         return s;
     }

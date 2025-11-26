@@ -18,8 +18,11 @@ public sealed class ResourceCriteriaMAPIMapper(
     >,
         IMapper<ResourceCriteriaDTO, ResourceCriteriaMAPI>
 {
-    private readonly IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit> _strqMapper =
-        strqMapper;
+    private readonly IBidirectionalResultMapper<
+        StringQueryMAPI?,
+        Optional<StringQueryDTO>,
+        Unit
+    > _strqMapper = strqMapper;
 
     public Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>> Map(ResourceCriteriaMAPI input)
     {
@@ -99,22 +102,21 @@ public sealed class ResourceUpdateMAPIMapper
 }
 
 public sealed class ResourceSearchMAPIMapper(
-    IMapper<ResourceDomain, PublicResourceMAPI> mapper,
     IMapper<ResourceCriteriaDTO, ResourceCriteriaMAPI> cMapper
 )
     : IMapper<
-        PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>,
-        PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>
+        PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
+        PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
     >
 {
-    public PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI> Map(
-        PaginatedQuery<ResourceDomain, ResourceCriteriaDTO> input
+    public PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI> Map(
+        PaginatedQuery<ResourceSummary, ResourceCriteriaDTO> input
     ) =>
         new()
         {
             Page = input.Page,
             TotalPages = input.TotalPages,
             Criteria = cMapper.Map(input.Criteria),
-            Results = input.Results.Select(mapper.Map),
+            Results = input.Results,
         };
 }

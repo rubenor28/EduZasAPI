@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Resources;
 
-public sealed class ResourceEFQuerier(
+public class ResourceSummaryEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<Resource, ResourceDomain> projector,
+    IEFProjector<Resource, ResourceSummary> projector,
     int pageSize
-) : EFQuerier<ResourceDomain, ResourceCriteriaDTO, Resource>(ctx, projector, pageSize)
+) : EFQuerier<ResourceSummary, ResourceCriteriaDTO, Resource>(ctx, projector, pageSize)
 {
     public override IQueryable<Resource> BuildQuery(ResourceCriteriaDTO criteria) =>
         _dbSet

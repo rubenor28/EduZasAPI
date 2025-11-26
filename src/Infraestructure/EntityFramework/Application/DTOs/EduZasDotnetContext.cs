@@ -427,15 +427,12 @@ public partial class EduZasDotnetContext : DbContext
                 .IsRequired()
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("active");
+            var contentProperty = resourceBuilder.Property(e => e.Content)
+                .HasConversion(new JsonNodeToStringConverter())
+                .HasColumnName("content");
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
-                resourceBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
-            }
-            else
-            {
-                resourceBuilder.Property(e => e.Content)
-                    .HasConversion(new JsonNodeToStringConverter())
-                    .HasColumnName("content");
+                contentProperty.HasColumnType("json");
             }
             resourceBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
 
@@ -598,15 +595,12 @@ public partial class EduZasDotnetContext : DbContext
             testBuilder.HasKey(e => e.TestId).HasName("PRIMARY");
             testBuilder.ToTable("tests");
             testBuilder.HasIndex(e => e.ProfessorId, "idx_tests_professor_id");
+            var contentProperty = testBuilder.Property(e => e.Content)
+                .HasConversion(new JsonNodeToStringConverter())
+                .HasColumnName("content");
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
-                testBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
-            }
-            else
-            {
-                testBuilder.Property(e => e.Content)
-                    .HasConversion(new JsonNodeToStringConverter())
-                    .HasColumnName("content");
+                contentProperty.HasColumnType("json");
             }
             testBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
 

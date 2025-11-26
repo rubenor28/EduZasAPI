@@ -5,8 +5,8 @@ namespace MinimalAPI.Application.DTOs.Resources;
 
 public sealed record ResourceCriteriaMAPI : CriteriaDTO
 {
-    public required StringQueryMAPI? Title { get; set; }
-    public required bool? Active { get; set; }
-    public required ulong? ProfessorId { get; set; }
-    public required string? ClassId { get; set; }
+    public StringQueryMAPI? Title { get; set; }
+    public bool? Active { get; set; }
+    public ulong? ProfessorId { get; set; }
+    public string? ClassId { get; set; }
 }

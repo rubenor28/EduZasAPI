@@ -149,10 +149,10 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IUpdaterAsync<ResourceDomain, ResourceUpdateDTO>, ResourceEFUpdater>();
         s.AddScoped<IDeleterAsync<Guid, ResourceDomain>, ResourceEFDeleter>();
         s.AddScoped<IReaderAsync<Guid, ResourceDomain>, ResourceEFReader>();
-        s.AddScoped<IQuerierAsync<ResourceDomain, ResourceCriteriaDTO>>(
-            sp => new ResourceEFQuerier(
+        s.AddScoped<IQuerierAsync<ResourceSummary, ResourceCriteriaDTO>>(
+            sp => new ResourceSummaryEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Resource, ResourceDomain>>(),
+                sp.GetRequiredService<IEFProjector<Resource, ResourceSummary>>(),
                 pageSize
             )
         );
