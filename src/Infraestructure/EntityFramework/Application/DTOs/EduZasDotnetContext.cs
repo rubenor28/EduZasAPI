@@ -44,7 +44,7 @@ public partial class EduZasDotnetContext : DbContext
     public virtual DbSet<Notification> Notifications { get; set; }
     public virtual DbSet<NotificationPerUser> NotificationPerUsers { get; set; }
     public virtual DbSet<Resource> Resources { get; set; }
-    public virtual DbSet<ResourcePerClass> ResourcesPerClass { get; set; }
+    public virtual DbSet<ClassResource> ClassResources { get; set; }
     public virtual DbSet<Tag> Tags { get; set; }
     public virtual DbSet<ContactTag> ContactTags { get; set; }
     public virtual DbSet<Test> Tests { get; set; }
@@ -481,45 +481,51 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConstraintName("resources_ibfk_1");
         });
 
-        modelBuilder.Entity<ResourcePerClass>(resourcePerClassBuilder =>
+        modelBuilder.Entity<ClassResource>(classResourceBuilder =>
         {
-            resourcePerClassBuilder.HasKey(e => new { e.ClassId, e.ResourceId }).HasName("PRIMARY");
-            resourcePerClassBuilder.ToTable("resources_per_class");
-            resourcePerClassBuilder.HasIndex(e => e.ResourceId, "idx_resources_per_class_resource_id");
+            classResourceBuilder.HasKey(e => new { e.ClassId, e.ResourceId }).HasName("PRIMARY");
+            classResourceBuilder.ToTable("class_resources");
+            classResourceBuilder.HasIndex(e => e.ResourceId, "idx_class_resources_resource_id");
 
-            resourcePerClassBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
+            classResourceBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
+            
+            classResourceBuilder
+                .Property(e => e.Hidden)
+                .IsRequired()
+                .HasColumnName("hidden")
+                .HasDefaultValue(false);
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
-                resourcePerClassBuilder.UseCollation("utf8mb4_unicode_ci");
-                resourcePerClassBuilder.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                classResourceBuilder.UseCollation("utf8mb4_unicode_ci");
+                classResourceBuilder.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
-                resourcePerClassBuilder.Property(e => e.ResourceId)
+                classResourceBuilder.Property(e => e.ResourceId)
                     .HasColumnType("char(36)")
                     .HasColumnName("resource_id");
 
-                resourcePerClassBuilder.Property(e => e.CreatedAt)
+                classResourceBuilder.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
                     .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
             {
-                resourcePerClassBuilder.Property(e => e.ResourceId).HasColumnName("resource_id");
-                resourcePerClassBuilder.Property(e => e.CreatedAt)
+                classResourceBuilder.Property(e => e.ResourceId).HasColumnName("resource_id");
+                classResourceBuilder.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .HasColumnName("created_at");
             }
 
-            resourcePerClassBuilder.HasOne(d => d.Class)
-                .WithMany(p => p.ResourcesPerClass)
+            classResourceBuilder.HasOne(d => d.Class)
+                .WithMany(p => p.ClassResources)
                 .HasForeignKey(d => d.ClassId)
-                .HasConstraintName("resources_per_class_ibfk_1");
+                .HasConstraintName("class_resources_ibfk_1");
 
-            resourcePerClassBuilder.HasOne(d => d.Resource)
-                .WithMany(p => p.ResourcesPerClass)
+            classResourceBuilder.HasOne(d => d.Resource)
+                .WithMany(p => p.ClassResources)
                 .HasForeignKey(d => d.ResourceId)
-                .HasConstraintName("resources_per_class_ibfk_2");
+                .HasConstraintName("class_resources_ibfk_2");
         });
 
         modelBuilder.Entity<Tag>(tagBuilder =>

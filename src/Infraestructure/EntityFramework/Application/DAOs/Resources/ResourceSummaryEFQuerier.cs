@@ -23,6 +23,6 @@ public class ResourceSummaryEFQuerier(
             .WhereStringQuery(criteria.Title, t => t.Title)
             .WhereOptional(
                 criteria.ClassId,
-                id => r => r.ResourcesPerClass.Any(rpc => rpc.ClassId == id)
+                id => r => r.ClassResources.Any(rpc => rpc.ClassId == id)
             );
 }

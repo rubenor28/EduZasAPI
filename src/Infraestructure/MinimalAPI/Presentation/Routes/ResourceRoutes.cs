@@ -1,5 +1,7 @@
+using Application.DTOs.ClassResources;
 using Application.DTOs.Common;
 using Application.DTOs.Resources;
+using Application.UseCases.ClassResource;
 using Application.UseCases.Resources;
 using Domain.Entities;
 using Domain.ValueObjects;
@@ -16,7 +18,8 @@ public static class ResourceRoutes
     {
         var group = app.MapGroup("/resources").WithTags("Recursos académicos");
 
-        group.MapPost("/", AddResource)
+        group
+            .MapPost("/", AddResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicResourceMAPI>(StatusCodes.Status201Created)
@@ -26,15 +29,18 @@ public static class ResourceRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Crear un nuevo recurso académico.";
-                op.Description = "Añade un nuevo recurso y lo asocia a un profesor.";
+                op.Description = "Añade un nuevo recurso.";
                 op.Responses["201"].Description = "Recurso creado exitosamente.";
-                op.Responses["400"].Description = "El ID del profesor no es válido o no se encontró.";
+                op.Responses["400"].Description =
+                    "El ID del profesor no es válido o no se encontró.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
-                op.Responses["403"].Description = "El usuario no tiene permisos para crear recursos para el profesor especificado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para crear recursos para el profesor especificado.";
                 return op;
             });
 
-        group.MapGet("/{resourceId:guid}", GetResources)
+        group
+            .MapGet("/{resourceId:guid}", GetResources)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
@@ -46,14 +52,18 @@ public static class ResourceRoutes
                 op.Description = "Recupera la información de un recurso académico específico.";
                 op.Responses["200"].Description = "Recurso obtenido exitosamente.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
-                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                op.Responses["404"].Description =
+                    "No se encontró un recurso con el ID proporcionado.";
                 return op;
             });
 
-        group.MapPost("/search", SearchResource)
+        group
+            .MapPost("/search", SearchResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>(
+                StatusCodes.Status200OK
+            )
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .WithOpenApi(op =>
@@ -66,7 +76,8 @@ public static class ResourceRoutes
                 return op;
             });
 
-        group.MapDelete("/{resourceId:guid}", DeleteResource)
+        group
+            .MapDelete("/{resourceId:guid}", DeleteResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
@@ -79,12 +90,15 @@ public static class ResourceRoutes
                 op.Description = "Elimina un recurso específico por su ID.";
                 op.Responses["204"].Description = "Recurso eliminado exitosamente.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
-                op.Responses["403"].Description = "El usuario no tiene permisos para eliminar este recurso.";
-                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para eliminar este recurso.";
+                op.Responses["404"].Description =
+                    "No se encontró un recurso con el ID proporcionado.";
                 return op;
             });
 
-        group.MapPut("/", UpdateResource)
+        group
+            .MapPut("/", UpdateResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
@@ -99,8 +113,31 @@ public static class ResourceRoutes
                 op.Responses["200"].Description = "Recurso actualizado exitosamente.";
                 op.Responses["400"].Description = "Los datos para la actualización son inválidos.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
-                op.Responses["403"].Description = "El usuario no tiene permisos para modificar este recurso.";
-                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para modificar este recurso.";
+                op.Responses["404"].Description =
+                    "No se encontró un recurso con el ID proporcionado.";
+                return op;
+            });
+
+        group
+            .MapPost("/", AddClassResource)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Asignar un recurso académico a una clase.";
+                op.Description = "Añade un nuevo recurso.";
+                op.Responses["200"].Description = "Recurso actualizado exitosamente.";
+                op.Responses["400"].Description = "Los datos para la actualización son inválidos.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para modificar este recurso.";
+
                 return op;
             });
 
@@ -141,7 +178,10 @@ public static class ResourceRoutes
     public static Task<IResult> SearchResource(
         ResourceCriteriaMAPI request,
         ResourceQueryUseCase useCase,
-        IMapper<ResourceCriteriaMAPI, Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
+        IMapper<
+            ResourceCriteriaMAPI,
+            Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>
+        > reqMapper,
         IMapper<
             PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
             PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
@@ -185,6 +225,49 @@ public static class ResourceRoutes
             useCase,
             mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
             mapResponse: (resource) => Results.Ok(resMapper.Map(resource))
+        );
+    }
+
+    public static Task<IResult> AddClassResource(
+        ClassResourceIdDTO request,
+        AddClassResourceUseCase useCase,
+        IMapper<ClassResourceIdDTO, Executor, NewClassResourceDTO> reqMapper,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapResponse: _ => Results.NoContent()
+        );
+    }
+
+    public static Task<IResult> DeleteClassResource(
+        ClassResourceIdDTO request,
+        DeleteClassResourceUseCase useCase,
+        IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO> reqMapper,
+        HttpContext ctx,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapResponse: _ => Results.NoContent()
+        );
+    }
+
+    public static Task<IResult> ReadResourceClass(
+        ClassResourceIdDTO request,
+        ReadClassResourceUseCase useCase,
+        RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => request,
+            mapResponse: res => Results.Ok(res)
         );
     }
 }

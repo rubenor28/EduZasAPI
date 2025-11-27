@@ -1,6 +1,7 @@
 using Application.DAOs;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
+using Application.DTOs.ClassResources;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
@@ -13,6 +14,7 @@ using Application.DTOs.Users;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
+using EntityFramework.Application.DAOs.ClassResources;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DAOs.ContactTags;
@@ -156,6 +158,11 @@ public static class RepositoryServiceCollectionExtensions
                 pageSize
             )
         );
+
+        // Class Resource
+        s.AddScoped<ICreatorAsync<ClassResourceDomain, NewClassResourceDTO>, ClassResourceEFCreator>();
+        s.AddScoped<IDeleterAsync<ClassResourceIdDTO, ClassResourceDomain>, ClassResourceEFDeleter>();
+        s.AddScoped<IReaderAsync<ClassResourceIdDTO, ClassResourceDomain>, ClassResourceEFReader>();
 
         return s;
     }

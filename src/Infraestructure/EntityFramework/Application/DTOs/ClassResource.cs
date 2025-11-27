@@ -1,10 +1,12 @@
 namespace EntityFramework.Application.DTOs;
 
-public partial class ResourcePerClass
+public partial class ClassResource
 {
     public string ClassId { get; set; } = null!;
 
     public Guid ResourceId { get; set; }
+
+    public bool Hidden { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

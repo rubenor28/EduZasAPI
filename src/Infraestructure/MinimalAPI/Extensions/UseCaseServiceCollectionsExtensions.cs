@@ -1,6 +1,7 @@
 using Application.UseCases.Auth;
 using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
+using Application.UseCases.ClassResource;
 using Application.UseCases.ClassStudents;
 using Application.UseCases.Contacts;
 using Application.UseCases.ContactTags;
@@ -90,6 +91,11 @@ public static class UseCaseServiceCollectionExtensions
         s.AddTransient<ResourceQueryUseCase>();
         s.AddTransient<DeleteResourceUseCase>();
         s.AddTransient<UpdateResourceUseCase>();
+
+        // Class resource
+        s.AddTransient<AddClassResourceUseCase>();
+        s.AddTransient<DeleteClassResourceUseCase>();
+        s.AddTransient<ReadClassResourceUseCase>();
 
         return s;
     }

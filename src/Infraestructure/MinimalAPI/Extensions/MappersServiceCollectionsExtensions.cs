@@ -1,5 +1,6 @@
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
+using Application.DTOs.ClassResources;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
@@ -16,6 +17,7 @@ using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
 using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.ClassResources;
 using EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
 using EntityFramework.InterfaceAdapters.Mappers.Contacts;
@@ -132,28 +134,56 @@ public static class MapperServiceCollectionExtensions
 
         // String Query DTO
         s.RegisterBidirectionalResultMapper<StringSearchMapper, string, StringSearchType, Unit>();
-        s.RegisterBidirectionalResultMapper<StringQueryMAPIMapper, StringQueryMAPI, StringQueryDTO, Unit>();
-        s.RegisterBidirectionalResultMapper<OptionalStringQueryMAPIMapper, StringQueryMAPI?, Optional<StringQueryDTO>, Unit>();
+        s.RegisterBidirectionalResultMapper<
+            StringQueryMAPIMapper,
+            StringQueryMAPI,
+            StringQueryDTO,
+            Unit
+        >();
+        s.RegisterBidirectionalResultMapper<
+            OptionalStringQueryMAPIMapper,
+            StringQueryMAPI?,
+            Optional<StringQueryDTO>,
+            Unit
+        >();
 
         // USERS
         // EF
         s.RegisterBidirectionalResultMapper<UserTypeUintMapper, uint, UserType, Unit>();
         s.RegisterBidirectionalResultMapper<UserTypeUlongMapper, ulong, UserType, Unit>();
         s.RegisterBidirectionalResultMapper<UserTypeStringMapper, string, UserType, Unit>();
-        s.RegisterBidirectionalResultMapper<OptionalUserTypeUintMapper, uint?, Optional<UserType>, Unit>();
+        s.RegisterBidirectionalResultMapper<
+            OptionalUserTypeUintMapper,
+            uint?,
+            Optional<UserType>,
+            Unit
+        >();
         s.AddSingleton<IMapper<NewUserDTO, User>, NewUserEFMapper>();
         s.AddSingleton<IUpdateMapper<UserUpdateDTO, User>, UpdateUserEFMapper>();
         s.RegisterEFProjector<UserProjector, UserDomain, User>();
-
 
         // Minimal API
         s.AddSingleton<IMapper<Executor, ReadUserDTO>, UserReadMAPIMapper>();
         s.AddSingleton<IMapper<UserDomain, PublicUserMAPI>, UserMAPIMapper>();
         s.AddSingleton<IMapper<NewUserMAPI, NewUserDTO>, NewUserMAPIMapper>();
         s.AddSingleton<IMapper<ulong, Executor, DeleteUserDTO>, DeleteUserMAPIMapper>();
-        s.AddSingleton<IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>, UserUpdateMAPIMapper>();
-        s.RegisterBidirectionalResultMapper<UserCriteriaMAPIMapper, UserCriteriaMAPI, UserCriteriaDTO, IEnumerable<FieldErrorDTO>>();
-        s.AddSingleton<IMapper<PaginatedQuery<UserDomain, UserCriteriaDTO>, PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>>, UserSearchMAPIMapper>();
+        s.AddSingleton<
+            IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>,
+            UserUpdateMAPIMapper
+        >();
+        s.RegisterBidirectionalResultMapper<
+            UserCriteriaMAPIMapper,
+            UserCriteriaMAPI,
+            UserCriteriaDTO,
+            IEnumerable<FieldErrorDTO>
+        >();
+        s.AddSingleton<
+            IMapper<
+                PaginatedQuery<UserDomain, UserCriteriaDTO>,
+                PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>
+            >,
+            UserSearchMAPIMapper
+        >();
 
         // CLASSES
         // EF
@@ -166,35 +196,91 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewClassMAPI, Executor, NewClassDTO>, NewClassMAPIMapper>();
         s.AddSingleton<IMapper<string, Executor, DeleteClassDTO>, DeleteClassMAPIMapper>();
         s.AddSingleton<IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO>, ClassUpdateMAPIMapper>();
-        s.RegisterBidirectionalMapper<WithStudentMAPIMapper, WithStudentMAPI?, Optional<WithStudentDTO>>();
-        s.RegisterBidirectionalMapper<WithProfessorMAPIMapper, WithProfessorMAPI?, Optional<WithProfessorDTO>>();
-        s.RegisterBidirectionalResultMapper<ClassCriteriaMAPIMapper, ClassCriteriaMAPI, ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>();
-        s.AddSingleton<IMapper<PaginatedQuery<ClassDomain, ClassCriteriaDTO>, PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>, ClassSearchMAPIMapper>();
+        s.RegisterBidirectionalMapper<
+            WithStudentMAPIMapper,
+            WithStudentMAPI?,
+            Optional<WithStudentDTO>
+        >();
+        s.RegisterBidirectionalMapper<
+            WithProfessorMAPIMapper,
+            WithProfessorMAPI?,
+            Optional<WithProfessorDTO>
+        >();
+        s.RegisterBidirectionalResultMapper<
+            ClassCriteriaMAPIMapper,
+            ClassCriteriaMAPI,
+            ClassCriteriaDTO,
+            IEnumerable<FieldErrorDTO>
+        >();
+        s.AddSingleton<
+            IMapper<
+                PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
+                PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+            >,
+            ClassSearchMAPIMapper
+        >();
 
         // CLASS PROFESSOR
         // EF
         s.AddSingleton<IMapper<NewClassProfessorDTO, ClassProfessor>, NewClassProfessorEFMapper>();
-        s.AddSingleton<IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>, UpdateClassProfessorEFMapper>();
+        s.AddSingleton<
+            IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>,
+            UpdateClassProfessorEFMapper
+        >();
         s.RegisterEFProjector<ClassProfessorProjector, ClassProfessorDomain, ClassProfessor>();
 
         // Minimal API
-        s.AddSingleton<IMapper<ClassProfessorDomain, ClassProfessorMAPI>, ClassProfessorMAPIMapper>();
-        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>, NewClassProfessorMAPIMapper>();
-        s.AddSingleton<IMapper<string, ulong, Executor, DeleteClassProfessorDTO>, DeleteClassProfessorMAPIMapper>();
-        s.AddSingleton<IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>, ClassProfessorUpdateMAPIMapper>();
-        s.AddSingleton<IMapper<PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>, PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>>, ClassProfessorSearchMAPIMapper>();
-        s.RegisterBidirectionalMapper<ClassProfessorsCriteriaMAPIMapper, ClassProfessorCriteriaMAPI, ClassProfessorCriteriaDTO>();
+        s.AddSingleton<
+            IMapper<ClassProfessorDomain, ClassProfessorMAPI>,
+            ClassProfessorMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>,
+            NewClassProfessorMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<string, ulong, Executor, DeleteClassProfessorDTO>,
+            DeleteClassProfessorMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>,
+            ClassProfessorUpdateMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<
+                PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>,
+                PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>
+            >,
+            ClassProfessorSearchMAPIMapper
+        >();
+        s.RegisterBidirectionalMapper<
+            ClassProfessorsCriteriaMAPIMapper,
+            ClassProfessorCriteriaMAPI,
+            ClassProfessorCriteriaDTO
+        >();
 
         // CLASS STUDENTS
         // EF
         s.AddSingleton<IMapper<NewClassStudentDTO, ClassStudent>, NewClassStudentEFMapper>();
-        s.AddSingleton<IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>, UpdateClassStudentEFMapper>();
+        s.AddSingleton<
+            IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>,
+            UpdateClassStudentEFMapper
+        >();
         s.RegisterEFProjector<ClassStudentProjector, ClassStudentDomain, ClassStudent>();
 
         // Minimal API
-        s.AddSingleton<IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>, NewClassStudentMAPIMapper>();
-        s.AddSingleton<IMapper<string, ulong, Executor, DeleteClassStudentDTO>, DeleteClassStudentMAPIMapper>();
-        s.AddSingleton<IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>, UpdateClassStudentMAPIMapper>();
+        s.AddSingleton<
+            IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>,
+            NewClassStudentMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<string, ulong, Executor, DeleteClassStudentDTO>,
+            DeleteClassStudentMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>,
+            UpdateClassStudentMAPIMapper
+        >();
 
         // NOTIFICATIONS
         // EF
@@ -202,16 +288,42 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewNotificationDTO, Notification>, NewNotificationEFMapper>();
 
         // Minimal API
-        s.RegisterBidirectionalMapper<NotificationCriteriaMAPIMapper, NotificationCriteriaMAPI, NotificationCriteriaDTO>();
-        s.AddSingleton<IMapper<int, ulong, NotificationCriteriaDTO>, UserNotificationCriteriaMAPIMapper>();
-        s.AddSingleton<IMapper<NotificationDomain, PublicNotificationMAPI>, PublicNotificationMAPIMapper>();
-        s.AddSingleton<IMapper<PaginatedQuery<NotificationDomain, NotificationCriteriaDTO>, PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>>, NotificationSearchMAPIMapper>();
+        s.RegisterBidirectionalMapper<
+            NotificationCriteriaMAPIMapper,
+            NotificationCriteriaMAPI,
+            NotificationCriteriaDTO
+        >();
+        s.AddSingleton<
+            IMapper<int, ulong, NotificationCriteriaDTO>,
+            UserNotificationCriteriaMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<NotificationDomain, PublicNotificationMAPI>,
+            PublicNotificationMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<
+                PaginatedQuery<NotificationDomain, NotificationCriteriaDTO>,
+                PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>
+            >,
+            NotificationSearchMAPIMapper
+        >();
 
         // USER NOTIFICATIONS
         // EF
-        s.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>, NewUserNotificationEFMapper>();
-        s.AddSingleton<IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>, UpdateUserNotificationEFMapper>();
-        s.RegisterEFProjector<UserNotificationProjector, UserNotificationDomain, NotificationPerUser>();
+        s.AddSingleton<
+            IMapper<NewUserNotificationDTO, NotificationPerUser>,
+            NewUserNotificationEFMapper
+        >();
+        s.AddSingleton<
+            IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>,
+            UpdateUserNotificationEFMapper
+        >();
+        s.RegisterEFProjector<
+            UserNotificationProjector,
+            UserNotificationDomain,
+            NotificationPerUser
+        >();
 
         // TAGS
         // EF
@@ -219,9 +331,20 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewTagDTO, Tag>, NewTagEFMapper>();
 
         // Minimal API
-        s.RegisterBidirectionalResultMapper<TagCriteriaMAPIMapper, TagCriteriaMAPI, TagCriteriaDTO, IEnumerable<FieldErrorDTO>>();
+        s.RegisterBidirectionalResultMapper<
+            TagCriteriaMAPIMapper,
+            TagCriteriaMAPI,
+            TagCriteriaDTO,
+            IEnumerable<FieldErrorDTO>
+        >();
         s.AddSingleton<IMapper<TagDomain, PublicTagMAPI>, PublicTagMAPIMapper>();
-        s.AddSingleton<IMapper<PaginatedQuery<TagDomain, TagCriteriaDTO>, PaginatedQuery<string, TagCriteriaMAPI>>, TagSearchMAPIMapper>();
+        s.AddSingleton<
+            IMapper<
+                PaginatedQuery<TagDomain, TagCriteriaDTO>,
+                PaginatedQuery<string, TagCriteriaMAPI>
+            >,
+            TagSearchMAPIMapper
+        >();
 
         // CONTACTS
         // EF
@@ -231,11 +354,25 @@ public static class MapperServiceCollectionExtensions
 
         // Minimal API
         s.AddSingleton<IMapper<ContactDomain, PublicContactMAPI>, PublicContactMAPIMapper>();
-        s.RegisterBidirectionalResultMapper<ContactCriteriaMAPIMapper, ContactCriteriaMAPI, ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>();
+        s.RegisterBidirectionalResultMapper<
+            ContactCriteriaMAPIMapper,
+            ContactCriteriaMAPI,
+            ContactCriteriaDTO,
+            IEnumerable<FieldErrorDTO>
+        >();
         s.AddSingleton<IMapper<ContactUpdateMAPI, ContactUpdateDTO>, ContactUpdateMAPIMapper>();
-        s.AddSingleton<IMapper<PaginatedQuery<ContactDomain, ContactCriteriaDTO>, PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>>, ContactSearchMAPIMapper>();
+        s.AddSingleton<
+            IMapper<
+                PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
+                PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>
+            >,
+            ContactSearchMAPIMapper
+        >();
         s.AddSingleton<IMapper<NewContactMAPI, Executor, NewContactDTO>, NewContactMAPIMapper>();
-        s.AddSingleton<IMapper<ulong, ulong, Executor, DeleteContactDTO>, DeleteContactMAPIMapper>();
+        s.AddSingleton<
+            IMapper<ulong, ulong, Executor, DeleteContactDTO>,
+            DeleteContactMAPIMapper
+        >();
 
         // CONTACT TAGS
         // EF
@@ -243,8 +380,14 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>, NewContactTagEFMapper>();
 
         // Minimal API
-        s.AddSingleton<IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>, NewContactTagMAPIMapper>();
-        s.AddSingleton<IMapper<ulong, ulong, string, Executor, DeleteContactTagDTO>, DeleteContactTagMAPIMapper>();
+        s.AddSingleton<
+            IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>,
+            NewContactTagMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<ulong, ulong, string, Executor, DeleteContactTagDTO>,
+            DeleteContactTagMAPIMapper
+        >();
 
         // TESTS
         // EF
@@ -260,12 +403,31 @@ public static class MapperServiceCollectionExtensions
         s.RegisterEFProjector<ResourceSummaryProjector, ResourceSummary, Resource>();
 
         // Minimal API
-        s.RegisterBidirectionalResultMapper<ResourceCriteriaMAPIMapper, ResourceCriteriaMAPI, ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>();
+        s.RegisterBidirectionalResultMapper<
+            ResourceCriteriaMAPIMapper,
+            ResourceCriteriaMAPI,
+            ResourceCriteriaDTO,
+            IEnumerable<FieldErrorDTO>
+        >();
         s.AddSingleton<IMapper<NewResourceMAPI, Executor, NewResourceDTO>, NewResourceMAPIMapper>();
         s.AddSingleton<IMapper<ResourceDomain, PublicResourceMAPI>, PublicResourceMAPIMapper>();
         s.AddSingleton<IMapper<Guid, Executor, DeleteResourceDTO>, DeleteResourceMAPIMapper>();
-        s.AddSingleton<IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>, ResourceUpdateMAPIMapper>();
-        s.AddSingleton<IMapper<PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>, PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>>, ResourceSearchMAPIMapper>();
+        s.AddSingleton<
+            IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>,
+            ResourceUpdateMAPIMapper
+        >();
+        s.AddSingleton<
+            IMapper<
+                PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
+                PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
+            >,
+            ResourceSearchMAPIMapper
+        >();
+
+        // Class Resource
+        // EF
+        s.AddSingleton<IMapper<NewClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
+        s.RegisterEFProjector<ClassResourceProjector, ClassResourceDomain, ClassResource>();
 
         return s;
     }

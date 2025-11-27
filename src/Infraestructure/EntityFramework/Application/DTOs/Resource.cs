@@ -20,5 +20,5 @@ public partial class Resource
 
     public virtual User Professor { get; set; } = null!;
 
-    public virtual ICollection<ResourcePerClass> ResourcesPerClass { get; set; } = new List<ResourcePerClass>();
+    public virtual ICollection<ClassResource> ClassResources { get; set; } = new List<ClassResource>();
 }
