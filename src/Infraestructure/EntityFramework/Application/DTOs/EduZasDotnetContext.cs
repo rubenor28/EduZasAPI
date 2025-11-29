@@ -50,6 +50,7 @@ public partial class EduZasDotnetContext : DbContext
     public virtual DbSet<Test> Tests { get; set; }
     public virtual DbSet<TestPerClass> TestsPerClasses { get; set; }
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<ResourceViewSession> ResourceViewSessions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -765,9 +766,46 @@ public partial class EduZasDotnetContext : DbContext
                 userBuilder.Property(e => e.Role).HasDefaultValueSql("'0'").HasColumnName("role");
             }
         });
+        
+        modelBuilder.Entity<ResourceViewSession>(builder =>
+        {
+            builder.HasKey(e => e.Id).HasName("PRIMARY");
+            builder.ToTable("ResourceViewSessions");
+
+            builder.HasIndex(e => e.UserId, "idx_resourceviewsessions_user_id");
+            builder.HasIndex(e => e.ResourceId, "idx_resourceviewsessions_resource_id");
+            builder.HasIndex(e => e.ClassId, "idx_resourceviewsessions_class_id");
+
+            builder.Property(e => e.Id).HasColumnType("char(36)").HasColumnName("id");
+            builder.Property(e => e.StartTimeUtc).HasColumnName("start_time_utc");
+            builder.Property(e => e.EndTimeUtc).HasColumnName("end_time_utc");
+            builder.Property(e => e.DurationSeconds).HasColumnName("duration_seconds");
+
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                builder.Property(e => e.UserId).HasColumnType("bigint(20) unsigned").HasColumnName("user_id");
+                builder.Property(e => e.ResourceId).HasColumnType("char(36)").HasColumnName("resource_id");
+                builder.Property(e => e.ClassId).HasMaxLength(15).HasColumnName("class_id");
+                builder.Property(e => e.CreatedAt).HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("created_at");
+                builder.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("modified_at");
+            }
+            else
+            {
+                builder.Property(e => e.UserId).HasColumnName("user_id");
+                builder.Property(e => e.ResourceId).HasColumnName("resource_id");
+                builder.Property(e => e.ClassId).HasColumnName("class_id");
+                builder.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("created_at");
+                builder.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("modified_at");
+            }
+
+            builder.HasOne(d => d.User).WithMany(p => p.ResourceViewSessions).HasForeignKey(d => d.UserId);
+            builder.HasOne(d => d.Resource).WithMany(p => p.ResourceViewSessions).HasForeignKey(d => d.ResourceId);
+            builder.HasOne(d => d.Class).WithMany(p => p.ResourceViewSessions).HasForeignKey(d => d.ClassId);
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+

@@ -39,4 +39,6 @@ public partial class User
     public virtual ICollection<Resource> Resources { get; set; } = new List<Resource>();
 
     public virtual ICollection<Test> Tests { get; set; } = new List<Test>();
+
+    public virtual ICollection<ResourceViewSession> ResourceViewSessions { get; set; } = new List<ResourceViewSession>();
 }
