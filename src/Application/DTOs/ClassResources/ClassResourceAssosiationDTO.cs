@@ -1,6 +1,6 @@
 namespace Application.DTOs.ClassResources;
 
-public class ClassResourceAssociationDTO
+public sealed record ClassResourceAssosiationDTO
 {
     public required Guid ResourceId { get; set; }
     public required string ClassId { get; set; }

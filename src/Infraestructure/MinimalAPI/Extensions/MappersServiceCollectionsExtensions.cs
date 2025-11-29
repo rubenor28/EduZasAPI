@@ -32,6 +32,7 @@ using InterfaceAdapters.Mappers.Common;
 using InterfaceAdapters.Mappers.Users;
 using MinimalAPI.Application.DTOs.Classes;
 using MinimalAPI.Application.DTOs.ClassProfessors;
+using MinimalAPI.Application.DTOs.ClassResources;
 using MinimalAPI.Application.DTOs.ClassStudents;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Contacts;
@@ -429,7 +430,7 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
         s.RegisterEFProjector<ClassResourceProjector, ClassResourceDomain, ClassResource>();
         // Minimal API
-        s.AddSingleton<IMapper<ClassResourceIdDTO, Executor, NewClassResourceDTO>, NewClassResourceMAPIMapper>();
+        s.AddSingleton<IMapper<NewClassResourceMAPI, Executor, NewClassResourceDTO>, NewClassResourceMAPIMapper>();
         s.AddSingleton<IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO>, DeleteClassResourceMAPIMapper>();
 
         return s;

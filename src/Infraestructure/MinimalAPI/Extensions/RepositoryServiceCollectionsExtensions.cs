@@ -163,6 +163,12 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<ICreatorAsync<ClassResourceDomain, NewClassResourceDTO>, ClassResourceEFCreator>();
         s.AddScoped<IDeleterAsync<ClassResourceIdDTO, ClassResourceDomain>, ClassResourceEFDeleter>();
         s.AddScoped<IReaderAsync<ClassResourceIdDTO, ClassResourceDomain>, ClassResourceEFReader>();
+        s.AddScoped<IQuerierAsync<ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>>(
+            sp => new ClassResourceAssosiationEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                pageSize
+            )
+        );
 
         return s;
     }

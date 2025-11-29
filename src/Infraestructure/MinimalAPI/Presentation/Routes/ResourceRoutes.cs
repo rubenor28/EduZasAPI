@@ -6,6 +6,8 @@ using Application.UseCases.Resources;
 using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
+using Microsoft.AspNetCore.Mvc;
+using MinimalAPI.Application.DTOs.ClassResources;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Resources;
 using MinimalAPI.Presentation.Filters;
@@ -121,7 +123,7 @@ public static class ResourceRoutes
             });
 
         group
-            .MapPost("/", AddClassResource)
+            .MapPost("/association", AddClassResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
@@ -131,9 +133,51 @@ public static class ResourceRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Asignar un recurso académico a una clase.";
-                op.Description = "Añade un nuevo recurso.";
-                op.Responses["204"].Description = "Recurso actualizado exitosamente.";
-                op.Responses["400"].Description = "Los datos para la actualización son inválidos.";
+                op.Description = "Crea una asociación entre un recurso y una clase.";
+                op.Responses["204"].Description = "Recurso asignado exitosamente.";
+                op.Responses["400"].Description = "Los datos de la asociación son inválidos.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para realizar esta acción.";
+
+                return op;
+            });
+
+        group
+            .MapDelete("/association", DeleteClassResource)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Desasociar un recurso de una clase.";
+                op.Description = "Elimina la asociación entre un recurso y una clase.";
+                op.Responses["204"].Description = "Recurso desasociado exitosamente.";
+                op.Responses["400"].Description = "Los datos de la asociación son inválidos.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para realizar esta acción.";
+
+                return op;
+            });
+
+        group
+            .MapPost("/assigned", GetAssignedResources)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .Produces<
+                PaginatedQuery<ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>
+            >(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Busqueda de recursos asociados a las clases de un profesor";
+                op.Description =
+                    "Busca las clases a las cuales pertenece el profesor determinando si el recurso seleccionado se encuentra asignado a la clase.";
+                op.Responses["200"].Description = "Recurso actualizado exitosamente.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
                 op.Responses["403"].Description =
                     "El usuario no tiene permisos para modificar este recurso.";
@@ -229,11 +273,11 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> AddClassResource(
-        ClassResourceIdDTO request,
-        AddClassResourceUseCase useCase,
-        IMapper<ClassResourceIdDTO, Executor, NewClassResourceDTO> reqMapper,
+        [FromBody] NewClassResourceMAPI request,
+        [FromServices] AddClassResourceUseCase useCase,
+        [FromServices] IMapper<NewClassResourceMAPI, Executor, NewClassResourceDTO> reqMapper,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -244,11 +288,11 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> DeleteClassResource(
-        ClassResourceIdDTO request,
-        DeleteClassResourceUseCase useCase,
-        IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO> reqMapper,
+        [FromBody] ClassResourceIdDTO request,
+        [FromServices] DeleteClassResourceUseCase useCase,
+        [FromServices] IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO> reqMapper,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -268,6 +312,19 @@ public static class ResourceRoutes
             useCase,
             mapRequest: () => request,
             mapResponse: res => Results.Ok(res)
+        );
+    }
+
+    public static Task<IResult> GetAssignedResources(
+        [FromBody] ClassResourceAssosiationCriteriaDTO request,
+        [FromServices] ClassResourceAssosiationQueryUseCase useCase,
+        [FromServices] RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            useCase,
+            mapRequest: () => request,
+            mapResponse: (results) => Results.Ok(results)
         );
     }
 }

@@ -35,7 +35,6 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
     {
         var query = BuildQuery(criteria);
         var totalRecords = await query.CountAsync();
-
         var results = await query
             .Select(_projector.Projection)
             .Skip(CalcOffset(criteria.Page))

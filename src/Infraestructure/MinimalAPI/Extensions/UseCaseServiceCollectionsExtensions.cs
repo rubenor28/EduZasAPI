@@ -96,6 +96,7 @@ public static class UseCaseServiceCollectionExtensions
         s.AddTransient<AddClassResourceUseCase>();
         s.AddTransient<DeleteClassResourceUseCase>();
         s.AddTransient<ReadClassResourceUseCase>();
+        s.AddTransient<ClassResourceAssosiationQueryUseCase>();
 
         return s;
     }
