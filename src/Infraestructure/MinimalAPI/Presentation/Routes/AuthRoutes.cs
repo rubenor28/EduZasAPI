@@ -1,4 +1,3 @@
-using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Domain.Entities;
