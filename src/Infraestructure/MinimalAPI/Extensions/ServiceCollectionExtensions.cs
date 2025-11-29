@@ -1,6 +1,8 @@
 using System.Text;
+using Application.Configuration;
 using Application.Services;
 using Bcrypt.Application.Services;
+using MailKitProj;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Application.DTOs.Common;
@@ -30,6 +32,7 @@ public static class ServiceCollectionExtensions
             .AddOtherInfrastructureServices()
             .AddCorsConfig(configuration)
             .AddAuthSettings(configuration)
+            .AddEmailSender(configuration)
             .AddDatabaseServices(configuration)
             .AddRepositories(configuration)
             .AddValidators()
@@ -102,6 +105,23 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Registra la configuración y los servicios para el envío de correos electrónicos.
+    /// </summary>
+    /// <param name="services">La colección de servicios donde se registrarán las dependencias.</param>
+    /// <param name="configuration">Configuración de la aplicación usada para obtener los ajustes SMTP.</param>
+    /// <returns>La colección de servicios con el servicio de correo registrado.</returns>
+    private static IServiceCollection AddEmailSender(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
+        services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+        return services;
+    }
+
     public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
@@ -166,3 +186,4 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
+

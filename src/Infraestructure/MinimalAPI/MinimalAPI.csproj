@@ -26,6 +26,7 @@
     <ProjectReference Include="..\BCrypt\BCrypt.csproj" />
     <ProjectReference Include="..\FluentValidation\FluentValidationProj.csproj" />
     <ProjectReference Include="..\Mariadb\Mariadb.csproj" />
+    <ProjectReference Include="..\MailKit\MailKitProj.csproj" />
   </ItemGroup>
 
 </Project>
