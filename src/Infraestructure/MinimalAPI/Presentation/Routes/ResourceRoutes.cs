@@ -132,7 +132,7 @@ public static class ResourceRoutes
             {
                 op.Summary = "Asignar un recurso académico a una clase.";
                 op.Description = "Añade un nuevo recurso.";
-                op.Responses["200"].Description = "Recurso actualizado exitosamente.";
+                op.Responses["204"].Description = "Recurso actualizado exitosamente.";
                 op.Responses["400"].Description = "Los datos para la actualización son inválidos.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
                 op.Responses["403"].Description =

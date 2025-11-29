@@ -1,0 +1,9 @@
+namespace Application.DTOs.ClassResources;
+
+public class ClassResourceAssociationDTO
+{
+    public required Guid ResourceId { get; set; }
+    public required string ClassId { get; set; }
+    public required string ClassName { get; set; }
+    public bool IsAssociated { get; set; }
+}

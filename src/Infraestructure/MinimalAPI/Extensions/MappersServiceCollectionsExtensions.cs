@@ -428,6 +428,9 @@ public static class MapperServiceCollectionExtensions
         // EF
         s.AddSingleton<IMapper<NewClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
         s.RegisterEFProjector<ClassResourceProjector, ClassResourceDomain, ClassResource>();
+        // Minimal API
+        s.AddSingleton<IMapper<ClassResourceIdDTO, Executor, NewClassResourceDTO>, NewClassResourceMAPIMapper>();
+        s.AddSingleton<IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO>, DeleteClassResourceMAPIMapper>();
 
         return s;
     }
