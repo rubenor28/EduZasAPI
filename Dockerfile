@@ -51,4 +51,4 @@ EXPOSE 8080
 COPY --from=build /home/build/dist/ .
 
 # Define el punto de entrada
-ENTRYPOINT ["dotnet", "EduZasAPI.Infraestructure.MinimalAPI.dll"]
+ENTRYPOINT ["dotnet", "MinimalAPI.dll"]
