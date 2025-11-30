@@ -1,9 +1,10 @@
 # Etapa 1: Construcción de la aplicación
-FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /home/build
 
-# Copia el archivo de solución y restaura las dependencias de todos los proyectos
+# Copia los archivos de proyecto y el de solución
+# Esto permite cachear la capa de restauración de paquetes de manera más efectiva
 COPY EduZasAPI.sln .
 COPY src/Domain/Domain.csproj src/Domain/
 COPY src/Application/Application.csproj src/Application/
@@ -15,22 +16,18 @@ COPY src/Infraestructure/Mariadb/Mariadb.csproj src/Infraestructure/Mariadb/
 COPY src/Infraestructure/MinimalAPI/MinimalAPI.csproj src/Infraestructure/MinimalAPI/
 COPY src/Infraestructure/MailKit/MailKitProj.csproj src/Infraestructure/MailKit/
 
-## Eliminar los tests de la solucion
-RUN dotnet sln EduZasAPI.sln remove tests/ApplicationTest/ApplicationTest.csproj
-RUN dotnet sln EduZasAPI.sln remove tests/Infraestructure/EntityFrameworkTest/EntityFrameworkTest.csproj
-RUN dotnet sln EduZasAPI.sln remove tests/Infraestructure/FluentValidationTest/FluentValidationTest.csproj
-
 # Restaura las dependencias de la solución
 RUN dotnet restore EduZasAPI.sln
 
-# Copia el resto del código y publica la aplicación
-COPY . .
+# Copia el resto del código fuente
+COPY src/ src/
 
-
-RUN dotnet publish EduZasAPI.sln -c Release -o ./dist
+# Publica únicamente el proyecto de entrada (API)
+# Usar --no-restore aprovecha la capa de caché del 'dotnet restore' anterior
+RUN dotnet publish "src/Infraestructure/MinimalAPI/MinimalAPI.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist --no-restore
 
 # Etapa 2: Imagen final para ejecución
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 WORKDIR /home/app
 
 # Instala el cliente de MariaDB para backups y comandos
@@ -40,8 +37,8 @@ RUN apk add --no-cache mariadb-client
 RUN adduser --disabled-password --home /app --gecos '' appuser && chown -R appuser /app
 USER appuser
 
-# Expone el puerto que usa la aplicación
-EXPOSE 5018
+# Expone el puerto 8080, el estándar para contenedores ASP.NET Core
+EXPOSE 8080
 
 # Copia la aplicación publicada desde la etapa de construcción
 COPY --from=build /home/build/dist/ .
