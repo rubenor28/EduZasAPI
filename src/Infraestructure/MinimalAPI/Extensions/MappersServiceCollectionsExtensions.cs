@@ -431,7 +431,7 @@ public static class MapperServiceCollectionExtensions
         s.RegisterEFProjector<ClassResourceProjector, ClassResourceDomain, ClassResource>();
         // Minimal API
         s.AddSingleton<IMapper<NewClassResourceMAPI, Executor, NewClassResourceDTO>, NewClassResourceMAPIMapper>();
-        s.AddSingleton<IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO>, DeleteClassResourceMAPIMapper>();
+        s.AddSingleton<IMapper<Guid, string, Executor, DeleteClassResourceDTO>, DeleteClassResourceMAPIMapper>();
 
         return s;
     }

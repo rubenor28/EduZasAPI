@@ -144,7 +144,7 @@ public static class ResourceRoutes
             });
 
         group
-            .MapDelete("/association", DeleteClassResource)
+            .MapDelete("/association/{resourceId:guid}/{classId:string}", DeleteClassResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
@@ -288,16 +288,17 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> DeleteClassResource(
-        [FromBody] ClassResourceIdDTO request,
+        Guid resourceId,
+        string classId,
         [FromServices] DeleteClassResourceUseCase useCase,
-        [FromServices] IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO> reqMapper,
+        [FromServices] IMapper<Guid, string, Executor, DeleteClassResourceDTO> reqMapper,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
             useCase,
-            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => reqMapper.Map(resourceId, classId, utils.GetExecutorFromContext(ctx)),
             mapResponse: _ => Results.NoContent()
         );
     }

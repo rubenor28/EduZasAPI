@@ -41,7 +41,7 @@ public sealed class ClassResourceAssosiationEFQuerier(EduZasDotnetContext ctx, i
                 ClassId = c.ClassId,
                 ClassName = c.ClassName,
                 ResourceId = criteria.ResourceId,
-                IsAssociated = _ctx.ClassResources.Any(cr =>
+                IsAssosiated = _ctx.ClassResources.Any(cr =>
                     cr.ClassId == c.ClassId && cr.ResourceId == criteria.ResourceId
                 ),
             })

@@ -120,8 +120,8 @@ public abstract class ReadUseCase<I, RE, E>(
         if (record.IsNone)
             return UseCaseErrors.NotFound();
 
-        ExtraTask(data, recordDeleted);
-        await ExtraTaskAsync(data, recordDeleted);
+        ExtraTask(request, record.Unwrap());
+        await ExtraTaskAsync(request, record.Unwrap());
 
         return record.Unwrap();
     }
@@ -161,45 +161,45 @@ public abstract class ReadUseCase<I, RE, E>(
     /// <summary>
     /// Ejecuta tareas adicionales síncronas después de eliminar la entidad.
     /// </summary>
-    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
+    /// <param name="request">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="readedEntity">Entidad creada en el sistema.</param>
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual void ExtraTask(RE deleteDTO, E deletedEntity) { }
+    protected virtual void ExtraTask(RE request, E readedEntity) { }
 
     /// <summary>
     /// Ejecuta tareas adicionales asíncronas después de eliminar la entidad.
     /// </summary>
-    /// <param name="deleteDTOewEntity">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
+    /// <param name="requestewEntity">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="readedEntity">Entidad creada en el sistema.</param>
     /// <returns>Tarea que representa la operación asíncrona.</returns>
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual Task ExtraTaskAsync(RE deleteDTO, E deletedEntity) =>
+    protected virtual Task ExtraTaskAsync(RE request, E readedEntity) =>
         Task.FromResult(Unit.Value);
 
     /// <summary>
     /// Ejecuta tareas adicionales síncronas previas a eliminar la entidad.
     /// </summary>
-    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
+    /// <param name="request">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="readedEntity">Entidad creada en el sistema.</param>
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual void PrevTask(RE deleteDTO) { }
+    protected virtual void PrevTask(RE request) { }
 
     /// <summary>
     /// Ejecuta tareas adicionales asíncronas previas a eliminar la entidad.
     /// </summary>
-    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
+    /// <param name="request">DTO con los datos originales de la nueva entidad.</param>
+    /// <param name="readedEntity">Entidad creada en el sistema.</param>
     /// <returns>Tarea que representa la operación asíncrona.</returns>
     /// <remarks>
     /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
     /// </remarks>
-    protected virtual Task PrevTaskAsync(RE deleteDTO) => Task.FromResult(Unit.Value);
+    protected virtual Task PrevTaskAsync(RE request) => Task.FromResult(Unit.Value);
 
     public abstract I GetId(RE request);
 }

@@ -19,13 +19,13 @@ public sealed class NewClassResourceMAPIMapper
 }
 
 public sealed class DeleteClassResourceMAPIMapper
-    : IMapper<ClassResourceIdDTO, Executor, DeleteClassResourceDTO>
+    : IMapper<Guid, string, Executor, DeleteClassResourceDTO>
 {
-    public DeleteClassResourceDTO Map(ClassResourceIdDTO in1, Executor in2) =>
+    public DeleteClassResourceDTO Map(Guid resourceId, string classId, Executor ex) =>
         new()
         {
-            ResourceId = in1.ResourceId,
-            ClassId = in1.ClassId,
-            Executor = in2,
+            ResourceId = resourceId,
+            ClassId = classId,
+            Executor = ex,
         };
 }
