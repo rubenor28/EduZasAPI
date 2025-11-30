@@ -144,7 +144,7 @@ public static class ResourceRoutes
             });
 
         group
-            .MapDelete("/association/{resourceId:guid}/{classId:string}", DeleteClassResource)
+            .MapDelete("/association/{resourceId:guid}/{classId}", DeleteClassResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
