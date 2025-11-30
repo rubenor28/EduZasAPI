@@ -13,6 +13,7 @@ COPY src/Infraestructure/EntityFramework/EntityFramework.csproj src/Infraestruct
 COPY src/Infraestructure/FluentValidation/FluentValidationProj.csproj src/Infraestructure/FluentValidation/
 COPY src/Infraestructure/Mariadb/Mariadb.csproj src/Infraestructure/Mariadb/
 COPY src/Infraestructure/MinimalAPI/MinimalAPI.csproj src/Infraestructure/MinimalAPI/
+COPY src/Infraestructure/MailKit/MailKitProj.csproj src/Infraestructure/MailKit/
 
 ## Eliminar los tests de la solucion
 RUN dotnet sln EduZasAPI.sln remove tests/ApplicationTest/ApplicationTest.csproj

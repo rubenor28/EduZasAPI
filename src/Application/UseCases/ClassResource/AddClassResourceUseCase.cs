@@ -1,6 +1,9 @@
+using System.Collections.Immutable;
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.ClassResources;
 using Application.DTOs.Common;
+using Application.DTOs.Users;
 using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
@@ -15,14 +18,20 @@ public sealed class AddClassResourceUseCase(
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<Guid, ResourceDomain> resourceReader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader,
+    IEmailSender emailSender,
+    IReaderAsync<ulong, UserDomain> userReader,
+    IQuerierAsync<UserDomain, UserCriteriaDTO> userQuierier,
     IBusinessValidationService<NewClassResourceDTO>? validator = null
 ) : AddUseCase<NewClassResourceDTO, ClassResourceDomain>(creator, validator)
 {
+    private readonly IEmailSender _emailSender = emailSender;
     private readonly IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> _reader = reader;
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
     private readonly IReaderAsync<Guid, ResourceDomain> _resourceReader = resourceReader;
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
+    private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuierier = userQuierier;
+    private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         NewClassResourceDTO value
@@ -69,4 +78,21 @@ public sealed class AddClassResourceUseCase(
 
         return Unit.Value;
     }
+
+    //TODO: Notificar usuarios por correo
+
+    // protected override async Task ExtraTaskAsync(
+    //     NewClassResourceDTO newEntity,
+    //     ClassResourceDomain createdEntity
+    // )
+    // {
+    //     var user = (await _userReader.GetAsync(newEntity.Executor.Id)).Unwrap();
+    //     var search = await _userQuierier.GetByAsync(new() { EnrolledInClass = newEntity.ClassId });
+    //     var email = new EmailMessage {
+    //       Subject = $"Nuevo recurso compartido por {user.FatherLastname} {user.FirstName}",
+    //       To = [.. search.Results.Select(s => s.Email)],
+    //       Body = $"<h1>EduZas</h1><h2>{user.FatherLastname} {user.FirstName} ha publicado un nuevo recurso</h2><a href=\"\">Abrir recurso</a>"
+    //
+    //     };
+    // }
 }
