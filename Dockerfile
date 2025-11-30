@@ -40,6 +40,10 @@ WORKDIR /home/app
 # Instala el cliente de MariaDB para backups y comandos
 RUN apk add --no-cache mariadb-client
 
+# Establece las variables de entorno para las rutas de los binarios de MariaDB
+ENV DatabaseBinaries__DumpPath="/usr/bin/mariadb-dump"
+ENV DatabaseBinaries__MariadbPath="/usr/bin/mariadb"
+
 # Crea un usuario no-root para mayor seguridad
 RUN adduser --disabled-password --home /app --gecos '' appuser && chown -R appuser /app
 USER appuser
