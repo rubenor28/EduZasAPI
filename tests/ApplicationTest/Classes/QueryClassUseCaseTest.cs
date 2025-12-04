@@ -1,10 +1,12 @@
 using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using Application.UseCases.Classes;
+using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +18,7 @@ public class QueryClassUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
     private readonly ClassProjector _classMapper = new();
+    private readonly UserMapper _userMapper = new();
     private readonly Random _rdm = new();
 
     public QueryClassUseCaseTest()
@@ -28,12 +31,12 @@ public class QueryClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var querier = new ClassEFQuerier(_ctx, _classMapper, pageSize: 10);
+        var querier = new ClassEFQuerier(_ctx, _classMapper, maxPageSize: 10);
 
         _useCase = new QueryClassUseCase(querier, null);
     }
 
-    private async Task<User> SeedUser(UserType role = UserType.STUDENT)
+    private async Task<UserDomain> SeedUser(UserType role = UserType.STUDENT)
     {
         var id = (ulong)_rdm.NextInt64(1, 1_000_000);
         var user = new User
@@ -45,10 +48,13 @@ public class QueryClassUseCaseTest : IDisposable
             Password = "test",
             Role = (uint)role,
         };
+
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
-        return user;
+        return _userMapper.Map(user);
     }
+
+    private static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
 
     private async Task<Class> SeedClass(string name)
     {
@@ -91,11 +97,14 @@ public class QueryClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithNoCriteria_ReturnsAllClasses()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         await SeedClass("Class A");
         await SeedClass("Class B");
         await SeedClass("Class C");
 
-        var result = await _useCase.ExecuteAsync(new ClassCriteriaDTO());
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = new ClassCriteriaDTO(), Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         Assert.Equal(3, result.Unwrap().Results.Count());
@@ -104,6 +113,7 @@ public class QueryClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_FilterByClassName_ReturnsMatchingClass()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         await SeedClass("Class A");
         var classB = await SeedClass("Class B");
         await SeedClass("Class C");
@@ -113,7 +123,9 @@ public class QueryClassUseCaseTest : IDisposable
             ClassName = new StringQueryDTO { Text = "Class B", SearchType = StringSearchType.EQ },
         };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var classes = result.Unwrap().Results.ToList();
@@ -124,19 +136,22 @@ public class QueryClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_FilterWithProfessor_ReturnsMatchingClasses()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var profA = await SeedUser(UserType.PROFESSOR);
         var profB = await SeedUser(UserType.PROFESSOR);
         var classA = await SeedClass("Class A");
         var classB = await SeedClass("Class B");
-        await SeedClassProfessor(classA.ClassId, profA.UserId, true);
-        await SeedClassProfessor(classB.ClassId, profB.UserId, true);
+        await SeedClassProfessor(classA.ClassId, profA.Id, true);
+        await SeedClassProfessor(classB.ClassId, profB.Id, true);
 
         var criteria = new ClassCriteriaDTO
         {
-            WithProfessor = new WithProfessorDTO { Id = profA.UserId },
+            WithProfessor = new WithProfessorDTO { Id = profA.Id },
         };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var classes = result.Unwrap().Results.ToList();
@@ -147,19 +162,22 @@ public class QueryClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_FilterWithStudent_ReturnsMatchingClasses()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var studentA = await SeedUser();
         var studentB = await SeedUser();
         var classA = await SeedClass("Class A");
         var classB = await SeedClass("Class B");
-        await SeedClassStudent(classA.ClassId, studentA.UserId);
-        await SeedClassStudent(classB.ClassId, studentB.UserId);
+        await SeedClassStudent(classA.ClassId, studentA.Id);
+        await SeedClassStudent(classB.ClassId, studentB.Id);
 
         var criteria = new ClassCriteriaDTO
         {
-            WithStudent = new WithStudentDTO { Id = studentB.UserId },
+            WithStudent = new WithStudentDTO { Id = studentB.Id },
         };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var classes = result.Unwrap().Results.ToList();
@@ -170,6 +188,7 @@ public class QueryClassUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithNoMatches_ReturnsEmptyList()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         await SeedClass("Class A");
 
         var criteria = new ClassCriteriaDTO
@@ -181,7 +200,9 @@ public class QueryClassUseCaseTest : IDisposable
             },
         };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         Assert.Empty(result.Unwrap().Results);

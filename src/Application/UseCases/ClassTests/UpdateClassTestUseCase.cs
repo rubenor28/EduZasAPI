@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
 using Application.Services;
@@ -10,30 +11,23 @@ using Domain.ValueObjects;
 namespace Application.UseCases.ClassTests;
 
 public sealed class UpdateClassTestUseCase(
-    IUpdaterAsync<ClassTestDomain, ClassTestUpdateDTO> updater,
+    IUpdaterAsync<ClassTestDomain, ClassTestDTO> updater,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> reader,
-    IReaderAsync<ulong, TestDomain> testReader,
-    IBusinessValidationService<ClassTestUpdateDTO>? validator = null
-) : UpdateUseCase<ClassTestIdDTO, ClassTestUpdateDTO, ClassTestDomain>(updater, reader, validator)
+    IReaderAsync<Guid, TestDomain> testReader,
+    IBusinessValidationService<ClassTestDTO>? validator = null
+) : UpdateUseCase<ClassTestIdDTO, ClassTestDTO, ClassTestDomain>(updater, reader, validator)
 {
-    private readonly IReaderAsync<ulong, TestDomain> _testReader = testReader;
+    private readonly IReaderAsync<Guid, TestDomain> _testReader = testReader;
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        ClassTestUpdateDTO value
+        UserActionDTO<ClassTestDTO> value,
+        ClassTestDomain record
     )
     {
-        var recordSearch = await _reader.GetAsync(GetId(value));
-
-        if (recordSearch.IsNone)
-            return UseCaseErrors.NotFound();
-
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => await IsAuthorizedProfessor(
-                recordSearch.Unwrap(),
-                value.Executor
-            ),
+            UserType.PROFESSOR => await IsAuthorizedProfessor(record, value.Executor),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -49,15 +43,13 @@ public sealed class UpdateClassTestUseCase(
         Executor executor
     )
     {
-        var testSearch = await _testReader.GetAsync(testClassRelation.Id.TestId);
-        if (testSearch.IsNone)
-            throw new InvalidDataException("No se encontró el test de la relación");
-
-        var test = testSearch.Unwrap();
+        var test =
+            await _testReader.GetAsync(testClassRelation.TestId)
+            ?? throw new InvalidDataException("No se encontró el test de la relación");
 
         return test.ProfessorId == executor.Id;
     }
 
-    protected override ClassTestIdDTO GetId(ClassTestUpdateDTO dto) =>
+    protected override ClassTestIdDTO GetId(ClassTestDTO dto) =>
         new() { ClassId = dto.ClassId, TestId = dto.TestId };
 }

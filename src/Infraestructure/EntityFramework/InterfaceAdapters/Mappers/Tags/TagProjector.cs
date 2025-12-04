@@ -1,18 +1,13 @@
 using System.Linq.Expressions;
+using Application.DTOs.Tags;
 using Domain.Entities;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Tags;
 
-public class TagProjector : IEFProjector<Tag, TagDomain>
+public class TagProjector : IEFProjector<Tag, TagDomain, TagCriteriaDTO>
 {
-    public Expression<Func<Tag, TagDomain>> Projection =>
+    public Expression<Func<Tag, TagDomain>> GetProjection(TagCriteriaDTO criteria) =>
         input => new() { Text = input.Text, CreatedAt = input.CreatedAt };
-
-    private static readonly Lazy<Func<Tag, TagDomain>> _mapFunc = new(() =>
-        new TagProjector().Projection.Compile()
-    );
-
-    public TagDomain Map(Tag input) => _mapFunc.Value(input);
 }

@@ -1,10 +1,9 @@
 using Application.DTOs.Classes;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.DTOs.Users;
 using Domain.Entities;
-using Domain.ValueObjects;
+using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassTests;
 using EntityFramework.Application.DAOs.Tests;
@@ -45,10 +44,10 @@ public class ClassTestEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classTestMapper = new ClassTestProjector();
-        var classMapper = new ClassProjector();
-        var testMapper = new TestProjector();
-        var userMapper = new UserProjector();
+        var classTestMapper = new ClassTestMapper();
+        var classMapper = new ClassMapper();
+        var testMapper = new TestMapper();
+        var userMapper = new UserMapper();
 
         _creator = new(_ctx, classTestMapper, new NewClassTestEFMapper());
         _updater = new(_ctx, classTestMapper, new UpdateClassTestEFMapper());
@@ -68,11 +67,10 @@ public class ClassTestEFRepositoryTest : IDisposable
             FatherLastname = "Professor",
             Email = "test.professor@email.com",
             Password = "password",
+            Role = UserType.STUDENT,
         };
         return await _userCreator.AddAsync(newUser);
     }
-
-    private static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
 
     private async Task<ClassDomain> CreateSampleClass(UserDomain professor)
     {
@@ -81,11 +79,10 @@ public class ClassTestEFRepositoryTest : IDisposable
             Id = "test-class",
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
-            Subject = Optional.Some("Math"),
+            Section = "A",
+            Subject = "Math",
             OwnerId = professor.Id,
             Professors = [],
-            Executor = AsExecutor(professor),
         };
 
         return await _classCreator.AddAsync(newClass);
@@ -98,7 +95,6 @@ public class ClassTestEFRepositoryTest : IDisposable
             Title = "Test Title",
             Content = "Test Content",
             ProfessorId = professor.Id,
-            Executor = new() { Id = professor.Id, Role = professor.Role },
         };
         return await _testCreator.AddAsync(newTest);
     }
@@ -110,19 +106,18 @@ public class ClassTestEFRepositoryTest : IDisposable
         var createdClass = await CreateSampleClass(professor);
         var createdTest = await CreateSampleTest(professor);
 
-        var newClassTest = new NewClassTestDTO
+        var newClassTest = new ClassTestDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
             Visible = true,
-            Executor = AsExecutor(professor),
         };
 
         var created = await _creator.AddAsync(newClassTest);
 
         Assert.NotNull(created);
-        Assert.Equal(newClassTest.ClassId, created.Id.ClassId);
-        Assert.Equal(newClassTest.TestId, created.Id.TestId);
+        Assert.Equal(newClassTest.ClassId, created.ClassId);
+        Assert.Equal(newClassTest.TestId, created.TestId);
     }
 
     [Fact]
@@ -132,21 +127,19 @@ public class ClassTestEFRepositoryTest : IDisposable
         var createdClass = await CreateSampleClass(professor);
         var createdTest = await CreateSampleTest(professor);
 
-        var newClassTestDto = new NewClassTestDTO
+        var newClassTestDto = new ClassTestDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
             Visible = true,
-            Executor = AsExecutor(professor),
         };
         await _creator.AddAsync(newClassTestDto);
 
-        var updateDto = new ClassTestUpdateDTO
+        var updateDto = new ClassTestDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
             Visible = false,
-            Executor = AsExecutor(professor),
         };
 
         var updatedClassTest = await _updater.UpdateAsync(updateDto);
@@ -162,12 +155,11 @@ public class ClassTestEFRepositoryTest : IDisposable
         var createdClass = await CreateSampleClass(professor);
         var createdTest = await CreateSampleTest(professor);
 
-        var newClassTestDto = new NewClassTestDTO
+        var newClassTestDto = new ClassTestDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
             Visible = true,
-            Executor = AsExecutor(professor),
         };
 
         await _creator.AddAsync(newClassTestDto);
@@ -179,7 +171,7 @@ public class ClassTestEFRepositoryTest : IDisposable
         Assert.NotNull(deleted);
 
         var found = await _reader.GetAsync(idDto);
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     public void Dispose()

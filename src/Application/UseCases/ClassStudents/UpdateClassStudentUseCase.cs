@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
 using Application.Services;
@@ -20,22 +21,19 @@ public sealed class UpdateClassStudentUseCase(
         validator
     )
 {
-    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        ClassStudentUpdateDTO value
+    protected override Result<Unit, UseCaseError> ExtraValidation(
+        UserActionDTO<ClassStudentUpdateDTO> value,
+        ClassStudentDomain record
     )
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            _ => value.Executor.Id == value.UserId,
+            _ => value.Executor.Id == value.Data.UserId,
         };
 
         if (!authorized)
             return UseCaseErrors.Unauthorized();
-
-        var student = await _reader.GetAsync(GetId(value));
-        if (student.IsNone)
-            return UseCaseErrors.NotFound();
 
         return Unit.Value;
     }

@@ -1,5 +1,5 @@
 using Application.DAOs;
-using Application.DTOs.ClassProfessors;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.Services;
 using Application.UseCases.Common;
@@ -12,28 +12,18 @@ namespace Application.UseCases.ClassProfessors;
 public sealed class DeleteClassProfessorUseCase(
     IDeleterAsync<UserClassRelationId, ClassProfessorDomain> deleter,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> reader,
-    IBusinessValidationService<DeleteClassProfessorDTO>? validator = null
-)
-    : DeleteUseCase<UserClassRelationId, DeleteClassProfessorDTO, ClassProfessorDomain>(
-        deleter,
-        reader,
-        validator
-    )
+    IBusinessValidationService<UserClassRelationId>? validator = null
+) : DeleteUseCase<UserClassRelationId, ClassProfessorDomain>(deleter, reader, validator)
 {
-    private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
-    {
-        var professor = await _reader.GetAsync(new() { UserId = professorId, ClassId = classId });
-        return professor.IsSome && professor.Unwrap().IsOwner;
-    }
-
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        DeleteClassProfessorDTO value
+        UserActionDTO<UserClassRelationId> value,
+        ClassProfessorDomain professor
     )
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.Id.ClassId),
+            UserType.PROFESSOR => professor is not null && professor.IsOwner,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -41,14 +31,6 @@ public sealed class DeleteClassProfessorUseCase(
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
-        var record = await _reader.GetAsync(value.Id);
-        if (record.IsNone)
-            return UseCaseErrors.NotFound();
-
         return Unit.Value;
     }
-
-    protected override UserClassRelationId GetId(DeleteClassProfessorDTO value) => value.Id;
-
-    protected override UserClassRelationId GetId(ClassProfessorDomain value) => value.Id;
 }

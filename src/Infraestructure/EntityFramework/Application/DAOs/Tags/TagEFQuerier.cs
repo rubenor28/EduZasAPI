@@ -10,9 +10,9 @@ namespace EntityFramework.Application.DAOs.Tags;
 
 public class TagEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<Tag, TagDomain> projector,
-    int pageSize
-) : EFQuerier<TagDomain, TagCriteriaDTO, Tag>(ctx, projector, pageSize)
+    IEFProjector<Tag, TagDomain, TagCriteriaDTO> projector,
+    int maxPageSize
+) : EFQuerier<TagDomain, TagCriteriaDTO, Tag>(ctx, projector, maxPageSize)
 {
     public override IQueryable<Tag> BuildQuery(TagCriteriaDTO c) =>
         _dbSet

@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Notifications;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
@@ -21,12 +22,12 @@ public sealed class AddNotificationUseCase(
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuerier = userQuerier;
 
     protected override async Task ExtraTaskAsync(
-        NewNotificationDTO newE,
+        UserActionDTO<NewNotificationDTO> newE,
         NotificationDomain created
     )
     {
         var studentsSearch = await _userQuerier.GetByAsync(
-            new() { EnrolledInClass = newE.ClassId }
+            new() { EnrolledInClass = newE.Data.ClassId }
         );
 
         var newNotifications = studentsSearch.Results.Select(u => new NewUserNotificationDTO

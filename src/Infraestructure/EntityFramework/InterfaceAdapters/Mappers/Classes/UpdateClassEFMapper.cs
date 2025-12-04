@@ -1,7 +1,6 @@
 using Application.DTOs.Classes;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
-using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 
@@ -13,7 +12,7 @@ public class UpdateClassEFMapper : IUpdateMapper<ClassUpdateDTO, Class>
         c.ClassName = cu.ClassName;
         c.Active = cu.Active;
         c.Color = cu.Color;
-        c.Subject = cu.Subject.ToNullable();
-        c.Section = cu.Section.ToNullable();
+        c.Subject = cu.Subject;
+        c.Section = cu.Section;
     }
 }

@@ -41,6 +41,7 @@ public static class UseCaseServiceCollectionExtensions
         // Users
         s.AddTransient<UserQueryUseCase>();
         s.AddTransient<UpdateUserUseCase>();
+        s.AddTransient<UpdateUserInfoUseCase>();
 
         // Class use cases
         s.AddTransient<AddClassUseCase>();

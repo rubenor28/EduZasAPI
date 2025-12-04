@@ -4,7 +4,6 @@ using Application.DTOs.Users;
 using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.Auth;
@@ -18,10 +17,12 @@ namespace Application.UseCases.Auth;
 /// </remarks>
 public class LoginUseCase(
     IHashService hasher,
-    IQuerierAsync<UserDomain, UserCriteriaDTO> querier,
+    IReaderAsync<string, UserDomain> userReader,
     IBusinessValidationService<UserCredentialsDTO> validator
-) : IUseCaseAsync<UserCredentialsDTO, UserDomain>
+) : IGuestUseCaseAsync<UserCredentialsDTO, UserDomain>
 {
+    private readonly IReaderAsync<string, UserDomain> _userReader = userReader;
+
     /// <summary>
     /// Ejecuta el proceso de autenticación con las credenciales proporcionadas.
     /// </summary>
@@ -42,43 +43,23 @@ public class LoginUseCase(
     /// 4. Genera un token de autenticación si las credenciales son correctas
     /// </remarks>
     public async Task<Result<UserDomain, UseCaseError>> ExecuteAsync(
-        UserCredentialsDTO credentials
+        UserCredentialsDTO request
     )
     {
-        var validation = validator.IsValid(credentials);
+        var validation = validator.IsValid(request);
         if (validation.IsErr)
             return UseCaseErrors.Input(validation.UnwrapErr());
 
-        var emailSearch = new StringQueryDTO
-        {
-            Text = credentials.Email,
-            SearchType = StringSearchType.EQ,
-        };
+        var user = await _userReader.GetAsync(request.Email);
+        if (user is null)
+            return UseCaseErrors.NotFound();
 
-        var userSearch = await querier.GetByAsync(
-            new()
-            {
-                Active = Optional<bool>.Some(true),
-                Email = Optional<StringQueryDTO>.Some(emailSearch),
-            }
-        );
-
-        var results = userSearch.Results.Count();
-
-        if (results > 1)
-            throw new InvalidDataException($"Repeated email {credentials.Email} stored");
-
-        if (results == 0)
-            return UseCaseErrors.Input([new() { Field = "email", Message = "Email no encontrado" }]);
-
-        var usr = userSearch.Results.ToList()[0];
-
-        var pwdMatch = hasher.Matches(credentials.Password, usr.Password);
+        var pwdMatch = hasher.Matches(user.Password, request.Password);
         if (!pwdMatch)
-            return UseCaseErrors.Input(
-                [new() { Field = "password", Message = "Contraseña incorrecta" }]
-            );
+            return UseCaseErrors.Input([
+                new() { Field = "password", Message = "Contraseña incorrecta" },
+            ]);
 
-        return usr;
+        return user;
     }
 }

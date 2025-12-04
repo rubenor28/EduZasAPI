@@ -10,8 +10,6 @@ using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Classes;
-using MinimalAPI.Application.DTOs.ClassProfessors;
-using MinimalAPI.Application.DTOs.ClassStudents;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Presentation.Filters;
 
@@ -23,13 +21,14 @@ public static class ClassRoutes
     {
         var group = app.MapGroup("/classes").WithTags("Clases");
 
-        group.MapPost("/", AddClass)
+        group
+            .MapPost("/", AddClass)
             .WithName("Crear clases")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
-            .Produces<PublicClassMAPI>(StatusCodes.Status201Created)
+            .Produces<ClassDomain>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -42,12 +41,13 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPut("/", UpdateClass)
+        group
+            .MapPut("/", UpdateClass)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
-            .Produces<PublicClassMAPI>(StatusCodes.Status200OK)
+            .Produces<ClassDomain>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi(op =>
@@ -62,7 +62,8 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapDelete("/{id}", DeleteClass)
+        group
+            .MapDelete("/{id}", DeleteClass)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -81,12 +82,13 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPost("/assigned", ProfessorClasses)
+        group
+            .MapPost("/assigned", ProfessorClasses)
             .RequireAuthorization("ProfessorOrAdmin")
-            .AddEndpointFilter<UserIdFilter>()
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
-            .Produces<PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -101,12 +103,13 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPost("/enrolled", EnrolledClasses)
+        group
+            .MapPost("/enrolled", EnrolledClasses)
             .WithName("Obtener clases inscritas")
             .RequireAuthorization("RequireAuthenticated")
-            .AddEndpointFilter<UserIdFilter>()
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces<PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -119,7 +122,8 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPost("/enroll", EnrollClass)
+        group
+            .MapPost("/enroll", EnrollClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -141,7 +145,8 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapDelete("/enroll/{classId}/{userId:ulong}", UnenrollClass)
+        group
+            .MapDelete("/enroll/{classId}/{userId:ulong}", UnenrollClass)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -159,7 +164,8 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPut("/students/relationship", UpdateClassStudent)
+        group
+            .MapPut("/students/relationship", UpdateClassStudent)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
@@ -182,7 +188,8 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPost("/professor", AddProfessor)
+        group
+            .MapPost("/professor", AddProfessor)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status201Created)
@@ -208,12 +215,13 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPost("/professors", EnrolledClasses)
+        group
+            .MapPost("/professors", EnrolledClasses)
             .WithName("Buscar relaciones clase-professor")
             .RequireAuthorization("ProfessorOrAdmin")
-            .AddEndpointFilter<UserIdFilter>()
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces<PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -227,7 +235,8 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapGet("/professors/{classId}/{userId:ulong}", ReadProfessor)
+        group
+            .MapGet("/professors/{classId}/{userId:ulong}", ReadProfessor)
             .WithName("Leer relacion usuario professor - clase")
             .RequireAuthorization("ProfessorOrAdmin")
             .Produces<ClassProfessorDomain>()
@@ -246,7 +255,8 @@ public static class ClassRoutes
                 return op;
             });
 
-        group.MapPut("/professors", UpdateProfessor)
+        group
+            .MapPut("/professors", UpdateProfessor)
             .WithName("Actualizar la relacion usuario professor - clase")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
@@ -262,12 +272,15 @@ public static class ClassRoutes
                 op.Responses["200"].Description = "Recurso actualizado exitosamente.";
                 op.Responses["400"].Description = "Los datos para la actualización son inválidos.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
-                op.Responses["403"].Description = "El usuario no tiene permisos para modificar este recurso.";
-                op.Responses["404"].Description = "No se encontró un recurso con el ID proporcionado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para modificar este recurso.";
+                op.Responses["404"].Description =
+                    "No se encontró un recurso con el ID proporcionado.";
                 return op;
             });
 
-        group.MapDelete("/professors/{classId}/{userId:ulong}", RemoveProfessorFromClass)
+        group
+            .MapDelete("/professors/{classId}/{userId:ulong}", RemoveProfessorFromClass)
             .WithName("Eliminar relacion usuario professor - clase")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
@@ -291,34 +304,34 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> AddClass(
-        NewClassMAPI newClass,
+        NewClassDTO newClass,
         AddClassUseCase useCase,
-        IMapper<NewClassMAPI, Executor, NewClassDTO> requestMapper,
-        IMapper<ClassDomain, PublicClassMAPI> responseMapper,
+        IMapper<NewClassDTO, Executor, NewClassDTO> requestMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(newClass, utils.GetExecutorFromContext(ctx)),
-            mapResponse: (classRecord) =>
-                Results.Created($"/users/{classRecord.Id}", responseMapper.Map(classRecord))
+            mapRequest: () => newClass,
+            mapResponse: (classRecord) => Results.Created($"/users/{classRecord.Id}", classRecord)
         );
     }
 
     public static Task<IResult> UpdateClass(
-        ClassUpdateMAPI request,
+        ClassUpdateDTO request,
         UpdateClassUseCase useCase,
-        IMapper<ClassDomain, PublicClassMAPI> responseMapper,
-        IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO> requestMapper,
+        IMapper<ClassDomain, ClassDomain> responseMapper,
+        IMapper<ClassUpdateDTO, Executor, ClassUpdateDTO> requestMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => request,
             mapResponse: (classRecord) => Results.Ok(responseMapper.Map(classRecord))
         );
     }
@@ -327,13 +340,13 @@ public static class ClassRoutes
         string id,
         HttpContext ctx,
         RoutesUtils utils,
-        DeleteClassUseCase useCase,
-        IMapper<string, Executor, DeleteClassDTO> requestMapper
+        DeleteClassUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(id, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => id,
             mapResponse: (_) => Results.NoContent()
         );
     }
@@ -347,13 +360,14 @@ public static class ClassRoutes
         > requestMapper,
         IMapper<
             PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
-            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+            PaginatedQuery<ClassDomain, ClassCriteriaMAPI>
         > responseMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () =>
                 requestMapper.Map(
@@ -361,7 +375,7 @@ public static class ClassRoutes
                     {
                         WithStudent = new()
                         {
-                            Id = utils.GetIdFromContext(ctx),
+                            Id = utils.GetExecutorFromContext(ctx).Id,
                             Hidden = request.WithStudent?.Hidden,
                         },
                     }
@@ -371,16 +385,16 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> EnrollClass(
-        EnrollClassMAPI data,
+        UserClassRelationId req,
         HttpContext ctx,
         RoutesUtils utils,
-        AddClassStudentUseCase useCase,
-        IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO> requestMapper
+        AddClassStudentUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => req,
             mapResponse: (_) => Results.Created()
         );
     }
@@ -388,60 +402,60 @@ public static class ClassRoutes
     public static Task<IResult> UnenrollClass(
         string classId,
         ulong userId,
-        IMapper<string, ulong, Executor, DeleteClassStudentDTO> requestMapper,
         HttpContext ctx,
         RoutesUtils utils,
         DeleteClassStudentUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(classId, userId, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => new() { ClassId = classId, UserId = userId },
             mapResponse: (_) => Results.NoContent()
         );
     }
 
     public static Task<IResult> UpdateClassStudent(
-        ClassStudentUpdateMAPI request,
-        HttpContext ctx,
+        ClassStudentUpdateDTO request,
         RoutesUtils utils,
         UpdateClassStudentUseCase useCase,
-        IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO> requestMapper
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => request,
             mapResponse: (_) => Results.NoContent()
         );
     }
 
     public static Task<IResult> AddProfessor(
-        ClassProfessorMAPI data,
+        NewClassProfessorDTO data,
         HttpContext ctx,
         RoutesUtils utils,
-        AddClassProfessorUseCase useCase,
-        IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO> requestMapper
+        AddClassProfessorUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(data, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => data,
             mapResponse: (_) => Results.NoContent()
         );
     }
 
     public static Task<IResult> UpdateProfessor(
-        ClassProfessorMAPI request,
+        ClassProfessorUpdateDTO request,
         UpdateClassProfessorUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils,
-        IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO> reqMapper
+        RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => request,
             mapResponse: _ => Results.NoContent()
         );
     }
@@ -457,42 +471,30 @@ public static class ClassRoutes
         > requestMapper,
         IMapper<
             PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
-            PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
+            PaginatedQuery<ClassDomain, ClassCriteriaMAPI>
         > responseMapper
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () =>
-                requestMapper.Map(
-                    criteria with
-                    {
-                        WithProfessor = new()
-                        {
-                            Id = utils.GetIdFromContext(ctx),
-                            IsOwner = criteria.WithProfessor?.IsOwner,
-                        },
-                    }
-                ),
+            mapRequest: () => requestMapper.Map(criteria),
             mapResponse: (search) => Results.Ok(responseMapper.Map(search))
         );
     }
 
     public static Task<IResult> SearchClassProfessors(
-        ClassProfessorCriteriaMAPI request,
+        ClassProfessorCriteriaDTO request,
         SearchClassProfessorUseCase useCase,
-        IMapper<ClassProfessorCriteriaMAPI, ClassProfessorCriteriaDTO> reqMapper,
-        IMapper<
-            PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>,
-            PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>
-        > resMapper,
-        RoutesUtils utils
+        RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request),
-            mapResponse: (search) => Results.Ok(resMapper.Map(search))
+            mapRequest: () => request,
+            mapResponse: (search) => Results.Ok(search)
         );
     }
 
@@ -500,10 +502,12 @@ public static class ClassRoutes
         string classId,
         ulong userId,
         [FromServices] ReadClassProfessorUseCase useCase,
-        [FromServices] RoutesUtils utils
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => new UserClassRelationId { ClassId = classId, UserId = userId },
             mapResponse: professor => Results.Ok(professor)
@@ -513,15 +517,15 @@ public static class ClassRoutes
     public static Task<IResult> RemoveProfessorFromClass(
         string classId,
         ulong userId,
-        IMapper<string, ulong, Executor, DeleteClassProfessorDTO> reqMapper,
         DeleteClassProfessorUseCase useCase,
         RoutesUtils utils,
         HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(classId, userId, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => new() { ClassId = classId, UserId = userId },
             mapResponse: _ => Results.NoContent()
         );
     }

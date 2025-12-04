@@ -1,29 +1,23 @@
 using System.Linq.Expressions;
+using Application.DTOs.Tests;
 using Domain.Entities;
-using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 
-public class TestProjector : IEFProjector<Test, TestDomain>
+public class TestProjector : IEFProjector<Test, TestDomain, TestCriteriaDTO>
 {
-    public Expression<Func<Test, TestDomain>> Projection =>
+    public Expression<Func<Test, TestDomain>> GetProjection(TestCriteriaDTO criteria) =>
         t =>
             new()
             {
                 Id = t.TestId,
                 Title = t.Title,
                 Content = t.Content,
-                TimeLimitMinutes = t.TimeLimitMinutes.ToOptional(),
+                TimeLimitMinutes = t.TimeLimitMinutes,
                 ProfessorId = t.ProfessorId,
                 CreatedAt = t.CreatedAt,
                 ModifiedAt = t.ModifiedAt,
             };
-
-    private static readonly Lazy<Func<Test, TestDomain>> _mapFunc = new(() =>
-        new TestProjector().Projection.Compile()
-    );
-
-    public TestDomain Map(Test t) => _mapFunc.Value(t);
 }

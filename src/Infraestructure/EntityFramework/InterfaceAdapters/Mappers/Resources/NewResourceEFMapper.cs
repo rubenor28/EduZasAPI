@@ -9,7 +9,7 @@ public class NewResourceEFMapper : IMapper<NewResourceDTO, Resource>
     public Resource Map(NewResourceDTO input) =>
         new()
         {
-            ResourceId = input.Id,
+            ResourceId = Guid.NewGuid(),
             Title = input.Title,
             Content = input.Content,
             ProfessorId = input.ProfessorId,

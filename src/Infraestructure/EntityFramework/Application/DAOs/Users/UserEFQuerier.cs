@@ -10,7 +10,7 @@ namespace EntityFramework.Application.DAOs.Users;
 
 public class UserEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<User, UserDomain> projector,
+    IEFProjector<User, UserDomain, UserCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<UserDomain, UserCriteriaDTO, User>(ctx, projector, pageSize)
 {

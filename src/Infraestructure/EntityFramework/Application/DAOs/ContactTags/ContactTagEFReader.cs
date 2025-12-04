@@ -2,14 +2,14 @@ using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers.Common;
+using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ContactTags;
 
 public sealed class ContactTagEFReader(
     EduZasDotnetContext ctx,
-    IEFProjector<ContactTag, ContactTagDomain> projector
-) : EFReader<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, projector)
+    IMapper<ContactTag, ContactTagDomain> mapper
+) : EFReader<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, mapper)
 {
     protected override Expression<Func<ContactTag, bool>> GetIdPredicate(ContactTagIdDTO id) =>
         tpu =>

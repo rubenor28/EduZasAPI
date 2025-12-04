@@ -15,10 +15,10 @@ public class NewUserEFMapper(IMapper<UserType, uint> usrtMapper) : IMapper<NewUs
             Active = true,
             Email = source.Email,
             Password = source.Password,
-            Role = _usrtMapper.Map(UserType.STUDENT),
+            Role = _usrtMapper.Map(source.Role),
             FirstName = source.FirstName,
             FatherLastname = source.FatherLastname,
-            MidName = source.MidName.ToNullable(),
-            MotherLastname = source.MotherLastname.ToNullable(),
+            MidName = source.MidName,
+            MotherLastname = source.MotherLastname,
         };
 }

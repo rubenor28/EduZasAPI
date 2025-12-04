@@ -1,4 +1,4 @@
-using Application.DTOs.ClassStudents;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.UseCases.ClassStudents;
 using Domain.Entities;
@@ -23,8 +23,8 @@ public class AddClassStudentUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserProjector _userMapper = new();
-    private readonly ClassProjector _classMapper = new();
+    private readonly UserMapper _userMapper = new();
+    private readonly ClassMapper _classMapper = new();
 
     private readonly Random _rdm = new();
 
@@ -39,8 +39,8 @@ public class AddClassStudentUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var studentClassMapper = new ClassStudentProjector();
-        var professorClassMapper = new ClassProfessorProjector();
+        var studentClassMapper = new ClassStudentMapper();
+        var professorClassMapper = new ClassProfessorMapper();
 
         var userReader = new UserEFReader(_ctx, _userMapper);
         var classReader = new ClassEFReader(_ctx, _classMapper);
@@ -98,14 +98,11 @@ public class AddClassStudentUseCaseTest : IDisposable
         var cls = await SeedClass();
         var adminUser = await SeedUser(UserType.ADMIN);
 
-        var dto = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = user.Id,
-            Executor = AsExecutor(adminUser),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = user.Id };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(adminUser) }
+        );
 
         Assert.True(result.IsOk);
         var relation = await _ctx.ClassStudents.FindAsync(cls.Id, user.Id);
@@ -119,15 +116,17 @@ public class AddClassStudentUseCaseTest : IDisposable
         var cls = await SeedClass();
         var adminUser = await SeedUser(UserType.ADMIN);
 
-        var dto = new NewClassStudentDTO
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = user.Id };
+
+        var data = new UserActionDTO<UserClassRelationId>
         {
-            ClassId = cls.Id,
-            UserId = user.Id,
+            Data = dto,
             Executor = AsExecutor(adminUser),
         };
-        await _useCase.ExecuteAsync(dto); // Enroll first time
 
-        var result = await _useCase.ExecuteAsync(dto); // Attempt to enroll again
+        await _useCase.ExecuteAsync(data); // Enroll first time
+
+        var result = await _useCase.ExecuteAsync(data); // Attempt to enroll again
 
         Assert.True(result.IsErr);
         Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
@@ -137,14 +136,9 @@ public class AddClassStudentUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithNonExistentClass_ReturnsInputError()
     {
         var user = await SeedUser();
-        var dto = new NewClassStudentDTO
-        {
-            ClassId = "NON-EXISTENT",
-            UserId = user.Id,
-            Executor = AsExecutor(user),
-        };
+        var dto = new UserClassRelationId { ClassId = "NON-EXISTENT", UserId = user.Id };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(new() { Data = dto, Executor = AsExecutor(user) });
 
         Assert.True(result.IsErr);
         Assert.IsType<InputError>(result.UnwrapErr());
@@ -160,14 +154,11 @@ public class AddClassStudentUseCaseTest : IDisposable
     {
         var admin = await SeedUser(UserType.ADMIN);
         var cls = await SeedClass();
-        var dto = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = 999,
-            Executor = AsExecutor(admin),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = 999 };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         var error = result.UnwrapErr() as InputError;
@@ -193,14 +184,11 @@ public class AddClassStudentUseCaseTest : IDisposable
         );
         await _ctx.SaveChangesAsync();
 
-        var dto = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = professor.Id,
-            Executor = AsExecutor(professor),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = professor.Id };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(professor) }
+        );
 
         Assert.True(result.IsErr);
         var error = result.UnwrapErr() as InputError;

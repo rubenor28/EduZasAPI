@@ -30,7 +30,7 @@ public class AddClassUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserProjector _userMapper = new();
+    private readonly UserMapper _userMapper = new();
     private readonly Random _rdm = new();
 
     public AddClassUseCaseTest()
@@ -49,8 +49,8 @@ public class AddClassUseCaseTest : IDisposable
             20
         );
 
-        var classMapper = new ClassProjector();
-        var professorClassMapper = new ClassProfessorProjector();
+        var classMapper = new ClassMapper();
+        var professorClassMapper = new ClassProfessorMapper();
         var classCreator = new ClassEFCreator(_ctx, classMapper, new NewClassEFMapper());
 
         var professorClassCreator = new ClassProfessorsEFCreator(
@@ -76,7 +76,7 @@ public class AddClassUseCaseTest : IDisposable
 
     private async Task<UserDomain> SeedUser(UserType role)
     {
-      var id = (ulong)_rdm.NextInt64();
+        var id = (ulong)_rdm.NextInt64();
         var user = new User
         {
             UserId = id,
@@ -105,10 +105,11 @@ public class AddClassUseCaseTest : IDisposable
             Subject = "Math",
             OwnerId = user.Id,
             Professors = [],
-            Executor = AsExecutor(user),
         };
 
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newClass, Executor = AsExecutor(user) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -124,10 +125,15 @@ public class AddClassUseCaseTest : IDisposable
             Subject = "Math",
             OwnerId = 1000,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newClass,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsErr);
 
@@ -148,10 +154,11 @@ public class AddClassUseCaseTest : IDisposable
             Subject = "Math",
             OwnerId = user.Id,
             Professors = [],
-            Executor = AsExecutor(user)
         };
 
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newClass, Executor = AsExecutor(user) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -169,10 +176,11 @@ public class AddClassUseCaseTest : IDisposable
             Subject = "Math",
             OwnerId = user.Id,
             Professors = [],
-            Executor = AsExecutor(user)
         };
 
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newClass, Executor = AsExecutor(user) }
+        );
 
         Assert.True(result.IsErr);
 
@@ -193,10 +201,11 @@ public class AddClassUseCaseTest : IDisposable
             Subject = "Math",
             OwnerId = user.Id,
             Professors = [],
-            Executor = AsExecutor(user)
         };
 
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newClass, Executor = AsExecutor(user) }
+        );
 
         Assert.True(result.IsErr);
 
@@ -217,10 +226,11 @@ public class AddClassUseCaseTest : IDisposable
             Subject = "T",
             OwnerId = user.Id,
             Professors = [],
-            Executor = AsExecutor(user)
         };
 
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newClass, Executor = AsExecutor(user) }
+        );
 
         Assert.True(result.IsErr);
 
@@ -247,13 +257,14 @@ public class AddClassUseCaseTest : IDisposable
             Professors =
             [
                 new() { UserId = prof2.Id, IsOwner = false },
-                new() { UserId = prof3.Id, IsOwner = false }
+                new() { UserId = prof3.Id, IsOwner = false },
             ],
-            Executor = AsExecutor(owner),
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newClass, Executor = AsExecutor(owner) }
+        );
 
         // Assert
         if (result.IsErr)
@@ -263,8 +274,8 @@ public class AddClassUseCaseTest : IDisposable
         Assert.True(result.IsOk);
 
         var createdClass = result.Unwrap();
-        var professorRelations = await _ctx.ClassProfessors
-            .Where(cp => cp.ClassId == createdClass.Id)
+        var professorRelations = await _ctx
+            .ClassProfessors.Where(cp => cp.ClassId == createdClass.Id)
             .ToListAsync();
 
         Assert.Equal(3, professorRelations.Count);
@@ -288,11 +299,12 @@ public class AddClassUseCaseTest : IDisposable
             Subject = "Error Handling",
             OwnerId = owner.Id,
             Professors = [new() { UserId = student.Id, IsOwner = false }],
-            Executor = AsExecutor(owner),
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(newClass);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newClass, Executor = AsExecutor(owner) }
+        );
 
         // Assert
         Assert.True(result.IsErr);

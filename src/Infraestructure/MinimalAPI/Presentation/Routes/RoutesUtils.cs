@@ -67,6 +67,27 @@ public class RoutesUtils(
         }
     }
 
+    public async Task<IResult> HandleGuestUseCaseAsync<TRequest, TResponse>(
+        IGuestUseCaseAsync<TRequest, TResponse> useCase,
+        Func<TRequest> mapRequest,
+        Func<TResponse, IResult> mapResponse
+    )
+        where TRequest : notnull
+        where TResponse : notnull
+    {
+        return await HandleResponseAsync(async () =>
+        {
+            var request = mapRequest();
+
+            var result = await useCase.ExecuteAsync(request);
+
+            if (result.IsErr)
+                return _useCaseErrorMapper.Map(result.UnwrapErr());
+
+            return mapResponse(result.Unwrap());
+        });
+    }
+
     /// <summary>
     /// Orquesta la ejecución de un caso de uso asincrónico, manejando el mapeo de la solicitud, la ejecución del caso de uso y el mapeo de la respuesta.
     /// </summary>
@@ -80,6 +101,7 @@ public class RoutesUtils(
     /// un error de validación (BadRequest) o un error de lógica de negocio mapeado por <see cref="useCaseErrorMapper"/>.
     /// </returns>
     public async Task<IResult> HandleUseCaseAsync<TRequest, TResponse>(
+        HttpContext ctx,
         IUseCaseAsync<TRequest, TResponse> useCase,
         Func<Task<Result<TRequest, IEnumerable<FieldErrorDTO>>>> mapRequest,
         Func<TResponse, IResult> mapResponse
@@ -93,7 +115,9 @@ public class RoutesUtils(
             if (requestMap.IsErr)
                 return _useCaseErrorMapper.Map(UseCaseErrors.Input(requestMap.UnwrapErr()));
 
-            var result = await useCase.ExecuteAsync(requestMap.Unwrap());
+            var result = await useCase.ExecuteAsync(
+                new() { Data = requestMap.Unwrap(), Executor = GetExecutorFromContext(ctx) }
+            );
 
             if (result.IsErr)
                 return _useCaseErrorMapper.Map(result.UnwrapErr());
@@ -109,13 +133,14 @@ public class RoutesUtils(
     /// Esta sobrecarga es una conveniencia para casos donde el mapeo de la solicitud no es asincrónico.
     /// </remarks>
     public async Task<IResult> HandleUseCaseAsync<TRequest, TResponse>(
+        HttpContext ctx,
         IUseCaseAsync<TRequest, TResponse> useCase,
         Func<Result<TRequest, IEnumerable<FieldErrorDTO>>> mapRequest,
         Func<TResponse, IResult> mapResponse
     )
         where TRequest : notnull
         where TResponse : notnull =>
-        await HandleUseCaseAsync(useCase, () => Task.FromResult(mapRequest()), mapResponse);
+        await HandleUseCaseAsync(ctx, useCase, () => mapRequest(), mapResponse);
 
     /// <summary>
     /// Orquesta la ejecución de un caso de uso asincrónico donde el mapeo de la solicitud no requiere validación explícita.
@@ -124,28 +149,14 @@ public class RoutesUtils(
     /// Esta sobrecarga asume que la creación de la solicitud  <typeparamref name="TRequest"/> siempre es exitosa.
     /// </remarks>
     public async Task<IResult> HandleUseCaseAsync<TRequest, TResponse>(
+        HttpContext ctx,
         IUseCaseAsync<TRequest, TResponse> useCase,
         Func<TRequest> mapRequest,
         Func<TResponse, IResult> mapResponse
     )
         where TRequest : notnull
         where TResponse : notnull =>
-        await HandleUseCaseAsync(useCase, () => Task.FromResult(Result<TRequest, IEnumerable<FieldErrorDTO>>.Ok(mapRequest())), mapResponse);
-
-    /// <summary>
-    /// Obtiene el identificador del usuario autenticado desde el contexto HTTP.
-    /// </summary>
-    /// <param name="ctx">El <see cref="HttpContext"/> de la solicitud actual.</param>
-    /// <returns>El identificador del usuario como <see cref="ulong"/>.</returns>
-    /// <exception cref="InvalidDataException">Se lanza si el identificador del usuario no se encuentra en el contexto.</exception>
-    public ulong GetIdFromContext(HttpContext ctx)
-    {
-        var userId =
-            (string?)ctx.Items["UserId"]
-            ?? throw new InvalidDataException("Error al procesar el usuario: el 'UserId' no se encontró en el contexto.");
-
-        return ulong.Parse(userId);
-    }
+        await HandleUseCaseAsync(ctx, useCase, mapRequest: () => mapRequest(), mapResponse);
 
     /// <summary>
     /// Construye un objeto <see cref="Executor"/> a partir de la información del usuario autenticado en el contexto HTTP.
@@ -157,16 +168,22 @@ public class RoutesUtils(
     {
         var userId =
             (string?)ctx.Items["UserId"]
-            ?? throw new InvalidDataException("Error al procesar el Executor: el 'UserId' no se encontró en el contexto.");
+            ?? throw new InvalidDataException(
+                "Error al procesar el Executor: el 'UserId' no se encontró en el contexto."
+            );
 
         var userRole =
             (string?)ctx.Items["UserRole"]
-            ?? throw new InvalidDataException("Error al procesar el Executor: el 'UserRole' no se encontró en el contexto.");
+            ?? throw new InvalidDataException(
+                "Error al procesar el Executor: el 'UserRole' no se encontró en el contexto."
+            );
 
         var roleParse = _roleMapper.Map(userRole);
 
         if (roleParse.IsErr)
-            throw new InvalidDataException("Error al procesar el Executor: el rol proporcionado es inválido.");
+            throw new InvalidDataException(
+                "Error al procesar el Executor: el rol proporcionado es inválido."
+            );
 
         return new Executor { Id = ulong.Parse(userId), Role = roleParse.Unwrap() };
     }

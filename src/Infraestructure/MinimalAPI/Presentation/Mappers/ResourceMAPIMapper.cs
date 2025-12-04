@@ -9,7 +9,7 @@ using MinimalAPI.Application.DTOs.Resources;
 namespace MinimalAPI.Presentation.Mappers;
 
 public sealed class ResourceCriteriaMAPIMapper(
-    IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit> strqMapper
+    IBidirectionalResultMapper<StringQueryMAPI?, StringQueryDTO?, Unit> strqMapper
 )
     : IBidirectionalResultMapper<
         ResourceCriteriaMAPI,
@@ -20,7 +20,7 @@ public sealed class ResourceCriteriaMAPIMapper(
 {
     private readonly IBidirectionalResultMapper<
         StringQueryMAPI?,
-        Optional<StringQueryDTO>,
+        StringQueryDTO?,
         Unit
     > _strqMapper = strqMapper;
 
@@ -35,10 +35,10 @@ public sealed class ResourceCriteriaMAPIMapper(
 
         return new ResourceCriteriaDTO
         {
-            ClassId = input.ClassId.ToOptional(),
-            ProfessorId = input.ProfessorId.ToOptional(),
+            ClassId = input.ClassId,
+            ProfessorId = input.ProfessorId,
             Title = titleValidation.Unwrap(),
-            Active = input.Active.ToOptional(),
+            Active = input.Active,
             Page = input.Page,
         };
     }
@@ -48,56 +48,11 @@ public sealed class ResourceCriteriaMAPIMapper(
     public ResourceCriteriaMAPI MapFrom(ResourceCriteriaDTO input) =>
         new()
         {
-            ClassId = input.ClassId.ToNullable(),
-            ProfessorId = input.ProfessorId.ToNullable(),
-            Page = input.Page,
-            Active = input.Active.ToNullable(),
-            Title = _strqMapper.MapFrom(input.Title),
-        };
-}
-
-public sealed class NewResourceMAPIMapper : IMapper<NewResourceMAPI, Executor, NewResourceDTO>
-{
-    public NewResourceDTO Map(NewResourceMAPI value, Executor ex) =>
-        new()
-        {
-            Title = value.Title,
-            Content = value.Content,
-            ProfessorId = value.ProfessorId,
-            Executor = ex,
-        };
-}
-
-public sealed class PublicResourceMAPIMapper : IMapper<ResourceDomain, PublicResourceMAPI>
-{
-    public PublicResourceMAPI Map(ResourceDomain input) =>
-        new()
-        {
-            Id = input.Id,
-            Active = input.Active,
-            Title = input.Title,
-            Content = input.Content,
+            ClassId = input.ClassId,
             ProfessorId = input.ProfessorId,
-        };
-}
-
-public sealed class DeleteResourceMAPIMapper : IMapper<Guid, Executor, DeleteResourceDTO>
-{
-    public DeleteResourceDTO Map(Guid resourceId, Executor ex) =>
-        new() { Id = resourceId, Executor = ex };
-}
-
-public sealed class ResourceUpdateMAPIMapper
-    : IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>
-{
-    public ResourceUpdateDTO Map(ResourceUpdateMAPI value, Executor ex) =>
-        new()
-        {
-            Id = value.Id,
-            Active = value.Active,
-            Title = value.Title,
-            Content = value.Content,
-            Executor = ex,
+            Page = input.Page,
+            Active = input.Active,
+            Title = _strqMapper.MapFrom(input.Title),
         };
 }
 

@@ -4,7 +4,7 @@ public partial class Answer
 {
     public string Content { get; set; } = null!;
     public ulong UserId { get; set; }
-    public ulong TestId { get; set; }
+    public Guid TestId { get; set; }
     public string ClassId { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime ModifiedAt { get; set; }

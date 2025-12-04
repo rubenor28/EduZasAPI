@@ -9,13 +9,12 @@ public abstract class EFUpdater<DomainEntity, UpdateEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> domainMapper,
     IUpdateMapper<UpdateEntity, EFEntity> updateMapper
-)
-    : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, domainMapper),
-        IUpdaterAsync<DomainEntity, UpdateEntity>
+) : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx), IUpdaterAsync<DomainEntity, UpdateEntity>
     where EFEntity : class
     where DomainEntity : notnull
     where UpdateEntity : notnull
 {
+    protected readonly IMapper<EFEntity, DomainEntity> _domainMapper = domainMapper;
     protected readonly IUpdateMapper<UpdateEntity, EFEntity> _updateMapper = updateMapper;
 
     public async Task<DomainEntity> UpdateAsync(UpdateEntity updateData)

@@ -1,10 +1,10 @@
 using System.Buffers;
 using System.Text;
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.Tags;
-using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
@@ -25,9 +25,8 @@ public sealed class DeleteContactUseCase(
     TagQuerier tagQuerier,
     TagDeleter tagDeleter,
     ContactQuerier contactQuerier,
-    ContactTagDeleter contactTagDeleter,
-    IBusinessValidationService<DeleteContactDTO>? validator = null
-) : DeleteUseCase<ContactIdDTO, DeleteContactDTO, ContactDomain>(deleter, reader, validator)
+    ContactTagDeleter contactTagDeleter
+) : DeleteUseCase<ContactIdDTO, ContactDomain>(deleter, reader, null)
 {
     private readonly ContactQuerier _contactQuerier = contactQuerier;
     private readonly ContactTagDeleter _contactTagDeleter = contactTagDeleter;
@@ -37,15 +36,10 @@ public sealed class DeleteContactUseCase(
 
     /// <inheritdoc>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        DeleteContactDTO value
+        UserActionDTO<ContactIdDTO> value,
+        ContactDomain record
     )
     {
-        var recordSearch = await _reader.GetAsync(value.Id);
-        if (recordSearch.IsNone)
-            return UseCaseErrors.NotFound();
-
-        var record = recordSearch.Unwrap();
-
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
@@ -60,12 +54,10 @@ public sealed class DeleteContactUseCase(
         return Unit.Value;
     }
 
-    protected override ContactIdDTO GetId(DeleteContactDTO value) => value.Id;
-
-    protected override ContactIdDTO GetId(ContactDomain value) => value.Id;
-
-    /// <inheritdoc>
-    protected override async Task PrevTaskAsync(DeleteContactDTO deleteDTO)
+    protected override async Task PrevTaskAsync(
+        UserActionDTO<ContactIdDTO> deleteDTO,
+        ContactDomain record
+    )
     {
         // Proveedor de arrays alojados en el stack para evitar creacion de
         // arrays en el heap de forma inecesaria (reducir carga del Garbage Collector)
@@ -78,7 +70,7 @@ public sealed class DeleteContactUseCase(
         // Obtener todas las etiquetas del contacto a eliminar
         do
         {
-            contactTags = await _tagQuerier.GetByAsync(new() { ContactId = deleteDTO.Id.UserId });
+            contactTags = await _tagQuerier.GetByAsync(new() { ContactId = deleteDTO.Data.UserId });
 
             var listOfTagText = contactTags.Results.Select(t => t.Text);
             tags.AddRange(listOfTagText);
@@ -100,8 +92,8 @@ public sealed class DeleteContactUseCase(
                     new()
                     {
                         Tag = tag,
-                        AgendaOwnerId = deleteDTO.Id.AgendaOwnerId,
-                        UserId = deleteDTO.Id.UserId,
+                        AgendaOwnerId = deleteDTO.Data.AgendaOwnerId,
+                        UserId = deleteDTO.Data.UserId,
                     }
                 );
 
@@ -138,7 +130,7 @@ public sealed class DeleteContactUseCase(
             {
                 error = true;
                 errStr.Append(
-                    $"Error eliminadno relacion usuario-etiqueta: ({deleteDTO.Id},{tag})\n"
+                    $"Error eliminadno relacion usuario-etiqueta: ({deleteDTO.Data.UserId},{tag})\n"
                 );
             }
         }

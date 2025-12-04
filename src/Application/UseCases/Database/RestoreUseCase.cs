@@ -1,5 +1,5 @@
+using Application.DTOs;
 using Application.DTOs.Common;
-using Application.DTOs.Database;
 using Application.Services;
 using Application.UseCases.Common;
 using Domain.Enums;
@@ -12,7 +12,7 @@ namespace Application.UseCases.Database;
 /// </summary>
 /// <param name="importer">Servicio para importar la base de datos.</param>
 public sealed class RestoreUseCase(IDatabaseImporter importer)
-    : IUseCaseAsync<RestoreRequestDTO, Unit>
+    : IUseCaseAsync<Stream, Unit>
 {
     private readonly IDatabaseImporter _importer = importer;
 
@@ -28,12 +28,12 @@ public sealed class RestoreUseCase(IDatabaseImporter importer)
     /// </summary>
     /// <param name="request">La solicitud con el stream del respaldo.</param>
     /// <returns>Un resultado que indica éxito o un error.</returns>
-    public async Task<Result<Unit, UseCaseError>> ExecuteAsync(RestoreRequestDTO request)
+    public async Task<Result<Unit, UseCaseError>> ExecuteAsync(UserActionDTO<Stream> request)
     {
         if (!IsAuthorized(request.Executor))
             return UseCaseErrors.Unauthorized();
 
-        await _importer.RestoreAsync(request.InputStream);
+        await _importer.RestoreAsync(request.Data);
 
         return Unit.Value;
     }

@@ -10,7 +10,7 @@ namespace EntityFramework.Application.DAOs.Tests;
 
 public sealed class TestEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<Test, TestDomain> projector,
+    IEFProjector<Test, TestDomain, TestCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<TestDomain, TestCriteriaDTO, Test>(ctx, projector, pageSize)
 {

@@ -3,14 +3,14 @@ using Application.DTOs.ClassResources;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers.Common;
+using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassResources;
 
 public sealed class ClassResourceEFReader(
     EduZasDotnetContext ctx,
-    IEFProjector<ClassResource, ClassResourceDomain> projector
-) : EFReader<ClassResourceIdDTO, ClassResourceDomain, ClassResource>(ctx, projector)
+    IMapper<ClassResource, ClassResourceDomain> mapper
+) : EFReader<ClassResourceIdDTO, ClassResourceDomain, ClassResource>(ctx, mapper)
 {
     protected override Expression<Func<ClassResource, bool>> GetIdPredicate(
         ClassResourceIdDTO id

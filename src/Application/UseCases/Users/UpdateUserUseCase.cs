@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.Services;
@@ -16,7 +17,8 @@ public sealed class UpdateUserUseCase(
 ) : UpdateUseCase<ulong, UserUpdateDTO, UserDomain>(updater, reader, validator)
 {
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        UserUpdateDTO value
+        UserActionDTO<UserUpdateDTO> value,
+        UserDomain record
     )
     {
         var authorized = value.Executor.Role switch
@@ -27,10 +29,6 @@ public sealed class UpdateUserUseCase(
 
         if (!authorized)
             return UseCaseErrors.Unauthorized();
-
-        var userSearch = await _reader.GetAsync(value.Id);
-        if (userSearch.IsNone)
-            return UseCaseErrors.NotFound();
 
         return Unit.Value;
     }

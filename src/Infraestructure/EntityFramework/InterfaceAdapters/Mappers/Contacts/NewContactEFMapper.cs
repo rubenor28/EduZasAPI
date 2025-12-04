@@ -10,7 +10,7 @@ public class NewContactEFMapper : IMapper<NewContactDTO, AgendaContact>
         new()
         {
             Alias = input.Alias,
-            Notes = input.Notes.ToNullable(),
+            Notes = input.Notes,
             UserId = input.UserId,
             AgendaOwnerId = input.AgendaOwnerId,
         };

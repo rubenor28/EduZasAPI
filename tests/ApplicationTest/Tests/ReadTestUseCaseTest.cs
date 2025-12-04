@@ -1,9 +1,7 @@
 using Application.DTOs.Common;
-using Application.Services;
 using Application.UseCases.Tests;
 using Domain.Entities;
 using Domain.Enums;
-using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Tests;
@@ -13,28 +11,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTest.Tests;
 
-class MockUintValidator : IBusinessValidationService<ulong>
-{
-    public Result<Unit, IEnumerable<FieldErrorDTO>> IsValid(ulong data)
-    {
-        if (data <= 0)
-            return new FieldErrorDTO[]
-            {
-                new() { Field = "id", Message = "Debe ser un numero entero" },
-            };
-
-        return Unit.Value;
-    }
-}
-
 public class ReadTestUseCaseTest : IDisposable
 {
     private readonly ReadTestUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly TestProjector _testMapper = new();
-    private readonly UserProjector _userMapper = new();
+    private readonly TestMapper _testMapper = new();
+    private readonly UserMapper _userMapper = new();
 
     private readonly Random _random = new();
 
@@ -49,11 +33,10 @@ public class ReadTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testMapper = new TestProjector();
+        var testMapper = new TestMapper();
         var testReader = new TestEFReader(_ctx, testMapper);
-        var validator = new MockUintValidator();
 
-        _useCase = new ReadTestUseCase(testReader, validator);
+        _useCase = new ReadTestUseCase(testReader);
     }
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)
@@ -92,7 +75,13 @@ public class ReadTestUseCaseTest : IDisposable
         var professor = await SeedUser();
         var test = await SeedTest(professor.Id);
 
-        var result = await _useCase.ExecuteAsync(test.Id);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = test.Id,
+                Executor = new() { Id = professor.Id, Role = professor.Role },
+            }
+        );
 
         Assert.True(result.IsOk);
         var foundTest = result.Unwrap();
@@ -103,7 +92,13 @@ public class ReadTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_TestNotFound_ReturnsError()
     {
-        var result = await _useCase.ExecuteAsync(999);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = Guid.NewGuid(),
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<NotFoundError>(result.UnwrapErr());

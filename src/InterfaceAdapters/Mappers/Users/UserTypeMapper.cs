@@ -1,4 +1,5 @@
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 
@@ -129,35 +130,22 @@ public class UserTypeStringMapper
         };
 }
 
-public class OptionalUserTypeUintMapper
-    : IBidirectionalResultMapper<uint?, Optional<UserType>, Unit>,
-        IMapper<Optional<UserType>, uint?>
+public class OptionalUserTypeUintMapper(IBidirectionalResultMapper<uint, UserType, Unit> mapper)
+    : IBidirectionalResultMapper<uint?, UserType?, Unit>,
+        IMapper<UserType?, uint?>
 {
-    private readonly IBidirectionalResultMapper<uint, UserType, Unit> _mapper;
+    private readonly IBidirectionalResultMapper<uint, UserType, Unit> _mapper = mapper;
 
-    public OptionalUserTypeUintMapper(IBidirectionalResultMapper<uint, UserType, Unit> mapper)
-    {
-        _mapper = mapper;
-    }
-
-    public Result<Optional<UserType>, Unit> Map(uint? input)
+    public Result<UserType?, Unit> Map(uint? input)
     {
         if (input is null)
-        {
-            return Optional<UserType>.None();
-        }
+            return Result<UserType?, Unit>.Ok(null);
 
-        return _mapper.Map(input.Value).Match<Result<Optional<UserType>, Unit>>(
-            ok => Optional<UserType>.Some(ok),
-            err => err
-        );
+        return _mapper.Map(input.Value).Match<Result<UserType?, Unit>>(ok => ok, err => err);
     }
 
-    public uint? Map(Optional<UserType> input) => MapFrom(input);
+    public uint? Map(UserType? input) => MapFrom(input);
 
-    public uint? MapFrom(Optional<UserType> input) =>
-        input.Match<uint?>(
-            some => _mapper.MapFrom(some),
-            () => null
-        );
+    public uint? MapFrom(UserType? input) =>
+        input.Match<UserType, uint?>(some => _mapper.MapFrom(some), () => null);
 }

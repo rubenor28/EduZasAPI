@@ -1,15 +1,11 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.Services;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.Common;
 
-/// <summary>
-/// Caso de uso genérico para actualizar una entidad existente en el sistema.
-/// </summary>
-/// <typeparam name="UE">Tipo de los datos requeridos para la actualización.</typeparam>
-/// <typeparam name="E">Tipo de la entidad resultante.</typeparam>
 public abstract class UpdateUseCase<I, UE, E>(
     IUpdaterAsync<E, UE> updater,
     IReaderAsync<I, E> reader,
@@ -34,137 +30,64 @@ public abstract class UpdateUseCase<I, UE, E>(
     /// </summary>
     protected readonly IBusinessValidationService<UE>? _validator = validator;
 
-    /// <summary>
-    /// Ejecuta el proceso de actualización de una entidad, validando los datos de entrada
-    /// y aplicando las reglas de negocio correspondientes.
-    /// </summary>
-    /// <param name="request">Datos de actualización de la entidad.</param>
-    /// <param name="formatData">
-    /// Función opcional para formatear o transformar los datos de entrada antes de validarlos.
-    /// Actualmente no se utiliza en esta implementación.
-    /// </param>
-    /// <param name="extraValidation">
-    /// Función opcional para realizar validaciones sincrónicas adicionales sobre los datos.
-    /// Actualmente no se utiliza en esta implementación.
-    /// </param>
-    /// <param name="extraValidationAsync">
-    /// Función opcional para realizar validaciones asincrónicas adicionales sobre los datos.
-    /// Actualmente no se utiliza en esta implementación.
-    /// </param>
-    /// <returns>
-    /// Un <see cref="Result{T, E}"/> que contiene la entidad actualizada en caso de éxito,
-    /// o una lista de <see cref="FieldErrorDTO"/> si las validaciones fallan.
-    /// </returns>
-    public async Task<Result<E, UseCaseError>> ExecuteAsync(UE request)
+    public async Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<UE> request)
     {
-        var formatted = PreValidationFormat(request);
+        PreValidationFormat(ref request);
 
         if (_validator is not null)
         {
-            var validation = _validator.IsValid(formatted);
+            var validation = _validator.IsValid(request.Data);
             if (validation.IsErr)
                 return UseCaseErrors.Input(validation.UnwrapErr());
         }
 
-        var syncCheck = ExtraValidation(formatted);
+        var record = await _reader.GetAsync(GetId(request.Data));
+        if (record is null)
+            return UseCaseErrors.NotFound();
+
+        var syncCheck = ExtraValidation(request, record);
         if (syncCheck.IsErr)
             return syncCheck.UnwrapErr();
 
-        var asyncCheck = await ExtraValidationAsync(formatted);
+        var asyncCheck = await ExtraValidationAsync(request, record);
         if (asyncCheck.IsErr)
             return Result<E, UseCaseError>.Err(asyncCheck.UnwrapErr());
 
-        formatted = PostValidationFormat(formatted);
-        formatted = await PostValidationFormatAsync(formatted);
-        var updatedRecord = await _updater.UpdateAsync(request);
+        PostValidationFormat(request, record);
+        await PostValidationFormatAsync(request, record);
 
-        ExtraTask(formatted, updatedRecord);
-        await ExtraTaskAsync(formatted, updatedRecord);
+        var updatedRecord = await _updater.UpdateAsync(request.Data);
+
+        ExtraTask(request, record, updatedRecord);
+        await ExtraTaskAsync(request, record, updatedRecord);
 
         return updatedRecord;
     }
 
-    /// <summary>
-    /// Aplica formato a los datos antes de la validación principal.
-    /// </summary>
-    /// <param name="value">Datos a formatear.</param>
-    /// <returns>Datos formateados.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para aplicar transformaciones iniciales a los datos.
-    /// </remarks>
-    protected virtual UE PreValidationFormat(UE value) => value;
+    protected virtual void PreValidationFormat(ref UserActionDTO<UE> value) { }
 
-    /// <summary>
-    /// Aplica formato a los datos después de la validación principal de forma asíncrona.
-    /// </summary>
-    /// <param name="value">Datos a formatear.</param>
-    /// <returns>Datos formateados.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para aplicar transformaciones que requieren operaciones asíncronas.
-    /// </remarks>
-    protected virtual Task<UE> PostValidationFormatAsync(UE value) => Task.FromResult(value);
+    protected virtual Task PostValidationFormatAsync(UserActionDTO<UE> value, E original) =>
+        Task.CompletedTask;
 
-    /// <summary>
-    /// Aplica formato a los datos después de todas las validaciones.
-    /// </summary>
-    /// <param name="value">Datos a formatear.</param>
-    /// <returns>Datos formateados.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para aplicar transformaciones finales a los datos,
-    /// como el hashing de contraseñas antes de la persistencia.
-    /// </remarks>
-    protected virtual UE PostValidationFormat(UE value) => value;
+    protected virtual void PostValidationFormat(UserActionDTO<UE> value, E original) { }
 
-    /// <summary>
-    /// Realiza validaciones adicionales síncronas.
-    /// </summary>
-    /// <param name="value">Datos a validar.</param>
-    /// <returns>Resultado de la validación.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
-    /// </remarks>
-    protected virtual Result<Unit, UseCaseError> ExtraValidation(UE value) =>
-        Result<Unit, UseCaseError>.Ok(Unit.Value);
+    protected virtual Result<Unit, UseCaseError> ExtraValidation(
+        UserActionDTO<UE> value,
+        E original
+    ) => Result<Unit, UseCaseError>.Ok(Unit.Value);
 
-    /// <summary>
-    /// Realiza validaciones adicionales asíncronas.
-    /// </summary>
-    /// <param name="value">Datos a validar.</param>
-    /// <returns>Tarea que representa la validación asíncrona.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
-    /// como verificaciones en base de datos o llamadas a servicios externos.
-    /// </remarks>
-    protected async virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(UE value)
-    {
-        var record = await _reader.GetAsync(GetId(value));
-        if (record.IsNone)
-            return UseCaseErrors.NotFound();
+    protected virtual async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        UserActionDTO<UE> value,
+        E original
+    ) => Unit.Value;
 
-        return Unit.Value;
-    }
+    protected virtual void ExtraTask(UserActionDTO<UE> newEntity, E original, E createdEntity) { }
 
-    /// <summary>
-    /// Ejecuta tareas adicionales síncronas después de actualizar la entidad.
-    /// </summary>
-    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="createdEntity">Entidad creada en el sistema.</param>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
-    /// </remarks>
-    protected virtual void ExtraTask(UE newEntity, E createdEntity) { }
-
-    /// <summary>
-    /// Ejecuta tareas adicionales asíncronas después de actualizar la entidad.
-    /// </summary>
-    /// <param name="newEntity">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="createdEntity">Entidad creada en el sistema.</param>
-    /// <returns>Tarea que representa la operación asíncrona.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
-    /// </remarks>
-    protected virtual Task ExtraTaskAsync(UE newEntity, E createdEntity) =>
-        Task.FromResult(Unit.Value);
+    protected virtual Task ExtraTaskAsync(
+        UserActionDTO<UE> newEntity,
+        E original,
+        E createdEntity
+    ) => Task.FromResult(Unit.Value);
 
     protected abstract I GetId(UE dto);
 }

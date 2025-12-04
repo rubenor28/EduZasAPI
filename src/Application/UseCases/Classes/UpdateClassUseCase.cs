@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using Application.Services;
@@ -28,23 +29,20 @@ public class UpdateClassUseCase(
     /// <param name="value">DTO con los datos de la clase a actualizar.</param>
     /// <returns>Un resultado que indica si la validación fue exitosa o no.</returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        ClassUpdateDTO value
+        UserActionDTO<ClassUpdateDTO> value,
+        ClassDomain record
     )
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.Id),
+            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.Data.Id),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
 
         if (!authorized)
             return UseCaseErrors.Unauthorized();
-
-        var classToUpdate = await _reader.GetAsync(value.Id);
-        if (classToUpdate.IsNone)
-            return UseCaseErrors.NotFound();
 
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }
@@ -55,7 +53,7 @@ public class UpdateClassUseCase(
             new() { UserId = professorId, ClassId = classId }
         );
 
-        return professorSearch.IsSome && professorSearch.Unwrap().IsOwner;
+        return professorSearch is not null && professorSearch.IsOwner;
     }
 
     protected override string GetId(ClassUpdateDTO dto) => dto.Id;

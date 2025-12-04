@@ -20,7 +20,7 @@ public static class UserRoutes
         group
             .MapPost("/", SearchUsers)
             .RequireAuthorization("ProfessorOrAdmin")
-            .Produces<PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -39,7 +39,7 @@ public static class UserRoutes
         group
             .MapPut("/", UpdateUser)
             .RequireAuthorization("Admin")
-            .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
+            .Produces<PublicUserDTO>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -62,7 +62,7 @@ public static class UserRoutes
         group
             .MapDelete("/{userId:ulong}", DeleteUser)
             .RequireAuthorization("Admin")
-            .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
+            .Produces<PublicUserDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)
@@ -83,7 +83,7 @@ public static class UserRoutes
         group
             .MapGet("/{email}", GetUserByEmail)
             .RequireAuthorization("ProfessorOrAdmin")
-            .Produces<PublicUserMAPI>()
+            .Produces<PublicUserDTO>()
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -105,7 +105,7 @@ public static class UserRoutes
         group
             .MapGet("/{userId:ulong}", GetUserById)
             .RequireAuthorization("ProfessorOrAdmin")
-            .Produces<PublicUserMAPI>()
+            .Produces<PublicUserDTO>()
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -133,13 +133,14 @@ public static class UserRoutes
         IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
         IMapper<
             PaginatedQuery<UserDomain, UserCriteriaDTO>,
-            PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>
+            PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>
         > resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(criteria),
             mapResponse: (search) => Results.Ok(resMapper.Map(search))
@@ -156,10 +157,11 @@ public static class UserRoutes
             Executor,
             Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
-        IMapper<UserDomain, PublicUserMAPI> resMapper
+        IMapper<UserDomain, PublicUserDTO> resMapper
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
             mapResponse: (user) => Results.Ok(resMapper.Map(user))
@@ -171,13 +173,13 @@ public static class UserRoutes
         [FromServices] DeleteUserUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils,
-        IMapper<ulong, Executor, DeleteUserDTO> reqMapper,
-        IMapper<UserDomain, PublicUserMAPI> resMapper
+        IMapper<UserDomain, PublicUserDTO> resMapper
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(userId, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => userId,
             mapResponse: (user) => Results.Ok(resMapper.Map(user))
         );
     }
@@ -185,11 +187,13 @@ public static class UserRoutes
     public static Task<IResult> GetUserByEmail(
         string email,
         ReadUserEmailUseCase useCase,
-        IMapper<UserDomain, PublicUserMAPI> resMapper,
-        RoutesUtils utils
+        IMapper<UserDomain, PublicUserDTO> resMapper,
+        RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => email,
             mapResponse: (user) => Results.Ok(resMapper.Map(user))
@@ -199,11 +203,13 @@ public static class UserRoutes
     public static Task<IResult> GetUserById(
         ulong userId,
         ReadUserUseCase useCase,
-        IMapper<UserDomain, PublicUserMAPI> resMapper,
-        RoutesUtils utils
+        IMapper<UserDomain, PublicUserDTO> resMapper,
+        RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => userId,
             mapResponse: (user) => Results.Ok(resMapper.Map(user))

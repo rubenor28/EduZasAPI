@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Application.DTOs.Users;
+using Domain.Extensions;
 using Domain.Rules;
 using FluentValidation;
 using FluentValidationProj.Application.Services.Common;

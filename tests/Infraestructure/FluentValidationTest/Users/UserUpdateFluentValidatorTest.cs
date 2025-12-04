@@ -22,7 +22,6 @@ public class UserUpdateFluentValidatorTest
             MotherLastname = "KENNEDY",
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -42,7 +41,6 @@ public class UserUpdateFluentValidatorTest
             Password = "Password123!",
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -66,7 +64,6 @@ public class UserUpdateFluentValidatorTest
             Password = "Password123!",
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -90,7 +87,6 @@ public class UserUpdateFluentValidatorTest
             Password = "Password123!",
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -113,7 +109,6 @@ public class UserUpdateFluentValidatorTest
             Password = "Password123!",
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -139,7 +134,6 @@ public class UserUpdateFluentValidatorTest
             Password = password,
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -163,7 +157,6 @@ public class UserUpdateFluentValidatorTest
             MidName = midName,
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);
@@ -187,7 +180,6 @@ public class UserUpdateFluentValidatorTest
             MotherLastname = motherLastname,
             Active = true,
             Role = UserType.ADMIN,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var result = _validator.IsValid(dto);

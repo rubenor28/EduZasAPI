@@ -42,8 +42,6 @@ public static class ValidatorServiceCollectionExtensions
             UserCredentialsFluentValidator
         >();
 
-        services.AddSingleton<IBusinessValidationService<RolChangeDTO>, RolChangeFluentValidator>();
-
         // Class validators
         services.AddSingleton<IBusinessValidationService<NewClassDTO>, NewClassFluentValidator>();
 

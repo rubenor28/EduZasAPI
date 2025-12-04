@@ -39,8 +39,8 @@ public class UpdateTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly TestProjector _testMapper = new();
-    private readonly UserProjector _userMapper = new();
+    private readonly TestMapper _testMapper = new();
+    private readonly UserMapper _userMapper = new();
 
     private readonly Random _random = new();
 
@@ -110,10 +110,11 @@ public class UpdateTestUseCaseTest : IDisposable
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor.Id,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -130,10 +131,11 @@ public class UpdateTestUseCaseTest : IDisposable
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor.Id,
-            Executor = AsExecutor(professor),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(professor) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -145,14 +147,15 @@ public class UpdateTestUseCaseTest : IDisposable
 
         var updateDto = new TestUpdateDTO
         {
-            Id = 999, // Non-existent test
+            Id = Guid.NewGuid(), // Non-existent test
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = 1,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<NotFoundError>(result.UnwrapErr());
@@ -171,10 +174,15 @@ public class UpdateTestUseCaseTest : IDisposable
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor.Id,
-            Executor = AsExecutor(student),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = updateDto,
+                Executor = AsExecutor(student),
+            }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -193,10 +201,16 @@ public class UpdateTestUseCaseTest : IDisposable
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor1.Id,
-            Executor = AsExecutor(professor2),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = updateDto,
+
+                Executor = AsExecutor(professor2),
+            }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -214,10 +228,16 @@ public class UpdateTestUseCaseTest : IDisposable
             Title = "", // Invalid title
             Content = "Updated Content",
             ProfessorId = 1,
-            Executor = AsExecutor(professor),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = updateDto,
+
+                Executor = AsExecutor(professor),
+            }
+        );
 
         Assert.True(result.IsErr);
         var err = result.UnwrapErr();

@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using InterfaceAdapters.Mappers.Common;
+using Application.DTOs.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Common;
 
@@ -14,11 +14,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Common;
 /// </remarks>
 /// <typeparam name="TIn">El tipo del objeto de origen (usualmente la entidad de EF).</typeparam>
 /// <typeparam name="TOut">El tipo del objeto de destino (usualmente la entidad de Dominio o un DTO).</typeparam>
-public interface IEFProjector<TIn, TOut> : IMapper<TIn, TOut>
+public interface IEFProjector<TIn, TOut, TCriteria>
+    where TCriteria : CriteriaDTO
 {
     /// <summary>
     /// Obtiene el árbol de expresión que define la proyección de <typeparamref name="TIn"/> a <typeparamref name="TOut"/>.
     /// Esta expresión está diseñada para ser utilizada por Entity Framework para generar consultas optimizadas.
     /// </summary>
-    Expression<Func<TIn, TOut>> Projection { get; }
+    Expression<Func<TIn, TOut>> GetProjection(TCriteria criteria);
 }

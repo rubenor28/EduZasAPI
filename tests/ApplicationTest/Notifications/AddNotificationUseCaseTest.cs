@@ -1,5 +1,6 @@
 using Application.DTOs.Notifications;
 using Application.UseCases.Notifications;
+using Domain.Enums;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
@@ -29,8 +30,8 @@ public class AddNotificationUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var notificationMapper = new NotificationProjector();
-        var userNotificationMapper = new UserNotificationProjector();
+        var notificationMapper = new NotificationMapper();
+        var userNotificationMapper = new UserNotificationMapper();
 
         var notificationCreator = new NotificationEFCreator(
             _ctx,
@@ -95,7 +96,13 @@ public class AddNotificationUseCaseTest : IDisposable
             Title = "Test Notification",
         };
 
-        var result = await _useCase.ExecuteAsync(newNotificationDto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newNotificationDto,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
         var createdNotification = result.Unwrap();
@@ -118,7 +125,13 @@ public class AddNotificationUseCaseTest : IDisposable
             Title = "Test Notification",
         };
 
-        var result = await _useCase.ExecuteAsync(newNotificationDto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newNotificationDto,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
         var createdNotification = result.Unwrap();
@@ -133,16 +146,17 @@ public class AddNotificationUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithInvalidData_ReturnsError()
     {
-        // This test depends on the validator logic which is not part of this use case.
-        // We assume the generic AddUseCase or a validator would handle this.
-        // For now, we can just create a placeholder test.
-        await SeedClass(); // Seed the class to prevent FK constraint violation
+        await SeedClass();
         var newNotificationDto = new NewNotificationDTO { ClassId = "TEST-CLASS", Title = "" };
 
-        // We can't properly test validation without a validator injected.
-        // This test is expected to pass if no validator is configured to run.
-        var result = await _useCase.ExecuteAsync(newNotificationDto);
-        Assert.True(result.IsOk); // Or Assert.True(result.IsErr) if a validator is present.
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newNotificationDto,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
+        Assert.True(result.IsOk);
     }
 
     public void Dispose()

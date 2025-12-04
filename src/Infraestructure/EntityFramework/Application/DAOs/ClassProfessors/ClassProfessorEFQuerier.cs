@@ -10,13 +10,13 @@ namespace EntityFramework.Application.DAOs.ClassProfessors;
 
 public sealed class ClassProfessorEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<ClassProfessor, ClassProfessorDomain> projector,
-    int pageSize
+    IEFProjector<ClassProfessor, ClassProfessorDomain, ClassProfessorCriteriaDTO> projector,
+    int maxPageSize
 )
     : EFQuerier<ClassProfessorDomain, ClassProfessorCriteriaDTO, ClassProfessor>(
         ctx,
         projector,
-        pageSize
+        maxPageSize
     )
 {
     public override IQueryable<ClassProfessor> BuildQuery(ClassProfessorCriteriaDTO c) =>

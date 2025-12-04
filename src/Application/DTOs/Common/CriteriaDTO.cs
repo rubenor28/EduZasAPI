@@ -8,6 +8,13 @@ public abstract record CriteriaDTO
     /// <summary>
     /// Obtiene el número de página para la paginación de resultados.
     /// </summary>
-    /// <value>Número de página actual (base 0 o 1 dependiendo de la implementación).</value>
+    /// <remarks>El valor por defecto es 1</remarks>
     public int Page { get; set; } = 1;
+
+    /// <summary>
+    /// Número de elementos que puede tener una pagina.
+    /// </summary>
+    /// <value>Número de página actual.</value>
+    /// <remarks>El valor por defecto es int.MaxValue</remarks>
+    public int PageSize { get; set; } = int.MaxValue;
 }

@@ -7,7 +7,6 @@ using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Tests;
 using EntityFramework.InterfaceAdapters.Mappers.Users;
-using InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,8 +18,7 @@ public class QueryTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly TestProjector _testMapper = new();
-    private readonly UserProjector _userMapper = new();
+    private readonly UserMapper _userMapper = new();
 
     private readonly Random _random = new();
 
@@ -35,7 +33,8 @@ public class QueryTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testQuerier = new TestEFQuerier(_ctx, _testMapper, 10);
+        var testProjector = new TestProjector();
+        var testQuerier = new TestEFQuerier(_ctx, testProjector, 10);
 
         _useCase = new QueryTestUseCase(testQuerier);
     }
@@ -58,6 +57,8 @@ public class QueryTestUseCaseTest : IDisposable
         return _userMapper.Map(user);
     }
 
+    private static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
+
     private async Task<(UserDomain, UserDomain)> SeedTests()
     {
         var professor1 = await SeedUser();
@@ -66,21 +67,21 @@ public class QueryTestUseCaseTest : IDisposable
         _ctx.Tests.AddRange(
             new Test
             {
-                TestId = 1,
+                TestId = Guid.NewGuid(),
                 Title = "Math Test",
                 Content = "Test for algebra",
                 ProfessorId = professor1.Id,
             },
             new Test
             {
-                TestId = 2,
+                TestId = Guid.NewGuid(),
                 Title = "Science Test",
                 Content = "Test for biology",
                 ProfessorId = professor1.Id,
             },
             new Test
             {
-                TestId = 3,
+                TestId = Guid.NewGuid(),
                 Title = "History Test",
                 Content = "Test for world history",
                 ProfessorId = professor2.Id,
@@ -93,10 +94,13 @@ public class QueryTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithNoCriteria_ReturnsAllTests()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         await SeedTests();
         var criteria = new TestCriteriaDTO();
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var search = result.Unwrap();
@@ -107,13 +111,16 @@ public class QueryTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithTitleCriteria_ReturnsMatchingTests()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         await SeedTests();
         var criteria = new TestCriteriaDTO
         {
             Title = new StringQueryDTO { Text = "Math", SearchType = StringSearchType.LIKE },
         };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var search = result.Unwrap();
@@ -126,10 +133,13 @@ public class QueryTestUseCaseTest : IDisposable
     [Fact]
     public async Task ExecuteAsync_WithProfessorIdCriteria_ReturnsMatchingTests()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var (_, professor2) = await SeedTests();
         var criteria = new TestCriteriaDTO { ProfessorId = professor2.Id };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var search = result.Unwrap();

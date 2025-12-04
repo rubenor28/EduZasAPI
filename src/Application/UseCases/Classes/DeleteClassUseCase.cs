@@ -1,5 +1,5 @@
 using Application.DAOs;
-using Application.DTOs.Classes;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Entities;
@@ -12,16 +12,17 @@ public class DeleteClassUseCase(
     IDeleterAsync<string, ClassDomain> deleter,
     IReaderAsync<string, ClassDomain> reader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> relationReader
-) : DeleteUseCase<string, DeleteClassDTO, ClassDomain>(deleter, reader)
+) : DeleteUseCase<string, ClassDomain>(deleter, reader)
 {
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        DeleteClassDTO value
+        UserActionDTO<string> value,
+        ClassDomain record
     )
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.Id),
+            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.Data),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -29,9 +30,9 @@ public class DeleteClassUseCase(
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
-        var classSearch = await _reader.GetAsync(value.Id);
+        var classSearch = await _reader.GetAsync(value.Data);
 
-        if (classSearch.IsNone)
+        if (classSearch is null)
             return UseCaseErrors.NotFound();
 
         return Unit.Value;
@@ -43,10 +44,6 @@ public class DeleteClassUseCase(
             new() { UserId = professorId, ClassId = classId }
         );
 
-        return professorSearch.IsSome && professorSearch.Unwrap().IsOwner;
+        return professorSearch is not null && professorSearch.IsOwner;
     }
-
-    protected override string GetId(DeleteClassDTO value) => value.Id;
-
-    protected override string GetId(ClassDomain value) => value.Id;
 }

@@ -1,5 +1,3 @@
-using Application.DTOs.Common;
-using Domain.ValueObjects;
 
 namespace Application.DTOs.Classes;
 
@@ -11,35 +9,30 @@ public sealed record ClassUpdateDTO
     /// <summary>
     /// Obtiene o establece el identificador único de la clase a actualizar.
     /// </summary>
-    public required string Id { get; set; }
+    public required string Id { get; init; }
 
     /// <summary>
     /// Obtiene o establece el estado de la clase.
     /// </summary>
-    public required bool Active { get; set; }
+    public required bool Active { get; init; }
 
     /// <summary>
     /// Obtiene o establece el nombre de la clase.
     /// </summary>
-    public required string ClassName { get; set; }
-
-    /// <summary>
-    /// Color de la carta en la UI
-    /// </summary>
-    public required string Color { get; set; }
+    public required string ClassName { get; init; }
 
     /// <summary>
     /// Obtiene o establece la materia o asignatura de la clase (opcional).
     /// </summary>
-    public required Optional<string> Subject { get; set; }
+    public string? Subject { get; init; }
 
     /// <summary>
     /// Obtiene o establece la sección o grupo de la clase (opcional).
     /// </summary>
-    public required Optional<string> Section { get; set; }
+    public string? Section { get; init; }
 
     /// <summary>
-    /// Representa el ejecutor de la operacion
+    /// Color de la carta en la UI
     /// </summary>
-    public required Executor Executor { get; set; }
+    public required string Color { get; init; }
 }

@@ -1,13 +1,14 @@
 using System.Linq.Expressions;
+using Application.DTOs.Resources;
 using Domain.Entities;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Resources;
 
-public class ResourceProjector : IEFProjector<Resource, ResourceDomain>
+public class ResourceProjector : IEFProjector<Resource, ResourceDomain, ResourceCriteriaDTO>
 {
-    public Expression<Func<Resource, ResourceDomain>> Projection =>
+    public Expression<Func<Resource, ResourceDomain>> GetProjection(ResourceCriteriaDTO criteria) =>
         input =>
             new()
             {
@@ -19,17 +20,13 @@ public class ResourceProjector : IEFProjector<Resource, ResourceDomain>
                 CreatedAt = input.CreatedAt,
                 ModifiedAt = input.ModifiedAt,
             };
-
-    private static readonly Lazy<Func<Resource, ResourceDomain>> _mapFunc = new(() =>
-        new ResourceProjector().Projection.Compile()
-    );
-
-    public ResourceDomain Map(Resource input) => _mapFunc.Value(input);
 }
 
-public class ResourceSummaryProjector : IEFProjector<Resource, ResourceSummary>
+public class ResourceSummaryProjector : IEFProjector<Resource, ResourceSummary, ResourceCriteriaDTO>
 {
-    public Expression<Func<Resource, ResourceSummary>> Projection =>
+    public Expression<Func<Resource, ResourceSummary>> GetProjection(
+        ResourceCriteriaDTO criteria
+    ) =>
         input =>
             new()
             {
@@ -38,10 +35,4 @@ public class ResourceSummaryProjector : IEFProjector<Resource, ResourceSummary>
                 ProfessorId = input.ProfessorId,
                 Title = input.Title,
             };
-
-    private static readonly Lazy<Func<Resource, ResourceSummary>> _mapFunc = new(() =>
-        new ResourceSummaryProjector().Projection.Compile()
-    );
-
-    public ResourceSummary Map(Resource input) => _mapFunc.Value(input);
 }

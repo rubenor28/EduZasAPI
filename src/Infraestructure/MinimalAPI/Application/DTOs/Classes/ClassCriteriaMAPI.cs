@@ -1,19 +1,8 @@
+using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Common;
 
 namespace MinimalAPI.Application.DTOs.Classes;
-
-public record class WithProfessorMAPI
-{
-    public required ulong Id { get; set; }
-    public bool? IsOwner { get; set; } = null;
-}
-
-public record class WithStudentMAPI
-{
-    public required ulong Id { get; set; }
-    public bool? Hidden { get; set; } = null;
-}
 
 /// <summary>
 /// Representa los criterios de búsqueda y filtrado para consultas de clases
@@ -44,10 +33,10 @@ public sealed record ClassCriteriaMAPI : CriteriaDTO
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen asignado un profesor específico.
     /// </summary>
-    public WithProfessorMAPI? WithProfessor { get; set; }
+    public WithProfessorDTO? WithProfessor { get; set; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen inscrito un estudiante específico.
     /// </summary>
-    public WithStudentMAPI? WithStudent { get; set; }
+    public WithStudentDTO? WithStudent { get; set; }
 }

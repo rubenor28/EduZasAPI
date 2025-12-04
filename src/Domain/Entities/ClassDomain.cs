@@ -1,5 +1,3 @@
-using Domain.ValueObjects;
-
 namespace Domain.Entities;
 
 /// <summary>
@@ -35,12 +33,12 @@ public class ClassDomain
     /// <summary>
     /// Obtiene o establece la materia a la que pertenece la clase.
     /// </summary>
-    public required Optional<string> Subject { get; set; }
+    public string? Subject { get; set; }
 
     /// <summary>
     /// Obtiene o establece la sección o grupo de la clase.
     /// </summary>
-    public required Optional<string> Section { get; set; }
+    public string? Section { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la clase.

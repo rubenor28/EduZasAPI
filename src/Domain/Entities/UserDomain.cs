@@ -1,5 +1,4 @@
 using Domain.Enums;
-using Domain.ValueObjects;
 
 namespace Domain.Entities;
 
@@ -81,7 +80,7 @@ public class UserDomain
     /// Optional que contiene el segundo nombre si está presente,
     /// o None si no existe. Valor por defecto: None.
     /// </value>
-    public Optional<string> MidName { get; set; } = Optional<string>.None();
+    public string? MidName { get; set; }
 
     /// <summary>
     /// Obtiene o establece el apellido materno del usuario (opcional).
@@ -90,5 +89,5 @@ public class UserDomain
     /// Optional que contiene el apellido materno si está presente,
     /// o None si no existe. Valor por defecto: None.
     /// </value>
-    public Optional<string> MotherLastname { get; set; } = Optional<string>.None();
+    public string? MotherLastname { get; set; }
 }

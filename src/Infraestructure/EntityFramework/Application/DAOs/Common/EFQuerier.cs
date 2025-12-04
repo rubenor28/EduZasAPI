@@ -8,40 +8,52 @@ namespace EntityFramework.Application.DAOs.Common;
 
 public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
     EduZasDotnetContext ctx,
-    IEFProjector<EFEntity, DomainEntity> projector,
-    int pageSize
+    IEFProjector<EFEntity, DomainEntity, EntityCriteria> projector,
+    int maxPageSize
 )
-    : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, projector),
+    : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx),
         IQuerierAsync<DomainEntity, EntityCriteria>
     where EFEntity : class
     where EntityCriteria : CriteriaDTO
     where DomainEntity : notnull
 {
-    protected readonly int _pageSize = pageSize;
-    private readonly IEFProjector<EFEntity, DomainEntity> _projector = projector;
+    protected readonly int _maxPageSize = maxPageSize;
+    private readonly IEFProjector<EFEntity, DomainEntity, EntityCriteria> _projector = projector;
 
-    public int PageSize => _pageSize;
+    public int PageSize => _maxPageSize;
 
     protected int CalcOffset(int pageNumber)
     {
         if (pageNumber < 1)
             pageNumber = 1;
-        return (pageNumber - 1) * _pageSize;
+        return (pageNumber - 1) * _maxPageSize;
     }
 
+    ///<inheritdoc>
     public async Task<PaginatedQuery<DomainEntity, EntityCriteria>> GetByAsync(
         EntityCriteria criteria
     )
     {
         var query = BuildQuery(criteria);
         var totalRecords = await query.CountAsync();
+
+        var pageSize = criteria.PageSize < _maxPageSize ? criteria.PageSize : _maxPageSize;
+        if (pageSize <= 0)
+            pageSize = _maxPageSize;
+
+        var pageNumber = criteria.Page;
+        if (pageNumber < 1)
+            pageNumber = 1;
+
+        var offset = (pageNumber - 1) * pageSize;
+
         var results = await query
-            .Select(_projector.Projection)
-            .Skip(CalcOffset(criteria.Page))
-            .Take(_pageSize)
+            .Select(_projector.GetProjection(criteria))
+            .Skip(offset)
+            .Take(pageSize)
             .ToListAsync();
 
-        int totalPages = (int)Math.Ceiling((decimal)totalRecords / _pageSize);
+        var totalPages = pageSize > 0 ? (int)Math.Ceiling((decimal)totalRecords / pageSize) : 0;
 
         return new()
         {
@@ -52,5 +64,14 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
         };
     }
 
+    ///<inheritdoc>
+    public Task<int> CountAsync(EntityCriteria criteria) => BuildQuery(criteria).CountAsync();
+
+    ///<inheritdoc>
+    public Task<bool> AnyAsync(EntityCriteria criteria) => BuildQuery(criteria).AnyAsync();
+
+    /// <summary>
+    /// Método encargado de contruir un IQueryable<EFEntity> a partir de un criterio.
+    /// </summary>
     public abstract IQueryable<EFEntity> BuildQuery(EntityCriteria criteria);
 }

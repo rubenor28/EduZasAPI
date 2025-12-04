@@ -1,11 +1,9 @@
 using Application.DTOs.Common;
 using Application.DTOs.Tests;
-using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Tests;
-using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,8 +20,6 @@ public class TestEFRepositoryTest : IDisposable
     private readonly TestEFQuerier _querier;
     private readonly TestEFDeleter _deleter;
 
-    private readonly UserProjector _userMapper = new();
-
     public TestEFRepositoryTest()
     {
         var dbName = Guid.NewGuid().ToString();
@@ -35,44 +31,46 @@ public class TestEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testMapper = new TestProjector();
+        var testMapper = new TestMapper();
+        var testProjector = new TestProjector();
 
         _creator = new(_ctx, testMapper, new NewTestEFMapper());
         _updater = new(_ctx, testMapper, new UpdateTestEFMapper());
         _reader = new(_ctx, testMapper);
-        _querier = new(_ctx, testMapper, 10);
+        _querier = new(_ctx, testProjector, 10);
         _deleter = new(_ctx, testMapper);
     }
-
-    private async Task<UserDomain> CreateUser(UserType role = UserType.STUDENT)
+    
+    private async Task<User> CreateProfessor(ulong id = 1)
     {
-        var user = new User
+        var professor = new User
         {
-            Email = "test@test.com",
-            Password = "test",
-            FirstName = "test",
-            FatherLastname = "test",
+            UserId = id,
+            Email = $"professor{id}@example.com",
+            FirstName = "Test",
+            FatherLastname = "Professor",
+            Password = "hashedpassword", 
+            Role = (uint)UserType.PROFESSOR,
             Active = true,
-            Role = (uint)role,
+            CreatedAt = DateTime.UtcNow,
+            ModifiedAt = DateTime.UtcNow
         };
-
-        await _ctx.Users.AddAsync(user);
+        _ctx.Users.Add(professor);
         await _ctx.SaveChangesAsync();
-
-        return _userMapper.Map(user);
+        _ctx.ChangeTracker.Clear();
+        return professor;
     }
+
 
     [Fact]
     public async Task AddTest_ReturnsTest()
     {
-        var user = await CreateUser(UserType.PROFESSOR);
-
+        var professor = await CreateProfessor();
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfessorId = 1,
-            Executor = new() { Id = user.Id, Role = user.Role },
+            ProfessorId = professor.UserId,
         };
 
         var created = await _creator.AddAsync(newTest);
@@ -85,25 +83,23 @@ public class TestEFRepositoryTest : IDisposable
     [Fact]
     public async Task UpdateTest_ReturnsUpdatedTest()
     {
-        var user = await CreateUser(UserType.PROFESSOR);
-
+        var professor = await CreateProfessor();
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfessorId = 1,
-            Executor = new() { Id = user.Id, Role = user.Role },
+            ProfessorId = professor.UserId,
         };
 
         var created = await _creator.AddAsync(newTest);
+        _ctx.ChangeTracker.Clear();
 
         var update = new TestUpdateDTO
         {
             Id = created.Id,
             Title = "Updated Test Title",
             Content = "Updated Test Content",
-            ProfessorId = 1,
-            Executor = new() { Id = user.Id, Role = user.Role },
+            ProfessorId = professor.UserId,
         };
 
         var updatedTest = await _updater.UpdateAsync(update);
@@ -116,43 +112,40 @@ public class TestEFRepositoryTest : IDisposable
     [Fact]
     public async Task GetAsync_WhenTestExists_ReturnsTest()
     {
-        var user = await CreateUser(UserType.PROFESSOR);
-
+        var professor = await CreateProfessor();
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfessorId = 1,
-            Executor = new() { Id = user.Id, Role = user.Role },
+            ProfessorId = professor.UserId,
         };
         var created = await _creator.AddAsync(newTest);
 
         var foundTest = await _reader.GetAsync(created.Id);
 
-        Assert.True(foundTest.IsSome);
-        Assert.Equal(created.Id, foundTest.Unwrap().Id);
+        Assert.NotNull(foundTest);
+        Assert.Equal(created.Id, foundTest.Id);
     }
 
     [Fact]
     public async Task GetAsync_WhenTestDoesNotExist_ReturnsEmptyOptional()
     {
-        var foundTest = await _reader.GetAsync(999);
-
-        Assert.True(foundTest.IsNone);
+        var foundTest = await _reader.GetAsync(Guid.NewGuid());
+        Assert.Null(foundTest);
     }
 
     [Fact]
     public async Task DeleteAsync_WhenTestExists_ReturnsDeletedTest()
     {
-        var user = await CreateUser(UserType.PROFESSOR);
+        var professor = await CreateProfessor();
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
             Content = "Test Content",
-            ProfessorId = 1,
-            Executor = new() { Id = user.Id, Role = user.Role },
+            ProfessorId = professor.UserId,
         };
         var created = await _creator.AddAsync(newTest);
+        _ctx.ChangeTracker.Clear();
 
         var deletedTest = await _deleter.DeleteAsync(created.Id);
 
@@ -160,25 +153,24 @@ public class TestEFRepositoryTest : IDisposable
         Assert.Equal(created.Id, deletedTest.Id);
 
         var foundTest = await _reader.GetAsync(created.Id);
-        Assert.True(foundTest.IsNone);
+        Assert.Null(foundTest);
     }
 
     [Fact]
     public async Task DeleteAsync_WhenTestDoesNotExist_ThrowsException()
     {
-        await Assert.ThrowsAsync<ArgumentException>(() => _deleter.DeleteAsync(999));
+        await Assert.ThrowsAsync<ArgumentException>(() => _deleter.DeleteAsync(Guid.NewGuid()));
     }
 
     [Fact]
     public async Task GetByAsync_WithTitleCriteria_ReturnsMatchingTest()
     {
-        var user = await CreateUser(UserType.PROFESSOR);
+        var professor = await CreateProfessor();
         var newTest1 = new NewTestDTO
         {
             Title = "Math Test",
             Content = "Test Content",
-            ProfessorId = 1,
-            Executor = new() { Id = user.Id, Role = user.Role },
+            ProfessorId = professor.UserId,
         };
         await _creator.AddAsync(newTest1);
 
@@ -186,8 +178,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Science Test",
             Content = "Test Content",
-            ProfessorId = 1,
-            Executor = new() { Id = user.Id, Role = user.Role },
+            ProfessorId = professor.UserId,
         };
         await _creator.AddAsync(newTest2);
 

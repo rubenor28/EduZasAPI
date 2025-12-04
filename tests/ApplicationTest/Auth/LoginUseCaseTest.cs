@@ -1,8 +1,9 @@
 using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
+using Application.UseCases.Users;
 using Bcrypt.Application.Services;
-using Domain.ValueObjects;
+using Domain.Enums;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Users;
@@ -32,36 +33,49 @@ public class LoginUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var hasher = new BCryptHasher();
-        var userMapper = new UserProjector();
+        var userMapper = new UserMapper();
 
-        var querier = new UserEFQuerier(_ctx, userMapper, 10);
+        var userReader = new UserEmailEFReader(_ctx, userMapper);
         var credentialsValidator = new UserCredentialsFluentValidator();
-        var creator = new UserEFCreator(_ctx, userMapper, new NewUserEFMapper(new UserTypeUintMapper()));
+        var creator = new UserEFCreator(
+            _ctx,
+            userMapper,
+            new NewUserEFMapper(new UserTypeUintMapper())
+        );
         var newUserValidator = new NewUserFluentValidator();
 
-        _useCase = new LoginUseCase(hasher, querier, credentialsValidator);
-        _addUserUseCase = new AddUserUseCase(hasher, creator, newUserValidator, querier);
+        _useCase = new LoginUseCase(hasher, userReader, credentialsValidator);
+        _addUserUseCase = new AddUserUseCase(hasher, creator, newUserValidator, userReader);
+    }
+
+    private async Task SeedUser(string email, string password)
+    {
+        var newUser = new NewUserDTO
+        {
+            FirstName = "Test",
+            FatherLastname = "Test",
+            Email = email,
+            Password = password,
+            Role = UserType.STUDENT,
+        };
+
+        await _addUserUseCase.ExecuteAsync(
+            new()
+            {
+                Data = newUser,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
     }
 
     [Fact]
     public async Task ExecuteAsync_WithValidCredentials_ReturnsOk()
     {
-        var newUser = new NewUserDTO
-        {
-            FirstName = "JOHN",
-            FatherLastname = "DOE",
-            Email = "john.doe@example.com",
-            Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
-        };
-        await _addUserUseCase.ExecuteAsync(newUser);
+        var email = "john.doe@example.com";
+        var pwd = "Password123!";
+        await SeedUser(email, pwd);
 
-        var credentials = new UserCredentialsDTO
-        {
-            Email = "john.doe@example.com",
-            Password = "Password123!",
-        };
+        var credentials = new UserCredentialsDTO { Email = email, Password = pwd };
 
         var result = await _useCase.ExecuteAsync(credentials);
 
@@ -80,29 +94,17 @@ public class LoginUseCaseTest : IDisposable
         var result = await _useCase.ExecuteAsync(credentials);
 
         var err = result.UnwrapErr();
-        Assert.Equal(typeof(InputError), err.GetType());
-        Assert.Contains(((InputError)err).Errors, e => e.Field == "email");
+        Assert.IsType<NotFoundError>(err);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithIncorrectPassword_ReturnsError()
     {
-        var newUser = new NewUserDTO
-        {
-            FirstName = "JOHN",
-            FatherLastname = "DOE",
-            Email = "john.doe@example.com",
-            Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
-        };
-        await _addUserUseCase.ExecuteAsync(newUser);
+        var email = "john.doe@example.com";
+        var pwd = "Password123!";
+        await SeedUser(email, pwd);
 
-        var credentials = new UserCredentialsDTO
-        {
-            Email = "john.doe@example.com",
-            Password = "IncorrectPassword!",
-        };
+        var credentials = new UserCredentialsDTO { Email = email, Password = "IncorrectPassword!" };
 
         var result = await _useCase.ExecuteAsync(credentials);
 

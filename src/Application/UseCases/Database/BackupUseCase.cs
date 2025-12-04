@@ -1,3 +1,4 @@
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.Services;
 using Application.UseCases.Common;
@@ -6,7 +7,7 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Database;
 
-public sealed class BackupUseCase(IDatabaseExporter exporter) : IUseCaseAsync<Executor, Stream>
+public sealed class BackupUseCase(IDatabaseExporter exporter) : IUseCaseAsync<Unit, Stream>
 {
     private readonly IDatabaseExporter _exporter = exporter;
 
@@ -17,9 +18,9 @@ public sealed class BackupUseCase(IDatabaseExporter exporter) : IUseCaseAsync<Ex
             _ => false,
         };
 
-    public async Task<Result<Stream, UseCaseError>> ExecuteAsync(Executor executor)
+    public async Task<Result<Stream, UseCaseError>> ExecuteAsync(UserActionDTO<Unit> request)
     {
-        if (!IsAuthorized(executor))
+        if (!IsAuthorized(request.Executor))
             return UseCaseErrors.Unauthorized();
 
         var stream = await _exporter.ExportBackupAsync();

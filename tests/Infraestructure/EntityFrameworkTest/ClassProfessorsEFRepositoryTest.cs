@@ -1,5 +1,4 @@
 using Application.DTOs.ClassProfessors;
-using Application.DTOs.Common;
 using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.ClassProfessors;
@@ -21,8 +20,8 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
     private readonly ClassProfessorsEFUpdater _updater;
     private readonly ClassProfessorsEFDeleter _deleter;
 
-    private readonly UserProjector _userMapper = new();
-    private readonly ClassProjector _classMapper = new();
+    private readonly UserMapper _userMapper = new();
+    private readonly ClassMapper _classMapper = new();
 
     private readonly Random _rdm = new();
 
@@ -39,7 +38,7 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
 
         _classMapper = new();
 
-        var mapper = new ClassProfessorProjector();
+        var mapper = new ClassProfessorMapper();
 
         _creator = new(_ctx, mapper, new NewClassProfessorEFMapper());
         _reader = new(_ctx, mapper);
@@ -66,8 +65,6 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
         return _userMapper.Map(user);
     }
 
-    private static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
-
     private async Task<ClassDomain> SeedClass()
     {
         var id = (ulong)_rdm.NextInt64(1, 100_000);
@@ -80,7 +77,6 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
     [Fact]
     public async Task Add_ValidRelation_ReturnsRelation()
     {
-        var admin = await SeedUser(UserType.ADMIN);
         var user = await SeedUser();
         var cls = await SeedClass();
 
@@ -89,14 +85,13 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
             ClassId = cls.Id,
             UserId = user.Id,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
 
         var created = await _creator.AddAsync(newRelation);
 
         Assert.NotNull(created);
-        Assert.Equal(newRelation.ClassId, created.Id.ClassId);
-        Assert.Equal(newRelation.UserId, created.Id.UserId);
+        Assert.Equal(newRelation.ClassId, created.ClassId);
+        Assert.Equal(newRelation.UserId, created.UserId);
         Assert.Equal(newRelation.IsOwner, created.IsOwner);
     }
 
@@ -112,7 +107,6 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
             ClassId = cls.Id,
             UserId = user.Id,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
 
         await _creator.AddAsync(newRelation);
@@ -131,7 +125,6 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
             ClassId = "non-existent-class",
             UserId = user.Id,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
 
         await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(newRelation));
@@ -140,7 +133,6 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
     [Fact]
     public async Task Get_ExistingRelation_ReturnsRelation()
     {
-        var admin = await SeedUser(UserType.ADMIN);
         var user = await SeedUser();
         var cls = await SeedClass();
 
@@ -149,29 +141,29 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
             ClassId = cls.Id,
             UserId = user.Id,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
 
         var created = await _creator.AddAsync(newRelation);
 
-        var found = await _reader.GetAsync(created.Id);
+        var found = await _reader.GetAsync(
+            new() { ClassId = created.ClassId, UserId = created.UserId }
+        );
 
-        Assert.True(found.IsSome);
-        Assert.Equal(created.Id, found.Unwrap().Id);
+        Assert.NotNull(found);
+        Assert.Equal(created.ClassId, found.ClassId);
+        Assert.Equal(created.UserId, found.UserId);
     }
 
     [Fact]
     public async Task Get_NonExistingRelation_ReturnsEmptyOptional()
     {
         var found = await _reader.GetAsync(new() { ClassId = "non-existent", UserId = 99 });
-
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]
     public async Task Update_ExistingRelation_ReturnsUpdatedRelation()
     {
-        var admin = await SeedUser(UserType.ADMIN);
         var user = await SeedUser();
         var cls = await SeedClass();
 
@@ -180,25 +172,21 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
             ClassId = cls.Id,
             UserId = user.Id,
             IsOwner = false,
-            Executor = AsExecutor(admin),
         };
         var created = await _creator.AddAsync(newRelationDto);
 
         var updateDto = new ClassProfessorUpdateDTO
         {
-            UserId = created.Id.UserId,
-            ClassId = created.Id.ClassId,
+            UserId = created.UserId,
+            ClassId = created.ClassId,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
 
         var updated = await _updater.UpdateAsync(updateDto);
 
         Assert.NotNull(updated);
-        Assert.Equal(
-            new UserClassRelationId { ClassId = updateDto.ClassId, UserId = updateDto.UserId },
-            updated.Id
-        );
+        Assert.Equal(updateDto.ClassId, updated.ClassId);
+        Assert.Equal(updateDto.UserId, updated.UserId);
         Assert.Equal(updateDto.IsOwner, updated.IsOwner);
     }
 
@@ -211,7 +199,6 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
             ClassId = "non-existent",
             UserId = 99,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
 
         await Assert.ThrowsAnyAsync<Exception>(() => _updater.UpdateAsync(updateDto));
@@ -220,7 +207,6 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
     [Fact]
     public async Task Delete_ExistingRelation_ReturnsDeletedRelation()
     {
-        var admin = await SeedUser(UserType.ADMIN);
         var user = await SeedUser();
         var cls = await SeedClass();
 
@@ -229,17 +215,19 @@ public class ClassProfessorsEFRepositoryTest : IDisposable
             ClassId = cls.Id,
             UserId = user.Id,
             IsOwner = false,
-            Executor = AsExecutor(admin),
         };
-        var created = await _creator.AddAsync(newRelationDto);
 
-        var deleted = await _deleter.DeleteAsync(created.Id);
+        var created = await _creator.AddAsync(newRelationDto);
+        var id = new UserClassRelationId { ClassId = created.ClassId, UserId = created.UserId };
+
+        var deleted = await _deleter.DeleteAsync(id);
 
         Assert.NotNull(deleted);
-        Assert.Equal(created.Id, deleted.Id);
+        Assert.Equal(created.ClassId, deleted.ClassId);
+        Assert.Equal(created.UserId, deleted.UserId);
 
-        var found = await _reader.GetAsync(created.Id);
-        Assert.True(found.IsNone);
+        var found = await _reader.GetAsync(id);
+        Assert.Null(found);
     }
 
     [Fact]

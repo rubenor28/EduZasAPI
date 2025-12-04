@@ -2,14 +2,14 @@ using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers.Common;
+using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.UserNotifications;
 
 public class UserNotificationEFReader(
     EduZasDotnetContext ctx,
-    IEFProjector<NotificationPerUser, UserNotificationDomain> projector
-) : EFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(ctx, projector)
+    IMapper<NotificationPerUser, UserNotificationDomain> mapper
+) : EFReader<UserNotificationIdDTO, UserNotificationDomain, NotificationPerUser>(ctx, mapper)
 {
     protected override Expression<Func<NotificationPerUser, bool>> GetIdPredicate(
         UserNotificationIdDTO id

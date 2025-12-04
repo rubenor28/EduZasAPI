@@ -1,4 +1,4 @@
-using Domain.ValueObjects;
+using Domain.Enums;
 
 namespace Application.DTOs.Users;
 
@@ -18,25 +18,30 @@ public sealed record NewUserDTO
     /// Obtiene o establece el primer nombre del usuario.
     /// </summary>
     /// <value>Primer nombre del usuario. Campo obligatorio. Se normaliza automáticamente a mayúsculas invariables.</value>
-    public required string FirstName { get; set; }
+    public required string FirstName { get; init; }
 
     /// <summary>
     /// Obtiene o establece el apellido paterno del usuario.
     /// </summary>
     /// <value>Apellido paterno del usuario. Campo obligatorio. Se normaliza automáticamente a mayúsculas invariables.</value>
-    public required string FatherLastname { get; set; }
+    public required string FatherLastname { get; init; }
 
     /// <summary>
     /// Obtiene o establece la dirección de correo electrónico del usuario.
     /// </summary>
     /// <value>Dirección de correo electrónico del usuario. Campo obligatorio.</value>
-    public required string Email { get; set; }
+    public required string Email { get; init; }
 
     /// <summary>
     /// Obtiene o establece la contraseña del usuario.
     /// </summary>
     /// <value>Contraseña del usuario. Campo obligatorio.</value>
-    public required string Password { get; set; }
+    public required string Password { get; init; }
+
+    /// <summary>
+    /// Obtiene o establece el tipo de usuario.
+    /// </summary>
+    public required UserType Role { get; init; }
 
     /// <summary>
     /// Obtiene o establece el apellido materno del usuario.
@@ -45,7 +50,7 @@ public sealed record NewUserDTO
     /// Un objeto de tipo <see cref="Optional{T}"/> que contiene el apellido materno
     /// si se proporciona, o <c>None</c> si no está presente. Se normaliza a mayúsculas invariables.
     /// </value>
-    public Optional<string> MotherLastname { get; set; } = Optional<string>.None();
+    public string? MotherLastname { get; init; }
 
     /// <summary>
     /// Obtiene o establece el segundo nombre del usuario.
@@ -54,5 +59,5 @@ public sealed record NewUserDTO
     /// Un objeto de tipo <see cref="Optional{T}"/> que contiene el segundo nombre
     /// si se proporciona, o <c>None</c> si no está presente. Se normaliza a mayúsculas invariables.
     /// </value>
-    public Optional<string> MidName { get; set; } = Optional<string>.None();
+    public string? MidName { get; init; }
 }

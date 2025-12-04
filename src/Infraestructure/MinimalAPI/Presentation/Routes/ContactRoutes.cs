@@ -10,7 +10,6 @@ using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Contacts;
-using MinimalAPI.Application.DTOs.Tags;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
@@ -25,7 +24,7 @@ public static class ContactRoutes
             .MapPost("/", AddContact)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PublicContactMAPI>(StatusCodes.Status201Created)
+            .Produces<ContactDomain>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -48,10 +47,8 @@ public static class ContactRoutes
         group
             .MapPost("/me", SearchMyContacts)
             .RequireAuthorization("ProfessorOrAdmin")
-            .AddEndpointFilter<UserIdFilter>()
-            .Produces<PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>>(
-                StatusCodes.Status200OK
-            )
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<PaginatedQuery<ContactDomain, ContactCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -72,9 +69,7 @@ public static class ContactRoutes
             .MapPost("/all", SearchContacts)
             .RequireAuthorization("Admin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>>(
-                StatusCodes.Status200OK
-            )
+            .Produces<PaginatedQuery<ContactDomain, ContactCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -114,7 +109,7 @@ public static class ContactRoutes
             .MapPut("/", UpdateContact)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PublicContactMAPI>(StatusCodes.Status200OK)
+            .Produces<ContactDomain>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -136,7 +131,7 @@ public static class ContactRoutes
             .MapPost("/tags/search", TagsQuery)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<string, TagCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<string, TagCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -203,18 +198,17 @@ public static class ContactRoutes
     }
 
     private static Task<IResult> AddContact(
-        NewContactMAPI request,
+        NewContactDTO request,
         AddContactUseCase useCase,
-        IMapper<NewContactMAPI, Executor, NewContactDTO> reqMapper,
-        IMapper<ContactDomain, PublicContactMAPI> resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
-            mapResponse: (c) => Results.Created($"/contacts/{c.Id}", resMapper.Map(c))
+            mapRequest: () => request,
+            mapResponse: c => Results.Created($"/contacts/{c.Id}", c)
         );
     }
 
@@ -227,16 +221,22 @@ public static class ContactRoutes
         > reqMapper,
         IMapper<
             PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
-            PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>
+            PaginatedQuery<ContactDomain, ContactCriteriaMAPI>
         > resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () =>
-                reqMapper.Map(criteria with { AgendaOwnerId = utils.GetIdFromContext(ctx) }),
+                reqMapper.Map(
+                    criteria with
+                    {
+                        AgendaOwnerId = utils.GetExecutorFromContext(ctx).Id,
+                    }
+                ),
             mapResponse: (s) => Results.Ok(resMapper.Map(s))
         );
     }
@@ -250,16 +250,17 @@ public static class ContactRoutes
         > reqMapper,
         IMapper<
             PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
-            PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>
+            PaginatedQuery<ContactDomain, ContactCriteriaMAPI>
         > resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(criteria),
-            mapResponse: (search) => Results.Ok(resMapper.Map(search))
+            mapResponse: search => Results.Ok(resMapper.Map(search))
         );
     }
 
@@ -267,49 +268,48 @@ public static class ContactRoutes
         ulong agendaOwnerId,
         ulong contactId,
         DeleteContactUseCase useCase,
-        IMapper<ulong, ulong, Executor, DeleteContactDTO> reqMapper,
-        IMapper<ContactDomain, PublicContactMAPI> resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () =>
-                reqMapper.Map(agendaOwnerId, contactId, utils.GetExecutorFromContext(ctx)),
-            mapResponse: (contact) => Results.Ok(resMapper.Map(contact))
+            mapRequest: () => new() { AgendaOwnerId = agendaOwnerId, UserId = contactId },
+            mapResponse: (contact) => Results.Ok(contact)
         );
     }
 
     private static Task<IResult> UpdateContact(
-        ContactUpdateMAPI request,
+        ContactUpdateDTO request,
         UpdateContactUseCase useCase,
-        IMapper<ContactUpdateMAPI, ContactUpdateDTO> reqMapper,
-        IMapper<ContactDomain, PublicContactMAPI> resMapper,
+        IMapper<ContactUpdateDTO, ContactUpdateDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(request),
-            mapResponse: (contact) => Results.Ok(resMapper.Map(contact))
+            mapResponse: (contact) => Results.Ok(contact)
         );
     }
 
     private static Task<IResult> TagsQuery(
-        TagCriteriaMAPI criteria,
+        TagCriteriaDTO criteria,
         TagQueryUseCase useCase,
-        IMapper<TagCriteriaMAPI, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
+        IMapper<TagCriteriaDTO, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
         IMapper<
             PaginatedQuery<TagDomain, TagCriteriaDTO>,
-            PaginatedQuery<string, TagCriteriaMAPI>
+            PaginatedQuery<string, TagCriteriaDTO>
         > resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(criteria),
             mapResponse: (search) => Results.Ok(resMapper.Map(search))
@@ -325,6 +325,7 @@ public static class ContactRoutes
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(value, utils.GetExecutorFromContext(ctx)),
             mapResponse: (_) => Results.NoContent()
@@ -336,15 +337,20 @@ public static class ContactRoutes
         ulong userId,
         string tag,
         DeleteContactTagUseCase useCase,
-        IMapper<ulong, ulong, string, Executor, DeleteContactTagDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () =>
-                reqMapper.Map(agendaOwnerId, userId, tag, utils.GetExecutorFromContext(ctx)),
+                new()
+                {
+                    AgendaOwnerId = agendaOwnerId,
+                    UserId = userId,
+                    Tag = tag,
+                },
             mapResponse: _ => Results.NoContent()
         );
     }

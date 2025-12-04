@@ -20,7 +20,7 @@ public class AddTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserProjector _userMapper;
+    private readonly UserMapper _userMapper = new();
 
     private readonly Random _random = new();
 
@@ -35,9 +35,7 @@ public class AddTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var testMapper = new TestProjector();
-
-        _userMapper = new UserProjector();
+        var testMapper = new TestMapper();
 
         var testCreator = new TestEFCreator(_ctx, testMapper, new NewTestEFMapper());
         var userReader = new UserEFReader(_ctx, _userMapper);
@@ -74,10 +72,11 @@ public class AddTestUseCaseTest : IDisposable
             Title = "Test Title",
             Content = "Test content",
             ProfessorId = professor.Id,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(newTest);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newTest, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -91,10 +90,11 @@ public class AddTestUseCaseTest : IDisposable
             Title = "Test Title",
             Content = "Test Content",
             ProfessorId = user.Id,
-            Executor = AsExecutor(user),
         };
 
-        var result = await _useCase.ExecuteAsync(newTest);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newTest, Executor = AsExecutor(user) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -108,10 +108,11 @@ public class AddTestUseCaseTest : IDisposable
             Title = "Test Title",
             Content = "Test Content",
             ProfessorId = 999, // Non-existent professor
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(newTest);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newTest, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         var err = result.UnwrapErr();
@@ -128,10 +129,11 @@ public class AddTestUseCaseTest : IDisposable
             Title = "Test Title",
             Content = "Test Content",
             ProfessorId = student.Id,
-            Executor = AsExecutor(student),
         };
 
-        var result = await _useCase.ExecuteAsync(newTest);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newTest, Executor = AsExecutor(student) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -147,10 +149,11 @@ public class AddTestUseCaseTest : IDisposable
             Title = "Test Title",
             Content = "Test Content",
             ProfessorId = professor.Id,
-            Executor = AsExecutor(unauthorizedProfessor),
         };
 
-        var result = await _useCase.ExecuteAsync(newTest);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = newTest, Executor = AsExecutor(unauthorizedProfessor) }
+        );
 
         Assert.True(result.IsErr);
         Assert.Equal(typeof(UnauthorizedError), result.UnwrapErr().GetType());

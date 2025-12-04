@@ -11,12 +11,14 @@ namespace Domain.Entities;
 public sealed record ClassProfessorDomain
 {
     /// <summary>
-    /// Obtiene el identificador de la relación entre el usuario (profesor) y la clase.
+    /// Id único del usuario.
     /// </summary>
-    /// <value>
-    /// El identificador único de la relación, encapsulado en un objeto <see cref="UserClassRelationId"/>.
-    /// </value>
-    public required UserClassRelationId Id { get; init; }
+    public required ulong UserId { get; set; }
+
+    /// <summary>
+    /// Id único de una clase.
+    /// </summary>
+    public required string ClassId { get; set; }
 
     /// <summary>
     /// Obtiene un valor que indica si el profesor es el propietario de la clase.
@@ -34,4 +36,3 @@ public sealed record ClassProfessorDomain
     /// </value>
     public required DateTime CreatedAt { get; init; }
 }
-

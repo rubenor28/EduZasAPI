@@ -11,7 +11,7 @@ public class NewTestEFMapper : IMapper<NewTestDTO, Test>
         {
             Title = nt.Title,
             Content = nt.Content,
-            TimeLimitMinutes = nt.TimeLimitMinutes.ToNullable(),
+            TimeLimitMinutes = nt.TimeLimitMinutes,
             ProfessorId = nt.ProfessorId,
         };
 }

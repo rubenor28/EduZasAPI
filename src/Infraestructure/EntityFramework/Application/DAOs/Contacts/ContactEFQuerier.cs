@@ -1,5 +1,6 @@
 using Application.DTOs.Contacts;
 using Domain.Entities;
+using Domain.Extensions;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
 using EntityFramework.Extensions;
@@ -10,7 +11,7 @@ namespace EntityFramework.Application.DAOs.Contacts;
 
 public sealed class ContactEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<AgendaContact, ContactDomain> projector,
+    IEFProjector<AgendaContact, ContactDomain, ContactCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<ContactDomain, ContactCriteriaDTO, AgendaContact>(ctx, projector, pageSize)
 {

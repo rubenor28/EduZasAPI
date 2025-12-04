@@ -10,9 +10,14 @@ namespace EntityFramework.Application.DAOs.Notifications;
 
 public class NotificationEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<Notification, NotificationDomain> projector,
+    IEFProjector<Notification, NotificationDomain, NotificationCriteriaDTO> projector,
     int pageSize
-) : EFQuerier<NotificationDomain, NotificationCriteriaDTO, Notification>(ctx, projector, pageSize)
+)
+    : EFQuerier<NotificationDomain, NotificationCriteriaDTO, Notification>(
+        ctx,
+        projector,
+        pageSize
+    )
 {
     public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO cr) =>
         _dbSet

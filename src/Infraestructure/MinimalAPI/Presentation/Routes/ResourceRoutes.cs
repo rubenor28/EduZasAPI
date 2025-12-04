@@ -7,7 +7,6 @@ using Domain.Entities;
 using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Application.DTOs.ClassResources;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Resources;
 using MinimalAPI.Presentation.Filters;
@@ -24,7 +23,7 @@ public static class ResourceRoutes
             .MapPost("/", AddResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PublicResourceMAPI>(StatusCodes.Status201Created)
+            .Produces<ResourceDomain>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -45,7 +44,7 @@ public static class ResourceRoutes
             .MapGet("/{resourceId:guid}", GetResources)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
+            .Produces<ResourceDomain>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi(op =>
@@ -63,9 +62,7 @@ public static class ResourceRoutes
             .MapPost("/search", SearchResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<PublicResourceMAPI, ResourceCriteriaMAPI>>(
-                StatusCodes.Status200OK
-            )
+            .Produces<PaginatedQuery<ResourceDomain, ResourceCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .WithOpenApi(op =>
@@ -103,7 +100,7 @@ public static class ResourceRoutes
             .MapPut("/", UpdateResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PublicResourceMAPI>(StatusCodes.Status200OK)
+            .Produces<ResourceDomain>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -189,33 +186,33 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> AddResource(
-        NewResourceMAPI request,
+        NewResourceDTO request,
         AddResourceUseCase useCase,
-        IMapper<NewResourceMAPI, Executor, NewResourceDTO> reqMapper,
-        IMapper<ResourceDomain, PublicResourceMAPI> resMapper,
+        IMapper<NewResourceDTO, Executor, NewResourceDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
-            (resource) => Results.Created($"/resource/{resource.Id}", resMapper.Map(resource))
+            () => request,
+            (resource) => Results.Created($"/resource/{resource.Id}", resource)
         );
     }
 
     public static Task<IResult> GetResources(
         Guid resourceId,
         ReadResourceUseCase useCase,
-        IMapper<ResourceDomain, PublicResourceMAPI> resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             () => resourceId,
-            (resource) => Results.Ok(resMapper.Map(resource))
+            (resource) => Results.Ok(resource)
         );
     }
 
@@ -230,10 +227,12 @@ public static class ResourceRoutes
             PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
             PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
         > resMapper,
-        RoutesUtils utils
+        RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(request),
             mapResponse: (search) => Results.Ok(resMapper.Map(search))
@@ -243,44 +242,44 @@ public static class ResourceRoutes
     public static Task<IResult> DeleteResource(
         Guid resourceId,
         DeleteResourceUseCase useCase,
-        IMapper<Guid, Executor, DeleteResourceDTO> reqMapper,
-        IMapper<ResourceDomain, PublicResourceMAPI> resMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            () => reqMapper.Map(resourceId, utils.GetExecutorFromContext(ctx)),
-            (resource) => Results.Ok(resMapper.Map(resource))
+            () => resourceId,
+            (resource) => Results.Ok(resource)
         );
     }
 
     public static Task<IResult> UpdateResource(
-        ResourceUpdateMAPI request,
+        ResourceUpdateDTO request,
         UpdateResourceUseCase useCase,
-        IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO> reqMapper,
-        IMapper<ResourceDomain, PublicResourceMAPI> resMapper,
+        IMapper<ResourceUpdateDTO, Executor, ResourceUpdateDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
-            mapResponse: (resource) => Results.Ok(resMapper.Map(resource))
+            mapRequest: () => request,
+            mapResponse: (resource) => Results.Ok(resource)
         );
     }
 
     public static Task<IResult> AddClassResource(
-        [FromBody] NewClassResourceMAPI request,
+        [FromBody] NewClassResourceDTO request,
         [FromServices] AddClassResourceUseCase useCase,
-        [FromServices] IMapper<NewClassResourceMAPI, Executor, NewClassResourceDTO> reqMapper,
+        [FromServices] IMapper<NewClassResourceDTO, Executor, NewClassResourceDTO> reqMapper,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
             mapResponse: _ => Results.NoContent()
@@ -291,14 +290,14 @@ public static class ResourceRoutes
         Guid resourceId,
         string classId,
         [FromServices] DeleteClassResourceUseCase useCase,
-        [FromServices] IMapper<Guid, string, Executor, DeleteClassResourceDTO> reqMapper,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(resourceId, classId, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => new() { ClassId = classId, ResourceId = resourceId },
             mapResponse: _ => Results.NoContent()
         );
     }
@@ -306,10 +305,12 @@ public static class ResourceRoutes
     public static Task<IResult> ReadResourceClass(
         ClassResourceIdDTO request,
         ReadClassResourceUseCase useCase,
-        RoutesUtils utils
+        RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => request,
             mapResponse: res => Results.Ok(res)
@@ -319,10 +320,12 @@ public static class ResourceRoutes
     public static Task<IResult> GetAssignedResources(
         [FromBody] ClassResourceAssosiationCriteriaDTO request,
         [FromServices] ClassResourceAssosiationQueryUseCase useCase,
-        [FromServices] RoutesUtils utils
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => request,
             mapResponse: (results) => Results.Ok(results)

@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Resources;
 using Application.Services;
@@ -17,12 +18,12 @@ public sealed class AddResourceUseCase(
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
-    protected override Result<Unit, UseCaseError> ExtraValidation(NewResourceDTO value)
+    protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<NewResourceDTO> value)
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.ProfessorId == value.Executor.Id,
+            UserType.PROFESSOR => value.Data.ProfessorId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -34,13 +35,13 @@ public sealed class AddResourceUseCase(
     }
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        NewResourceDTO value
+        UserActionDTO<NewResourceDTO> value
     )
     {
         List<FieldErrorDTO> errors = [];
 
-        var userSearch = await _userReader.GetAsync(value.ProfessorId);
-        if (userSearch.IsNone)
+        var userSearch = await _userReader.GetAsync(value.Data.ProfessorId);
+        if (userSearch is null)
             errors.Add(new() { Field = "professorId", Message = "Usuario no encontrado" });
 
         if (errors.Count > 0)

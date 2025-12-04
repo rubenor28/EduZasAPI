@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.Services;
@@ -11,18 +12,19 @@ namespace Application.UseCases.Tests;
 
 public sealed class UpdateTestUseCase(
     IUpdaterAsync<TestDomain, TestUpdateDTO> updater,
-    IReaderAsync<ulong, TestDomain> reader,
+    IReaderAsync<Guid, TestDomain> reader,
     IBusinessValidationService<TestUpdateDTO>? validator = null
-) : UpdateUseCase<ulong, TestUpdateDTO, TestDomain>(updater, reader, validator)
+) : UpdateUseCase<Guid, TestUpdateDTO, TestDomain>(updater, reader, validator)
 {
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        TestUpdateDTO value
+        UserActionDTO<TestUpdateDTO> value,
+        TestDomain record
     )
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.Executor.Id == value.ProfessorId,
+            UserType.PROFESSOR => value.Executor.Id == value.Data.ProfessorId,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -30,12 +32,8 @@ public sealed class UpdateTestUseCase(
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
-        var record = await _reader.GetAsync(value.Id);
-        if (record.IsNone)
-            return UseCaseErrors.NotFound();
-
         return Unit.Value;
     }
 
-    protected override ulong GetId(TestUpdateDTO dto) => dto.Id;
+    protected override Guid GetId(TestUpdateDTO dto) => dto.Id;
 }

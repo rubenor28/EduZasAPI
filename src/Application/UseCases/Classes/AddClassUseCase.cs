@@ -1,5 +1,5 @@
-using System.Text;
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.Common;
@@ -7,6 +7,7 @@ using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.Classes;
@@ -60,12 +61,12 @@ public class AddClassUseCase(
     ///   Devuelve <see cref="UseCaseErrors.Unauthorized"/> si el usuario ejecutor no tiene permisos.
     /// </returns>
     /// <exception cref="NotImplementedException">Se lanza si el rol del usuario no está contemplado en la lógica de autorización.</exception>
-    protected override Result<Unit, UseCaseError> ExtraValidation(NewClassDTO value)
+    protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<NewClassDTO> value)
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.OwnerId == value.Executor.Id,
+            UserType.PROFESSOR => value.Data.OwnerId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -85,31 +86,41 @@ public class AddClassUseCase(
     ///   Devuelve un error de <see cref="UseCaseErrors.Input"/> si el usuario propietario no se encuentra.
     /// </returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        NewClassDTO value
+        UserActionDTO<NewClassDTO> value
     )
     {
         List<FieldErrorDTO> errors = [];
 
-        (await userReader.GetAsync(value.OwnerId)).IfNone(() =>
+        (await userReader.GetAsync(value.Data.OwnerId)).IfNull(() =>
             errors.Add(new() { Field = "ownerId", Message = "No se encontró el usuario" })
         );
 
-        var validationTasks = value.Professors.Select(async professor =>
+        var validationTasks = value.Data.Professors.Select(async professor =>
         {
             var userResult = await userReader.GetAsync(professor.UserId);
             return userResult.Match(
-                user => user.Role == UserType.STUDENT ? professor.UserId : (ulong?)null, // Return ID if student
-                () => professor.UserId // Return ID if not found
+                user => user.Role == UserType.STUDENT ? professor.UserId : (ulong?)null,
+                () => professor.UserId
             );
         });
 
         var invalidIdResults = await Task.WhenAll(validationTasks);
-        var invalidProfessorIds = invalidIdResults.Where(id => id is not null).Select(id => id!.Value).ToList();
+        var invalidProfessorIds = invalidIdResults
+            .Where(id => id is not null)
+            .Select(id => id!.Value)
+            .ToList();
 
         if (invalidProfessorIds.Count > 0)
         {
             var idList = string.Join(", ", invalidProfessorIds);
-            errors.Add(new() { Field = "professors", Message = $"Los siguientes usuarios no son válidos o son estudiantes: [{idList}]" });
+            errors.Add(
+                new()
+                {
+                    Field = "professors",
+                    Message =
+                        $"Los siguientes usuarios no son válidos o son estudiantes: [{idList}]",
+                }
+            );
         }
 
         if (errors.Count > 0)
@@ -126,17 +137,16 @@ public class AddClassUseCase(
     /// <exception cref="InvalidOperationException">
     ///     Se lanza si no se puede generar un ID único después del número máximo de intentos.
     /// </exception>
-    protected override async Task<NewClassDTO> PostValidationFormatAsync(NewClassDTO value)
+    protected override async Task<UserActionDTO<NewClassDTO>> PostValidationFormatAsync(UserActionDTO<NewClassDTO> value)
     {
         for (int i = 0; i < _maxIdGenerationTries; i++)
         {
             var newId = _idGenerator.Generate();
             var repeated = await _reader.GetAsync(newId);
 
-            if (repeated.IsNone)
+            if (repeated is null)
             {
-                value.Id = newId;
-                return value;
+                return value with { Data = value.Data with { Id = newId } };
             }
         }
 
@@ -152,16 +162,18 @@ public class AddClassUseCase(
     /// <param name="newEntity">El DTO original con los datos de la nueva clase.</param>
     /// <param name="createdEntity">La entidad de dominio de la clase recién creada.</param>
     /// <returns>Una tarea que representa la operación asíncrona.</returns>
-    protected override async Task ExtraTaskAsync(NewClassDTO newEntity, ClassDomain createdEntity)
+    protected override async Task ExtraTaskAsync(
+        UserActionDTO<NewClassDTO> newEntity,
+        ClassDomain createdEntity
+    )
     {
-        newEntity.Professors.Add(new() { UserId = newEntity.OwnerId, IsOwner = true });
+        newEntity.Data.Professors.Add(new() { UserId = newEntity.Data.OwnerId, IsOwner = true });
 
-        var professors = newEntity.Professors.Select(p => new NewClassProfessorDTO()
+        var professors = newEntity.Data.Professors.Select(p => new NewClassProfessorDTO()
         {
             ClassId = createdEntity.Id,
             UserId = p.UserId,
             IsOwner = p.IsOwner,
-            Executor = newEntity.Executor, // NO se realiza alguna validacion en el repositorio
         });
 
         await _professorRelationCreator.AddRangeAsync(professors);

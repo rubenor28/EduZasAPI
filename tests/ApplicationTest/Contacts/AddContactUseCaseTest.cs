@@ -1,10 +1,10 @@
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.Users;
 using Application.UseCases.Contacts;
 using Domain.Entities;
 using Domain.Enums;
-using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Tags;
@@ -25,7 +25,7 @@ public class AddContactUseCaseTest : IDisposable
     private readonly SqliteConnection _conn;
     private readonly EduZasDotnetContext _ctx;
     private readonly AddContactUseCase _useCase;
-    private readonly UserProjector _userMapper = new();
+    private readonly UserMapper _userMapper = new();
     private readonly UserEFCreator _userCreator;
 
     public AddContactUseCaseTest()
@@ -39,14 +39,15 @@ public class AddContactUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var contactMapper = new ContactProjector();
+        var contactMapper = new ContactMapper();
+        var contactReader = new ContactEFReader(_ctx, contactMapper);
+
         var contactCreator = new ContactEFCreator(_ctx, contactMapper, new NewContactEFMapper());
         var userReader = new UserEFReader(_ctx, _userMapper);
-        var contactQuerier = new ContactEFQuerier(_ctx, contactMapper, 10);
-        var tagMapper = new TagProjector();
+        var tagMapper = new TagMapper();
         var tagReader = new TagEFReader(_ctx, tagMapper);
         var tagCreator = new TagEFCreator(_ctx, tagMapper, new NewTagEFMapper());
-        var contactTagMapper = new ContactTagProjector();
+        var contactTagMapper = new ContactTagMapper();
         var contactTagCreator = new ContactTagEFCreator(
             _ctx,
             contactTagMapper,
@@ -58,7 +59,7 @@ public class AddContactUseCaseTest : IDisposable
 
         _useCase = new AddContactUseCase(
             contactCreator,
-            contactQuerier,
+            contactReader,
             userReader,
             tagReader,
             tagCreator,
@@ -66,7 +67,7 @@ public class AddContactUseCaseTest : IDisposable
         );
     }
 
-    private async Task<UserDomain> CreateUser(string email)
+    private async Task<UserDomain> CreateUser(string email, UserType role = UserType.STUDENT)
     {
         var user = new NewUserDTO
         {
@@ -74,6 +75,7 @@ public class AddContactUseCaseTest : IDisposable
             FatherLastname = "User",
             Email = email,
             Password = "Password123!",
+            Role = role,
         };
         return await _userCreator.AddAsync(user);
     }
@@ -90,11 +92,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -110,11 +117,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = 999,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = 999, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = 999, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsErr);
         var error = result.UnwrapErr();
@@ -133,11 +145,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = 999, // Non-existent user
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsErr);
         var error = result.UnwrapErr();
@@ -150,32 +167,28 @@ public class AddContactUseCaseTest : IDisposable
     {
         var agendaOwner = await CreateUser("owner@example.com");
         var contactUser = await CreateUser("contact@example.com");
+        _ctx.ChangeTracker.Clear();
 
-        var firstContact = new NewContactDTO
+        var contact = new NewContactDTO
         {
             Alias = "Test",
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
-        await _useCase.ExecuteAsync(firstContact);
 
-        var secondContact = new NewContactDTO
+        var execution = new UserActionDTO<NewContactDTO>
         {
-            Alias = "Test",
-            Notes = "Test note",
-            AgendaOwnerId = agendaOwner.Id,
-            UserId = contactUser.Id,
+            Data = contact,
             Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
         };
 
-        var result = await _useCase.ExecuteAsync(secondContact);
+        await _useCase.ExecuteAsync(execution);
+        var result = await _useCase.ExecuteAsync(execution);
 
         Assert.True(result.IsErr);
-        Assert.Equal(typeof(AlreadyExistsError), result.UnwrapErr().GetType());
+        Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
     }
 
     [Fact]
@@ -191,11 +204,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = unauthorizedUser.Id, Role = UserType.PROFESSOR },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = unauthorizedUser.Id, Role = UserType.PROFESSOR },
+            }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -213,11 +231,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.PROFESSOR }, // Authorized non-admin
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.PROFESSOR }, // Authorized non-admin
+            }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -234,11 +257,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some(["tag1", "tag2"]),
+            Tags = ["tag1", "tag2"],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
         Assert.Equal(2, await _ctx.Tags.CountAsync());
@@ -263,11 +291,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some(["existing-tag"]),
+            Tags = ["existing-tag"],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
         Assert.Equal(1, await _ctx.Tags.CountAsync()); // No new tag created
@@ -290,11 +323,16 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some(["existing-tag", "new-tag"]),
+            Tags = ["existing-tag", "new-tag"],
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
         Assert.Equal(2, await _ctx.Tags.CountAsync()); // One new tag created
@@ -315,11 +353,15 @@ public class AddContactUseCaseTest : IDisposable
             Notes = "Test note",
             AgendaOwnerId = agendaOwner.Id,
             UserId = contactUser.Id,
-            Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.None(),
         };
 
-        var result = await _useCase.ExecuteAsync(newContact);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
         Assert.Equal(0, await _ctx.Tags.CountAsync());

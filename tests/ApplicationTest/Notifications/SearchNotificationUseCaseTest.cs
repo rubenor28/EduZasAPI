@@ -1,6 +1,8 @@
-﻿using Application.DTOs.Notifications;
+﻿using Application.DTOs.Common;
+using Application.DTOs.Notifications;
 using Application.UseCases.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
@@ -23,8 +25,8 @@ public class SearchNotificationUseCaseTest
 
     private readonly Random _rdm = new();
 
-    private readonly ClassProjector _classMapper = new();
-    private readonly UserProjector _userMapper;
+    private readonly ClassMapper _classMapper = new();
+    private readonly UserMapper _userMapper = new();
 
     public SearchNotificationUseCaseTest()
     {
@@ -37,8 +39,8 @@ public class SearchNotificationUseCaseTest
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var notificationMapper = new NotificationProjector();
-        var userNotificationMapper = new UserNotificationProjector();
+        var notificationMapper = new NotificationMapper();
+        var userNotificationMapper = new UserNotificationMapper();
 
         var notificationCreator = new NotificationEFCreator(
             _ctx,
@@ -52,8 +54,8 @@ public class SearchNotificationUseCaseTest
             new NewUserNotificationEFMapper()
         );
 
-        _userMapper = new UserProjector();
-        var userQuerier = new UserEFQuerier(_ctx, _userMapper, 10);
+        var userProjector = new UserProjector();
+        var userQuerier = new UserEFQuerier(_ctx, userProjector, 10);
 
         _addNotificationUseCase = new AddNotificationUseCase(
             notificationCreator,
@@ -61,11 +63,12 @@ public class SearchNotificationUseCaseTest
             userQuerier
         );
 
-        var notificationQuerier = new NotificationEFQuerier(_ctx, notificationMapper, 10);
+        var notificationProjector = new NotificationProjector();
+        var notificationQuerier = new NotificationEFQuerier(_ctx, notificationProjector, 10);
         _useCase = new SearchNotificationUseCase(notificationQuerier);
     }
 
-    private async Task<(ClassDomain, UserDomain)> SeedStudent()
+    private async Task<UserDomain> SeedUser(UserType role = UserType.STUDENT)
     {
         var id = (ulong)_rdm.NextInt64(1, 100_000);
 
@@ -76,39 +79,53 @@ public class SearchNotificationUseCaseTest
             FirstName = "test",
             FatherLastname = "test",
             Password = "test",
+            Role = (uint)role,
         };
 
-        var cls = new Class { ClassId = $"class-test-{id}", ClassName = "Test Class" };
-
         _ctx.Users.Add(user);
+        await _ctx.SaveChangesAsync();
+        return _userMapper.Map(user);
+    }
+
+    private async Task<(ClassDomain, UserDomain)> SeedStudent()
+    {
+        var student = await SeedUser();
+
+        var cls = new Class { ClassId = $"class-test-{student.Id}", ClassName = "Test Class" };
 
         _ctx.Classes.Add(cls);
-
         _ctx.ClassStudents.Add(
             new()
             {
-                ClassId = $"class-test-{id}",
-                StudentId = id,
+                ClassId = $"class-test-{student.Id}",
+                StudentId = student.Id,
                 Hidden = false,
             }
         );
 
         await _ctx.SaveChangesAsync();
-        return (_classMapper.Map(cls), _userMapper.Map(user));
+        return (_classMapper.Map(cls), student);
     }
+
+    private static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
 
     [Fact]
     public async Task SearchUserNotification_ByStudent_ReturnsNotification()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var (cls, user) = await SeedStudent();
 
         var notification = new NewNotificationDTO { ClassId = cls.Id, Title = "Test" };
 
-        await _addNotificationUseCase.ExecuteAsync(notification);
+        await _addNotificationUseCase.ExecuteAsync(
+            new() { Data = notification, Executor = AsExecutor(admin) }
+        );
 
         var criteria = new NotificationCriteriaDTO { UserId = user.Id };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var search = result.Unwrap();
@@ -126,9 +143,12 @@ public class SearchNotificationUseCaseTest
     [Fact]
     public async Task SearchUserNotification_ByStudent_ReturnsEmtpy()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var criteria = new NotificationCriteriaDTO { UserId = 1 };
 
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var search = result.Unwrap();
@@ -140,14 +160,19 @@ public class SearchNotificationUseCaseTest
     [Fact]
     public async Task SearchUserNotification_ByClass_ReturnsNotification()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var (cls, _) = await SeedStudent();
 
         var notification = new NewNotificationDTO { ClassId = cls.Id, Title = "Test" };
 
-        await _addNotificationUseCase.ExecuteAsync(notification);
+        await _addNotificationUseCase.ExecuteAsync(
+            new() { Data = notification, Executor = AsExecutor(admin) }
+        );
 
         var criteria = new NotificationCriteriaDTO { ClassId = cls.Id };
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var search = result.Unwrap();
@@ -164,8 +189,11 @@ public class SearchNotificationUseCaseTest
     [Fact]
     public async Task SearchUserNotification_ByClass_ReturnsEmtpy()
     {
+        var admin = await SeedUser(UserType.ADMIN);
         var criteria = new NotificationCriteriaDTO { ClassId = "Test-Class" };
-        var result = await _useCase.ExecuteAsync(criteria);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = criteria, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var search = result.Unwrap();

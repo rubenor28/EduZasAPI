@@ -1,7 +1,6 @@
 using Application.DTOs.Tests;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
-using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 
@@ -11,7 +10,7 @@ public class UpdateTestEFMapper : IUpdateMapper<TestUpdateDTO, Test>
     {
         t.Title = tu.Title;
         t.Content = tu.Content;
-        t.TimeLimitMinutes = tu.TimeLimitMinutes.ToNullable();
+        t.TimeLimitMinutes = tu.TimeLimitMinutes;
         t.ProfessorId = tu.ProfessorId;
     }
 }

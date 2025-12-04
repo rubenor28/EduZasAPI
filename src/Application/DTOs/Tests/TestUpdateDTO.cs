@@ -1,15 +1,11 @@
-using Application.DTOs.Common;
-using Domain.ValueObjects;
 
 namespace Application.DTOs.Tests;
 
 public sealed record TestUpdateDTO
 {
-    public required ulong Id { get; set; }
-    public required string Title { get; set; }
-    public required string Content { get; set; }
-    public Optional<uint> TimeLimitMinutes { get; set; } = Optional<uint>.None();
-    public required ulong ProfessorId { get; set; }
-
-    public required Executor Executor { get; set; }
+    public required Guid Id { get; init; }
+    public required string Title { get; init; }
+    public required string Content { get; init; }
+    public uint? TimeLimitMinutes { get; init; } 
+    public required ulong ProfessorId { get; init; }
 }

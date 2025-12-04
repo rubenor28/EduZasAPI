@@ -9,13 +9,15 @@ public abstract class EFCreator<DomainEntity, NewEntity, EFEntity>(
     IMapper<EFEntity, DomainEntity> domainMapper,
     IMapper<NewEntity, EFEntity> newEntityMapper
 )
-    : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx, domainMapper),
-        ICreatorAsync<DomainEntity, NewEntity>, IBulkCreatorAsync<DomainEntity, NewEntity>
+    : EntityFrameworkDAO<DomainEntity, EFEntity>(ctx),
+        ICreatorAsync<DomainEntity, NewEntity>,
+        IBulkCreatorAsync<DomainEntity, NewEntity>
     where EFEntity : class
     where NewEntity : notnull
     where DomainEntity : notnull
 {
     protected readonly IMapper<NewEntity, EFEntity> _newEntityMapper = newEntityMapper;
+    protected readonly IMapper<EFEntity, DomainEntity> _domainMapper = domainMapper;
 
     public async Task<DomainEntity> AddAsync(NewEntity value)
     {

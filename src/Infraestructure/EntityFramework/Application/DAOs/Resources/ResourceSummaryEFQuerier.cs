@@ -10,7 +10,7 @@ namespace EntityFramework.Application.DAOs.Resources;
 
 public class ResourceSummaryEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<Resource, ResourceSummary> projector,
+    IEFProjector<Resource, ResourceSummary, ResourceCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<ResourceSummary, ResourceCriteriaDTO, Resource>(ctx, projector, pageSize)
 {

@@ -1,16 +1,11 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.Services;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.Common;
 
-/// <summary>
-/// Caso de uso genérico para la ejecución de consultas paginadas
-/// basado en criterios de búsqueda.
-/// </summary>
-/// <typeparam name="E">Tipo de la entidad resultante de la consulta.</typeparam>
-/// <typeparam name="C">Tipo del criterio de búsqueda, debe implementar <see cref="ICriteriaDTO"/>.</typeparam>
 public class QueryUseCase<C, E>(
     IQuerierAsync<E, C> querier,
     IBusinessValidationService<C>? validator = null
@@ -21,24 +16,18 @@ public class QueryUseCase<C, E>(
     protected readonly IQuerierAsync<E, C> _querier = querier;
     protected readonly IBusinessValidationService<C>? _validator = validator;
 
-    /// <summary>
-    /// Ejecuta la consulta asíncrona con los criterios especificados.
-    /// </summary>
-    /// <param name="criteria">Criterios de búsqueda.</param>
-    /// <returns>
-    /// Una consulta paginada de tipo <see cref="PaginatedQuery{E, C}"/>
-    /// con los resultados correspondientes.
-    /// </returns>
-    public async Task<Result<PaginatedQuery<E, C>, UseCaseError>> ExecuteAsync(C criteria)
+    public async Task<Result<PaginatedQuery<E, C>, UseCaseError>> ExecuteAsync(
+        UserActionDTO<C> request
+    )
     {
         List<FieldErrorDTO> errors = [];
 
-        if (criteria.Page < 1)
+        if (request.Data.Page < 1)
             errors.Add(new() { Field = "page", Message = "Formato invalido" });
 
         if (_validator is not null)
         {
-            var result = _validator.IsValid(criteria);
+            var result = _validator.IsValid(request.Data);
             if (result.IsErr)
             {
                 var errs = result.UnwrapErr();
@@ -49,19 +38,28 @@ public class QueryUseCase<C, E>(
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
 
-        var validation = ExtraValidation(criteria);
+        var validation = ExtraValidation(request);
         if (validation.IsErr)
             return validation.UnwrapErr();
 
-        var validationAsync = await ExtraValidationAsync(criteria);
+        var validationAsync = await ExtraValidationAsync(request);
         if (validationAsync.IsErr)
             return validationAsync.UnwrapErr();
 
-        return await _querier.GetByAsync(criteria);
+        PrevFormat(ref request);
+        await PrevFormatAsync(ref request);
+
+        return await _querier.GetByAsync(request.Data);
     }
 
-    protected virtual Result<Unit, UseCaseError> ExtraValidation(C criteria) => Unit.Value;
+    protected virtual Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<C> criteria) =>
+        Unit.Value;
 
-    protected virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(C criteria) =>
-        Task.FromResult(Result<Unit, UseCaseError>.Ok(Unit.Value));
+    protected virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        UserActionDTO<C> criteria
+    ) => Task.FromResult(Result<Unit, UseCaseError>.Ok(Unit.Value));
+
+    protected virtual void PrevFormat(ref UserActionDTO<C> criteria) { }
+
+    protected virtual Task PrevFormatAsync(ref UserActionDTO<C> criteria) => Task.CompletedTask;
 }

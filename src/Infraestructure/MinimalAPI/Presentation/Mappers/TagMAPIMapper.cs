@@ -9,12 +9,12 @@ using MinimalAPI.Application.DTOs.Tags;
 namespace MinimalAPI.Presentation.Mappers;
 
 public sealed class TagCriteriaMAPIMapper(
-    IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit> strqMapper
+    IBidirectionalResultMapper<StringQueryMAPI?, StringQueryDTO?, Unit> strqMapper
 )
     : IBidirectionalResultMapper<TagCriteriaMAPI, TagCriteriaDTO, IEnumerable<FieldErrorDTO>>,
         IMapper<TagCriteriaDTO, TagCriteriaMAPI>
 {
-    private readonly IBidirectionalResultMapper<StringQueryMAPI?, Optional<StringQueryDTO>, Unit> _strqMapper =
+    private readonly IBidirectionalResultMapper<StringQueryMAPI?, StringQueryDTO?, Unit> _strqMapper =
         strqMapper;
 
     public Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>> Map(TagCriteriaMAPI input)
@@ -29,8 +29,8 @@ public sealed class TagCriteriaMAPIMapper(
         return new TagCriteriaDTO
         {
             Text = textValidation.Unwrap(),
-            ContactId = input.ContactId.ToOptional(),
-            AgendaOwnerId = input.AgendaOwnerId.ToOptional(),
+            ContactId = input.ContactId,
+            AgendaOwnerId = input.AgendaOwnerId,
             Page = input.Page,
         };
     }
@@ -41,15 +41,10 @@ public sealed class TagCriteriaMAPIMapper(
         new()
         {
             Page = input.Page,
-            ContactId = input.ContactId.ToNullable(),
-            AgendaOwnerId = input.AgendaOwnerId.ToNullable(),
+            ContactId = input.ContactId,
+            AgendaOwnerId = input.AgendaOwnerId,
             Text = _strqMapper.MapFrom(input.Text),
         };
-}
-
-public sealed class PublicTagMAPIMapper : IMapper<TagDomain, PublicTagMAPI>
-{
-    public PublicTagMAPI Map(TagDomain source) => new() { Text = source.Text };
 }
 
 public sealed class TagSearchMAPIMapper(IMapper<TagCriteriaDTO, TagCriteriaMAPI> cMapper)

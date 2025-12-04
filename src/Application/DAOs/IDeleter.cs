@@ -1,5 +1,3 @@
-using Domain.ValueObjects;
-
 namespace Application.DAOs;
 
 /// <summary>
@@ -19,4 +17,5 @@ public interface IDeleterAsync<I, E>
     /// La entidad eliminada
     /// </returns>
     Task<E> DeleteAsync(I id);
+    Task<IEnumerable<E>> BulkDelete(IEnumerable<I> ids);
 }

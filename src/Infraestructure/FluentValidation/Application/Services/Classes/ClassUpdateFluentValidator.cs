@@ -1,4 +1,5 @@
 using Application.DTOs.Classes;
+using Domain.Extensions;
 using FluentValidation;
 using FluentValidationProj.Application.Services.Common;
 

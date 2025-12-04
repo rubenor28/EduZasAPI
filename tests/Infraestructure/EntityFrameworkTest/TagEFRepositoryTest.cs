@@ -27,10 +27,11 @@ public class TagEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new TagProjector();
+        var projector = new TagProjector();
+        var mapper = new TagMapper();
 
         _creator = new(_ctx, mapper, new NewTagEFMapper());
-        _querier = new(_ctx, mapper, 10);
+        _querier = new(_ctx, projector, 10);
     }
 
     [Fact]

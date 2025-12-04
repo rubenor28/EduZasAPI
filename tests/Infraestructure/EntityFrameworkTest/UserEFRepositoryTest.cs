@@ -33,14 +33,15 @@ public class UserEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new UserProjector();
-
+        var mapper = new UserMapper();
+        var projector = new UserProjector();
         var roleMapper = new UserTypeUintMapper();
+
         _creator = new(_ctx, mapper, new NewUserEFMapper(roleMapper));
         _updater = new(_ctx, mapper, new UpdateUserEFMapper(roleMapper));
         _reader = new(_ctx, mapper);
         _deleter = new(_ctx, mapper);
-        _querier = new(_ctx, mapper, 10);
+        _querier = new(_ctx, projector, 10);
     }
 
     public static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
@@ -54,6 +55,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test",
             FatherLastname = "test",
+            Role = UserType.STUDENT,
         };
 
         var created = await _creator.AddAsync(newUser);
@@ -72,6 +74,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test",
             FatherLastname = "test",
+            Role = UserType.STUDENT,
         };
         await _creator.AddAsync(newUser);
 
@@ -81,6 +84,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "othersecurepwd1234",
             FirstName = "test2",
             FatherLastname = "test2",
+            Role = UserType.STUDENT,
         };
 
         await Assert.ThrowsAsync<DbUpdateException>(() => _creator.AddAsync(duplicateUser));
@@ -95,6 +99,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test",
             FatherLastname = "test",
+            Role = UserType.STUDENT,
         };
         var created = await _creator.AddAsync(newUser);
 
@@ -109,7 +114,6 @@ public class UserEFRepositoryTest : IDisposable
             MidName = "update",
             MotherLastname = "update",
             Role = UserType.PROFESSOR,
-            Executor = AsExecutor(created),
         };
 
         var updatedUser = await _updater.UpdateAsync(update);
@@ -120,8 +124,8 @@ public class UserEFRepositoryTest : IDisposable
         Assert.Equal(update.Password, updatedUser.Password);
         Assert.Equal(update.FatherLastname, updatedUser.FatherLastname);
         Assert.Equal(update.Active, updatedUser.Active);
-        Assert.Equal(update.MidName.Unwrap(), updatedUser.MidName.Unwrap());
-        Assert.Equal(update.MotherLastname.Unwrap(), updatedUser.MotherLastname.Unwrap());
+        Assert.Equal(update.MidName, updatedUser.MidName);
+        Assert.Equal(update.MotherLastname, updatedUser.MotherLastname);
     }
 
     [Fact]
@@ -133,6 +137,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test",
             FatherLastname = "test",
+            Role = UserType.STUDENT,
         };
 
         var otherUser = new NewUserDTO
@@ -141,6 +146,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test",
             FatherLastname = "test",
+            Role = UserType.STUDENT,
         };
 
         await _creator.AddAsync(otherUser);
@@ -157,7 +163,6 @@ public class UserEFRepositoryTest : IDisposable
             MidName = "update",
             MotherLastname = "update",
             Role = created.Role,
-            Executor = AsExecutor(created),
         };
 
         await Assert.ThrowsAsync<DbUpdateException>(() =>
@@ -174,21 +179,21 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test",
             FatherLastname = "test",
+            Role = UserType.STUDENT,
         };
         var created = await _creator.AddAsync(newUser);
 
         var foundUser = await _reader.GetAsync(created.Id);
 
-        Assert.True(foundUser.IsSome);
-        Assert.Equal(created.Id, foundUser.Unwrap().Id);
+        Assert.NotNull(foundUser);
+        Assert.Equal(created.Id, foundUser.Id);
     }
 
     [Fact]
     public async Task GetAsync_WhenUserDoesNotExist_ReturnsEmptyOptional()
     {
         var foundUser = await _reader.GetAsync(123);
-
-        Assert.True(foundUser.IsNone);
+        Assert.Null(foundUser);
     }
 
     [Fact]
@@ -200,6 +205,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test",
             FatherLastname = "test",
+            Role = UserType.STUDENT,
         };
         var created = await _creator.AddAsync(newUser);
 
@@ -209,7 +215,7 @@ public class UserEFRepositoryTest : IDisposable
         Assert.Equal(created.Id, deletedUser.Id);
 
         var foundUser = await _reader.GetAsync(created.Id);
-        Assert.True(foundUser.IsNone);
+        Assert.Null(foundUser);
     }
 
     [Fact]
@@ -227,6 +233,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test1",
             FatherLastname = "test1",
+            Role = UserType.STUDENT,
         };
         await _creator.AddAsync(newUser1);
 
@@ -236,6 +243,7 @@ public class UserEFRepositoryTest : IDisposable
             Password = "securepwd1234",
             FirstName = "test2",
             FatherLastname = "test2",
+            Role = UserType.STUDENT,
         };
         await _creator.AddAsync(newUser2);
 

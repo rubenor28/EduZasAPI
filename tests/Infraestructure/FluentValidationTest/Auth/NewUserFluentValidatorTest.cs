@@ -1,6 +1,5 @@
 using Application.DTOs.Users;
 using Domain.Enums;
-using Domain.ValueObjects;
 using FluentValidationProj.Application.Services.Auth;
 
 namespace FluentValidationTest.Auth;
@@ -20,6 +19,7 @@ public class NewUserFluentValidatorTest
             Password = "Password123!",
             MidName = "FITZGERALD",
             MotherLastname = "KENNEDY",
+            Role = UserType.STUDENT,
         };
 
         var result = _validator.IsValid(dto);
@@ -39,8 +39,7 @@ public class NewUserFluentValidatorTest
             FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
 
         var result = _validator.IsValid(dto);
@@ -61,8 +60,7 @@ public class NewUserFluentValidatorTest
             FatherLastname = fatherLastname,
             Email = "john.doe@example.com",
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
 
         var result = _validator.IsValid(dto);
@@ -82,8 +80,7 @@ public class NewUserFluentValidatorTest
             FatherLastname = "DOE",
             Email = email,
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
 
         var result = _validator.IsValid(dto);
@@ -106,8 +103,7 @@ public class NewUserFluentValidatorTest
             FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = password,
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
 
         var result = _validator.IsValid(dto);
@@ -127,8 +123,8 @@ public class NewUserFluentValidatorTest
             FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
-            MidName = Optional.Some(midName),
-            MotherLastname = Optional.None<string>(),
+            MidName = midName,
+            Role = UserType.STUDENT,
         };
 
         var result = _validator.IsValid(dto);
@@ -148,8 +144,8 @@ public class NewUserFluentValidatorTest
             FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.Some(motherLastname),
+            MotherLastname = motherLastname,
+            Role = UserType.STUDENT,
         };
 
         var result = _validator.IsValid(dto);

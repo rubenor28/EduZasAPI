@@ -1,24 +1,26 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
 using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassTests;
 
 public sealed class AddClassTestUseCase(
-    ICreatorAsync<ClassTestDomain, NewClassTestDTO> creator,
-    IReaderAsync<ulong, TestDomain> testReader,
+    ICreatorAsync<ClassTestDomain, ClassTestDTO> creator,
+    IReaderAsync<Guid, TestDomain> testReader,
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> classTestReader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader,
-    IBusinessValidationService<NewClassTestDTO>? validator = null
-) : AddUseCase<NewClassTestDTO, ClassTestDomain>(creator, validator)
+    IBusinessValidationService<ClassTestDTO>? validator = null
+) : AddUseCase<ClassTestDTO, ClassTestDomain>(creator, validator)
 {
-    private readonly IReaderAsync<ulong, TestDomain> _testReader = testReader;
+    private readonly IReaderAsync<Guid, TestDomain> _testReader = testReader;
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
     private readonly IReaderAsync<ClassTestIdDTO, ClassTestDomain> _classTestReader =
         classTestReader;
@@ -26,18 +28,18 @@ public sealed class AddClassTestUseCase(
         professorReader;
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        NewClassTestDTO value
+        UserActionDTO<ClassTestDTO> value
     )
     {
         List<FieldErrorDTO> errors = [];
 
-        (await _classReader.GetAsync(value.ClassId)).IfNone(() =>
+        (await _classReader.GetAsync(value.Data.ClassId)).IfNull(() =>
             errors.Add(new() { Field = "classId", Message = "No se encontró la clase" })
         );
 
-        var testSearch = await _testReader.GetAsync(value.TestId);
+        var test = await _testReader.GetAsync(value.Data.TestId);
 
-        testSearch.IfNone(() =>
+        test.IfNull(() =>
             errors.Add(new() { Field = "testId", Message = "No se encontró el test" })
         );
 
@@ -46,14 +48,11 @@ public sealed class AddClassTestUseCase(
 
         var authorized = value.Executor.Role switch
         {
-            UserType.ADMIN => await TestOwnerIsClassProfessor(
-                testSearch.Unwrap().ProfessorId,
-                value.ClassId
-            ),
+            UserType.ADMIN => await TestOwnerIsClassProfessor(test!.ProfessorId, value.Data.ClassId),
             UserType.PROFESSOR => await IsProfessorAuthorized(
                 value.Executor.Id,
-                value.ClassId,
-                testSearch.Unwrap()
+                value.Data.ClassId,
+                test!
             ),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
@@ -63,10 +62,10 @@ public sealed class AddClassTestUseCase(
             return UseCaseErrors.Unauthorized();
 
         var classTestSearch = await _classTestReader.GetAsync(
-            new() { ClassId = value.ClassId, TestId = value.TestId }
+            new() { ClassId = value.Data.ClassId, TestId = value.Data.TestId }
         );
 
-        if (classTestSearch.IsSome)
+        if (classTestSearch is not null)
             return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
@@ -78,7 +77,7 @@ public sealed class AddClassTestUseCase(
             new() { ClassId = classId, UserId = testOwner }
         );
 
-        return professor.IsSome;
+        return professor is not null;
     }
 
     private async Task<bool> IsProfessorAuthorized(
@@ -91,6 +90,6 @@ public sealed class AddClassTestUseCase(
             new() { ClassId = classId, UserId = professorId }
         );
 
-        return professorSearch.IsSome && test.ProfessorId == professorId;
+        return professorSearch is not null && test.ProfessorId == professorId;
     }
 }

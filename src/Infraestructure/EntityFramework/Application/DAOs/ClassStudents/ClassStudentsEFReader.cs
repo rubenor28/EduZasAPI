@@ -2,14 +2,14 @@ using System.Linq.Expressions;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers.Common;
+using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassStudents;
 
 public class ClassStudentsEFReader(
     EduZasDotnetContext ctx,
-    IEFProjector<ClassStudent, ClassStudentDomain> projector
-) : EFReader<UserClassRelationId, ClassStudentDomain, ClassStudent>(ctx, projector)
+    IMapper<ClassStudent, ClassStudentDomain> mapper
+) : EFReader<UserClassRelationId, ClassStudentDomain, ClassStudent>(ctx, mapper)
 {
     protected override Expression<Func<ClassStudent, bool>> GetIdPredicate(
         UserClassRelationId id

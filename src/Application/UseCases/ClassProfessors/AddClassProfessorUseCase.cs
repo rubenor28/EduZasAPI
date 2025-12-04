@@ -1,10 +1,12 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.Common;
 using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassProfessors;
@@ -27,13 +29,16 @@ public class AddClassProfessorUseCase(
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        NewClassProfessorDTO value
+        UserActionDTO<NewClassProfessorDTO> value
     )
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => await IsProfessorAuthorized(value.Executor.Id, value.ClassId),
+            UserType.PROFESSOR => await IsProfessorAuthorized(
+                value.Executor.Id,
+                value.Data.ClassId
+            ),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -43,11 +48,11 @@ public class AddClassProfessorUseCase(
 
         List<FieldErrorDTO> errors = [];
 
-        (await _userReader.GetAsync(value.UserId)).IfNone(() =>
+        (await _userReader.GetAsync(value.Data.UserId)).IfNull(() =>
             errors.Add(new() { Field = "userId", Message = "Usuario no encontrado" })
         );
 
-        (await _classReader.GetAsync(value.ClassId)).IfNone(() =>
+        (await _classReader.GetAsync(value.Data.ClassId)).IfNull(() =>
             errors.Add(new() { Field = "classId", Message = "Clase no encontrada" })
         );
 
@@ -55,10 +60,10 @@ public class AddClassProfessorUseCase(
             return UseCaseErrors.Input(errors);
 
         var relationSearch = await _reader.GetAsync(
-            new() { UserId = value.UserId, ClassId = value.ClassId }
+            new() { UserId = value.Data.UserId, ClassId = value.Data.ClassId }
         );
 
-        if (relationSearch.IsSome)
+        if (relationSearch is not null)
             return UseCaseErrors.AlreadyExists();
 
         return Unit.Value;
@@ -67,6 +72,6 @@ public class AddClassProfessorUseCase(
     private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
     {
         var professor = await _reader.GetAsync(new() { ClassId = classId, UserId = professorId });
-        return professor.IsSome && professor.Unwrap().IsOwner;
+        return professor is not null && professor.IsOwner;
     }
 }

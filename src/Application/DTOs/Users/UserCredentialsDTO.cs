@@ -14,7 +14,7 @@ public sealed record UserCredentialsDTO
     /// Obtiene o establece la dirección de correo electrónico del usuario.
     /// </summary>
     /// <value>Email del usuario utilizado para identificarse. Campo obligatorio.</value>
-    public required string Email { get; set; }
+    public required string Email { get; init; }
 
     /// <summary>
     /// Obtiene o establece la contraseña del usuario para autenticación.
@@ -24,5 +24,5 @@ public sealed record UserCredentialsDTO
     /// Esta contraseña deberá ser verificada contra la versión hasheada almacenada
     /// en el sistema durante el proceso de autenticación.
     /// </remarks>
-    public required string Password { get; set; }
+    public required string Password { get; init; }
 }

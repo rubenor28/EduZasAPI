@@ -1,5 +1,3 @@
-using Domain.ValueObjects;
-
 namespace Domain.Entities;
 
 public sealed record NotificationDomain

@@ -16,7 +16,7 @@ public class ReadUserUseCaseTest : IDisposable
     private readonly ReadUserUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserProjector _userMapper = new();
+    private readonly UserMapper _userMapper = new();
     private readonly Random _rdm = new();
 
     public ReadUserUseCaseTest()
@@ -52,14 +52,19 @@ public class ReadUserUseCaseTest : IDisposable
         return _userMapper.Map(user);
     }
 
+    public static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
+
     [Fact]
     public async Task ExecuteAsync_WithExistingUser_ReturnsOkWithUserData()
     {
         // Arrange
+        var admin = await SeedUser(UserType.ADMIN);
         var seededUser = await SeedUser();
 
         // Act
-        var result = await _useCase.ExecuteAsync(seededUser.Id);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = seededUser.Id, Executor = AsExecutor(admin) }
+        );
 
         // Assert
         Assert.True(result.IsOk);
@@ -72,10 +77,13 @@ public class ReadUserUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithNonExistentUser_ReturnsNotFoundError()
     {
         // Arrange
+        var admin = await SeedUser(UserType.ADMIN);
         var nonExistentId = (ulong)_rdm.NextInt64(1, 100_000);
 
         // Act
-        var result = await _useCase.ExecuteAsync(nonExistentId);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = nonExistentId, Executor = AsExecutor(admin) }
+        );
 
         // Assert
         Assert.True(result.IsErr);
@@ -86,10 +94,13 @@ public class ReadUserUseCaseTest : IDisposable
     public async Task ExecuteAsync_WithInvalidId_ReturnsInputError()
     {
         // Arrange
+        var admin = await SeedUser(UserType.ADMIN);
         const ulong invalidId = 0;
 
         // Act
-        var result = await _useCase.ExecuteAsync(invalidId);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = invalidId, Executor = AsExecutor(admin) }
+        );
 
         // Assert
         Assert.True(result.IsErr);

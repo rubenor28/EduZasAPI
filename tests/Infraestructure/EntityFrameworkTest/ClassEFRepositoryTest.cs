@@ -1,7 +1,6 @@
 using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using Domain.Enums;
-using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
@@ -32,9 +31,10 @@ public class ClassEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classMapper = new ClassProjector();
+        var classProjector = new ClassProjector();
+        var classMapper = new ClassMapper();
 
-        _querier = new(_ctx, classMapper, 10);
+        _querier = new(_ctx, classProjector, 10);
         _reader = new(_ctx, classMapper);
         _creator = new(_ctx, classMapper, new NewClassEFMapper());
         _updater = new(_ctx, classMapper, new UpdateClassEFMapper());
@@ -49,11 +49,10 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "test-class",
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
-            Subject = Optional.Some("Math"),
+            Section = "A",
+            Subject = "Math",
             OwnerId = 1,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         var created = await _creator.AddAsync(newClass);
@@ -71,11 +70,10 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "test-class",
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
-            Subject = Optional.Some("Math"),
+            Section = "A",
+            Subject = "Math",
             OwnerId = 1,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         await _creator.AddAsync(newClass);
 
@@ -84,11 +82,10 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "test-class",
             ClassName = "Another Class",
             Color = "#000000",
-            Section = Optional.Some("B"),
-            Subject = Optional.Some("Science"),
+            Section = "B",
+            Subject = "Science",
             OwnerId = 2,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(duplicateClass));
@@ -102,11 +99,10 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "test-class",
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
-            Subject = Optional.Some("Math"),
+            Section = "A",
+            Subject = "Math",
             OwnerId = 1,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         var created = await _creator.AddAsync(newClass);
 
@@ -116,9 +112,8 @@ public class ClassEFRepositoryTest : IDisposable
             ClassName = "Updated Class Name",
             Color = "#123456",
             Active = false,
-            Section = Optional.Some("B"),
-            Subject = Optional.Some("Science"),
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
+            Section = "B",
+            Subject = "Science",
         };
 
         var updatedClass = await _updater.UpdateAsync(update);
@@ -128,8 +123,8 @@ public class ClassEFRepositoryTest : IDisposable
         Assert.Equal(update.ClassName, updatedClass.ClassName);
         Assert.Equal(update.Color, updatedClass.Color);
         Assert.Equal(update.Active, updatedClass.Active);
-        Assert.Equal(update.Section.Unwrap(), updatedClass.Section.Unwrap());
-        Assert.Equal(update.Subject.Unwrap(), updatedClass.Subject.Unwrap());
+        Assert.Equal(update.Section, updatedClass.Section);
+        Assert.Equal(update.Subject, updatedClass.Subject);
     }
 
     [Fact]
@@ -140,26 +135,24 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "test-class",
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
-            Subject = Optional.Some("Math"),
+            Section = "A",
+            Subject = "Math",
             OwnerId = 1,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         var created = await _creator.AddAsync(newClass);
 
         var foundClass = await _reader.GetAsync(created.Id);
 
-        Assert.True(foundClass.IsSome);
-        Assert.Equal(created.Id, foundClass.Unwrap().Id);
+        Assert.NotNull(foundClass);
+        Assert.Equal(created.Id, foundClass.Id);
     }
 
     [Fact]
     public async Task GetAsync_WhenClassDoesNotExist_ReturnsEmptyOptional()
     {
         var foundClass = await _reader.GetAsync("non-existent-class");
-
-        Assert.True(foundClass.IsNone);
+        Assert.Null(foundClass);
     }
 
     [Fact]
@@ -170,11 +163,10 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "test-class",
             ClassName = "Test Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
-            Subject = Optional.Some("Math"),
+            Section = "A",
+            Subject = "Math",
             OwnerId = 1,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         var created = await _creator.AddAsync(newClass);
 
@@ -184,7 +176,7 @@ public class ClassEFRepositoryTest : IDisposable
         Assert.Equal(created.Id, deletedClass.Id);
 
         var foundClass = await _reader.GetAsync(created.Id);
-        Assert.True(foundClass.IsNone);
+        Assert.Null(foundClass);
     }
 
     [Fact]
@@ -203,11 +195,10 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "class1",
             ClassName = "Math Class",
             Color = "#ffffff",
-            Section = Optional.Some("A"),
-            Subject = Optional.Some("Math"),
+            Section = "A",
+            Subject = "Math",
             OwnerId = 1,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         await _creator.AddAsync(newClass1);
 
@@ -216,11 +207,10 @@ public class ClassEFRepositoryTest : IDisposable
             Id = "class2",
             ClassName = "Science Class",
             Color = "#ffffff",
-            Section = Optional.Some("B"),
-            Subject = Optional.Some("Science"),
+            Section = "B",
+            Subject = "Science",
             OwnerId = 2,
             Professors = [],
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
         await _creator.AddAsync(newClass2);
 

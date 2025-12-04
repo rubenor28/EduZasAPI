@@ -1,6 +1,5 @@
 using Application.DTOs.Common;
 using Domain.Enums;
-using Domain.ValueObjects;
 
 namespace Application.DTOs.Users;
 
@@ -22,7 +21,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el valor booleano para filtrar por estado activo/inactivo,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<bool> Active { get; set; } = Optional<bool>.None();
+    public bool? Active { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el tipo o rol del usuario.
@@ -31,7 +30,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el <see cref="UserType"/> para filtrar por rol,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<UserType> Role { get; set; } = Optional<UserType>.None();
+    public UserType? Role { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el primer nombre del usuario.
@@ -40,7 +39,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el primer nombre para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<StringQueryDTO> FirstName { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? FirstName { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el segundo nombre del usuario.
@@ -49,7 +48,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el segundo nombre para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<StringQueryDTO> MidName { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? MidName { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido paterno del usuario.
@@ -58,7 +57,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el apellido paterno para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<StringQueryDTO> FatherLastname { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? FatherLastname { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido materno del usuario.
@@ -67,7 +66,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el apellido materno para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<StringQueryDTO> MotherLastname { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? MotherLastname { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el email del usuario.
@@ -76,7 +75,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el email para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<StringQueryDTO> Email { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? Email { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la contraseña del usuario.
@@ -85,7 +84,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la contraseña para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<StringQueryDTO> Password { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? Password { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de creación del usuario.
@@ -94,7 +93,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la fecha de creación para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<DateTime> CreatedAt { get; set; } = Optional<DateTime>.None();
+    public DateTime? CreatedAt { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de modificación del usuario.
@@ -103,7 +102,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la fecha de modificación para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<DateTime> ModifiedAt { get; set; } = Optional<DateTime>.None();
+    public DateTime? ModifiedAt { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para usuarios inscritos en una clase específica.
@@ -112,7 +111,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el ID de la clase para filtrar usuarios inscritos,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> EnrolledInClass { get; set; } = Optional<string>.None();
+    public string? EnrolledInClass { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para usuarios que enseñan en una clase específica.
@@ -121,5 +120,5 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el ID de la clase para filtrar usuarios que enseñan,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public Optional<string> TeachingInClass { get; set; } = Optional<string>.None();
+    public string? TeachingInClass { get; init; } 
 }

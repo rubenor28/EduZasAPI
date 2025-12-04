@@ -4,7 +4,7 @@ namespace EntityFramework.Application.DTOs;
 
 public partial class Test
 {
-    public ulong TestId { get; set; }
+    public Guid TestId { get; set; }
 
     public string Title { get; set; } = null!;
 

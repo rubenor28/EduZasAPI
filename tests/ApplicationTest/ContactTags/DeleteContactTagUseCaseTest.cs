@@ -1,5 +1,4 @@
 using Application.DTOs.Common;
-using Application.DTOs.ContactTags;
 using Application.UseCases.ContactTags;
 using Domain.Entities;
 using Domain.Enums;
@@ -22,8 +21,8 @@ public class DeleteContactTagUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly DeleteContactTagUseCase _useCase;
 
-    private readonly UserProjector _userMapper = new();
-    private readonly ContactProjector _contactMapper = new();
+    private readonly UserMapper _userMapper = new();
+    private readonly ContactMapper _contactMapper = new();
 
     public DeleteContactTagUseCaseTest()
     {
@@ -36,12 +35,13 @@ public class DeleteContactTagUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var contactQuerier = new ContactEFQuerier(_ctx, _contactMapper, 10);
+        var contactProjector = new ContactProjector();
+        var contactQuerier = new ContactEFQuerier(_ctx, contactProjector, 10);
 
-        var tagMapper = new TagProjector();
+        var tagMapper = new TagMapper();
         var tagDeleter = new TagEFDeleter(_ctx, tagMapper);
 
-        var contactTagMapper = new ContactTagProjector();
+        var contactTagMapper = new ContactTagMapper();
         var contactTagDeleter = new ContactTagEFDeleter(_ctx, contactTagMapper);
         var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
 
@@ -114,19 +114,17 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new DeleteContactTagDTO
+        var dto = new ContactTagIdDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.Id,
-                UserId = contactUser.Id,
-                Tag = tag,
-            },
-            Executor = AsExecutor(owner),
+            AgendaOwnerId = owner.Id,
+            UserId = contactUser.Id,
+            Tag = tag,
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(owner) }
+        );
 
         // Assert
         Assert.True(result.IsOk);
@@ -147,19 +145,17 @@ public class DeleteContactTagUseCaseTest : IDisposable
         await CreateContactTag(owner.Id, contactUser1.Id, tag);
         await CreateContactTag(owner.Id, contactUser2.Id, tag);
 
-        var dto = new DeleteContactTagDTO
+        var dto = new ContactTagIdDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.Id,
-                UserId = contactUser1.Id,
-                Tag = tag,
-            },
-            Executor = AsExecutor(owner),
+            AgendaOwnerId = owner.Id,
+            UserId = contactUser1.Id,
+            Tag = tag,
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(owner) }
+        );
 
         // Assert
         Assert.True(result.IsOk);
@@ -175,19 +171,17 @@ public class DeleteContactTagUseCaseTest : IDisposable
         var contactUser = await CreateUser("contact@test.com");
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new DeleteContactTagDTO
+        var dto = new ContactTagIdDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.Id,
-                UserId = contactUser.Id,
-                Tag = "non-existent-tag",
-            },
-            Executor = AsExecutor(owner),
+            AgendaOwnerId = owner.Id,
+            UserId = contactUser.Id,
+            Tag = "non-existent-tag",
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(owner) }
+        );
 
         // Assert
         Assert.True(result.IsErr);
@@ -205,19 +199,17 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new DeleteContactTagDTO
+        var dto = new ContactTagIdDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.Id,
-                UserId = contactUser.Id,
-                Tag = tag,
-            },
-            Executor = AsExecutor(unauthorized),
+            AgendaOwnerId = owner.Id,
+            UserId = contactUser.Id,
+            Tag = tag,
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(unauthorized) }
+        );
 
         // Assert
         Assert.True(result.IsErr);
@@ -235,19 +227,17 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new DeleteContactTagDTO
+        var dto = new ContactTagIdDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.Id,
-                UserId = contactUser.Id,
-                Tag = tag,
-            },
-            Executor = AsExecutor(admin),
+            AgendaOwnerId = owner.Id,
+            UserId = contactUser.Id,
+            Tag = tag,
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         // Assert
         Assert.True(result.IsOk);
@@ -265,19 +255,17 @@ public class DeleteContactTagUseCaseTest : IDisposable
         const string tag = "test-tag";
         await CreateContactTag(owner.Id, contactUser.Id, tag);
 
-        var dto = new DeleteContactTagDTO
+        var dto = new ContactTagIdDTO
         {
-            Id = new()
-            {
-                AgendaOwnerId = owner.Id,
-                UserId = contactUser.Id,
-                Tag = tag,
-            },
-            Executor = AsExecutor(student),
+            AgendaOwnerId = owner.Id,
+            UserId = contactUser.Id,
+            Tag = tag,
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(student) }
+        );
 
         // Assert
         Assert.True(result.IsErr);

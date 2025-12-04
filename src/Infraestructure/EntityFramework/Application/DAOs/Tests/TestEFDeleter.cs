@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace EntityFramework.Application.DAOs.Tests;
 
 public sealed class TestEFDeleter(EduZasDotnetContext ctx, IMapper<Test, TestDomain> domainMapper)
-    : EFDeleter<ulong, TestDomain, Test>(ctx, domainMapper)
+    : EFDeleter<Guid, TestDomain, Test>(ctx, domainMapper)
 {
-    public override Task<Test?> GetTrackedById(ulong id) =>
+    public override Task<Test?> GetTrackedById(Guid id) =>
         _dbSet.AsTracking().AsQueryable().Where(t => t.TestId == id).FirstOrDefaultAsync();
 }

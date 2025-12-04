@@ -26,11 +26,12 @@ public class NotificationEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new NotificationProjector();
+        var mapper = new NotificationMapper();
+        var projector = new NotificationProjector();
 
         _creator = new(_ctx, mapper, new NewNotificationEFMapper());
         _reader = new(_ctx, mapper);
-        _querier = new(_ctx, mapper, 10);
+        _querier = new(_ctx, projector, 10);
     }
 
     private async Task SeedData()
@@ -61,15 +62,15 @@ public class NotificationEFRepositoryTest : IDisposable
 
         var found = await _reader.GetAsync(created.Id);
 
-        Assert.True(found.IsSome);
-        Assert.Equal(created.Id, found.Unwrap().Id);
+        Assert.NotNull(found);
+        Assert.Equal(created.Id, found.Id);
     }
 
     [Fact]
     public async Task GetAsync_WhenNotificationDoesNotExists_ReturnsNone()
     {
         var found = await _reader.GetAsync(123);
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]

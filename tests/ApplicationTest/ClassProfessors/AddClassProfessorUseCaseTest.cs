@@ -21,8 +21,8 @@ public class AddClassProfessorUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserProjector _userMapper = new();
-    private readonly ClassProjector _classMapper = new();
+    private readonly UserMapper _userMapper = new();
+    private readonly ClassMapper _classMapper = new();
 
     private readonly Random _random = new();
 
@@ -40,7 +40,7 @@ public class AddClassProfessorUseCaseTest : IDisposable
         var userReader = new UserEFReader(_ctx, _userMapper);
         var classReader = new ClassEFReader(_ctx, _classMapper);
 
-        var classProfessorMapper = new ClassProfessorProjector();
+        var classProfessorMapper = new ClassProfessorMapper();
 
         var professorReader = new ClassProfessorsEFReader(_ctx, classProfessorMapper);
 
@@ -98,10 +98,11 @@ public class AddClassProfessorUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = target.Id,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var relation = await _ctx.ClassProfessors.FindAsync(cls.Id, target.Id);
@@ -122,9 +123,10 @@ public class AddClassProfessorUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = ownerProfessor.Id,
             IsOwner = true,
-            Executor = AsExecutor(admin),
         };
-        var bootstrap = await _useCase.ExecuteAsync(bootstrapDto);
+        var bootstrap = await _useCase.ExecuteAsync(
+            new() { Data = bootstrapDto, Executor = AsExecutor(admin) }
+        );
         Assert.True(bootstrap.IsOk);
 
         var dto = new NewClassProfessorDTO
@@ -132,10 +134,11 @@ public class AddClassProfessorUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = newProfessor.Id,
             IsOwner = false,
-            Executor = AsExecutor(ownerProfessor),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(ownerProfessor) }
+        );
         Assert.True(result.IsOk);
         var relation = await _ctx.ClassProfessors.FindAsync(cls.Id, newProfessor.Id);
         Assert.NotNull(relation);
@@ -154,10 +157,11 @@ public class AddClassProfessorUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = target.Id,
             IsOwner = false,
-            Executor = AsExecutor(studentExecutor),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(studentExecutor) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -174,10 +178,11 @@ public class AddClassProfessorUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = 999999,
             IsOwner = false,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         var error = result.UnwrapErr() as InputError;
@@ -199,10 +204,11 @@ public class AddClassProfessorUseCaseTest : IDisposable
             ClassId = "NON-EXISTENT",
             UserId = target.Id,
             IsOwner = false,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         var error = result.UnwrapErr() as InputError;
@@ -225,13 +231,15 @@ public class AddClassProfessorUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = target.Id,
             IsOwner = false,
-            Executor = AsExecutor(admin),
         };
 
-        var first = await _useCase.ExecuteAsync(dto);
+        var first = await _useCase.ExecuteAsync(new() { Data = dto, Executor = AsExecutor(admin) });
         Assert.True(first.IsOk);
 
-        var second = await _useCase.ExecuteAsync(dto);
+        var second = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
+
         Assert.True(second.IsErr);
         Assert.IsType<AlreadyExistsError>(second.UnwrapErr());
     }

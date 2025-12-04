@@ -124,7 +124,14 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<Answer>(answerBuilder =>
         {
-            answerBuilder.HasKey(e => new { e.TestId, e.ClassId, e.UserId }).HasName("PRIMARY");
+            answerBuilder
+                .HasKey(e => new
+                {
+                    e.TestId,
+                    e.ClassId,
+                    e.UserId,
+                })
+                .HasName("PRIMARY");
             answerBuilder.ToTable("answer");
 
             answerBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
@@ -428,7 +435,8 @@ public partial class EduZasDotnetContext : DbContext
                 .IsRequired()
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("active");
-            var contentProperty = resourceBuilder.Property(e => e.Content)
+            var contentProperty = resourceBuilder
+                .Property(e => e.Content)
                 .HasConversion(new JsonNodeToStringConverter())
                 .HasColumnName("content");
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
@@ -440,11 +448,11 @@ public partial class EduZasDotnetContext : DbContext
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 resourceBuilder.UseCollation("utf8mb4_unicode_ci");
-                                        var resourceIdProperty = resourceBuilder
-                                            .Property(e => e.ResourceId)
-                                            .HasColumnType("char(36)")
-                                            .HasColumnName("resource_id");
-                                                        resourceBuilder
+                var resourceIdProperty = resourceBuilder
+                    .Property(e => e.ResourceId)
+                    .HasColumnType("char(36)")
+                    .HasColumnName("resource_id");
+                resourceBuilder
                     .Property(e => e.ProfessorId)
                     .HasColumnType("bigint(20) unsigned")
                     .HasColumnName("professor_id");
@@ -488,8 +496,11 @@ public partial class EduZasDotnetContext : DbContext
             classResourceBuilder.ToTable("class_resources");
             classResourceBuilder.HasIndex(e => e.ResourceId, "idx_class_resources_resource_id");
 
-            classResourceBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
-            
+            classResourceBuilder
+                .Property(e => e.ClassId)
+                .HasMaxLength(20)
+                .HasColumnName("class_id");
+
             classResourceBuilder
                 .Property(e => e.Hidden)
                 .IsRequired()
@@ -501,11 +512,13 @@ public partial class EduZasDotnetContext : DbContext
                 classResourceBuilder.UseCollation("utf8mb4_unicode_ci");
                 classResourceBuilder.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
-                classResourceBuilder.Property(e => e.ResourceId)
+                classResourceBuilder
+                    .Property(e => e.ResourceId)
                     .HasColumnType("char(36)")
                     .HasColumnName("resource_id");
 
-                classResourceBuilder.Property(e => e.CreatedAt)
+                classResourceBuilder
+                    .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
                     .HasColumnType("datetime")
                     .HasColumnName("created_at");
@@ -513,17 +526,20 @@ public partial class EduZasDotnetContext : DbContext
             else
             {
                 classResourceBuilder.Property(e => e.ResourceId).HasColumnName("resource_id");
-                classResourceBuilder.Property(e => e.CreatedAt)
+                classResourceBuilder
+                    .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .HasColumnName("created_at");
             }
 
-            classResourceBuilder.HasOne(d => d.Class)
+            classResourceBuilder
+                .HasOne(d => d.Class)
                 .WithMany(p => p.ClassResources)
                 .HasForeignKey(d => d.ClassId)
                 .HasConstraintName("class_resources_ibfk_1");
 
-            classResourceBuilder.HasOne(d => d.Resource)
+            classResourceBuilder
+                .HasOne(d => d.Resource)
                 .WithMany(p => p.ClassResources)
                 .HasForeignKey(d => d.ResourceId)
                 .HasConstraintName("class_resources_ibfk_2");
@@ -554,21 +570,31 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<ContactTag>(contactTagBuilder =>
         {
-            contactTagBuilder.HasKey(e => new { e.TagText, e.AgendaOwnerId, e.UserId }).HasName("PRIMARY");
+            contactTagBuilder
+                .HasKey(e => new
+                {
+                    e.TagText,
+                    e.AgendaOwnerId,
+                    e.UserId,
+                })
+                .HasName("PRIMARY");
             contactTagBuilder.ToTable("contact_tags");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
-                contactTagBuilder.Property(e => e.TagText)
+                contactTagBuilder
+                    .Property(e => e.TagText)
                     .HasMaxLength(30)
                     .HasColumnName("tag_text");
-                contactTagBuilder.Property(e => e.AgendaOwnerId)
+                contactTagBuilder
+                    .Property(e => e.AgendaOwnerId)
                     .HasColumnType("bigint(20) unsigned")
                     .HasColumnName("agenda_owner_id");
-                contactTagBuilder.Property(e => e.UserId)
+                contactTagBuilder
+                    .Property(e => e.UserId)
                     .HasColumnType("bigint(20) unsigned")
                     .HasColumnName("contact_id");
-                
+
                 contactTagBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
@@ -602,7 +628,8 @@ public partial class EduZasDotnetContext : DbContext
             testBuilder.HasKey(e => e.TestId).HasName("PRIMARY");
             testBuilder.ToTable("tests");
             testBuilder.HasIndex(e => e.ProfessorId, "idx_tests_professor_id");
-            var contentProperty = testBuilder.Property(e => e.Content)
+            var contentProperty = testBuilder
+                .Property(e => e.Content)
                 .HasConversion(new JsonNodeToStringConverter())
                 .HasColumnName("content");
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
@@ -616,7 +643,7 @@ public partial class EduZasDotnetContext : DbContext
                 testBuilder.UseCollation("utf8mb4_unicode_ci");
                 testBuilder
                     .Property(e => e.TestId)
-                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnType("char(36)")
                     .HasColumnName("test_id");
                 testBuilder
                     .Property(e => e.ProfessorId)
@@ -675,7 +702,7 @@ public partial class EduZasDotnetContext : DbContext
                 testPerClassBuilder.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
                 testPerClassBuilder
                     .Property(e => e.TestId)
-                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnType("char(36)")
                     .HasColumnName("test_id");
                 testPerClassBuilder
                     .Property(e => e.CreatedAt)
@@ -766,7 +793,7 @@ public partial class EduZasDotnetContext : DbContext
                 userBuilder.Property(e => e.Role).HasDefaultValueSql("'0'").HasColumnName("role");
             }
         });
-        
+
         modelBuilder.Entity<ResourceViewSession>(builder =>
         {
             builder.HasKey(e => e.Id).HasName("PRIMARY");
@@ -783,24 +810,55 @@ public partial class EduZasDotnetContext : DbContext
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
-                builder.Property(e => e.UserId).HasColumnType("bigint(20) unsigned").HasColumnName("user_id");
-                builder.Property(e => e.ResourceId).HasColumnType("char(36)").HasColumnName("resource_id");
+                builder
+                    .Property(e => e.UserId)
+                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnName("user_id");
+                builder
+                    .Property(e => e.ResourceId)
+                    .HasColumnType("char(36)")
+                    .HasColumnName("resource_id");
                 builder.Property(e => e.ClassId).HasMaxLength(15).HasColumnName("class_id");
-                builder.Property(e => e.CreatedAt).HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("created_at");
-                builder.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("current_timestamp()").HasColumnType("datetime").HasColumnName("modified_at");
+                builder
+                    .Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("current_timestamp()")
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+                builder
+                    .Property(e => e.ModifiedAt)
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasDefaultValueSql("current_timestamp()")
+                    .HasColumnType("datetime")
+                    .HasColumnName("modified_at");
             }
             else
             {
                 builder.Property(e => e.UserId).HasColumnName("user_id");
                 builder.Property(e => e.ResourceId).HasColumnName("resource_id");
                 builder.Property(e => e.ClassId).HasColumnName("class_id");
-                builder.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("created_at");
-                builder.Property(e => e.ModifiedAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("CURRENT_TIMESTAMP").HasColumnName("modified_at");
+                builder
+                    .Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasColumnName("created_at");
+                builder
+                    .Property(e => e.ModifiedAt)
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasColumnName("modified_at");
             }
 
-            builder.HasOne(d => d.User).WithMany(p => p.ResourceViewSessions).HasForeignKey(d => d.UserId);
-            builder.HasOne(d => d.Resource).WithMany(p => p.ResourceViewSessions).HasForeignKey(d => d.ResourceId);
-            builder.HasOne(d => d.Class).WithMany(p => p.ResourceViewSessions).HasForeignKey(d => d.ClassId);
+            builder
+                .HasOne(d => d.User)
+                .WithMany(p => p.ResourceViewSessions)
+                .HasForeignKey(d => d.UserId);
+            builder
+                .HasOne(d => d.Resource)
+                .WithMany(p => p.ResourceViewSessions)
+                .HasForeignKey(d => d.ResourceId);
+            builder
+                .HasOne(d => d.Class)
+                .WithMany(p => p.ResourceViewSessions)
+                .HasForeignKey(d => d.ClassId);
         });
 
         OnModelCreatingPartial(modelBuilder);
@@ -808,4 +866,3 @@ public partial class EduZasDotnetContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
-

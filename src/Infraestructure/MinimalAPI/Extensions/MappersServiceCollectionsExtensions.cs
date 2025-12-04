@@ -31,12 +31,8 @@ using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Common;
 using InterfaceAdapters.Mappers.Users;
 using MinimalAPI.Application.DTOs.Classes;
-using MinimalAPI.Application.DTOs.ClassProfessors;
-using MinimalAPI.Application.DTOs.ClassResources;
-using MinimalAPI.Application.DTOs.ClassStudents;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Contacts;
-using MinimalAPI.Application.DTOs.Notifications;
 using MinimalAPI.Application.DTOs.Resources;
 using MinimalAPI.Application.DTOs.Tags;
 using MinimalAPI.Application.DTOs.Users;
@@ -87,7 +83,6 @@ public static class MapperServiceCollectionExtensions
         where TImplementation : class,
             IBidirectionalResultMapper<TIn, TOut, TError>,
             IMapper<TOut, TIn>
-        where TOut : notnull
         where TError : notnull
     {
         // 1. Clase Concreta
@@ -109,20 +104,6 @@ public static class MapperServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection RegisterEFProjector<TImp, TEntity, TEF>(
-        this IServiceCollection services
-    )
-        where TImp : class, IEFProjector<TEF, TEntity>
-    {
-        // 1. Clase Concreta
-        services.AddSingleton<TImp>();
-
-        services.AddSingleton<IMapper<TEF, TEntity>>(sp => sp.GetRequiredService<TImp>());
-        services.AddSingleton<IEFProjector<TEF, TEntity>>(sp => sp.GetRequiredService<TImp>());
-
-        return services;
-    }
-
     /// <summary>
     /// Registra el contexto de mapeo de datos en la configuración.
     /// </summary>
@@ -135,303 +116,115 @@ public static class MapperServiceCollectionExtensions
 
         // String Query DTO
         s.RegisterBidirectionalResultMapper<StringSearchMapper, string, StringSearchType, Unit>();
-        s.RegisterBidirectionalResultMapper<
-            StringQueryMAPIMapper,
-            StringQueryMAPI,
-            StringQueryDTO,
-            Unit
-        >();
-        s.RegisterBidirectionalResultMapper<
-            OptionalStringQueryMAPIMapper,
-            StringQueryMAPI?,
-            Optional<StringQueryDTO>,
-            Unit
-        >();
+        s.RegisterBidirectionalResultMapper<StringQueryMAPIMapper, StringQueryMAPI, StringQueryDTO, Unit>();
+        s.RegisterBidirectionalResultMapper<OptionalStringQueryMAPIMapper, StringQueryMAPI?, StringQueryDTO?, Unit>();
 
         // USERS
         // EF
         s.RegisterBidirectionalResultMapper<UserTypeUintMapper, uint, UserType, Unit>();
         s.RegisterBidirectionalResultMapper<UserTypeUlongMapper, ulong, UserType, Unit>();
         s.RegisterBidirectionalResultMapper<UserTypeStringMapper, string, UserType, Unit>();
-        s.RegisterBidirectionalResultMapper<
-            OptionalUserTypeUintMapper,
-            uint?,
-            Optional<UserType>,
-            Unit
-        >();
+        s.RegisterBidirectionalResultMapper<OptionalUserTypeUintMapper, uint?, UserType?, Unit>();
+
+        s.AddSingleton<IMapper<User, UserDomain>, UserMapper>();
         s.AddSingleton<IMapper<NewUserDTO, User>, NewUserEFMapper>();
         s.AddSingleton<IUpdateMapper<UserUpdateDTO, User>, UpdateUserEFMapper>();
-        s.RegisterEFProjector<UserProjector, UserDomain, User>();
+        s.AddSingleton<IEFProjector<User, UserDomain, UserCriteriaDTO>, UserProjector>();
 
         // Minimal API
-        s.AddSingleton<IMapper<Executor, ReadUserDTO>, UserReadMAPIMapper>();
-        s.AddSingleton<IMapper<UserDomain, PublicUserMAPI>, UserMAPIMapper>();
-        s.AddSingleton<IMapper<NewUserMAPI, NewUserDTO>, NewUserMAPIMapper>();
-        s.AddSingleton<IMapper<ulong, Executor, DeleteUserDTO>, DeleteUserMAPIMapper>();
-        s.AddSingleton<
-            IMapper<UserUpdateMAPI, Executor, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>,
-            UserUpdateMAPIMapper
-        >();
-        s.RegisterBidirectionalResultMapper<
-            UserCriteriaMAPIMapper,
-            UserCriteriaMAPI,
-            UserCriteriaDTO,
-            IEnumerable<FieldErrorDTO>
-        >();
-        s.AddSingleton<
-            IMapper<
-                PaginatedQuery<UserDomain, UserCriteriaDTO>,
-                PaginatedQuery<PublicUserMAPI, UserCriteriaMAPI>
-            >,
-            UserSearchMAPIMapper
-        >();
+        s.AddSingleton<IMapper<UserDomain, PublicUserDTO>, UserMAPIMapper>();
+        s.AddSingleton<IMapper<UserUpdateMAPI, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>, UserUpdateMAPIMapper>();
+        s.RegisterBidirectionalResultMapper<UserCriteriaMAPIMapper, UserCriteriaMAPI, UserCriteriaDTO, IEnumerable<FieldErrorDTO>>();
+        s.AddSingleton<IMapper<PaginatedQuery<UserDomain, UserCriteriaDTO>, PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>>, UserSearchMAPIMapper>();
 
         // CLASSES
         // EF
         s.AddSingleton<IMapper<NewClassDTO, Class>, NewClassEFMapper>();
         s.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>, UpdateClassEFMapper>();
-        s.RegisterEFProjector<ClassProjector, ClassDomain, Class>();
+        s.AddSingleton<IMapper<Class, ClassDomain>, ClassMapper>();
+        s.AddSingleton<IEFProjector<Class, ClassDomain, ClassCriteriaDTO>, ClassProjector>();
 
         //Minimal API
-        s.AddSingleton<IMapper<ClassDomain, PublicClassMAPI>, ClassMAPIMapper>();
-        s.AddSingleton<IMapper<NewClassMAPI, Executor, NewClassDTO>, NewClassMAPIMapper>();
-        s.AddSingleton<IMapper<string, Executor, DeleteClassDTO>, DeleteClassMAPIMapper>();
-        s.AddSingleton<IMapper<ClassUpdateMAPI, Executor, ClassUpdateDTO>, ClassUpdateMAPIMapper>();
-        s.RegisterBidirectionalMapper<
-            WithStudentMAPIMapper,
-            WithStudentMAPI?,
-            Optional<WithStudentDTO>
-        >();
-        s.RegisterBidirectionalMapper<
-            WithProfessorMAPIMapper,
-            WithProfessorMAPI?,
-            Optional<WithProfessorDTO>
-        >();
-        s.RegisterBidirectionalResultMapper<
-            ClassCriteriaMAPIMapper,
-            ClassCriteriaMAPI,
-            ClassCriteriaDTO,
-            IEnumerable<FieldErrorDTO>
-        >();
-        s.AddSingleton<
-            IMapper<
-                PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
-                PaginatedQuery<PublicClassMAPI, ClassCriteriaMAPI>
-            >,
-            ClassSearchMAPIMapper
-        >();
+        s.RegisterBidirectionalResultMapper<ClassCriteriaMAPIMapper, ClassCriteriaMAPI, ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>();
+        s.AddSingleton<IMapper<PaginatedQuery<ClassDomain, ClassCriteriaDTO>, PaginatedQuery<ClassDomain, ClassCriteriaMAPI>>, ClassSearchMAPIMapper>();
 
         // CLASS PROFESSOR
         // EF
         s.AddSingleton<IMapper<NewClassProfessorDTO, ClassProfessor>, NewClassProfessorEFMapper>();
-        s.AddSingleton<
-            IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>,
-            UpdateClassProfessorEFMapper
-        >();
-        s.RegisterEFProjector<ClassProfessorProjector, ClassProfessorDomain, ClassProfessor>();
-
-        // Minimal API
-        s.AddSingleton<
-            IMapper<ClassProfessorDomain, ClassProfessorMAPI>,
-            ClassProfessorMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<ClassProfessorMAPI, Executor, NewClassProfessorDTO>,
-            NewClassProfessorMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<string, ulong, Executor, DeleteClassProfessorDTO>,
-            DeleteClassProfessorMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<ClassProfessorMAPI, Executor, ClassProfessorUpdateDTO>,
-            ClassProfessorUpdateMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<
-                PaginatedQuery<ClassProfessorDomain, ClassProfessorCriteriaDTO>,
-                PaginatedQuery<ClassProfessorMAPI, ClassProfessorCriteriaMAPI>
-            >,
-            ClassProfessorSearchMAPIMapper
-        >();
-        s.RegisterBidirectionalMapper<
-            ClassProfessorsCriteriaMAPIMapper,
-            ClassProfessorCriteriaMAPI,
-            ClassProfessorCriteriaDTO
-        >();
+        s.AddSingleton<IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>, UpdateClassProfessorEFMapper>();
+        s.AddSingleton<IMapper<ClassProfessor, ClassProfessorDomain>, ClassProfessorMapper>();
+        s.AddSingleton<IEFProjector<ClassProfessor, ClassProfessorDomain, ClassProfessorCriteriaDTO>, ClassProfessorProjector>();
 
         // CLASS STUDENTS
         // EF
-        s.AddSingleton<IMapper<NewClassStudentDTO, ClassStudent>, NewClassStudentEFMapper>();
-        s.AddSingleton<
-            IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>,
-            UpdateClassStudentEFMapper
-        >();
-        s.RegisterEFProjector<ClassStudentProjector, ClassStudentDomain, ClassStudent>();
-
-        // Minimal API
-        s.AddSingleton<
-            IMapper<EnrollClassMAPI, Executor, NewClassStudentDTO>,
-            NewClassStudentMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<string, ulong, Executor, DeleteClassStudentDTO>,
-            DeleteClassStudentMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<ClassStudentUpdateMAPI, Executor, ClassStudentUpdateDTO>,
-            UpdateClassStudentMAPIMapper
-        >();
+        s.AddSingleton<IMapper<UserClassRelationId, ClassStudent>, NewClassStudentEFMapper>();
+        s.AddSingleton<IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>, UpdateClassStudentEFMapper>();
+        s.AddSingleton<IMapper<ClassStudent, ClassStudentDomain>, ClassStudentMapper>();
 
         // NOTIFICATIONS
         // EF
-        s.RegisterEFProjector<NotificationProjector, NotificationDomain, Notification>();
+        s.AddSingleton<IMapper<Notification, NotificationDomain>, NotificationMapper>();
         s.AddSingleton<IMapper<NewNotificationDTO, Notification>, NewNotificationEFMapper>();
+        s.AddSingleton<IEFProjector<Notification, NotificationDomain, NotificationCriteriaDTO>, NotificationProjector>();
 
         // Minimal API
-        s.RegisterBidirectionalMapper<
-            NotificationCriteriaMAPIMapper,
-            NotificationCriteriaMAPI,
-            NotificationCriteriaDTO
-        >();
-        s.AddSingleton<
-            IMapper<int, ulong, NotificationCriteriaDTO>,
-            UserNotificationCriteriaMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<NotificationDomain, PublicNotificationMAPI>,
-            PublicNotificationMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<
-                PaginatedQuery<NotificationDomain, NotificationCriteriaDTO>,
-                PaginatedQuery<PublicNotificationMAPI, NotificationCriteriaMAPI>
-            >,
-            NotificationSearchMAPIMapper
-        >();
+        s.AddSingleton<IMapper<int, ulong, NotificationCriteriaDTO>, UserNotificationCriteriaMAPIMapper>();
 
         // USER NOTIFICATIONS
         // EF
-        s.AddSingleton<
-            IMapper<NewUserNotificationDTO, NotificationPerUser>,
-            NewUserNotificationEFMapper
-        >();
-        s.AddSingleton<
-            IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>,
-            UpdateUserNotificationEFMapper
-        >();
-        s.RegisterEFProjector<
-            UserNotificationProjector,
-            UserNotificationDomain,
-            NotificationPerUser
-        >();
+        s.AddSingleton<IMapper<NotificationPerUser, UserNotificationDomain>>();
+        s.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>, NewUserNotificationEFMapper>();
+        s.AddSingleton<IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>, UpdateUserNotificationEFMapper>();
 
         // TAGS
         // EF
-        s.RegisterEFProjector<TagProjector, TagDomain, Tag>();
+        s.AddSingleton<IMapper<Tag, TagDomain>, TagMapper>();
         s.AddSingleton<IMapper<NewTagDTO, Tag>, NewTagEFMapper>();
+        s.AddSingleton<IEFProjector<Tag, TagDomain, TagCriteriaDTO>, TagProjector>();
 
         // Minimal API
-        s.RegisterBidirectionalResultMapper<
-            TagCriteriaMAPIMapper,
-            TagCriteriaMAPI,
-            TagCriteriaDTO,
-            IEnumerable<FieldErrorDTO>
-        >();
-        s.AddSingleton<IMapper<TagDomain, PublicTagMAPI>, PublicTagMAPIMapper>();
-        s.AddSingleton<
-            IMapper<
-                PaginatedQuery<TagDomain, TagCriteriaDTO>,
-                PaginatedQuery<string, TagCriteriaMAPI>
-            >,
-            TagSearchMAPIMapper
-        >();
+        s.RegisterBidirectionalResultMapper<TagCriteriaMAPIMapper, TagCriteriaMAPI, TagCriteriaDTO, IEnumerable<FieldErrorDTO>>();
+        s.AddSingleton<IMapper<PaginatedQuery<TagDomain, TagCriteriaDTO>, PaginatedQuery<string, TagCriteriaMAPI>>, TagSearchMAPIMapper>();
 
         // CONTACTS
         // EF
+        s.AddSingleton<IMapper<AgendaContact, ContactDomain>, ContactMapper>();
         s.AddSingleton<IMapper<NewContactDTO, AgendaContact>, NewContactEFMapper>();
         s.AddSingleton<IUpdateMapper<ContactUpdateDTO, AgendaContact>, UpdateContactEFMapper>();
-        s.RegisterEFProjector<ContactProjector, ContactDomain, AgendaContact>();
+        s.AddSingleton<IEFProjector<AgendaContact, ContactDomain, ContactCriteriaDTO>, ContactProjector>();
 
         // Minimal API
-        s.AddSingleton<IMapper<ContactDomain, PublicContactMAPI>, PublicContactMAPIMapper>();
-        s.RegisterBidirectionalResultMapper<
-            ContactCriteriaMAPIMapper,
-            ContactCriteriaMAPI,
-            ContactCriteriaDTO,
-            IEnumerable<FieldErrorDTO>
-        >();
-        s.AddSingleton<IMapper<ContactUpdateMAPI, ContactUpdateDTO>, ContactUpdateMAPIMapper>();
-        s.AddSingleton<
-            IMapper<
-                PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
-                PaginatedQuery<PublicContactMAPI, ContactCriteriaMAPI>
-            >,
-            ContactSearchMAPIMapper
-        >();
-        s.AddSingleton<IMapper<NewContactMAPI, Executor, NewContactDTO>, NewContactMAPIMapper>();
-        s.AddSingleton<
-            IMapper<ulong, ulong, Executor, DeleteContactDTO>,
-            DeleteContactMAPIMapper
-        >();
+        s.RegisterBidirectionalResultMapper<ContactCriteriaMAPIMapper, ContactCriteriaMAPI, ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>();
 
         // CONTACT TAGS
         // EF
-        s.RegisterEFProjector<ContactTagProjector, ContactTagDomain, ContactTag>();
+        s.AddSingleton<IMapper<ContactTag, ContactTagDomain>, ContactTagMapper>();
         s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>, NewContactTagEFMapper>();
 
         // Minimal API
-        s.AddSingleton<
-            IMapper<ContactTagIdDTO, Executor, NewContactTagDTO>,
-            NewContactTagMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<ulong, ulong, string, Executor, DeleteContactTagDTO>,
-            DeleteContactTagMAPIMapper
-        >();
+        s.AddSingleton<IMapper<ContactTagIdDTO, NewContactTagDTO>, NewContactTagMAPIMapper>();
 
         // TESTS
         // EF
         s.AddSingleton<IMapper<NewTestDTO, Test>, NewTestEFMapper>();
         s.AddSingleton<IUpdateMapper<TestUpdateDTO, Test>, UpdateTestEFMapper>();
-        s.RegisterEFProjector<TestProjector, TestDomain, Test>();
+        s.AddSingleton<IMapper<Test, TestDomain>, TestMapper>();
+        s.AddSingleton<IEFProjector<Test, TestDomain, TestCriteriaDTO>, TestProjector>();
 
         // Resource
         // EF
         s.AddSingleton<IMapper<NewResourceDTO, Resource>, NewResourceEFMapper>();
         s.AddSingleton<IUpdateMapper<ResourceUpdateDTO, Resource>, UpdateResourceEFMapper>();
-        s.RegisterEFProjector<ResourceProjector, ResourceDomain, Resource>();
-        s.RegisterEFProjector<ResourceSummaryProjector, ResourceSummary, Resource>();
+        s.AddSingleton<IMapper<Resource, ResourceDomain>, ResourceMapper>();
+        s.AddSingleton<IEFProjector<Resource, ResourceDomain, ResourceCriteriaDTO>, ResourceProjector>();
 
         // Minimal API
-        s.RegisterBidirectionalResultMapper<
-            ResourceCriteriaMAPIMapper,
-            ResourceCriteriaMAPI,
-            ResourceCriteriaDTO,
-            IEnumerable<FieldErrorDTO>
-        >();
-        s.AddSingleton<IMapper<NewResourceMAPI, Executor, NewResourceDTO>, NewResourceMAPIMapper>();
-        s.AddSingleton<IMapper<ResourceDomain, PublicResourceMAPI>, PublicResourceMAPIMapper>();
-        s.AddSingleton<IMapper<Guid, Executor, DeleteResourceDTO>, DeleteResourceMAPIMapper>();
-        s.AddSingleton<
-            IMapper<ResourceUpdateMAPI, Executor, ResourceUpdateDTO>,
-            ResourceUpdateMAPIMapper
-        >();
-        s.AddSingleton<
-            IMapper<
-                PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
-                PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
-            >,
-            ResourceSearchMAPIMapper
-        >();
+        s.RegisterBidirectionalResultMapper<ResourceCriteriaMAPIMapper, ResourceCriteriaMAPI, ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>();
+        s.AddSingleton<IMapper<PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>, PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>>, ResourceSearchMAPIMapper>();
 
         // Class Resource
         // EF
         s.AddSingleton<IMapper<NewClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
-        s.RegisterEFProjector<ClassResourceProjector, ClassResourceDomain, ClassResource>();
-        // Minimal API
-        s.AddSingleton<IMapper<NewClassResourceMAPI, Executor, NewClassResourceDTO>, NewClassResourceMAPIMapper>();
-        s.AddSingleton<IMapper<Guid, string, Executor, DeleteClassResourceDTO>, DeleteClassResourceMAPIMapper>();
 
         return s;
     }

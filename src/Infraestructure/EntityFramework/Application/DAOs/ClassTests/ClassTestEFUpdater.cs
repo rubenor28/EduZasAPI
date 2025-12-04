@@ -11,15 +11,15 @@ namespace EntityFramework.Application.DAOs.ClassTests;
 public sealed class ClassTestEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<TestPerClass, ClassTestDomain> domainMapper,
-    IUpdateMapper<ClassTestUpdateDTO, TestPerClass> updateMapper
+    IUpdateMapper<ClassTestDTO, TestPerClass> updateMapper
 )
-    : EFUpdater<ClassTestDomain, ClassTestUpdateDTO, TestPerClass>(
+    : EFUpdater<ClassTestDomain, ClassTestDTO, TestPerClass>(
         ctx,
         domainMapper,
         updateMapper
     )
 {
-    protected override async Task<TestPerClass?> GetTrackedByDTO(ClassTestUpdateDTO id) =>
+    protected override async Task<TestPerClass?> GetTrackedByDTO(ClassTestDTO id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

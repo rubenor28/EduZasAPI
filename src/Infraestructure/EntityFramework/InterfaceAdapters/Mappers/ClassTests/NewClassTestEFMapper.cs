@@ -4,9 +4,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.ClassTests;
 
-public class NewClassTestEFMapper : IMapper<NewClassTestDTO, TestPerClass>
+public class NewClassTestEFMapper : IMapper<ClassTestDTO, TestPerClass>
 {
-    public TestPerClass Map(NewClassTestDTO nct) =>
+    public TestPerClass Map(ClassTestDTO nct) =>
         new()
         {
             TestId = nct.TestId,

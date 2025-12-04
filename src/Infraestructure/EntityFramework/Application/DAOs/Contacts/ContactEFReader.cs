@@ -2,14 +2,12 @@
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;
-using EntityFramework.InterfaceAdapters.Mappers.Common;
+using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Contacts;
 
-public class ContactEFReader(
-    EduZasDotnetContext ctx,
-    IEFProjector<AgendaContact, ContactDomain> projector
-) : EFReader<ContactIdDTO, ContactDomain, AgendaContact>(ctx, projector)
+public class ContactEFReader(EduZasDotnetContext ctx, IMapper<AgendaContact, ContactDomain> mapper)
+    : EFReader<ContactIdDTO, ContactDomain, AgendaContact>(ctx, mapper)
 {
     protected override Expression<Func<AgendaContact, bool>> GetIdPredicate(ContactIdDTO id) =>
         c => c.UserId == id.UserId && c.AgendaOwnerId == id.AgendaOwnerId;

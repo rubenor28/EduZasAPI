@@ -25,7 +25,7 @@ public class AddTagToContactUseCaseTest : IDisposable
     private readonly AddContactTagUseCase _useCase;
     private readonly ContactEFCreator _contactCreator;
 
-    private readonly UserProjector _userMapper = new();
+    private readonly UserMapper _userMapper = new();
 
     public AddTagToContactUseCaseTest()
     {
@@ -40,16 +40,20 @@ public class AddTagToContactUseCaseTest : IDisposable
 
         var userReader = new UserEFReader(_ctx, _userMapper);
 
-        var contactMapper = new ContactProjector();
+        var contactMapper = new ContactMapper();
         _contactCreator = new ContactEFCreator(_ctx, contactMapper, new NewContactEFMapper());
         var contactReader = new ContactEFReader(_ctx, contactMapper);
 
-        var tagMapper = new TagProjector();
+        var tagMapper = new TagMapper();
         var tagReader = new TagEFReader(_ctx, tagMapper);
         var tagCreator = new TagEFCreator(_ctx, tagMapper, new NewTagEFMapper());
 
-        var contactTagMapper = new ContactTagProjector();
-        var contactTagCreator = new ContactTagEFCreator(_ctx, contactTagMapper, new NewContactTagEFMapper());
+        var contactTagMapper = new ContactTagMapper();
+        var contactTagCreator = new ContactTagEFCreator(
+            _ctx,
+            contactTagMapper,
+            new NewContactTagEFMapper()
+        );
         var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
 
         _useCase = new AddContactTagUseCase(
@@ -86,7 +90,6 @@ public class AddTagToContactUseCaseTest : IDisposable
             Alias = "Test Contact",
             AgendaOwnerId = ownerId,
             UserId = userId, // Corrected property
-            Executor = new Executor { Id = ownerId, Role = UserType.ADMIN },
         };
         return await _contactCreator.AddAsync(contact);
     }
@@ -105,11 +108,16 @@ public class AddTagToContactUseCaseTest : IDisposable
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
             Tag = "new-tag",
-            Executor = new() { Id = owner.Id, Role = owner.Role },
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = owner.Id, Role = owner.Role },
+            }
+        );
 
         // Assert
         Assert.True(result.IsOk);
@@ -129,11 +137,16 @@ public class AddTagToContactUseCaseTest : IDisposable
             AgendaOwnerId = owner.Id,
             UserId = 99,
             Tag = "new-tag",
-            Executor = new() { Id = owner.Id, Role = owner.Role },
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = owner.Id, Role = owner.Role },
+            }
+        );
 
         // Assert
         Assert.True(result.IsErr);
@@ -152,11 +165,16 @@ public class AddTagToContactUseCaseTest : IDisposable
             AgendaOwnerId = 99,
             UserId = contact.Id,
             Tag = "new-tag",
-            Executor = new() { Id = contact.Id, Role = contact.Role },
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = contact.Id, Role = contact.Role },
+            }
+        );
 
         // Assert
         Assert.True(result.IsErr);
@@ -179,11 +197,16 @@ public class AddTagToContactUseCaseTest : IDisposable
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
             Tag = "new-tag",
-            Executor = new() { Id = unauthorized.Id, Role = unauthorized.Role },
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = unauthorized.Id, Role = unauthorized.Role },
+            }
+        );
 
         // Assert
         Assert.True(result.IsErr);
@@ -204,11 +227,16 @@ public class AddTagToContactUseCaseTest : IDisposable
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
             Tag = "new-tag",
-            Executor = new() { Id = student.Id, Role = student.Role },
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = student.Id, Role = student.Role },
+            }
+        );
 
         // Assert
         Assert.True(result.IsErr);
@@ -229,11 +257,16 @@ public class AddTagToContactUseCaseTest : IDisposable
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
             Tag = "new-tag",
-            Executor = new() { Id = admin.Id, Role = admin.Role },
         };
 
         // Act
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = admin.Id, Role = admin.Role },
+            }
+        );
 
         // Assert
         Assert.True(result.IsOk);
@@ -253,11 +286,22 @@ public class AddTagToContactUseCaseTest : IDisposable
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
             Tag = "new-tag",
-            Executor = new() { Id = owner.Id, Role = owner.Role },
         };
 
-        await _useCase.ExecuteAsync(dto); // First time is OK
-        var result = await _useCase.ExecuteAsync(dto); // Second time should fail
+        await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = owner.Id, Role = owner.Role },
+            }
+        ); // First time is OK
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = dto,
+                Executor = new() { Id = owner.Id, Role = owner.Role },
+            }
+        ); // Second time should fail
         Assert.True(result.IsErr);
         Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
     }

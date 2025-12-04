@@ -18,9 +18,9 @@ public class UpdateClassStudentUseCaseTest : IDisposable
     private readonly UpdateClassStudentUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserProjector _userMapper = new();
-    private readonly ClassProjector _classMapper = new();
-    private readonly ClassStudentProjector _classStudentMapper = new();
+    private readonly UserMapper _userMapper = new();
+    private readonly ClassMapper _classMapper = new();
+    private readonly ClassStudentMapper _classStudentMapper = new();
     private readonly Random _rdm = new();
 
     public UpdateClassStudentUseCaseTest()
@@ -34,7 +34,11 @@ public class UpdateClassStudentUseCaseTest : IDisposable
         _ctx.Database.EnsureCreated();
 
         var studentReader = new ClassStudentsEFReader(_ctx, _classStudentMapper);
-        var updater = new ClassStudentsEFUpdater(_ctx, _classStudentMapper, new UpdateClassStudentEFMapper());
+        var updater = new ClassStudentsEFUpdater(
+            _ctx,
+            _classStudentMapper,
+            new UpdateClassStudentEFMapper()
+        );
 
         _useCase = new UpdateClassStudentUseCase(updater, studentReader, null);
     }
@@ -110,10 +114,11 @@ public class UpdateClassStudentUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = student.Id,
             Hidden = true,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         await _ctx.Entry(relation).ReloadAsync();
@@ -134,10 +139,11 @@ public class UpdateClassStudentUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = student.Id,
             Hidden = true,
-            Executor = AsExecutor(professor),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(professor) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -158,10 +164,11 @@ public class UpdateClassStudentUseCaseTest : IDisposable
             ClassId = classA.Id,
             UserId = student.Id,
             Hidden = true,
-            Executor = AsExecutor(professor),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(professor) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -180,10 +187,11 @@ public class UpdateClassStudentUseCaseTest : IDisposable
             ClassId = cls.Id,
             UserId = studentToUpdate.Id,
             Hidden = true,
-            Executor = AsExecutor(studentExecutor),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(studentExecutor) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -198,10 +206,11 @@ public class UpdateClassStudentUseCaseTest : IDisposable
             ClassId = "non-existent",
             UserId = 999,
             Hidden = true,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<NotFoundError>(result.UnwrapErr());

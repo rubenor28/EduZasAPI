@@ -2,7 +2,6 @@ using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Domain.Entities;
 using Domain.Enums;
-using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Contacts;
@@ -33,12 +32,13 @@ public class AgendaContactEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new ContactProjector();
+        var mapper = new ContactMapper();
+        var projector = new ContactProjector();
 
         _creator = new(_ctx, mapper, new NewContactEFMapper());
         _reader = new(_ctx, mapper);
         _updater = new(_ctx, mapper, new UpdateContactEFMapper());
-        _querier = new(_ctx, mapper, 10);
+        _querier = new(_ctx, projector, 10);
 
         _user1 = new User
         {
@@ -64,18 +64,18 @@ public class AgendaContactEFRepositoryTest : IDisposable
         var newContact = new NewContactDTO
         {
             Alias = "Test Alias",
-            Notes = "Test notes".ToOptional(),
+            Notes = "Test notes",
             AgendaOwnerId = _user1.UserId,
             UserId = _user2.UserId,
-            Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+
+            Tags = [],
         };
 
         var created = await _creator.AddAsync(newContact);
 
         Assert.NotNull(created);
         Assert.Equal(newContact.Alias, created.Alias);
-        Assert.Equal(newContact.Notes.Unwrap(), created.Notes.Unwrap());
+        Assert.Equal(newContact.Notes, created.Notes);
         Assert.Equal(newContact.AgendaOwnerId, created.Id.AgendaOwnerId);
         Assert.Equal(newContact.UserId, created.Id.UserId);
     }
@@ -86,22 +86,20 @@ public class AgendaContactEFRepositoryTest : IDisposable
         var newContact = new NewContactDTO
         {
             Alias = "Test Alias",
-            Notes = "Test notes".ToOptional(),
+            Notes = "Test notes",
             AgendaOwnerId = _user1.UserId,
             UserId = _user2.UserId,
-            Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
         await _creator.AddAsync(newContact);
 
         var duplicateContact = new NewContactDTO
         {
             Alias = "Duplicate Alias",
-            Notes = "Duplicate notes".ToOptional(),
+            Notes = "Duplicate notes",
             AgendaOwnerId = _user1.UserId,
             UserId = _user2.UserId,
-            Executor = new Executor { Id = _user1.UserId, Role = UserType.ADMIN },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
 
         await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(duplicateContact));
@@ -113,26 +111,24 @@ public class AgendaContactEFRepositoryTest : IDisposable
         var newContact = new NewContactDTO
         {
             Alias = "Test Alias",
-            Notes = "Test notes".ToOptional(),
+            Notes = "Test notes",
             AgendaOwnerId = _user1.UserId,
             UserId = _user2.UserId,
-            Executor = new() { Id = 1, Role = UserType.STUDENT },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
         var created = await _creator.AddAsync(newContact);
 
         var found = await _reader.GetAsync(created.Id);
 
-        Assert.True(found.IsSome);
-        var foundContact = found.Unwrap();
-        Assert.Equal(created.Id, foundContact.Id);
+        Assert.NotNull(found);
+        Assert.Equal(created.Id, found.Id);
     }
 
     [Fact]
     public async Task GetAsync_WhenContactDoesNotExist_ReturnsEmptyOptional()
     {
         var found = await _reader.GetAsync(new() { AgendaOwnerId = 98, UserId = 99 });
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]
@@ -141,11 +137,10 @@ public class AgendaContactEFRepositoryTest : IDisposable
         var newContact = new NewContactDTO
         {
             Alias = "Test Alias",
-            Notes = "Test notes".ToOptional(),
+            Notes = "Test notes",
             AgendaOwnerId = _user1.UserId,
             UserId = _user2.UserId,
-            Executor = new() { Id = 1, Role = UserType.STUDENT },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+            Tags = [],
         };
 
         var created = await _creator.AddAsync(newContact);
@@ -155,7 +150,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             AgendaOwnerId = created.Id.AgendaOwnerId,
             UserId = created.Id.UserId,
             Alias = "Updated Alias",
-            Notes = "Updated notes".ToOptional(),
+            Notes = "Updated notes",
         };
 
         var updated = await _updater.UpdateAsync(update);
@@ -166,7 +161,7 @@ public class AgendaContactEFRepositoryTest : IDisposable
             updated.Id
         );
         Assert.Equal(update.Alias, updated.Alias);
-        Assert.Equal(update.Notes.Unwrap(), updated.Notes.Unwrap());
+        Assert.Equal(update.Notes, updated.Notes);
     }
 
     [Fact]
@@ -177,8 +172,8 @@ public class AgendaContactEFRepositoryTest : IDisposable
             Alias = "Alias 1",
             AgendaOwnerId = _user1.UserId,
             UserId = _user2.UserId,
-            Executor = new() { Id = 1, Role = UserType.STUDENT },
-            Tags = Optional<IEnumerable<string>>.Some([]),
+
+            Tags = [],
         };
         await _creator.AddAsync(newContact1);
 

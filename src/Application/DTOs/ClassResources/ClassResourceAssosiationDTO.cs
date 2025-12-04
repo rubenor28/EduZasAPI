@@ -2,8 +2,8 @@ namespace Application.DTOs.ClassResources;
 
 public sealed record ClassResourceAssosiationDTO
 {
-    public required Guid ResourceId { get; set; }
-    public required string ClassId { get; set; }
-    public required string ClassName { get; set; }
-    public bool IsAssosiated { get; set; }
+    public required Guid ResourceId { get; init; }
+    public required string ClassId { get; init; }
+    public required string ClassName { get; init; }
+    public bool IsAssosiated { get; init; }
 }

@@ -1,14 +1,14 @@
 using System.Linq.Expressions;
+using Application.DTOs.Classes;
 using Domain.Entities;
-using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 
-public class ClassProjector : IEFProjector<Class, ClassDomain>
+public class ClassProjector : IEFProjector<Class, ClassDomain, ClassCriteriaDTO>
 {
-    public Expression<Func<Class, ClassDomain>> Projection =>
+    public Expression<Func<Class, ClassDomain>> GetProjection(ClassCriteriaDTO _) =>
         ef =>
             new()
             {
@@ -16,15 +16,9 @@ public class ClassProjector : IEFProjector<Class, ClassDomain>
                 Active = ef.Active ?? false,
                 ClassName = ef.ClassName,
                 Color = ef.Color ?? "#007bff",
-                Subject = ef.Subject.ToOptional(),
-                Section = ef.Section.ToOptional(),
+                Subject = ef.Subject,
+                Section = ef.Section,
                 CreatedAt = ef.CreatedAt,
                 ModifiedAt = ef.ModifiedAt,
             };
-
-    private static readonly Lazy<Func<Class, ClassDomain>> _mapFunc = new(() =>
-        new ClassProjector().Projection.Compile()
-    );
-
-    public ClassDomain Map(Class ef) => _mapFunc.Value(ef);
 }

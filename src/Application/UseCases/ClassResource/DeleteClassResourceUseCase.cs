@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.ClassResources;
 using Application.DTOs.Common;
 using Application.Services;
@@ -13,9 +14,9 @@ public sealed class DeleteClassResourceUseCase(
     IDeleterAsync<ClassResourceIdDTO, ClassResourceDomain> deleter,
     IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> reader,
     IReaderAsync<Guid, ResourceDomain> resourceReader,
-    IBusinessValidationService<DeleteClassResourceDTO>? validator = null
+    IBusinessValidationService<ClassResourceIdDTO>? validator = null
 )
-    : DeleteUseCase<ClassResourceIdDTO, DeleteClassResourceDTO, ClassResourceDomain>(
+    : DeleteUseCase<ClassResourceIdDTO, ClassResourceDomain>(
         deleter,
         reader,
         validator
@@ -23,21 +24,15 @@ public sealed class DeleteClassResourceUseCase(
 {
     private readonly IReaderAsync<Guid, ResourceDomain> _resourceReader = resourceReader;
 
-    protected override ClassResourceIdDTO GetId(DeleteClassResourceDTO value) =>
-        new() { ClassId = value.ClassId, ResourceId = value.ResourceId };
-
-    protected override ClassResourceIdDTO GetId(ClassResourceDomain value) =>
-        new() { ClassId = value.ClassId, ResourceId = value.ResourceId };
-
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        DeleteClassResourceDTO value
+        UserActionDTO<ClassResourceIdDTO> value,
+        ClassResourceDomain record
     )
     {
-        var resourceSearch = await _resourceReader.GetAsync(value.ResourceId);
-        if (resourceSearch.IsNone)
+        var resource = await _resourceReader.GetAsync(value.Data.ResourceId);
+        if (resource is null)
             return UseCaseErrors.NotFound();
 
-        var resource = resourceSearch.Unwrap();
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,

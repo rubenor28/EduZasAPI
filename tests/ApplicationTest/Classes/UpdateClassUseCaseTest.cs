@@ -1,12 +1,14 @@
 using Application.DTOs.Classes;
 using Application.DTOs.Common;
 using Application.UseCases.Classes;
+using Domain.Entities;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
 using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
+using EntityFramework.InterfaceAdapters.Mappers.Users;
 using FluentValidationProj.Application.Services.Classes;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,7 @@ public class UpdateClassUseCaseTest : IDisposable
     private readonly UpdateClassUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
+    private readonly UserMapper _userMapper = new();
 
     public UpdateClassUseCaseTest()
     {
@@ -30,8 +33,8 @@ public class UpdateClassUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classMapper = new ClassProjector();
-        var professorRelationMapper = new ClassProfessorProjector();
+        var classMapper = new ClassMapper();
+        var professorRelationMapper = new ClassProfessorMapper();
 
         var classUpdateValidator = new ClassUpdateFluentValidator();
 
@@ -47,7 +50,7 @@ public class UpdateClassUseCaseTest : IDisposable
         );
     }
 
-    private async Task<User> SeedUser(UserType role, ulong userId = 1)
+    private async Task<UserDomain> SeedUser(UserType role, ulong userId = 1)
     {
         var user = new User
         {
@@ -60,8 +63,10 @@ public class UpdateClassUseCaseTest : IDisposable
         };
         _ctx.Users.Add(user);
         await _ctx.SaveChangesAsync();
-        return user;
+        return _userMapper.Map(user);
     }
+
+    private static Executor AsExecutor(UserDomain u) => new() { Id = u.Id, Role = u.Role };
 
     private async Task<Class> SeedClass(string classId = "TEST-CLASS")
     {
@@ -98,20 +103,21 @@ public class UpdateClassUseCaseTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var owner = await SeedUser(UserType.PROFESSOR, 2);
         var cls = await SeedClass();
-        await SeedRelation(cls.ClassId, owner.UserId, true);
+        await SeedRelation(cls.ClassId, owner.Id, true);
 
         var updateDto = new ClassUpdateDTO
         {
             Id = cls.ClassId,
             ClassName = "New Name by Admin",
-            Executor = new() { Id = admin.UserId, Role = UserType.ADMIN },
             Active = cls.Active!.Value,
             Color = cls.Color!,
             Section = cls.Section!,
             Subject = cls.Subject!,
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
         var updatedClass = await _ctx.Classes.FindAsync(cls.ClassId);
@@ -124,20 +130,21 @@ public class UpdateClassUseCaseTest : IDisposable
     {
         var owner = await SeedUser(UserType.PROFESSOR);
         var cls = await SeedClass();
-        await SeedRelation(cls.ClassId, owner.UserId, true);
+        await SeedRelation(cls.ClassId, owner.Id, true);
 
         var updateDto = new ClassUpdateDTO
         {
             Id = cls.ClassId,
             ClassName = "New Name by Owner",
-            Executor = new() { Id = owner.UserId, Role = UserType.PROFESSOR },
             Active = cls.Active!.Value,
             Color = cls.Color!,
             Section = cls.Section!,
             Subject = cls.Subject!,
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(owner) }
+        );
 
         Assert.True(result.IsOk);
         var updatedClass = await _ctx.Classes.FindAsync(cls.ClassId);
@@ -151,21 +158,22 @@ public class UpdateClassUseCaseTest : IDisposable
         var owner = await SeedUser(UserType.PROFESSOR, 1);
         var nonOwner = await SeedUser(UserType.PROFESSOR, 2);
         var cls = await SeedClass();
-        await SeedRelation(cls.ClassId, owner.UserId, true);
-        await SeedRelation(cls.ClassId, nonOwner.UserId, false); // Non-owner relation
+        await SeedRelation(cls.ClassId, owner.Id, true);
+        await SeedRelation(cls.ClassId, nonOwner.Id, false); // Non-owner relation
 
         var updateDto = new ClassUpdateDTO
         {
             Id = cls.ClassId,
             ClassName = "New Name",
-            Executor = new() { Id = nonOwner.UserId, Role = UserType.PROFESSOR },
             Active = cls.Active!.Value,
             Color = cls.Color!,
             Section = cls.Section!,
             Subject = cls.Subject!,
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(nonOwner) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -181,14 +189,15 @@ public class UpdateClassUseCaseTest : IDisposable
         {
             Id = cls.ClassId,
             ClassName = "New Name",
-            Executor = new Executor { Id = student.UserId, Role = UserType.STUDENT },
             Active = cls.Active!.Value,
             Color = cls.Color!,
             Section = cls.Section!,
             Subject = cls.Subject!,
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(student) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -202,14 +211,15 @@ public class UpdateClassUseCaseTest : IDisposable
         {
             Id = "NON-EXISTENT",
             ClassName = "New Name",
-            Executor = new() { Id = admin.UserId, Role = UserType.ADMIN },
             Active = true,
             Color = "#000000",
             Section = "Valid Section",
             Subject = "Valid Subject",
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<NotFoundError>(result.UnwrapErr());
@@ -220,20 +230,21 @@ public class UpdateClassUseCaseTest : IDisposable
     {
         var owner = await SeedUser(UserType.PROFESSOR);
         var cls = await SeedClass();
-        await SeedRelation(cls.ClassId, owner.UserId, true);
+        await SeedRelation(cls.ClassId, owner.Id, true);
 
         var updateDto = new ClassUpdateDTO
         {
             Id = cls.ClassId,
             ClassName = "", // Invalid name
-            Executor = new Executor { Id = owner.UserId, Role = UserType.PROFESSOR },
             Active = cls.Active!.Value,
             Color = cls.Color!,
             Section = cls.Section!,
             Subject = cls.Subject!,
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(owner) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<InputError>(result.UnwrapErr());

@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.ClassResources;
@@ -8,6 +7,7 @@ using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassResource;
@@ -34,35 +34,35 @@ public sealed class AddClassResourceUseCase(
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        NewClassResourceDTO value
+        UserActionDTO<NewClassResourceDTO> value
     )
     {
         var classResSearch = await _reader.GetAsync(
-            new() { ClassId = value.ClassId, ResourceId = value.ResourceId }
+            new() { ClassId = value.Data.ClassId, ResourceId = value.Data.ResourceId }
         );
 
-        if (classResSearch.IsSome)
+        if (classResSearch is not null)
             return UseCaseErrors.AlreadyExists();
 
         var errors = new List<FieldErrorDTO>();
-        (await _classReader.GetAsync(value.ClassId)).IfNone(() =>
+        (await _classReader.GetAsync(value.Data.ClassId)).IfNull(() =>
             errors.Add(new() { Field = "classId", Message = "No se encontró la clase" })
         );
 
-        var resourceSearch = await _resourceReader.GetAsync(value.ResourceId);
-        resourceSearch.IfNone(() =>
+        var resourceSearch = await _resourceReader.GetAsync(value.Data.ResourceId);
+        resourceSearch.IfNull(() =>
             errors.Add(new() { Field = "resourceId", Message = "No se encontró el recurso" })
         );
 
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
 
-        var resource = resourceSearch.Unwrap();
+        var resource = resourceSearch!;
         var professor = await _professorReader.GetAsync(
-            new() { UserId = resource.ProfessorId, ClassId = value.ClassId }
+            new() { UserId = resource.ProfessorId, ClassId = value.Data.ClassId }
         );
 
-        if (professor.IsNone)
+        if (professor is null)
             return UseCaseErrors.Unauthorized();
 
         var authorized = value.Executor.Role switch
@@ -82,17 +82,18 @@ public sealed class AddClassResourceUseCase(
     //TODO: Notificar usuarios por correo
 
     // protected override async Task ExtraTaskAsync(
-    //     NewClassResourceDTO newEntity,
+    //     UserActionDTO<NewClassResourceDTO> newEntity,
     //     ClassResourceDomain createdEntity
     // )
     // {
-    //     var user = (await _userReader.GetAsync(newEntity.Executor.Id)).Unwrap();
-    //     var search = await _userQuierier.GetByAsync(new() { EnrolledInClass = newEntity.ClassId });
-    //     var email = new EmailMessage {
-    //       Subject = $"Nuevo recurso compartido por {user.FatherLastname} {user.FirstName}",
-    //       To = [.. search.Results.Select(s => s.Email)],
-    //       Body = $"<h1>EduZas</h1><h2>{user.FatherLastname} {user.FirstName} ha publicado un nuevo recurso</h2><a href=\"\">Abrir recurso</a>"
-    //
+    //     var user = await _userReader.GetAsync(newEntity.Executor.Id) ?? throw new ArgumentException("No se pudo encontrar el usuario");
+    //     var search = await _userQuierier.GetByAsync(new() { EnrolledInClass = newEntity.Data.ClassId });
+    //     var email = new EmailMessage
+    //     {
+    //         Subject = $"Nuevo recurso compartido por {user.FatherLastname} {user.FirstName}",
+    //         To = [.. search.Results.Select(s => s.Email)],
+    //         Body =
+    //             $"<h1>EduZas</h1><h2>{user.FatherLastname} {user.FirstName} ha publicado un nuevo recurso</h2><a href=\"\">Abrir recurso</a>",
     //     };
     // }
 }

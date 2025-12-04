@@ -11,8 +11,7 @@ public static class Result
     /// <typeparam name="T">Tipo del valor.</typeparam>
     /// <param name="value">Valor a encapsular.</param>
     /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
-    public static Result<T, Unit> Ok<T>(T value)
-        where T : notnull => Result<T, Unit>.Ok(value);
+    public static Result<T, Unit> Ok<T>(T value) => Result<T, Unit>.Ok(value);
 
     /// <summary>
     /// Crea un resultado fallido que contiene un error.
@@ -20,8 +19,7 @@ public static class Result
     /// <typeparam name="E">Tipo del error.</typeparam>
     /// <param name="error">Error a encapsular.</param>
     /// <returns>Un resultado fallido con el error proporcionado.</returns>
-    public static Result<Unit, E> Err<E>(E error)
-        where E : notnull => Result<Unit, E>.Err(error);
+    public static Result<Unit, E> Err<E>(E error) => Result<Unit, E>.Err(error);
 
     /// <summary>
     /// Crea un resultado exitoso que contiene un valor.
@@ -30,9 +28,7 @@ public static class Result
     /// <typeparam name="E">Tipo del error.</typeparam>
     /// <param name="value">Valor a encapsular.</param>
     /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
-    public static Result<T, E> Ok<T, E>(T value)
-        where T : notnull
-        where E : notnull => Result<T, E>.Ok(value);
+    public static Result<T, E> Ok<T, E>(T value) => Result<T, E>.Ok(value);
 
     /// <summary>
     /// Crea un resultado fallido que contiene un error.
@@ -41,9 +37,7 @@ public static class Result
     /// <typeparam name="E">Tipo del error.</typeparam>
     /// <param name="error">Error a encapsular.</param>
     /// <returns>Un resultado fallido con el error proporcionado.</returns>
-    public static Result<T, E> Err<T, E>(E error)
-        where T : notnull
-        where E : notnull => Result<T, E>.Err(error);
+    public static Result<T, E> Err<T, E>(E error) => Result<T, E>.Err(error);
 }
 
 /// <summary>
@@ -53,8 +47,6 @@ public static class Result
 /// <typeparam name="T">Tipo del valor en caso de éxito.</typeparam>
 /// <typeparam name="E">Tipo del error en caso de fallo.</typeparam>
 public abstract class Result<T, E>
-    where T : notnull
-    where E : notnull
 {
     /// <summary>
     /// Obtiene un valor que indica si el resultado es exitoso (Ok).
@@ -141,8 +133,7 @@ public abstract class Result<T, E>
     /// <returns>
     /// Un nuevo Result con el valor transformado si era Ok, o el mismo error si era Err.
     /// </returns>
-    public abstract Result<U, E> Map<U>(Func<T, U> fn)
-        where U : notnull;
+    public abstract Result<U, E> Map<U>(Func<T, U> fn);
 
     /// <summary>
     /// Aplica una función al error contenido si el resultado es Err.
@@ -152,8 +143,7 @@ public abstract class Result<T, E>
     /// <returns>
     /// Un nuevo Result con el error transformado si era Err, o el mismo valor si era Ok.
     /// </returns>
-    public abstract Result<T, F> MapErr<F>(Func<E, F> fn)
-        where F : notnull;
+    public abstract Result<T, F> MapErr<F>(Func<E, F> fn);
 
     /// <summary>
     /// Encadena operaciones aplicando una función que devuelve otro Result.
@@ -163,8 +153,7 @@ public abstract class Result<T, E>
     /// <returns>
     /// El Result devuelto por la función si era Ok, o el mismo error si era Err.
     /// </returns>
-    public abstract Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn)
-        where U : notnull;
+    public abstract Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn);
 
     /// <summary>
     /// Maneja errores aplicando una función que devuelve otro Result en caso de error.
@@ -174,8 +163,7 @@ public abstract class Result<T, E>
     /// <returns>
     /// El Result devuelto por la función si era Err, o el mismo valor si era Ok.
     /// </returns>
-    public abstract Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn)
-        where F : notnull;
+    public abstract Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn);
 
     /// <summary>
     /// Ejecuta una acción si el resultado es exitoso.

@@ -21,10 +21,10 @@ public class UpdateClassTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly UserProjector _userMapper = new();
-    private readonly TestProjector _testMapper = new();
-    private readonly ClassProjector _classMapper = new();
-    private readonly ClassTestProjector _classTestMapper = new();
+    private readonly UserMapper _userMapper = new();
+    private readonly TestMapper _testMapper = new();
+    private readonly ClassMapper _classMapper = new();
+    private readonly ClassTestMapper _classTestMapper = new();
 
     private readonly Random _random = new();
 
@@ -39,8 +39,8 @@ public class UpdateClassTestUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var classTestMapper = new ClassTestProjector();
-        var testMapper = new TestProjector();
+        var classTestMapper = new ClassTestMapper();
+        var testMapper = new TestMapper();
 
         var classTestUpdater = new ClassTestEFUpdater(
             _ctx,
@@ -76,7 +76,7 @@ public class UpdateClassTestUseCaseTest : IDisposable
     {
         var test = new Test
         {
-            TestId = 1,
+            TestId = Guid.NewGuid(),
             Title = "Original Title",
             Content = "Original Content",
             ProfessorId = professorId,
@@ -102,7 +102,7 @@ public class UpdateClassTestUseCaseTest : IDisposable
         return _classMapper.Map(@class);
     }
 
-    private async Task<ClassTestDomain> SeedClassTest(string classId, ulong testId)
+    private async Task<ClassTestDomain> SeedClassTest(string classId, Guid testId)
     {
         var classTest = new TestPerClass
         {
@@ -126,15 +126,16 @@ public class UpdateClassTestUseCaseTest : IDisposable
         var @class = await SeedClass(professor.Id);
         var classTest = await SeedClassTest(@class.Id, test.Id);
 
-        var updateDto = new ClassTestUpdateDTO
+        var updateDto = new ClassTestDTO
         {
-            ClassId = classTest.Id.ClassId,
-            TestId = classTest.Id.TestId,
+            ClassId = classTest.ClassId,
+            TestId = classTest.TestId,
             Visible = true,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -147,15 +148,16 @@ public class UpdateClassTestUseCaseTest : IDisposable
         var @class = await SeedClass(professor.Id);
         var classTest = await SeedClassTest(@class.Id, test.Id);
 
-        var updateDto = new ClassTestUpdateDTO
+        var updateDto = new ClassTestDTO
         {
-            ClassId = classTest.Id.ClassId,
-            TestId = classTest.Id.TestId,
+            ClassId = classTest.ClassId,
+            TestId = classTest.TestId,
             Visible = true,
-            Executor = AsExecutor(professor),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(professor) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -165,15 +167,16 @@ public class UpdateClassTestUseCaseTest : IDisposable
     {
         var admin = await SeedUser(UserType.ADMIN);
 
-        var updateDto = new ClassTestUpdateDTO
+        var updateDto = new ClassTestDTO
         {
             ClassId = "non-existend",
-            TestId = 999,
+            TestId = Guid.NewGuid(),
             Visible = true,
-            Executor = AsExecutor(admin),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         Assert.Equal(typeof(NotFoundError), result.UnwrapErr().GetType());
@@ -188,15 +191,16 @@ public class UpdateClassTestUseCaseTest : IDisposable
         var @class = await SeedClass(professor.Id);
         var classTest = await SeedClassTest(@class.Id, test.Id);
 
-        var updateDto = new ClassTestUpdateDTO
+        var updateDto = new ClassTestDTO
         {
-            ClassId = classTest.Id.ClassId,
-            TestId = classTest.Id.TestId,
+            ClassId = classTest.ClassId,
+            TestId = classTest.TestId,
             Visible = true,
-            Executor = AsExecutor(student),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(student) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -211,15 +215,16 @@ public class UpdateClassTestUseCaseTest : IDisposable
         var @class = await SeedClass(professor1.Id);
         var classTest = await SeedClassTest(@class.Id, test.Id);
 
-        var updateDto = new ClassTestUpdateDTO
+        var updateDto = new ClassTestDTO
         {
-            ClassId = classTest.Id.ClassId,
-            TestId = classTest.Id.TestId,
+            ClassId = classTest.ClassId,
+            TestId = classTest.TestId,
             Visible = true,
-            Executor = AsExecutor(professor2),
         };
 
-        var result = await _useCase.ExecuteAsync(updateDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = updateDto, Executor = AsExecutor(professor2) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());

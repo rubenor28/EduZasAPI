@@ -27,7 +27,7 @@ public class UserNotificationEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new UserNotificationProjector();
+        var mapper = new UserNotificationMapper();
 
         _creator = new(_ctx, mapper, new NewUserNotificationEFMapper());
         _reader = new(_ctx, mapper);
@@ -82,10 +82,9 @@ public class UserNotificationEFRepositoryTest : IDisposable
 
         var found = await _reader.GetAsync(created.Id);
 
-        Assert.True(found.IsSome);
-        var unwrapped = found.Unwrap();
-        Assert.Equal(created.Id.UserId, unwrapped.Id.UserId);
-        Assert.Equal(created.Id.NotificationId, unwrapped.Id.NotificationId);
+        Assert.NotNull(found);
+        Assert.Equal(created.Id.UserId, found.Id.UserId);
+        Assert.Equal(created.Id.NotificationId, found.Id.NotificationId);
     }
 
     [Fact]
@@ -93,7 +92,7 @@ public class UserNotificationEFRepositoryTest : IDisposable
     {
         var id = new UserNotificationIdDTO { UserId = 123, NotificationId = 456 };
         var found = await _reader.GetAsync(id);
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]

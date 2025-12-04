@@ -2,7 +2,7 @@
 
 public partial class TestPerClass
 {
-    public ulong TestId { get; set; }
+    public Guid TestId { get; set; }
 
     public string ClassId { get; set; } = null!;
 

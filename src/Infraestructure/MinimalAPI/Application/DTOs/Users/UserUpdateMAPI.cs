@@ -1,5 +1,3 @@
-using Application.DTOs.Common;
-
 namespace MinimalAPI.Application.DTOs.Users;
 
 /// <summary>
@@ -12,13 +10,13 @@ namespace MinimalAPI.Application.DTOs.Users;
 /// </remarks>
 public sealed record UserUpdateMAPI
 {
-    public required ulong Id { get; set; }
-    public required bool Active { get; set; }
-    public required uint Role { get; set; }
-    public required string FirstName { get; set; }
-    public required string FatherLastname { get; set; }
-    public required string Email { get; set; }
-    public required string Password { get; set; }
-    public required string? MidName { get; set; }
-    public required string? MotherLastname { get; set; }
+    public required ulong Id { get; init; }
+    public required bool Active { get; init; }
+    public required uint Role { get; init; }
+    public required string FirstName { get; init; }
+    public required string FatherLastname { get; init; }
+    public required string Email { get; init; }
+    public required string Password { get; init; }
+    public required string? MidName { get; init; }
+    public required string? MotherLastname { get; init; }
 }

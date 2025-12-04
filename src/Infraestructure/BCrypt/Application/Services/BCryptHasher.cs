@@ -1,4 +1,5 @@
 using Application.Services;
+using BCrypt.Net;
 
 namespace Bcrypt.Application.Services;
 
@@ -20,8 +21,9 @@ public class BCryptHasher : IHashService
     /// </summary>
     /// <param name="input">Cadena de texto original a hashear.</param>
     /// <returns>El hash BCrypt generado a partir de la cadena de entrada.</returns>
-    public string Hash(string input) => BCrypt.Net.BCrypt.HashPassword(inputKey: input);
-    
+    public string Hash(string input) =>
+        BCrypt.Net.BCrypt.EnhancedHashPassword(input);
+
     /// <summary>
     /// Verifica si una cadena de texto coincide con un hash BCrypt dado.
     /// </summary>
@@ -30,5 +32,6 @@ public class BCryptHasher : IHashService
     /// <returns>
     /// true si la cadena de texto coincide con el hash BCrypt proporcionado; false en caso contrario.
     /// </returns>
-    public bool Matches(string input, string hash) => BCrypt.Net.BCrypt.Verify(input, hash);
+    public bool Matches(string input, string hash) =>
+        BCrypt.Net.BCrypt.EnhancedVerify(input, hash);
 }

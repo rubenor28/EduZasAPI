@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.Common;
 using Application.Services;
@@ -20,12 +21,12 @@ public sealed class UpdateClassProfessorUseCase(
         validator
     )
 {
-    protected override Result<Unit, UseCaseError> ExtraValidation(ClassProfessorUpdateDTO value)
+    protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<ClassProfessorUpdateDTO> value, ClassProfessorDomain record)
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.UserId == value.Executor.Id,
+            UserType.PROFESSOR => value.Data.UserId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };

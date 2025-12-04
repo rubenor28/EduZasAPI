@@ -12,7 +12,7 @@ public class NewClassEFMapper : IMapper<NewClassDTO, Class>
             ClassId = nc.Id,
             ClassName = nc.ClassName,
             Color = nc.Color,
-            Section = nc.Section.ToNullable(),
-            Subject = nc.Subject.ToNullable(),
+            Section = nc.Section,
+            Subject = nc.Subject,
         };
 }

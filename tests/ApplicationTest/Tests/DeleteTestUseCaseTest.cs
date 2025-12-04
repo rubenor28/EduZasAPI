@@ -1,5 +1,4 @@
 using Application.DTOs.Common;
-using Application.DTOs.Tests;
 using Application.UseCases.Tests;
 using Domain.Entities;
 using Domain.Enums;
@@ -18,8 +17,8 @@ public class DeleteTestUseCaseTest : IDisposable
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
 
-    private readonly TestProjector _testMapper = new();
-    private readonly UserProjector _userMapper = new();
+    private readonly TestMapper _testMapper = new();
+    private readonly UserMapper _userMapper = new();
 
     private readonly Random _random = new();
 
@@ -61,7 +60,7 @@ public class DeleteTestUseCaseTest : IDisposable
     {
         var test = new Test
         {
-            TestId = 1,
+            TestId = Guid.NewGuid(),
             Title = "Original Title",
             Content = "Original Content",
             ProfessorId = professorId,
@@ -79,8 +78,9 @@ public class DeleteTestUseCaseTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var seeded = await SeedTest(admin.Id);
 
-        var deleteDto = new DeleteTestDTO { Id = seeded.Id, Executor = AsExecutor(admin) };
-        var result = await _useCase.ExecuteAsync(deleteDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = seeded.Id, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -89,13 +89,10 @@ public class DeleteTestUseCaseTest : IDisposable
     public async Task ExecuteAsync_TestNotFound_ReturnsError()
     {
         var user = await SeedUser(UserType.ADMIN);
-        var deleteDto = new DeleteTestDTO
-        {
-            Id = 999, // Non-existent test
-            Executor = AsExecutor(user),
-        };
 
-        var result = await _useCase.ExecuteAsync(deleteDto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = Guid.NewGuid(), Executor = AsExecutor(user) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<NotFoundError>(result.UnwrapErr());

@@ -6,8 +6,6 @@ using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.ContactTags;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Tag = EntityFramework.Application.DTOs.Tag;
-using User = EntityFramework.Application.DTOs.User;
 
 namespace EntityFrameworkTest;
 
@@ -30,7 +28,7 @@ public class ContactTagEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new ContactTagProjector();
+        var mapper = new ContactTagMapper();
 
         _creator = new(_ctx, mapper, new NewContactTagEFMapper());
         _reader = new(_ctx, mapper);
@@ -84,7 +82,6 @@ public class ContactTagEFRepositoryTest : IDisposable
             AgendaOwnerId = owner.UserId,
             UserId = contact.UserId,
             Tag = "tag-test",
-            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
         var created = await _creator.AddAsync(newRelationDto);
@@ -104,7 +101,6 @@ public class ContactTagEFRepositoryTest : IDisposable
             AgendaOwnerId = owner.UserId,
             UserId = contact.UserId,
             Tag = "tag-test",
-            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
         await _creator.AddAsync(newRelationDto);
@@ -121,7 +117,6 @@ public class ContactTagEFRepositoryTest : IDisposable
             AgendaOwnerId = owner.UserId,
             UserId = contact.UserId,
             Tag = "tag-test",
-            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
         await _creator.AddAsync(newRelationDto);
@@ -135,10 +130,10 @@ public class ContactTagEFRepositoryTest : IDisposable
 
         var found = await _reader.GetAsync(idToFind);
 
-        Assert.True(found.IsSome);
-        Assert.Equal(newRelationDto.AgendaOwnerId, found.Unwrap().Id.AgendaOwnerId);
-        Assert.Equal(newRelationDto.UserId, found.Unwrap().Id.UserId);
-        Assert.Equal(newRelationDto.Tag, found.Unwrap().Id.Tag);
+        Assert.NotNull(found);
+        Assert.Equal(newRelationDto.AgendaOwnerId, found.Id.AgendaOwnerId);
+        Assert.Equal(newRelationDto.UserId, found.Id.UserId);
+        Assert.Equal(newRelationDto.Tag, found.Id.Tag);
     }
 
     [Fact]
@@ -153,7 +148,7 @@ public class ContactTagEFRepositoryTest : IDisposable
             }
         );
 
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]
@@ -165,7 +160,6 @@ public class ContactTagEFRepositoryTest : IDisposable
             AgendaOwnerId = owner.UserId,
             UserId = contact.UserId,
             Tag = "tag-test",
-            Executor = new() { Id = owner.UserId, Role = UserType.ADMIN },
         };
 
         await _creator.AddAsync(newRelationDto);
@@ -185,7 +179,7 @@ public class ContactTagEFRepositoryTest : IDisposable
         Assert.Equal(newRelationDto.Tag, deleted.Id.Tag);
 
         var found = await _reader.GetAsync(idToDelete);
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]

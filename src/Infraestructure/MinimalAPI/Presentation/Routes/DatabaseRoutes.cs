@@ -1,6 +1,6 @@
 using Application.DTOs.Common;
-using Application.DTOs.Database;
 using Application.UseCases.Database;
+using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Presentation.Filters;
@@ -23,8 +23,10 @@ public static class DatabaseRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Crear un respaldo de la base de datos.";
-                op.Description = "Genera un archivo .sql con el estado actual de la base de datos. Requiere privilegios de administrador.";
-                op.Responses["200"].Description = "Respaldo generado exitosamente. El cuerpo de la respuesta es el archivo .sql.";
+                op.Description =
+                    "Genera un archivo .sql con el estado actual de la base de datos. Requiere privilegios de administrador.";
+                op.Responses["200"].Description =
+                    "Respaldo generado exitosamente. El cuerpo de la respuesta es el archivo .sql.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
                 op.Responses["403"].Description = "El usuario no es administrador.";
                 return op;
@@ -42,9 +44,11 @@ public static class DatabaseRoutes
             .WithOpenApi(op =>
             {
                 op.Summary = "Restaurar la base de datos desde un respaldo.";
-                op.Description = "Carga un archivo .sql para restaurar el estado de la base de datos. Esta operación es destructiva. Requiere privilegios de administrador.";
+                op.Description =
+                    "Carga un archivo .sql para restaurar el estado de la base de datos. Esta operación es destructiva. Requiere privilegios de administrador.";
                 op.Responses["200"].Description = "Restauración completada con éxito.";
-                op.Responses["400"].Description = "No se proporcionó un archivo o el archivo está vacío.";
+                op.Responses["400"].Description =
+                    "No se proporcionó un archivo o el archivo está vacío.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
                 op.Responses["403"].Description = "El usuario no es administrador.";
                 return op;
@@ -60,8 +64,9 @@ public static class DatabaseRoutes
     )
     {
         return await utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => utils.GetExecutorFromContext(ctx),
+            mapRequest: () => Unit.Value,
             mapResponse: (stream) =>
             {
                 var fileName = $"backup-{DateTime.UtcNow:yyyyMMddHHmmss}.sql";
@@ -90,8 +95,9 @@ public static class DatabaseRoutes
             var executor = utils.GetExecutorFromContext(httpContext);
             await using var inputStream = file.OpenReadStream();
 
-            var request = new RestoreRequestDTO { Executor = executor, InputStream = inputStream };
-            var result = await useCase.ExecuteAsync(request);
+            var result = await useCase.ExecuteAsync(
+                new() { Executor = executor, Data = inputStream }
+            );
 
             if (result.IsErr)
                 return useCaseErrorsMapper.Map(result.UnwrapErr());

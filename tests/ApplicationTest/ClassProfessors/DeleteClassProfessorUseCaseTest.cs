@@ -1,4 +1,3 @@
-using Application.DTOs.ClassProfessors;
 using Application.DTOs.Common;
 using Application.UseCases.ClassProfessors;
 using Domain.Entities;
@@ -18,8 +17,8 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
     private readonly DeleteClassProfessorUseCase _useCase;
     private readonly EduZasDotnetContext _ctx;
     private readonly SqliteConnection _conn;
-    private readonly UserProjector _userMapper = new();
-    private readonly ClassProjector _classMapper = new();
+    private readonly UserMapper _userMapper = new();
+    private readonly ClassMapper _classMapper = new();
     private readonly Random _rdm = new();
 
     public DeleteClassProfessorUseCaseTest()
@@ -32,7 +31,7 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var professorClassMapper = new ClassProfessorProjector();
+        var professorClassMapper = new ClassProfessorMapper();
 
         var reader = new ClassProfessorsEFReader(_ctx, professorClassMapper);
         var deleter = new ClassProfessorsEFDeleter(_ctx, professorClassMapper);
@@ -89,13 +88,11 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var cls = await SeedClass();
         await SeedClassProfessor(cls.Id, professorToDelete.Id, false);
 
-        var dto = new DeleteClassProfessorDTO
-        {
-            Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(admin),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = professorToDelete.Id };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
         var found = await _ctx.ClassProfessors.FindAsync(cls.Id, professorToDelete.Id);
 
         Assert.True(result.IsOk);
@@ -111,13 +108,11 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         await SeedClassProfessor(cls.Id, ownerProfessor.Id, true);
         await SeedClassProfessor(cls.Id, professorToDelete.Id, false);
 
-        var dto = new DeleteClassProfessorDTO
-        {
-            Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(ownerProfessor),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = professorToDelete.Id };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(ownerProfessor) }
+        );
         var found = await _ctx.ClassProfessors.FindAsync(cls.Id, professorToDelete.Id);
 
         Assert.True(result.IsOk);
@@ -133,13 +128,11 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         await SeedClassProfessor(cls.Id, nonOwnerProfessor.Id, false);
         await SeedClassProfessor(cls.Id, professorToDelete.Id, false);
 
-        var dto = new DeleteClassProfessorDTO
-        {
-            Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(nonOwnerProfessor),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = professorToDelete.Id };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(nonOwnerProfessor) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -153,13 +146,11 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var cls = await SeedClass();
         await SeedClassProfessor(cls.Id, professorToDelete.Id, false);
 
-        var dto = new DeleteClassProfessorDTO
-        {
-            Id = new() { ClassId = cls.Id, UserId = professorToDelete.Id },
-            Executor = AsExecutor(student),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = professorToDelete.Id };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(student) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<UnauthorizedError>(result.UnwrapErr());
@@ -171,13 +162,11 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var admin = await SeedUser(UserType.ADMIN);
         var cls = await SeedClass();
 
-        var dto = new DeleteClassProfessorDTO
-        {
-            Id = new() { ClassId = cls.Id, UserId = 999 },
-            Executor = AsExecutor(admin),
-        };
+        var dto = new UserClassRelationId { ClassId = cls.Id, UserId = 9 };
 
-        var result = await _useCase.ExecuteAsync(dto);
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(admin) }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<NotFoundError>(result.UnwrapErr());

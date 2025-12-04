@@ -1,5 +1,3 @@
-using Domain.ValueObjects;
-
 namespace Application.DAOs;
 
 /// <summary>
@@ -19,5 +17,5 @@ public interface IReaderAsync<I, E>
     /// Un <see cref="Optional{E}"/> que contiene la entidad si se encuentra,
     /// o vacío si no existe.
     /// </returns>
-    Task<Optional<E>> GetAsync(I id);
+    Task<E?> GetAsync(I id);
 }

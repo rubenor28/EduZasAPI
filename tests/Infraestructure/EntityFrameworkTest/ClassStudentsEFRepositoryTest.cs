@@ -1,7 +1,5 @@
 using Application.DTOs.ClassStudents;
-using Application.DTOs.Common;
 using Domain.Entities;
-using Domain.Enums;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
@@ -22,8 +20,8 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     private readonly ClassStudentsEFUpdater _updater;
     private readonly ClassStudentsEFDeleter _deleter;
 
-    private readonly ClassProjector _classMapper = new();
-    private readonly UserProjector _userMapper = new();
+    private readonly ClassMapper _classMapper = new();
+    private readonly UserMapper _userMapper = new();
 
     public StudentPerClassEFRepositoryTest()
     {
@@ -36,7 +34,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         _ctx = new EduZasDotnetContext(opts);
         _ctx.Database.EnsureCreated();
 
-        var mapper = new ClassStudentProjector();
+        var mapper = new ClassStudentMapper();
 
         _creator = new(_ctx, mapper, new NewClassStudentEFMapper());
         _reader = new(_ctx, mapper);
@@ -60,8 +58,6 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         return _userMapper.Map(user);
     }
 
-    private static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
-
     private async Task<ClassDomain> SeedClass()
     {
         var classEntity = new Class { ClassId = "test-class", ClassName = "Test Class" };
@@ -75,12 +71,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
     {
         var user = await SeedUser();
         var cls = await SeedClass();
-        var newRelation = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = user.Id,
-            Executor = AsExecutor(user),
-        };
+        var newRelation = new UserClassRelationId { ClassId = cls.Id, UserId = user.Id };
 
         var created = await _creator.AddAsync(newRelation);
 
@@ -95,12 +86,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = user.Id,
-            Executor = AsExecutor(user),
-        };
+        var newRelation = new UserClassRelationId { ClassId = cls.Id, UserId = user.Id };
 
         await _creator.AddAsync(newRelation);
         await Assert.ThrowsAnyAsync<Exception>(() => _creator.AddAsync(newRelation));
@@ -112,28 +98,22 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = user.Id,
-            Executor = AsExecutor(user),
-        };
+        var newRelation = new UserClassRelationId { ClassId = cls.Id, UserId = user.Id };
 
         var created = await _creator.AddAsync(newRelation);
 
         var found = await _reader.GetAsync(created.Id);
 
-        Assert.True(found.IsSome);
-        Assert.Equal(newRelation.UserId, found.Unwrap().Id.UserId);
-        Assert.Equal(newRelation.ClassId, found.Unwrap().Id.ClassId);
+        Assert.NotNull(found);
+        Assert.Equal(newRelation.UserId, found.Id.UserId);
+        Assert.Equal(newRelation.ClassId, found.Id.ClassId);
     }
 
     [Fact]
     public async Task Get_NonExistingRelation_ReturnsEmptyOptional()
     {
         var found = await _reader.GetAsync(new() { ClassId = "non-existent", UserId = 99 });
-
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]
@@ -142,12 +122,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = user.Id,
-            Executor = AsExecutor(user),
-        };
+        var newRelation = new UserClassRelationId { ClassId = cls.Id, UserId = user.Id };
 
         var created = await _creator.AddAsync(newRelation);
 
@@ -156,7 +131,6 @@ public class StudentPerClassEFRepositoryTest : IDisposable
             ClassId = created.Id.ClassId,
             UserId = created.Id.UserId,
             Hidden = true,
-            Executor = AsExecutor(user),
         };
 
         var updated = await _updater.UpdateAsync(toUpdate);
@@ -173,7 +147,6 @@ public class StudentPerClassEFRepositoryTest : IDisposable
             ClassId = "non-existent",
             UserId = 99,
             Hidden = true,
-            Executor = new() { Id = 1, Role = UserType.ADMIN },
         };
 
         await Assert.ThrowsAnyAsync<Exception>(() => _updater.UpdateAsync(toUpdate));
@@ -185,12 +158,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var user = await SeedUser();
         var cls = await SeedClass();
 
-        var newRelation = new NewClassStudentDTO
-        {
-            ClassId = cls.Id,
-            UserId = user.Id,
-            Executor = AsExecutor(user),
-        };
+        var newRelation = new UserClassRelationId { ClassId = cls.Id, UserId = user.Id };
 
         var created = await _creator.AddAsync(newRelation);
 
@@ -200,7 +168,7 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         Assert.Equal(created.Id, deleted.Id);
 
         var found = await _reader.GetAsync(created.Id);
-        Assert.True(found.IsNone);
+        Assert.Null(found);
     }
 
     [Fact]

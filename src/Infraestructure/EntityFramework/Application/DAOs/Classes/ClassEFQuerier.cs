@@ -10,9 +10,9 @@ namespace EntityFramework.Application.DAOs.Classes;
 
 public class ClassEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<Class, ClassDomain> projector,
-    int pageSize
-) : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>(ctx, projector, pageSize)
+    IEFProjector<Class, ClassDomain, ClassCriteriaDTO> projector,
+    int maxPageSize
+) : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>(ctx, projector, maxPageSize)
 {
     public override IQueryable<Class> BuildQuery(ClassCriteriaDTO cr) =>
         _dbSet
@@ -27,9 +27,7 @@ public class ClassEFQuerier(
                     c =>
                         c.ClassProfessors.Any(pl =>
                             pl.ProfessorId == professor.Id
-                            && (
-                                professor.IsOwner.IsNone || pl.IsOwner == professor.IsOwner.Unwrap()
-                            )
+                            && (professor.IsOwner == null || pl.IsOwner == professor.IsOwner)
                         )
             )
             .WhereOptional(
@@ -38,7 +36,7 @@ public class ClassEFQuerier(
                     c =>
                         c.ClassStudents.Any(sl =>
                             sl.StudentId == student.Id
-                            && (student.Hidden.IsNone || sl.Hidden == student.Hidden.Unwrap())
+                            && (student.Hidden == null || sl.Hidden == student.Hidden)
                         )
             )
             .OrderByDescending(c => c.CreatedAt);

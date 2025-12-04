@@ -1,12 +1,12 @@
-using Application.DTOs.ClassStudents;
+using Domain.Entities;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
 
-public class NewClassStudentEFMapper : IMapper<NewClassStudentDTO, ClassStudent>
+public class NewClassStudentEFMapper : IMapper<UserClassRelationId, ClassStudent>
 {
-    public ClassStudent Map(NewClassStudentDTO input) =>
+    public ClassStudent Map(UserClassRelationId input) =>
         new()
         {
             ClassId = input.ClassId,

@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.Services;
@@ -17,14 +18,12 @@ public sealed class AddTestUseCase(
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
-    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        NewTestDTO value
-    )
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(UserActionDTO<NewTestDTO> value)
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.Executor.Id == value.ProfessorId,
+            UserType.PROFESSOR => value.Executor.Id == value.Data.ProfessorId,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -32,11 +31,11 @@ public sealed class AddTestUseCase(
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
-        var userSearch = await _userReader.GetAsync(value.ProfessorId);
-        if (userSearch.IsNone)
-            return UseCaseErrors.Input(
-                [new() { Field = "profesorId", Message = "No se encontró el usuario" }]
-            );
+        var userSearch = await _userReader.GetAsync(value.Data.ProfessorId);
+        if (userSearch is null)
+            return UseCaseErrors.Input([
+                new() { Field = "profesorId", Message = "No se encontró el usuario" },
+            ]);
 
         return Unit.Value;
     }

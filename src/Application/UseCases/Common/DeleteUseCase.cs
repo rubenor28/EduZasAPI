@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.Services;
 using Domain.ValueObjects;
@@ -9,16 +10,15 @@ namespace Application.UseCases.Common;
 /// Caso de uso genérico para eliminar una entidad del sistema.
 /// </summary>
 /// <typeparam name="I">El tipo del identificador de la entidad.</typeparam>
-/// <typeparam name="DE">El tipo del DTO de entrada para la eliminación.</typeparam>
+/// <typeparam name="I">El tipo del DTO de entrada para la eliminación.</typeparam>
 /// <typeparam name="E">El tipo de la entidad de dominio que se eliminará.</typeparam>
-public abstract class DeleteUseCase<I, DE, E>(
+public abstract class DeleteUseCase<I, E>(
     IDeleterAsync<I, E> deleter,
     IReaderAsync<I, E> reader,
-    IBusinessValidationService<DE>? validator = null
-) : IUseCaseAsync<DE, E>
+    IBusinessValidationService<I>? validator = null
+) : IUseCaseAsync<I, E>
     where I : notnull
     where E : notnull
-    where DE : notnull
 {
     /// <summary>
     /// Entidad encargada de eliminar una entidad de un medio persistente
@@ -33,122 +33,60 @@ public abstract class DeleteUseCase<I, DE, E>(
     /// <summary>
     /// Entidad encargada de validar formato de las propiedades de una entidad
     /// </summary>
-    protected readonly IBusinessValidationService<DE>? _validator = validator;
+    protected readonly IBusinessValidationService<I>? _validator = validator;
 
     /// <summary>
     /// Ejecuta el caso de uso para eliminar una entidad.
     /// </summary>
-    /// <param name="data">El DTO con la información para la eliminación.</param>
+    /// <param name="request">El DTO con la información para la eliminación.</param>
     /// <returns>Un <see cref="Result{T, E}"/> que contiene la entidad eliminada o un error.</returns>
-    public async Task<Result<E, UseCaseError>> ExecuteAsync(DE data)
+    public async Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<I> request)
     {
         if (_validator is not null)
         {
-            var validation = _validator.IsValid(data);
+            var validation = _validator.IsValid(request.Data);
             if (validation.IsErr)
                 return UseCaseErrors.Input(validation.UnwrapErr());
         }
 
-        var syncCheck = ExtraValidation(data);
+        var record = await _reader.GetAsync(request.Data);
+        if (record is null)
+            return UseCaseErrors.NotFound();
+
+        var syncCheck = ExtraValidation(request, record);
         if (syncCheck.IsErr)
             return syncCheck.UnwrapErr();
 
-        var asyncCheck = await ExtraValidationAsync(data);
+        var asyncCheck = await ExtraValidationAsync(request, record);
         if (asyncCheck.IsErr)
             return asyncCheck.UnwrapErr();
 
-        PrevTask(data);
-        await PrevTaskAsync(data);
+        PrevTask(request, record);
+        await PrevTaskAsync(request, record);
 
-        var recordDeleted = await _deleter.DeleteAsync(GetId(data));
+        await _deleter.DeleteAsync(request.Data);
 
-        ExtraTask(data, recordDeleted);
-        await ExtraTaskAsync(data, recordDeleted);
-        return recordDeleted;
+        ExtraTask(request, record);
+        await ExtraTaskAsync(request, record);
+        return record;
     }
 
-    /// <summary>
-    /// Realiza validaciones adicionales síncronas.
-    /// </summary>
-    /// <param name="value">Datos a validar.</param>
-    /// <returns>Resultado de la validación.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para agregar validaciones personalizadas síncronas.
-    /// </remarks>
-    protected virtual Result<Unit, UseCaseError> ExtraValidation(DE value) =>
-        Result<Unit, UseCaseError>.Ok(Unit.Value);
+    protected virtual Result<Unit, UseCaseError> ExtraValidation(
+        UserActionDTO<I> value,
+        E record
+    ) => Result<Unit, UseCaseError>.Ok(Unit.Value);
 
-    /// <summary>
-    /// Realiza validaciones adicionales asíncronas.
-    /// </summary>
-    /// <param name="value">Datos a validar.</param>
-    /// <returns>Tarea que representa la validación asíncrona.</returns>
-    /// <remarks>
-    /// Por defecto busca la existencia por ID del registro y retorna un <see cref="NotFoundError">
-    /// si no se encuentra
-    ///
-    /// Este método puede ser sobrescrito para agregar validaciones personalizadas asíncronas,
-    /// como verificaciones en base de datos o llamadas a servicios externos.
-    /// </remarks>
-    protected async virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(DE value)
-    {
-        var record = await _reader.GetAsync(GetId(value));
-        if (record.IsNone)
-            return UseCaseErrors.NotFound();
+    protected virtual async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        UserActionDTO<I> value,
+        E record
+    ) => Unit.Value;
 
-        return Unit.Value;
-    }
+    protected virtual void ExtraTask(UserActionDTO<I> deleteDTO, E deletedEntity) { }
 
-    /// <summary>
-    /// Ejecuta tareas adicionales síncronas después de eliminar la entidad.
-    /// </summary>
-    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
-    /// </remarks>
-    protected virtual void ExtraTask(DE deleteDTO, E deletedEntity) { }
-
-    /// <summary>
-    /// Ejecuta tareas adicionales asíncronas después de eliminar la entidad.
-    /// </summary>
-    /// <param name="deleteDTOewEntity">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
-    /// <returns>Tarea que representa la operación asíncrona.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
-    /// </remarks>
-    protected virtual Task ExtraTaskAsync(DE deleteDTO, E deletedEntity) =>
+    protected virtual Task ExtraTaskAsync(UserActionDTO<I> deleteDTO, E deletedEntity) =>
         Task.FromResult(Unit.Value);
 
-    /// <summary>
-    /// Ejecuta tareas adicionales síncronas previas a eliminar la entidad.
-    /// </summary>
-    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para ejecutar lógica adicional después de la creación exitosa.
-    /// </remarks>
-    protected virtual void PrevTask(DE deleteDTO) { }
+    protected virtual void PrevTask(UserActionDTO<I> deleteDTO, E record) { }
 
-    /// <summary>
-    /// Ejecuta tareas adicionales asíncronas previas a eliminar la entidad.
-    /// </summary>
-    /// <param name="deleteDTO">DTO con los datos originales de la nueva entidad.</param>
-    /// <param name="deletedEntity">Entidad creada en el sistema.</param>
-    /// <returns>Tarea que representa la operación asíncrona.</returns>
-    /// <remarks>
-    /// Este método puede ser sobrescrito para ejecutar lógica asíncrona adicional después de la creación exitosa.
-    /// </remarks>
-    protected virtual Task PrevTaskAsync(DE deleteDTO) => Task.FromResult(Unit.Value);
-
-    /// <summary>
-    /// Metodo abstracto para obtener el ID del DTO.
-    /// </summary>
-    protected abstract I GetId(DE value);
-
-    /// <summary>
-    /// Metodo abstracto para obtener el ID del registro.
-    /// </summary>
-    protected abstract I GetId(E value);
+    protected virtual Task PrevTaskAsync(UserActionDTO<I> deleteDTO, E record) => Task.FromResult(Unit.Value);
 }

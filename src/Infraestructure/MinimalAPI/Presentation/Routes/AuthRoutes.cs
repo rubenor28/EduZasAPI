@@ -1,11 +1,11 @@
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
+using Application.UseCases.Users;
 using Domain.Entities;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
-using MinimalAPI.Application.DTOs.Users;
 using MinimalAPI.Application.Services;
 using MinimalAPI.Presentation.Filters;
 
@@ -30,7 +30,7 @@ public static class AuthRoutes
         group
             .MapPost("/sign-in", AddUser)
             .WithName("Registrar usuario")
-            .Produces<PublicUserMAPI>(StatusCodes.Status201Created)
+            .Produces<PublicUserDTO>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces<MessageResponse>(StatusCodes.Status409Conflict)
             .WithOpenApi(op =>
@@ -47,7 +47,7 @@ public static class AuthRoutes
         group
             .MapPost("/login", Login)
             .WithName("Iniciar sesión")
-            .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
+            .Produces<PublicUserDTO>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -80,8 +80,8 @@ public static class AuthRoutes
             .MapGet("/me", UserData)
             .WithName("Verificar autenticado")
             .RequireAuthorization("RequireAuthenticated")
-            .AddEndpointFilter<UserIdFilter>()
-            .Produces<PublicUserMAPI>(StatusCodes.Status200OK)
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<PublicUserDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi(op =>
@@ -97,14 +97,16 @@ public static class AuthRoutes
             });
 
         group
-            .MapGet("/antiforgery/token", (IAntiforgery antiforgery, HttpContext context) =>
-            {
-                var tokens = antiforgery.GetAndStoreTokens(context);
-                return Results.Ok(new { tokens.HeaderName, tokens.RequestToken });
-            })
+            .MapGet(
+                "/antiforgery/token",
+                (IAntiforgery antiforgery, HttpContext context) =>
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    return Results.Ok(new { tokens.HeaderName, tokens.RequestToken });
+                }
+            )
             .WithName("Obtener token antifalsificación")
             .ExcludeFromDescription();
-
 
         return group;
     }
@@ -117,15 +119,16 @@ public static class AuthRoutes
     /// <param name="utils">Utilidad para manejar respuestas y excepciones.</param>
     /// <returns>Un <see cref="IResult"/> con el resultado de la operación.</returns>
     public static async Task<IResult> AddUser(
-        NewUserMAPI request,
+        NewUserDTO request,
         AddUserUseCase useCase,
         RoutesUtils utils,
-        IMapper<NewUserMAPI, NewUserDTO> newUserMapper,
-        IMapper<UserDomain, PublicUserMAPI> userMapper,
+        IMapper<NewUserDTO, NewUserDTO> newUserMapper,
+        IMapper<UserDomain, PublicUserDTO> userMapper,
         HttpContext ctx
     )
     {
         return await utils.HandleUseCaseAsync(
+            ctx,
             useCase,
             mapRequest: () => newUserMapper.Map(request),
             mapResponse: (user) => Results.Created($"/users/{user.Id}", userMapper.Map(user))
@@ -147,7 +150,7 @@ public static class AuthRoutes
     public async static Task<IResult> Login(
         UserCredentialsDTO credentials,
         LoginUseCase useCase,
-        IMapper<UserDomain, PublicUserMAPI> userMapper,
+        IMapper<UserDomain, PublicUserDTO> userMapper,
         RoutesUtils utils,
         JwtSettings jwtSettings,
         JwtService jwtService,
@@ -155,10 +158,10 @@ public static class AuthRoutes
         IWebHostEnvironment env
     )
     {
-        return await utils.HandleUseCaseAsync(
+        return await utils.HandleGuestUseCaseAsync(
             useCase,
             mapRequest: () => credentials,
-            mapResponse: (user) =>
+            mapResponse: user =>
             {
                 var token = jwtService.Generate(new AuthPayload { Id = user.Id, Role = user.Role });
 
@@ -209,12 +212,13 @@ public static class AuthRoutes
         HttpContext ctx,
         [FromServices] RoutesUtils utils,
         [FromServices] ReadUserUseCase useCase,
-        [FromServices] IMapper<UserDomain, PublicUserMAPI> userMapper
+        [FromServices] IMapper<UserDomain, PublicUserDTO> userMapper
     )
     {
         return await utils.HandleUseCaseAsync(
+            ctx,
             useCase,
-            mapRequest: () => utils.GetIdFromContext(ctx),
+            mapRequest: () => utils.GetExecutorFromContext(ctx).Id,
             mapResponse: (user) => Results.Ok(userMapper.Map(user))
         );
     }

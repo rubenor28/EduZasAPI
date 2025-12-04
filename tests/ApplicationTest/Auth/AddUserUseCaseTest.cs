@@ -1,8 +1,8 @@
 using Application.DTOs.Common;
 using Application.DTOs.Users;
-using Application.UseCases.Auth;
+using Application.UseCases.Users;
 using Bcrypt.Application.Services;
-using Domain.ValueObjects;
+using Domain.Enums;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Users;
@@ -32,12 +32,12 @@ public class AddUserUseCaseTest : IDisposable
 
         var hasher = new BCryptHasher();
         var roleMapper = new UserTypeUintMapper();
-        var mapper = new UserProjector();
+        var mapper = new UserMapper();
         var creator = new UserEFCreator(_ctx, mapper, new NewUserEFMapper(roleMapper));
-        var querier = new UserEFQuerier(_ctx, mapper, 10);
+        var reader = new UserEmailEFReader(_ctx, mapper);
         var validator = new NewUserFluentValidator();
 
-        _useCase = new AddUserUseCase(hasher, creator, validator, querier);
+        _useCase = new AddUserUseCase(hasher, creator, validator, reader);
     }
 
     [Fact]
@@ -49,11 +49,16 @@ public class AddUserUseCaseTest : IDisposable
             FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
 
-        var result = await _useCase.ExecuteAsync(newUser);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newUser,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsOk);
     }
@@ -67,10 +72,15 @@ public class AddUserUseCaseTest : IDisposable
             FatherLastname = "DOE",
             Email = "jane.doe@example.com",
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
-        await _useCase.ExecuteAsync(existingUser);
+        await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = existingUser,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         var newUser = new NewUserDTO
         {
@@ -78,11 +88,16 @@ public class AddUserUseCaseTest : IDisposable
             FatherLastname = "DOE",
             Email = "jane.doe@example.com", // Duplicate email
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
 
-        var result = await _useCase.ExecuteAsync(newUser);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newUser,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsErr);
         Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
@@ -97,11 +112,16 @@ public class AddUserUseCaseTest : IDisposable
             FatherLastname = "DOE",
             Email = "john.doe@example.com",
             Password = "Password123!",
-            MidName = Optional.None<string>(),
-            MotherLastname = Optional.None<string>(),
+            Role = UserType.STUDENT,
         };
 
-        var result = await _useCase.ExecuteAsync(newUser);
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newUser,
+                Executor = new() { Id = 1, Role = UserType.ADMIN },
+            }
+        );
 
         Assert.True(result.IsErr);
         var error = result.UnwrapErr();

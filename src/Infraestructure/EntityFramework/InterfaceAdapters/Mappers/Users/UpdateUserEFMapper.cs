@@ -18,8 +18,8 @@ public class UpdateUserEFMapper(IMapper<UserType, uint> usrtMapper)
         destination.FatherLastname = source.FatherLastname;
         destination.Email = source.Email;
         destination.Password = source.Password;
-        destination.MidName = source.MidName.ToNullable();
-        destination.MotherLastname = source.MotherLastname.ToNullable();
+        destination.MidName = source.MidName;
+        destination.MotherLastname = source.MotherLastname;
         destination.Active = source.Active;
         destination.Role = _usrtMapper.Map(source.Role);
     }

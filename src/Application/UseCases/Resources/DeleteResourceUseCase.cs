@@ -1,7 +1,6 @@
 using Application.DAOs;
+using Application.DTOs;
 using Application.DTOs.Common;
-using Application.DTOs.Resources;
-using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
@@ -11,19 +10,18 @@ namespace Application.UseCases.Resources;
 
 public sealed class DeleteResourceUseCase(
     IDeleterAsync<Guid, ResourceDomain> deleter,
-    IReaderAsync<Guid, ResourceDomain> reader,
-    IBusinessValidationService<DeleteResourceDTO>? validator = null
-) : DeleteUseCase<Guid, DeleteResourceDTO, ResourceDomain>(deleter, reader, validator)
+    IReaderAsync<Guid, ResourceDomain> reader
+) : DeleteUseCase<Guid, ResourceDomain>(deleter, reader, null)
 {
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        DeleteResourceDTO value
+        UserActionDTO<Guid> value,
+        ResourceDomain record
     )
     {
-        var resourceSearch = await _reader.GetAsync(value.Id);
-        if (resourceSearch.IsNone)
+        var resource = await _reader.GetAsync(value.Data);
+        if (resource is null)
             return UseCaseErrors.NotFound();
 
-        var resource = resourceSearch.Unwrap();
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
@@ -37,8 +35,4 @@ public sealed class DeleteResourceUseCase(
 
         return Unit.Value;
     }
-
-    protected override Guid GetId(DeleteResourceDTO value) => value.Id;
-
-    protected override Guid GetId(ResourceDomain value) => value.Id;
 }

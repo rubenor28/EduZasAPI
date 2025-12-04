@@ -1,6 +1,4 @@
-using Application.DTOs.Common;
 using Domain.Enums;
-using Domain.ValueObjects;
 
 namespace Application.DTOs.Users;
 
@@ -18,25 +16,25 @@ public sealed record UserUpdateDTO
     /// Obtiene o establece el identificador único del usuario a actualizar.
     /// </summary>
     /// <value>Identificador numérico del usuario. Campo obligatorio.</value>
-    public required ulong Id { get; set; }
+    public required ulong Id { get; init; }
 
     /// <summary>
     /// Obtiene o establece el primer nombre del usuario.
     /// </summary>
     /// <value>Primer nombre del usuario. Campo obligatorio.</value>
-    public required string FirstName { get; set; }
+    public required string FirstName { get; init; }
 
     /// <summary>
     /// Obtiene o establece el apellido paterno del usuario.
     /// </summary>
     /// <value>Apellido paterno del usuario. Campo obligatorio.</value>
-    public required string FatherLastname { get; set; }
+    public required string FatherLastname { get; init; }
 
     /// <summary>
     /// Obtiene o establece la dirección de correo electrónico del usuario.
     /// </summary>
     /// <value>Email del usuario. Campo obligatorio.</value>
-    public required string Email { get; set; }
+    public required string Email { get; init; }
 
     /// <summary>
     /// Obtiene o establece la contraseña del usuario (generalmente hasheada).
@@ -46,7 +44,7 @@ public sealed record UserUpdateDTO
     /// Este campo debe contener la contraseña hasheada, no en texto plano.
     /// Para operaciones de cambio de contraseña, considera usar un campo separado.
     /// </remarks>
-    public required string Password { get; set; }
+    public required string Password { get; init; }
 
     /// <summary>
     /// Obtiene o establece el estado de activación del usuario.
@@ -55,9 +53,9 @@ public sealed record UserUpdateDTO
     /// true si el usuario está activo; false si está inactivo.
     /// Valor por defecto: true.
     /// </value>
-    public required bool Active { get; set; }
+    public required bool Active { get; init; }
 
-    public required UserType Role { get; set; }
+    public required UserType Role { get; init; }
 
     /// <summary>
     /// Obtiene o establece el segundo nombre del usuario (opcional).
@@ -67,7 +65,7 @@ public sealed record UserUpdateDTO
     /// o None si no se desea modificar este campo.
     /// Valor por defecto: None.
     /// </value>
-    public Optional<string> MidName { get; set; } = Optional<string>.None();
+    public string? MidName { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el apellido materno del usuario (opcional).
@@ -77,10 +75,5 @@ public sealed record UserUpdateDTO
     /// o None si no se desea modificar este campo.
     /// Valor por defecto: None.
     /// </value>
-    public Optional<string> MotherLastname { get; set; } = Optional<string>.None();
-
-    /// <summary>
-    /// DTO que representa el usuario que ejecuta la accion
-    /// </summary>
-    public required Executor Executor { get; set; }
+    public string? MotherLastname { get; init; } 
 }

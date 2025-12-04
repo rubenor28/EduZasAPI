@@ -52,7 +52,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<UserDomain, UserCriteriaDTO>>(
             sp => new UserEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<User, UserDomain>>(),
+                sp.GetRequiredService<IEFProjector<User, UserDomain, UserCriteriaDTO>>(),
                 pageSize
             )
         );
@@ -65,7 +65,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ClassDomain, ClassCriteriaDTO>>(
             sp => new ClassEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Class, ClassDomain>>(),
+                sp.GetRequiredService<IEFProjector<Class, ClassDomain, ClassCriteriaDTO>>(),
                 pageSize
              )
         );
@@ -78,7 +78,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IDeleterAsync<UserClassRelationId, ClassProfessorDomain>, ClassProfessorsEFDeleter>();
 
         // CLASS STUDENTS
-        s.AddScoped<ICreatorAsync<ClassStudentDomain, NewClassStudentDTO>, ClassStudentEFCreator>();
+        s.AddScoped<ICreatorAsync<ClassStudentDomain, UserClassRelationId>, ClassStudentEFCreator>();
         s.AddScoped<IReaderAsync<UserClassRelationId, ClassStudentDomain>, ClassStudentsEFReader>();
         s.AddScoped<IUpdaterAsync<ClassStudentDomain, ClassStudentUpdateDTO>, ClassStudentsEFUpdater>();
         s.AddScoped<IDeleterAsync<UserClassRelationId, ClassStudentDomain>, ClassStudentsEFDeleter>();
@@ -91,7 +91,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<NotificationDomain, NotificationCriteriaDTO>>(
             sp => new NotificationEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Notification, NotificationDomain>>(),
+                sp.GetRequiredService<IEFProjector<Notification, NotificationDomain, NotificationCriteriaDTO>>(),
                 pageSize
             )
         );
@@ -110,7 +110,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>>(
             sp => new TagEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Tag, TagDomain>>(),
+                sp.GetRequiredService<IEFProjector<Tag, TagDomain, TagCriteriaDTO>>(),
                 pageSize
             )
         );
@@ -123,7 +123,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ContactDomain, ContactCriteriaDTO>>(
             sp => new ContactEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<AgendaContact, ContactDomain>>(),
+                sp.GetRequiredService<IEFProjector<AgendaContact, ContactDomain, ContactCriteriaDTO>>(),
                 pageSize
             )
         );
@@ -136,12 +136,12 @@ public static class RepositoryServiceCollectionExtensions
         // TEST
         s.AddScoped<ICreatorAsync<TestDomain, NewTestDTO>, TestEFCreator>();
         s.AddScoped<IUpdaterAsync<TestDomain, TestUpdateDTO>, TestEFUpdater>();
-        s.AddScoped<IDeleterAsync<ulong, TestDomain>, TestEFDeleter>();
-        s.AddScoped<IReaderAsync<ulong, TestDomain>, TestEFReader>();
+        s.AddScoped<IDeleterAsync<Guid, TestDomain>, TestEFDeleter>();
+        s.AddScoped<IReaderAsync<Guid, TestDomain>, TestEFReader>();
         s.AddScoped<IQuerierAsync<TestDomain, TestCriteriaDTO>>(
             sp => new TestEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Test, TestDomain>>(),
+                sp.GetRequiredService<IEFProjector<Test, TestDomain, TestCriteriaDTO>>(),
                 pageSize
             )
         );
@@ -154,7 +154,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ResourceSummary, ResourceCriteriaDTO>>(
             sp => new ResourceSummaryEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Resource, ResourceSummary>>(),
+                sp.GetRequiredService<IEFProjector<Resource, ResourceSummary, ResourceCriteriaDTO>>(),
                 pageSize
             )
         );
@@ -166,6 +166,7 @@ public static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>>(
             sp => new ClassResourceAssosiationEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<Class, ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>>(),
                 pageSize
             )
         );

@@ -22,4 +22,18 @@ public interface IQuerierAsync<E, C>
     /// <param name="query">Criterios de consulta.</param>
     /// <returns>Resultados paginados que cumplen con los criterios.</returns>
     Task<PaginatedQuery<E, C>> GetByAsync(C query);
+
+    /// <summary>
+    /// Obtiene la cuenta de resultados de una consulta.
+    /// </summary>
+    /// <param name="query">Criterios de consulta.</param>
+    /// <returns>Numero de resultados de una consulta.</returns>
+    Task<int> CountAsync(C query);
+
+    /// <summary>
+    /// Indica si hay al menos un resultado en una busqueda realizada.
+    /// </summary>
+    /// <param name="query">Criterios de consulta.</param>
+    /// <returns>Booleano indicando si hay o no resultados.</returns>
+    Task<bool> AnyAsync(C query);
 }

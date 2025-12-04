@@ -1,5 +1,4 @@
 using Application.DTOs.Common;
-using Domain.ValueObjects;
 
 namespace Application.DTOs.Classes;
 
@@ -11,12 +10,12 @@ public sealed record WithProfessorDTO
     /// <summary>
     /// ID del profesor a buscar.
     /// </summary>
-    public required ulong Id { get; set; }
+    public required ulong Id { get; init; }
 
     /// <summary>
     /// Indica si el profesor es el propietario de la clase.
     /// </summary>
-    public Optional<bool> IsOwner { get; set; } = Optional<bool>.None();
+    public bool? IsOwner { get; init; }
 }
 
 /// <summary>
@@ -27,12 +26,12 @@ public sealed record WithStudentDTO
     /// <summary>
     /// ID del estudiante a buscar.
     /// </summary>
-    public required ulong Id { get; set; }
+    public required ulong Id { get; init; }
 
     /// <summary>
     /// Indica si la clase está oculta para el estudiante.
     /// </summary>
-    public Optional<bool> Hidden { get; set; } = Optional<bool>.None();
+    public bool? Hidden { get; init; }
 }
 
 /// <summary>
@@ -43,30 +42,30 @@ public sealed record ClassCriteriaDTO : CriteriaDTO
     /// <summary>
     /// Obtiene o establece el filtro opcional para el estado de activación de la clase.
     /// </summary>
-    public Optional<bool> Active { get; set; } = Optional<bool>.None();
+    public bool? Active { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el nombre de la clase.
     /// </summary>
-    public Optional<StringQueryDTO> ClassName { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? ClassName { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la materia o asignatura de la clase.
     /// </summary>
-    public Optional<StringQueryDTO> Subject { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? Subject { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la sección o grupo de la clase.
     /// </summary>
-    public Optional<StringQueryDTO> Section { get; set; } = Optional<StringQueryDTO>.None();
+    public StringQueryDTO? Section { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen asignado un profesor específico.
     /// </summary>
-    public Optional<WithProfessorDTO> WithProfessor { get; set; } = Optional<WithProfessorDTO>.None();
+    public WithProfessorDTO? WithProfessor { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para clases que tienen inscrito un estudiante específico.
     /// </summary>
-    public Optional<WithStudentDTO> WithStudent { get; set; } = Optional<WithStudentDTO>.None();
+    public WithStudentDTO? WithStudent { get; init; }
 }

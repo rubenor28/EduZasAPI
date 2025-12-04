@@ -1,9 +1,10 @@
 using Application.DAOs;
-using Application.DTOs.ClassStudents;
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassStudents;
@@ -18,7 +19,7 @@ public class DeleteClassStudentUseCase(
     IReaderAsync<ulong, UserDomain> userReader,
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader
-) : DeleteUseCase<UserClassRelationId, DeleteClassStudentDTO, ClassStudentDomain>(deleter, reader)
+) : DeleteUseCase<UserClassRelationId, ClassStudentDomain>(deleter, reader)
 {
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
@@ -34,38 +35,40 @@ public class DeleteClassStudentUseCase(
     /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
     /// </returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        DeleteClassStudentDTO value
+        UserActionDTO<UserClassRelationId> value,
+        ClassStudentDomain record
     )
     {
         var errors = new List<FieldErrorDTO>();
 
-        var classSearch = await classReader.GetAsync(value.Id.ClassId);
-        if (classSearch.IsNone)
+        var classSearch = await classReader.GetAsync(value.Data.ClassId);
+        if (classSearch is null)
             errors.Add(new() { Field = "classId", Message = "Clase no encontrada" });
 
-        var usrSearch = await userReader.GetAsync(value.Id.UserId);
-        usrSearch.IfNone(() =>
+        var usrSearch = await userReader.GetAsync(value.Data.UserId);
+        usrSearch.IfNull(() =>
             errors.Add(new() { Field = "userId", Message = "Usuario no encontrado" })
         );
 
         if (errors.Count > 0)
             return UseCaseErrors.Input(errors);
 
-        var studentRelationSearch = await _reader.GetAsync(value.Id);
+        var student = await _reader.GetAsync(value.Data);
 
-        if (studentRelationSearch.IsNone)
+        if (student is null)
             return UseCaseErrors.NotFound();
-
-        var studentRelation = studentRelationSearch.Unwrap();
 
         var authorized = value.Executor.Role switch
         {
             // Admin puede eliminar de una clase a cualquiera
             UserType.ADMIN => true,
             // El alumno solo puede eliminarse a sí mismo
-            UserType.STUDENT => studentRelation.Id.UserId == value.Executor.Id,
+            UserType.STUDENT => student.Id.UserId == value.Executor.Id,
             // El profesor solo puede eliminar si tiene los permisos adecuados
-            UserType.PROFESSOR => await IsAuthorizedProfessor(value.Executor.Id, value.Id.ClassId),
+            UserType.PROFESSOR => await IsAuthorizedProfessor(
+                value.Executor.Id,
+                value.Data.ClassId
+            ),
             _ => throw new NotImplementedException("UseCase not prepared for this user type"),
         };
 
@@ -75,23 +78,15 @@ public class DeleteClassStudentUseCase(
         return Unit.Value;
     }
 
-    protected override UserClassRelationId GetId(DeleteClassStudentDTO value) => value.Id;
-
-    protected override UserClassRelationId GetId(ClassStudentDomain value) => value.Id;
-
     /// <summary>
     /// Funcion que determina si un profesor puede desincribir a un alumno
     /// </summary>
     private async Task<bool> IsAuthorizedProfessor(ulong professorId, string classId)
     {
-        var professorRelationSearch = await _professorReader.GetAsync(
+        var professor = await _professorReader.GetAsync(
             new() { UserId = professorId, ClassId = classId }
         );
 
-        // El usuario es profesor, pero no de esta clase
-        if (professorRelationSearch.IsNone)
-            return false;
-
-        return professorRelationSearch.Unwrap().IsOwner;
+        return professor is not null && professor.IsOwner;
     }
 }
