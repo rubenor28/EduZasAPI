@@ -172,7 +172,7 @@ public static class MapperServiceCollectionExtensions
 
         // USER NOTIFICATIONS
         // EF
-        s.AddSingleton<IMapper<NotificationPerUser, UserNotificationDomain>>();
+        s.AddSingleton<IMapper<NotificationPerUser, UserNotificationDomain>, UserNotificationMapper>();
         s.AddSingleton<IMapper<NewUserNotificationDTO, NotificationPerUser>, NewUserNotificationEFMapper>();
         s.AddSingleton<IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>, UpdateUserNotificationEFMapper>();
 
@@ -224,6 +224,7 @@ public static class MapperServiceCollectionExtensions
 
         // Class Resource
         // EF
+        s.AddSingleton<IMapper<ClassResource, ClassResourceDomain>, ClassResourceMapper>();
         s.AddSingleton<IMapper<NewClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
 
         return s;

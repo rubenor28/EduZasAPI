@@ -130,7 +130,7 @@ public static class UserRoutes
     public static Task<IResult> SearchUsers(
         UserCriteriaMAPI criteria,
         UserQueryUseCase useCase,
-        IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
+        [FromServices] IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
         IMapper<
             PaginatedQuery<UserDomain, UserCriteriaDTO>,
             PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>
@@ -152,7 +152,7 @@ public static class UserRoutes
         UpdateUserUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils,
-        IMapper<
+        [FromServices] IMapper<
             UserUpdateMAPI,
             Executor,
             Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>

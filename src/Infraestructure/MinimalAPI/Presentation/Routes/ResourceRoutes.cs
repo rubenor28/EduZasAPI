@@ -188,7 +188,7 @@ public static class ResourceRoutes
     public static Task<IResult> AddResource(
         NewResourceDTO request,
         AddResourceUseCase useCase,
-        IMapper<NewResourceDTO, Executor, NewResourceDTO> reqMapper,
+        [FromServices] IMapper<NewResourceDTO, Executor, NewResourceDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -219,11 +219,11 @@ public static class ResourceRoutes
     public static Task<IResult> SearchResource(
         ResourceCriteriaMAPI request,
         ResourceQueryUseCase useCase,
-        IMapper<
+        [FromServices] IMapper<
             ResourceCriteriaMAPI,
             Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
-        IMapper<
+        [FromServices] IMapper<
             PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
             PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
         > resMapper,
@@ -257,7 +257,7 @@ public static class ResourceRoutes
     public static Task<IResult> UpdateResource(
         ResourceUpdateDTO request,
         UpdateResourceUseCase useCase,
-        IMapper<ResourceUpdateDTO, Executor, ResourceUpdateDTO> reqMapper,
+        [FromServices] IMapper<ResourceUpdateDTO, Executor, ResourceUpdateDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )

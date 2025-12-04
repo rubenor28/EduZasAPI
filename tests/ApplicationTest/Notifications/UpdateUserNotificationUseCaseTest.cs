@@ -67,13 +67,12 @@ public class UpdateUserNotificationUseCaseTest : IDisposable
 
     private async Task<ulong> SeedNotification(ulong userId, bool isRead)
     {
-        var user = await SeedUser();
         var newClass = new Class { ClassId = "TEST-CLASS", ClassName = "Test Class" };
         _ctx.Classes.Add(newClass);
 
         var notification = new Notification
         {
-            NotificationId = 1,
+            NotificationId = (ulong)_rdm.NextInt64(1, int.MaxValue),
             ClassId = "TEST-CLASS",
             Title = "Test Notification",
         };
@@ -83,7 +82,7 @@ public class UpdateUserNotificationUseCaseTest : IDisposable
         var userNotification = new NotificationPerUser
         {
             NotificationId = notification.NotificationId,
-            UserId = user.Id,
+            UserId = userId,
             Readed = isRead,
         };
         _ctx.NotificationPerUsers.Add(userNotification);

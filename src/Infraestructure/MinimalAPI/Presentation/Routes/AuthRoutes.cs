@@ -122,7 +122,7 @@ public static class AuthRoutes
         NewUserDTO request,
         AddUserUseCase useCase,
         RoutesUtils utils,
-        IMapper<NewUserDTO, NewUserDTO> newUserMapper,
+        [FromServices] IMapper<NewUserDTO, NewUserDTO> newUserMapper,
         IMapper<UserDomain, PublicUserDTO> userMapper,
         HttpContext ctx
     )

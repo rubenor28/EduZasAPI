@@ -82,12 +82,11 @@ public sealed class AddContactUseCase(
                 var normalizedTags = tags.Distinct().ToList();
                 foreach (var t in normalizedTags)
                 {
-                    await _tagReader
-                        .GetAsync(t)
-                        .Match(
-                            tag => Task.CompletedTask,
-                            async () => await _tagCreator.AddAsync(new() { Text = t })
-                        );
+                    var tag = await _tagReader.GetAsync(t);
+                    if (tag is null)
+                    {
+                        await _tagCreator.AddAsync(new() { Text = t });
+                    }
 
                     await _contactTagCreator.AddAsync(
                         new()
@@ -102,11 +101,12 @@ public sealed class AddContactUseCase(
         );
     }
 
-    private Task<Result<Unit, FieldErrorDTO>> SearchUser(ulong id, string field) =>
-        _userReader
-            .GetAsync(id)
-            .Match<UserDomain, Result<Unit, FieldErrorDTO>>(
-                async user => Unit.Value,
-                async () => new FieldErrorDTO { Field = field, Message = "Usuario no encontrado" }
-            );
+    private async Task<Result<Unit, FieldErrorDTO>> SearchUser(ulong id, string field)
+    {
+        var user = await _userReader.GetAsync(id);
+        if (user is null)
+            return new FieldErrorDTO { Field = field, Message = "Usuario no encontrado" };
+
+        return Unit.Value;
+    }
 }

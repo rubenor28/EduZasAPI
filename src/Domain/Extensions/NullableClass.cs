@@ -181,21 +181,6 @@ public static class NullableClass
         return nullAction();
     }
 
-    public static async Task<U> Match<T, U>(
-        this Task<T?> task,
-        Func<T, Task<U>> someAction,
-        Func<Task<U>> nullAction
-    )
-        where T : class
-    {
-        var value = await task;
-        if (value is not null)
-            return await someAction(value);
-
-        return await nullAction();
-    }
-
-    /// <summary>
     /// Si el valor no es nulo, aplica una función transformadora sobre él.
     /// </summary>
     /// <typeparam name="T">El tipo del objeto original.</typeparam>
