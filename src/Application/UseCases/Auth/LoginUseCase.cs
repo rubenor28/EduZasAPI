@@ -54,7 +54,7 @@ public class LoginUseCase(
         if (user is null)
             return UseCaseErrors.NotFound();
 
-        var pwdMatch = hasher.Matches(user.Password, request.Password);
+        var pwdMatch = hasher.Matches(request.Password, user.Password);
         if (!pwdMatch)
             return UseCaseErrors.Input([
                 new() { Field = "password", Message = "Contraseña incorrecta" },

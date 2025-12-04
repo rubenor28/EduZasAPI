@@ -297,7 +297,7 @@ public static class ResourceRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => new() { ClassId = classId, ResourceId = resourceId },
+            mapRequest: () => new ClassResourceIdDTO { ClassId = classId, ResourceId = resourceId },
             mapResponse: _ => Results.NoContent()
         );
     }

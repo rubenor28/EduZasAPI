@@ -122,7 +122,6 @@ public static class AuthRoutes
         NewUserDTO request,
         AddUserUseCase useCase,
         RoutesUtils utils,
-        [FromServices] IMapper<NewUserDTO, NewUserDTO> newUserMapper,
         IMapper<UserDomain, PublicUserDTO> userMapper,
         HttpContext ctx
     )
@@ -130,7 +129,7 @@ public static class AuthRoutes
         return await utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => newUserMapper.Map(request),
+            mapRequest: () => request,
             mapResponse: (user) => Results.Created($"/users/{user.Id}", userMapper.Map(user))
         );
     }

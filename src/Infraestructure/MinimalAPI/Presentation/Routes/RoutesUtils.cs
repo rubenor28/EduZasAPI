@@ -103,7 +103,7 @@ public class RoutesUtils(
     public async Task<IResult> HandleUseCaseAsync<TRequest, TResponse>(
         HttpContext ctx,
         IUseCaseAsync<TRequest, TResponse> useCase,
-        Func<Task<Result<TRequest, IEnumerable<FieldErrorDTO>>>> mapRequest,
+        Func<Result<TRequest, IEnumerable<FieldErrorDTO>>> mapRequest,
         Func<TResponse, IResult> mapResponse
     )
         where TRequest : notnull
@@ -111,7 +111,7 @@ public class RoutesUtils(
     {
         return await HandleResponseAsync(async () =>
         {
-            var requestMap = await mapRequest();
+            var requestMap = mapRequest();
             if (requestMap.IsErr)
                 return _useCaseErrorMapper.Map(UseCaseErrors.Input(requestMap.UnwrapErr()));
 
@@ -125,38 +125,6 @@ public class RoutesUtils(
             return mapResponse(result.Unwrap());
         });
     }
-
-    /// <summary>
-    /// Orquesta la ejecución de un caso de uso asincrónico con un mapeo de solicitud sincrónico.
-    /// </summary>
-    /// <remarks>
-    /// Esta sobrecarga es una conveniencia para casos donde el mapeo de la solicitud no es asincrónico.
-    /// </remarks>
-    public async Task<IResult> HandleUseCaseAsync<TRequest, TResponse>(
-        HttpContext ctx,
-        IUseCaseAsync<TRequest, TResponse> useCase,
-        Func<Result<TRequest, IEnumerable<FieldErrorDTO>>> mapRequest,
-        Func<TResponse, IResult> mapResponse
-    )
-        where TRequest : notnull
-        where TResponse : notnull =>
-        await HandleUseCaseAsync(ctx, useCase, () => mapRequest(), mapResponse);
-
-    /// <summary>
-    /// Orquesta la ejecución de un caso de uso asincrónico donde el mapeo de la solicitud no requiere validación explícita.
-    /// </summary>
-    /// <remarks>
-    /// Esta sobrecarga asume que la creación de la solicitud  <typeparamref name="TRequest"/> siempre es exitosa.
-    /// </remarks>
-    public async Task<IResult> HandleUseCaseAsync<TRequest, TResponse>(
-        HttpContext ctx,
-        IUseCaseAsync<TRequest, TResponse> useCase,
-        Func<TRequest> mapRequest,
-        Func<TResponse, IResult> mapResponse
-    )
-        where TRequest : notnull
-        where TResponse : notnull =>
-        await HandleUseCaseAsync(ctx, useCase, mapRequest: () => mapRequest(), mapResponse);
 
     /// <summary>
     /// Construye un objeto <see cref="Executor"/> a partir de la información del usuario autenticado en el contexto HTTP.

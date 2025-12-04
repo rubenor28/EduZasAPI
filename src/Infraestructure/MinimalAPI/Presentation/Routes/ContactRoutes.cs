@@ -276,7 +276,7 @@ public static class ContactRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => new() { AgendaOwnerId = agendaOwnerId, UserId = contactId },
+            mapRequest: () => new ContactIdDTO { AgendaOwnerId = agendaOwnerId, UserId = contactId },
             mapResponse: (contact) => Results.Ok(contact)
         );
     }
@@ -346,7 +346,7 @@ public static class ContactRoutes
             ctx,
             useCase,
             mapRequest: () =>
-                new()
+                new ContactTagIdDTO
                 {
                     AgendaOwnerId = agendaOwnerId,
                     UserId = userId,

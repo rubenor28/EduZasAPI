@@ -410,7 +410,7 @@ public static class ClassRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => new() { ClassId = classId, UserId = userId },
+            mapRequest: () => new UserClassRelationId { ClassId = classId, UserId = userId },
             mapResponse: (_) => Results.NoContent()
         );
     }
@@ -525,7 +525,7 @@ public static class ClassRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => new() { ClassId = classId, UserId = userId },
+            mapRequest: () => new UserClassRelationId { ClassId = classId, UserId = userId },
             mapResponse: _ => Results.NoContent()
         );
     }
