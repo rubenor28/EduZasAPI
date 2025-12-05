@@ -188,7 +188,6 @@ public static class ResourceRoutes
     public static Task<IResult> AddResource(
         NewResourceDTO request,
         AddResourceUseCase useCase,
-        [FromServices] IMapper<NewResourceDTO, Executor, NewResourceDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -219,11 +218,13 @@ public static class ResourceRoutes
     public static Task<IResult> SearchResource(
         ResourceCriteriaMAPI request,
         ResourceQueryUseCase useCase,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             ResourceCriteriaMAPI,
             Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
             PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
         > resMapper,
@@ -257,7 +258,6 @@ public static class ResourceRoutes
     public static Task<IResult> UpdateResource(
         ResourceUpdateDTO request,
         UpdateResourceUseCase useCase,
-        [FromServices] IMapper<ResourceUpdateDTO, Executor, ResourceUpdateDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -273,7 +273,6 @@ public static class ResourceRoutes
     public static Task<IResult> AddClassResource(
         [FromBody] NewClassResourceDTO request,
         [FromServices] AddClassResourceUseCase useCase,
-        [FromServices] IMapper<NewClassResourceDTO, Executor, NewClassResourceDTO> reqMapper,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
     )
@@ -281,7 +280,7 @@ public static class ResourceRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => request,
             mapResponse: _ => Results.NoContent()
         );
     }

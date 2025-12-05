@@ -321,7 +321,6 @@ public static class ClassRoutes
     public static Task<IResult> UpdateClass(
         ClassUpdateDTO request,
         UpdateClassUseCase useCase,
-        [FromServices] IMapper<ClassDomain, ClassDomain> responseMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -330,7 +329,7 @@ public static class ClassRoutes
             ctx,
             useCase,
             mapRequest: () => request,
-            mapResponse: (classRecord) => Results.Ok(responseMapper.Map(classRecord))
+            mapResponse: (classRecord) => Results.Ok(classRecord)
         );
     }
 
@@ -352,11 +351,13 @@ public static class ClassRoutes
     public static Task<IResult> EnrolledClasses(
         ClassCriteriaMAPI request,
         QueryClassUseCase useCase,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             ClassCriteriaMAPI,
             Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > requestMapper,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
             PaginatedQuery<ClassDomain, ClassCriteriaMAPI>
         > responseMapper,
@@ -463,11 +464,13 @@ public static class ClassRoutes
         HttpContext ctx,
         RoutesUtils utils,
         QueryClassUseCase useCase,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             ClassCriteriaMAPI,
             Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > requestMapper,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
             PaginatedQuery<ClassDomain, ClassCriteriaMAPI>
         > responseMapper

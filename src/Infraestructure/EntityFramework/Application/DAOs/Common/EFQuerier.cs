@@ -34,7 +34,7 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
         EntityCriteria criteria
     )
     {
-        var query = BuildQuery(criteria);
+        var query = BuildQuery(criteria).AsNoTracking();
         var totalRecords = await query.CountAsync();
 
         var pageSize = criteria.PageSize < _maxPageSize ? criteria.PageSize : _maxPageSize;
@@ -65,10 +65,10 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
     }
 
     ///<inheritdoc>
-    public Task<int> CountAsync(EntityCriteria criteria) => BuildQuery(criteria).CountAsync();
+    public Task<int> CountAsync(EntityCriteria criteria) => BuildQuery(criteria).AsNoTracking().CountAsync();
 
     ///<inheritdoc>
-    public Task<bool> AnyAsync(EntityCriteria criteria) => BuildQuery(criteria).AnyAsync();
+    public Task<bool> AnyAsync(EntityCriteria criteria) => BuildQuery(criteria).AsNoTracking().AnyAsync();
 
     /// <summary>
     /// Método encargado de contruir un IQueryable<EFEntity> a partir de un criterio.

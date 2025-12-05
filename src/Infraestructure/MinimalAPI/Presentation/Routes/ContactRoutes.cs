@@ -216,11 +216,13 @@ public static class ContactRoutes
     private static Task<IResult> SearchMyContacts(
         ContactCriteriaMAPI criteria,
         ContactQueryUseCase useCase,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             ContactCriteriaMAPI,
             Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
             PaginatedQuery<ContactDomain, ContactCriteriaMAPI>
         > resMapper,
@@ -245,11 +247,13 @@ public static class ContactRoutes
     private static Task<IResult> SearchContacts(
         ContactCriteriaMAPI criteria,
         ContactQueryUseCase useCase,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             ContactCriteriaMAPI,
             Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
             PaginatedQuery<ContactDomain, ContactCriteriaMAPI>
         > resMapper,
@@ -276,7 +280,8 @@ public static class ContactRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => new ContactIdDTO { AgendaOwnerId = agendaOwnerId, UserId = contactId },
+            mapRequest: () =>
+                new ContactIdDTO { AgendaOwnerId = agendaOwnerId, UserId = contactId },
             mapResponse: (contact) => Results.Ok(contact)
         );
     }
@@ -284,7 +289,6 @@ public static class ContactRoutes
     private static Task<IResult> UpdateContact(
         ContactUpdateDTO request,
         UpdateContactUseCase useCase,
-        [FromServices] IMapper<ContactUpdateDTO, ContactUpdateDTO> reqMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -292,7 +296,7 @@ public static class ContactRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request),
+            mapRequest: () => request,
             mapResponse: (contact) => Results.Ok(contact)
         );
     }
@@ -300,8 +304,10 @@ public static class ContactRoutes
     private static Task<IResult> TagsQuery(
         TagCriteriaDTO criteria,
         TagQueryUseCase useCase,
-        [FromServices] IMapper<TagCriteriaDTO, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<TagCriteriaDTO, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
+        [FromServices]
+            IMapper<
             PaginatedQuery<TagDomain, TagCriteriaDTO>,
             PaginatedQuery<string, TagCriteriaDTO>
         > resMapper,

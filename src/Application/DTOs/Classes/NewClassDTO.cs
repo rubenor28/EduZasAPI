@@ -41,5 +41,5 @@ public sealed record NewClassDTO
     /// <summary>
     /// Informacion para agregar profesores durante la creacion
     /// </summary>
-    public required ICollection<Professor> Professors { get; init; }
+    public ICollection<Professor> Professors { get; init; } = [];
 }
