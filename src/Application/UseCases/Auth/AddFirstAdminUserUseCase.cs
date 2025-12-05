@@ -4,6 +4,7 @@ using Application.DTOs.Users;
 using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.Auth;
@@ -34,11 +35,11 @@ public sealed class AddFirstAdminUserUseCase(
             MotherLastname = request.MotherLastname?.ToUpperInvariant(),
         };
 
-        var validation = _validator.IsValid(request);
+        var validation = _validator.IsValid(user);
         if (validation.IsErr)
             return UseCaseErrors.Input(validation.UnwrapErr());
 
-        user = user with { Password = _hasher.Hash(request.Password) };
+        user = user with { Password = _hasher.Hash(request.Password), Role = UserType.ADMIN };
 
         return await _creator.AddAsync(user);
     }

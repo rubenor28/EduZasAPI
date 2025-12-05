@@ -9,6 +9,28 @@ using MinimalAPI.Application.DTOs.Users;
 
 namespace MinimalAPI.Presentation.Mappers;
 
+public sealed class NewUserMAPIMapper(IMapper<uint, Result<UserType, Unit>> roleMapper)
+    : IMapper<NewUserMAPI, Result<NewUserDTO, IEnumerable<FieldErrorDTO>>>
+{
+    public Result<NewUserDTO, IEnumerable<FieldErrorDTO>> Map(NewUserMAPI input)
+    {
+        var roleParse = roleMapper.Map(input.Role);
+        if (roleParse.IsErr)
+            return new FieldErrorDTO[] { new() { Field = "role" } };
+
+        return new NewUserDTO
+        {
+            Role = roleParse.Unwrap(),
+            Email = input.Email,
+            FatherLastname = input.FatherLastname,
+            FirstName = input.FirstName,
+            MidName = input.MidName,
+            MotherLastname = input.MotherLastname,
+            Password = input.Password
+        };
+    }
+}
+
 public sealed class UserMAPIMapper(IMapper<UserType, uint> roleMapper)
     : IMapper<UserDomain, PublicUserDTO>
 {

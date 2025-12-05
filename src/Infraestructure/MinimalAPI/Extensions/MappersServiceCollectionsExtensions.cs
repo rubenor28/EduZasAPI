@@ -133,6 +133,7 @@ public static class MapperServiceCollectionExtensions
 
         // Minimal API
         s.AddSingleton<IMapper<UserDomain, PublicUserDTO>, UserMAPIMapper>();
+        s.AddSingleton<IMapper<NewUserMAPI, Result<NewUserDTO, IEnumerable<FieldErrorDTO>>>, NewUserMAPIMapper>();
         s.AddSingleton<IMapper<UserUpdateMAPI, Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>>, UserUpdateMAPIMapper>();
         s.RegisterBidirectionalResultMapper<UserCriteriaMAPIMapper, UserCriteriaMAPI, UserCriteriaDTO, IEnumerable<FieldErrorDTO>>();
         s.AddSingleton<IMapper<PaginatedQuery<UserDomain, UserCriteriaDTO>, PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>>, UserSearchMAPIMapper>();

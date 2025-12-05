@@ -1,3 +1,4 @@
+using Application.DAOs;
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Application.UseCases.Users;
@@ -28,8 +29,43 @@ public static class AuthRoutes
         var group = app.MapGroup("/auth").WithTags("Autenticacion");
 
         group
+            .MapGet("/have-users", HaveUsers)
+            .WithName("Verificar si existen usuarios")
+            .Produces<bool>(StatusCodes.Status200OK)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Verificar si existen usuarios en el sistema.";
+                op.Description =
+                    "Devuelve `true` si hay al menos un usuario registrado; de lo contrario, devuelve `false`.";
+                op.Responses["200"].Description =
+                    "La verificación se completó exitosamente.";
+                return op;
+            });
+
+        group
+            .MapPost("/first-user", AddFirstUser)
+            .WithName("Registrar primer usuario administrador")
+            .Produces<PublicUserDTO>(StatusCodes.Status201Created)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Registrar el primer usuario administrador.";
+                op.Description =
+                    "Crea la cuenta del administrador inicial. Este endpoint solo funciona si no existen otros usuarios en el sistema.";
+                op.Responses["201"].Description =
+                    "El primer usuario administrador fue creado exitosamente.";
+                op.Responses["400"].Description =
+                    "Los datos proporcionados tienen un formato incorrecto.";
+                op.Responses["403"].Description =
+                    "La operación no está permitida porque ya existen usuarios en el sistema.";
+                return op;
+            });
+
+        group
             .MapPost("/sign-in", AddUser)
-            .WithName("Registrar usuario")
+            .WithName("Registrar usuario")  
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicUserDTO>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces<MessageResponse>(StatusCodes.Status409Conflict)
@@ -109,6 +145,50 @@ public static class AuthRoutes
             .ExcludeFromDescription();
 
         return group;
+    }
+
+    /// <summary>
+    /// Verifica si existe algún usuario registrado en la base de datos.
+    /// </summary>
+    /// <param name="querier">Servicio de consulta para la entidad de usuario.</param>
+    /// <param name="utils">Utilidad para manejar la respuesta de la ruta.</param>
+    /// <returns>
+    /// Un <see cref="IResult"/> que contiene `true` si existe al menos un usuario,
+    /// de lo contrario, `false`.
+    /// </returns>
+    public static Task<IResult> HaveUsers(
+        [FromServices] IQuerierAsync<UserDomain, UserCriteriaDTO> querier,
+        [FromServices] RoutesUtils utils
+    ) => utils.HandleResponseAsync(async () => Results.Ok(await querier.AnyAsync(new() { })));
+
+    /// <summary>
+    /// Registra el primer usuario administrador del sistema.
+    /// </summary>
+    /// <remarks>
+    /// Esta operación solo es posible si no existen otros usuarios en la base de datos.
+    /// </remarks>
+    /// <param name="request">DTO con los datos del nuevo usuario administrador.</param>
+    /// <param name="useCase">Caso de uso para registrar el primer administrador.</param>
+    /// <param name="userMapper">Mapeador para convertir la entidad de dominio a un DTO público.</param>
+    /// <param name="utils">Utilidad para orquestar la ejecución del caso de uso.</param>
+    /// <returns>
+    /// Un <see cref="IResult"/> con el resultado de la operación:
+    /// - <c>201 Created</c> con los datos del usuario si fue exitoso.
+    /// - <c>400 Bad Request</c> si los datos son inválidos.
+    /// - <c>403 Forbidden</c> si ya existen usuarios en el sistema.
+    /// </returns>
+    public static Task<IResult> AddFirstUser(
+        [FromBody] NewUserDTO request,
+        [FromServices] AddFirstAdminUserUseCase useCase,
+        [FromServices] IMapper<UserDomain, PublicUserDTO> userMapper,
+        [FromServices] RoutesUtils utils
+    )
+    {
+        return utils.HandleGuestUseCaseAsync(
+            useCase,
+            mapRequest: () => request,
+            mapResponse: user => Results.Created($"/users/{user.Id}", userMapper.Map(user))
+        );
     }
 
     /// <summary>

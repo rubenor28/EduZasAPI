@@ -8,6 +8,7 @@ using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Application.DTOs.Users;
+using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -16,6 +17,24 @@ public static class UserRoutes
     public static RouteGroupBuilder MapUserRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/users").WithTags("Usuarios");
+
+        group
+            .MapPost("/sign-in", AddUser)
+            .WithName("Registrar usuario")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<PublicUserDTO>(StatusCodes.Status201Created)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<MessageResponse>(StatusCodes.Status409Conflict)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Registrar un nuevo usuario en el sistema.";
+                op.Description = "Crea una cuenta de usuario con la información proporcionada.";
+                op.Responses["201"].Description = "El usuario fue creado exitosamente.";
+                op.Responses["400"].Description =
+                    "Los datos proporcionados tienen un formato incorrecto.";
+                op.Responses["409"].Description = "El email proporcionado ya está registrado.";
+                return op;
+            });
 
         group
             .MapPost("/", SearchUsers)
@@ -130,7 +149,11 @@ public static class UserRoutes
     public static Task<IResult> SearchUsers(
         UserCriteriaMAPI criteria,
         UserQueryUseCase useCase,
-        [FromServices] IMapper<UserCriteriaMAPI, Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
+        [FromServices]
+            IMapper<
+            UserCriteriaMAPI,
+            Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>
+        > reqMapper,
         IMapper<
             PaginatedQuery<UserDomain, UserCriteriaDTO>,
             PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>
@@ -152,7 +175,8 @@ public static class UserRoutes
         UpdateUserUseCase useCase,
         HttpContext ctx,
         RoutesUtils utils,
-        [FromServices] IMapper<
+        [FromServices]
+            IMapper<
             UserUpdateMAPI,
             Executor,
             Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>
@@ -213,6 +237,29 @@ public static class UserRoutes
             useCase,
             mapRequest: () => userId,
             mapResponse: (user) => Results.Ok(resMapper.Map(user))
+        );
+    }
+
+    /// <summary>
+    /// Registra un nuevo usuario en el sistema.
+    /// </summary>
+    /// <param name="newUser">DTO con la información del nuevo usuario.</param>
+    /// <param name="useCase">Caso de uso para registrar al usuario.</param>
+    /// <param name="utils">Utilidad para manejar respuestas y excepciones.</param>
+    /// <returns>Un <see cref="IResult"/> con el resultado de la operación.</returns>
+    public static async Task<IResult> AddUser(
+        NewUserDTO request,
+        AddUserUseCase useCase,
+        RoutesUtils utils,
+        IMapper<UserDomain, PublicUserDTO> userMapper,
+        HttpContext ctx
+    )
+    {
+        return await utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () => request,
+            mapResponse: (user) => Results.Created($"/users/{user.Id}", userMapper.Map(user))
         );
     }
 }

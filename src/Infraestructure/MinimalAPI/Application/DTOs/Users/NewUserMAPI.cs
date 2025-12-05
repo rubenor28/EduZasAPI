@@ -1,18 +1,6 @@
-using Domain.Enums;
+namespace MinimalAPI.Application.DTOs.Users;
 
-namespace Application.DTOs.Users;
-
-/// <summary>
-/// Representa los datos requeridos para crear un nuevo usuario en el sistema.
-/// </summary>
-/// <remarks>
-/// Esta clase define los campos mínimos obligatorios y opcionales necesarios para
-/// registrar un usuario. Los nombres y apellidos se almacenan automáticamente
-/// en mayúsculas invariables, garantizando consistencia en el formato.
-/// Los campos opcionales están representados mediante <see cref="T?"/>,
-/// lo que evita el uso de valores nulos y permite un control más seguro.
-/// </remarks>
-public sealed record NewUserDTO
+public sealed record NewUserMAPI
 {
     /// <summary>
     /// Obtiene o inicializa el primer nombre del usuario.
@@ -41,7 +29,7 @@ public sealed record NewUserDTO
     /// <summary>
     /// Obtiene o inicializa el tipo de usuario.
     /// </summary>
-    public required UserType Role { get; init; }
+    public required uint Role { get; init; }
 
     /// <summary>
     /// Obtiene o inicializa el apellido materno del usuario.
