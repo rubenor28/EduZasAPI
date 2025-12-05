@@ -19,8 +19,9 @@ public static class UserRoutes
         var group = app.MapGroup("/users").WithTags("Usuarios");
 
         group
-            .MapPost("/sign-in", AddUser)
-            .WithName("Registrar usuario")
+            .MapPost("/", AddUser)
+            .WithName("Agregar usuario")
+            .RequireAuthorization("Admin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicUserDTO>(StatusCodes.Status201Created)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
@@ -37,8 +38,9 @@ public static class UserRoutes
             });
 
         group
-            .MapPost("/", SearchUsers)
-            .RequireAuthorization("ProfessorOrAdmin")
+            .MapPost("/all", SearchUsers)
+            .RequireAuthorization("Admin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -57,7 +59,8 @@ public static class UserRoutes
 
         group
             .MapPut("/", UpdateUser)
-            .RequireAuthorization("Admin")
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicUserDTO>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -123,7 +126,7 @@ public static class UserRoutes
 
         group
             .MapGet("/{userId:ulong}", GetUserById)
-            .RequireAuthorization("ProfessorOrAdmin")
+            .RequireAuthorization("Admin")
             .Produces<PublicUserDTO>()
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)

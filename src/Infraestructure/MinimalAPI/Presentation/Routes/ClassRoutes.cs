@@ -306,7 +306,6 @@ public static class ClassRoutes
     public static Task<IResult> AddClass(
         NewClassDTO newClass,
         AddClassUseCase useCase,
-        [FromServices] IMapper<NewClassDTO, Executor, NewClassDTO> requestMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -323,7 +322,6 @@ public static class ClassRoutes
         ClassUpdateDTO request,
         UpdateClassUseCase useCase,
         [FromServices] IMapper<ClassDomain, ClassDomain> responseMapper,
-        [FromServices] IMapper<ClassUpdateDTO, Executor, ClassUpdateDTO> requestMapper,
         HttpContext ctx,
         RoutesUtils utils
     )
@@ -478,7 +476,17 @@ public static class ClassRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => requestMapper.Map(criteria),
+            mapRequest: () =>
+                requestMapper.Map(
+                    criteria with
+                    {
+                        WithProfessor = new()
+                        {
+                            Id = utils.GetExecutorFromContext(ctx).Id,
+                            IsOwner = criteria.WithProfessor?.IsOwner,
+                        },
+                    }
+                ),
             mapResponse: (search) => Results.Ok(responseMapper.Map(search))
         );
     }
