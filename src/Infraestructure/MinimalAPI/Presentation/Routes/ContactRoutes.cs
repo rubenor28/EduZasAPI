@@ -10,7 +10,6 @@ using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
-using MinimalAPI.Application.DTOs.Contacts;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
@@ -199,10 +198,10 @@ public static class ContactRoutes
     }
 
     private static Task<IResult> AddContact(
-        NewContactDTO request,
-        AddContactUseCase useCase,
+        [FromBody] NewContactDTO request,
+        [FromServices] AddContactUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -214,67 +213,45 @@ public static class ContactRoutes
     }
 
     private static Task<IResult> SearchMyContacts(
-        ContactCriteriaMAPI criteria,
-        ContactQueryUseCase useCase,
-        [FromServices]
-            IMapper<
-            ContactCriteriaMAPI,
-            Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > reqMapper,
-        [FromServices]
-            IMapper<
-            PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
-            PaginatedQuery<ContactDomain, ContactCriteriaMAPI>
-        > resMapper,
-        HttpContext ctx,
-        RoutesUtils utils
+        [FromBody] ContactCriteriaDTO criteria,
+        [FromServices] ContactQueryUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
             mapRequest: () =>
-                reqMapper.Map(
-                    criteria with
-                    {
-                        AgendaOwnerId = utils.GetExecutorFromContext(ctx).Id,
-                    }
-                ),
-            mapResponse: (s) => Results.Ok(resMapper.Map(s))
+                criteria with
+                {
+                    AgendaOwnerId = utils.GetExecutorFromContext(ctx).Id,
+                },
+            mapResponse: s => Results.Ok(s)
         );
     }
 
     private static Task<IResult> SearchContacts(
-        ContactCriteriaMAPI criteria,
-        ContactQueryUseCase useCase,
-        [FromServices]
-            IMapper<
-            ContactCriteriaMAPI,
-            Result<ContactCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > reqMapper,
-        [FromServices]
-            IMapper<
-            PaginatedQuery<ContactDomain, ContactCriteriaDTO>,
-            PaginatedQuery<ContactDomain, ContactCriteriaMAPI>
-        > resMapper,
+        [FromBody] ContactCriteriaDTO criteria,
+        [FromServices] ContactQueryUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(criteria),
-            mapResponse: search => Results.Ok(resMapper.Map(search))
+            mapRequest: () => criteria,
+            mapResponse: search => Results.Ok(search)
         );
     }
 
     private static Task<IResult> DeleteContact(
-        ulong agendaOwnerId,
-        ulong contactId,
-        DeleteContactUseCase useCase,
+        [FromRoute] ulong agendaOwnerId,
+        [FromRoute] ulong contactId,
+        [FromServices] DeleteContactUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -287,10 +264,10 @@ public static class ContactRoutes
     }
 
     private static Task<IResult> UpdateContact(
-        ContactUpdateDTO request,
-        UpdateContactUseCase useCase,
+        [FromBody] ContactUpdateDTO request,
+        [FromServices] UpdateContactUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -302,50 +279,48 @@ public static class ContactRoutes
     }
 
     private static Task<IResult> TagsQuery(
-        TagCriteriaDTO criteria,
-        TagQueryUseCase useCase,
-        [FromServices]
-            IMapper<TagCriteriaDTO, Result<TagCriteriaDTO, IEnumerable<FieldErrorDTO>>> reqMapper,
-        [FromServices]
-            IMapper<
-            PaginatedQuery<TagDomain, TagCriteriaDTO>,
-            PaginatedQuery<string, TagCriteriaDTO>
-        > resMapper,
-        HttpContext ctx,
-        RoutesUtils utils
+        [FromBody] TagCriteriaDTO criteria,
+        [FromServices] TagQueryUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(criteria),
-            mapResponse: (search) => Results.Ok(resMapper.Map(search))
+            mapRequest: () => criteria,
+            mapResponse: (search) => Results.Ok(search)
         );
     }
 
     private static Task<IResult> AddContactTag(
-        ContactTagIdDTO value,
-        AddContactTagUseCase useCase,
-        [FromServices] IMapper<ContactTagIdDTO, Executor, NewContactTagDTO> reqMapper,
-        HttpContext ctx,
-        RoutesUtils utils
+        [FromBody] ContactTagIdDTO value,
+        [FromServices] AddContactTagUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(value, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () =>
+                new NewContactTagDTO
+                {
+                    UserId = value.UserId,
+                    Tag = value.Tag,
+                    AgendaOwnerId = value.AgendaOwnerId,
+                },
             mapResponse: (_) => Results.NoContent()
         );
     }
 
     private static Task<IResult> DeleteContactTag(
-        ulong agendaOwnerId,
-        ulong userId,
-        string tag,
-        DeleteContactTagUseCase useCase,
+        [FromRoute] ulong agendaOwnerId,
+        [FromRoute] ulong userId,
+        [FromRoute] string tag,
+        [FromServices] DeleteContactTagUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(

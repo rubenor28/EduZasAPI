@@ -58,8 +58,8 @@ public static class DatabaseRoutes
     }
 
     public static async Task<IResult> CreateBackup(
-        BackupUseCase useCase,
-        RoutesUtils utils,
+        [FromServices] BackupUseCase useCase,
+        [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
     {
@@ -76,11 +76,11 @@ public static class DatabaseRoutes
     }
 
     public static async Task<IResult> RestoreFromBackup(
-        RestoreUseCase useCase,
-        RoutesUtils utils,
+        [FromServices] RestoreUseCase useCase,
+        [FromServices] RoutesUtils utils,
         HttpContext httpContext,
         IFormFile file,
-        IMapper<UseCaseError, IResult> useCaseErrorsMapper
+        [FromServices] IMapper<UseCaseError, IResult> useCaseErrorsMapper
     )
     {
         return await utils.HandleResponseAsync(async () =>

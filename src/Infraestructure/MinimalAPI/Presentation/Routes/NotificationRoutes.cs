@@ -5,6 +5,7 @@ using Application.UseCases.Notifications;
 using Domain.Entities;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Presentation.Filters;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalAPI.Presentation.Routes;
 
@@ -40,11 +41,11 @@ public static class NotificationRoutes
     }
 
     public static async Task<IResult> GetUserNotifications(
-        int page,
-        SearchNotificationUseCase useCase,
+        [FromRoute] int page,
+        [FromServices] SearchNotificationUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils,
-        IReaderAsync<string, ClassDomain> classReader
+        [FromServices] RoutesUtils utils,
+        [FromServices] IReaderAsync<string, ClassDomain> classReader
     )
     {
         return await utils.HandleUseCaseAsync(

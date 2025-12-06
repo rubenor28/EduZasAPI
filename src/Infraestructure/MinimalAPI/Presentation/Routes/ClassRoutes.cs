@@ -6,10 +6,7 @@ using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
 using Domain.Entities;
-using Domain.ValueObjects;
-using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Application.DTOs.Classes;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Presentation.Filters;
 
@@ -88,7 +85,7 @@ public static class ClassRoutes
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
-            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -109,7 +106,7 @@ public static class ClassRoutes
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -221,7 +218,7 @@ public static class ClassRoutes
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -239,6 +236,7 @@ public static class ClassRoutes
             .MapGet("/professors/{classId}/{userId:ulong}", ReadProfessor)
             .WithName("Leer relacion usuario professor - clase")
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<ClassProfessorDomain>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -304,10 +302,10 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> AddClass(
-        NewClassDTO newClass,
-        AddClassUseCase useCase,
+        [FromBody] NewClassDTO newClass,
+        [FromServices] AddClassUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -319,10 +317,10 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> UpdateClass(
-        ClassUpdateDTO request,
-        UpdateClassUseCase useCase,
+        [FromBody] ClassUpdateDTO request,
+        [FromServices] UpdateClassUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -334,10 +332,10 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> DeleteClass(
-        string id,
+        [FromRoute] string id,
         HttpContext ctx,
-        RoutesUtils utils,
-        DeleteClassUseCase useCase
+        [FromServices] RoutesUtils utils,
+        [FromServices] DeleteClassUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
@@ -349,27 +347,16 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> EnrolledClasses(
-        ClassCriteriaMAPI request,
-        QueryClassUseCase useCase,
-        [FromServices]
-            IMapper<
-            ClassCriteriaMAPI,
-            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > requestMapper,
-        [FromServices]
-            IMapper<
-            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
-            PaginatedQuery<ClassDomain, ClassCriteriaMAPI>
-        > responseMapper,
-        HttpContext ctx,
-        RoutesUtils utils
+        [FromBody] ClassCriteriaDTO request,
+        [FromServices] QueryClassUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
     )
     {
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
             mapRequest: () =>
-                requestMapper.Map(
                     request with
                     {
                         WithStudent = new()
@@ -378,16 +365,16 @@ public static class ClassRoutes
                             Hidden = request.WithStudent?.Hidden,
                         },
                     }
-                ),
-            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
+                ,
+            mapResponse: search => Results.Ok(search)
         );
     }
 
     public static Task<IResult> EnrollClass(
-        UserClassRelationId req,
+        [FromBody] UserClassRelationId req,
         HttpContext ctx,
-        RoutesUtils utils,
-        AddClassStudentUseCase useCase
+        [FromServices] RoutesUtils utils,
+        [FromServices] AddClassStudentUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
@@ -399,11 +386,11 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> UnenrollClass(
-        string classId,
-        ulong userId,
+        [FromRoute] string classId,
+        [FromRoute] ulong userId,
         HttpContext ctx,
-        RoutesUtils utils,
-        DeleteClassStudentUseCase useCase
+        [FromServices] RoutesUtils utils,
+        [FromServices] DeleteClassStudentUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
@@ -415,9 +402,9 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> UpdateClassStudent(
-        ClassStudentUpdateDTO request,
-        RoutesUtils utils,
-        UpdateClassStudentUseCase useCase,
+        [FromBody] ClassStudentUpdateDTO request,
+        [FromServices] RoutesUtils utils,
+        [FromServices] UpdateClassStudentUseCase useCase,
         HttpContext ctx
     )
     {
@@ -430,10 +417,10 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> AddProfessor(
-        NewClassProfessorDTO data,
+        [FromBody] NewClassProfessorDTO data,
         HttpContext ctx,
-        RoutesUtils utils,
-        AddClassProfessorUseCase useCase
+        [FromServices] RoutesUtils utils,
+        [FromServices] AddClassProfessorUseCase useCase
     )
     {
         return utils.HandleUseCaseAsync(
@@ -445,10 +432,10 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> UpdateProfessor(
-        ClassProfessorUpdateDTO request,
-        UpdateClassProfessorUseCase useCase,
+        [FromBody] ClassProfessorUpdateDTO request,
+        [FromServices] UpdateClassProfessorUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -459,45 +446,33 @@ public static class ClassRoutes
         );
     }
 
-    public static Task<IResult> ProfessorClasses(
-        ClassCriteriaMAPI criteria,
-        HttpContext ctx,
-        RoutesUtils utils,
-        QueryClassUseCase useCase,
-        [FromServices]
-            IMapper<
-            ClassCriteriaMAPI,
-            Result<ClassCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > requestMapper,
-        [FromServices]
-            IMapper<
-            PaginatedQuery<ClassDomain, ClassCriteriaDTO>,
-            PaginatedQuery<ClassDomain, ClassCriteriaMAPI>
-        > responseMapper
-    )
+    public static async Task<IResult> ProfessorClasses( 
+        [FromBody] ClassCriteriaDTO criteria, 
+        [FromServices] QueryClassUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx)
     {
-        return utils.HandleUseCaseAsync(
-            ctx,
-            useCase,
-            mapRequest: () =>
-                requestMapper.Map(
-                    criteria with
-                    {
-                        WithProfessor = new()
+            return await utils.HandleUseCaseAsync(
+                ctx,
+                useCase,
+                mapRequest: () =>
+                        criteria with
                         {
-                            Id = utils.GetExecutorFromContext(ctx).Id,
-                            IsOwner = criteria.WithProfessor?.IsOwner,
-                        },
-                    }
-                ),
-            mapResponse: (search) => Results.Ok(responseMapper.Map(search))
-        );
+                            WithProfessor = new()
+                            {
+                                Id = utils.GetExecutorFromContext(ctx).Id,
+                                IsOwner = criteria.WithProfessor?.IsOwner,
+                            },
+                        }
+                    ,
+                mapResponse: search => Results.Ok(search)
+            );
     }
 
     public static Task<IResult> SearchClassProfessors(
-        ClassProfessorCriteriaDTO request,
-        SearchClassProfessorUseCase useCase,
-        RoutesUtils utils,
+        [FromBody] ClassProfessorCriteriaDTO request,
+        [FromServices] SearchClassProfessorUseCase useCase,
+        [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
     {
@@ -510,8 +485,8 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> ReadProfessor(
-        string classId,
-        ulong userId,
+        [FromRoute] string classId,
+        [FromRoute] ulong userId,
         [FromServices] ReadClassProfessorUseCase useCase,
         [FromServices] RoutesUtils utils,
         HttpContext ctx
@@ -526,10 +501,10 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> RemoveProfessorFromClass(
-        string classId,
-        ulong userId,
-        DeleteClassProfessorUseCase useCase,
-        RoutesUtils utils,
+        [FromRoute] string classId,
+        [FromRoute] ulong userId,
+        [FromServices] DeleteClassProfessorUseCase useCase,
+        [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
     {

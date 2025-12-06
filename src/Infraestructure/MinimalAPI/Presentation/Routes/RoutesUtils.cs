@@ -2,7 +2,6 @@ using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Enums;
 using Domain.ValueObjects;
-using InterfaceAdapters.Mappers.Common;
 using MinimalAPI.Application.DTOs.Common;
 
 namespace MinimalAPI.Presentation.Routes;
@@ -15,13 +14,30 @@ namespace MinimalAPI.Presentation.Routes;
 /// de casos de uso, asegurando que las rutas devuelvan respuestas HTTP consistentes y apropiadas.
 /// La implementación actual registra las excepciones en la consola; se planea integrar un sistema de logging más robusto.
 /// </remarks>
-public class RoutesUtils(
-    IMapper<string, Result<UserType, Unit>> roleMapper,
-    IMapper<UseCaseError, IResult> useCaseErrorMapper
-)
+public class RoutesUtils
 {
-    private readonly IMapper<string, Result<UserType, Unit>> _roleMapper = roleMapper;
-    private readonly IMapper<UseCaseError, IResult> _useCaseErrorMapper = useCaseErrorMapper;
+    public static UserType MapRole(string role) =>
+        role switch
+        {
+            "ADMIN" => UserType.ADMIN,
+            "PROFESSOR" => UserType.PROFESSOR,
+            "STUDENT" => UserType.STUDENT,
+            _ => throw new NotImplementedException(),
+        };
+
+    public static IResult MapError(UseCaseError err) =>
+        err switch
+        {
+            InputError errs => Results.BadRequest(
+                new FieldErrorResponse { Message = "Formato inválido", Errors = errs.Errors }
+            ),
+            UnauthorizedError => Results.Forbid(),
+            NotFoundError => Results.NotFound(),
+            AlreadyExistsError => Results.Conflict(
+                new MessageResponse { Message = "El elemento ya existe" }
+            ),
+            _ => throw new NotImplementedException(),
+        };
 
     /// <summary>
     /// Ejecuta de forma segura una acción de ruta sincrónica, capturando cualquier excepción inesperada.
@@ -82,7 +98,7 @@ public class RoutesUtils(
             var result = await useCase.ExecuteAsync(request);
 
             if (result.IsErr)
-                return _useCaseErrorMapper.Map(result.UnwrapErr());
+                return MapError(result.UnwrapErr());
 
             return mapResponse(result.Unwrap());
         });
@@ -113,14 +129,14 @@ public class RoutesUtils(
         {
             var requestMap = mapRequest();
             if (requestMap.IsErr)
-                return _useCaseErrorMapper.Map(UseCaseErrors.Input(requestMap.UnwrapErr()));
+                return MapError(UseCaseErrors.Input(requestMap.UnwrapErr()));
 
             var result = await useCase.ExecuteAsync(
                 new() { Data = requestMap.Unwrap(), Executor = GetExecutorFromContext(ctx) }
             );
 
             if (result.IsErr)
-                return _useCaseErrorMapper.Map(result.UnwrapErr());
+                return MapError(result.UnwrapErr());
 
             return mapResponse(result.Unwrap());
         });
@@ -146,14 +162,9 @@ public class RoutesUtils(
                 "Error al procesar el Executor: el 'UserRole' no se encontró en el contexto."
             );
 
-        var roleParse = _roleMapper.Map(userRole);
+        var roleParse = MapRole(userRole);
 
-        if (roleParse.IsErr)
-            throw new InvalidDataException(
-                "Error al procesar el Executor: el rol proporcionado es inválido."
-            );
-
-        return new Executor { Id = ulong.Parse(userId), Role = roleParse.Unwrap() };
+        return new Executor { Id = ulong.Parse(userId), Role = roleParse };
     }
 
     /// <summary>

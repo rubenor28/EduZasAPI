@@ -199,10 +199,10 @@ public static class AuthRoutes
     /// <param name="utils">Utilidad para manejar respuestas y excepciones.</param>
     /// <returns>Un <see cref="IResult"/> con el resultado de la operación.</returns>
     public static async Task<IResult> AddUser(
-        NewUserDTO request,
-        AddUserUseCase useCase,
-        RoutesUtils utils,
-        IMapper<UserDomain, PublicUserDTO> userMapper,
+        [FromBody] NewUserDTO request,
+        [FromServices] AddUserUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        [FromServices] IMapper<UserDomain, PublicUserDTO> userMapper,
         HttpContext ctx
     )
     {
@@ -227,14 +227,14 @@ public static class AuthRoutes
     /// <param name="env">Entorno de ejecución (dev/prod).</param>
     /// <returns>Un <see cref="IResult"/> con el usuario con todos sus campos o error.</returns>
     public async static Task<IResult> Login(
-        UserCredentialsDTO credentials,
-        LoginUseCase useCase,
-        IMapper<UserDomain, PublicUserDTO> userMapper,
-        RoutesUtils utils,
-        JwtSettings jwtSettings,
-        JwtService jwtService,
+        [FromBody] UserCredentialsDTO credentials,
+        [FromServices] LoginUseCase useCase,
+        [FromServices] IMapper<UserDomain, PublicUserDTO> userMapper,
+        [FromServices] RoutesUtils utils,
+        [FromServices] JwtSettings jwtSettings,
+        [FromServices] JwtService jwtService,
         HttpContext httpContext,
-        IWebHostEnvironment env
+        [FromServices] IWebHostEnvironment env
     )
     {
         return await utils.HandleGuestUseCaseAsync(
@@ -267,9 +267,9 @@ public static class AuthRoutes
     /// <param name="env">Entorno de ejecución (dev/prod).</param>
     /// <returns>Un <see cref="IResult"/> indicando el éxito de la operación.</returns>
     public static IResult Logout(
-        RoutesUtils utils,
+        [FromServices] RoutesUtils utils,
         HttpContext httpContext,
-        IWebHostEnvironment env
+        [FromServices] IWebHostEnvironment env
     )
     {
         return utils.HandleResponse(() =>

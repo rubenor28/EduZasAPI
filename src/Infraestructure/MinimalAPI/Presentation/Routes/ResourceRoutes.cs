@@ -8,7 +8,6 @@ using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
-using MinimalAPI.Application.DTOs.Resources;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
@@ -62,7 +61,7 @@ public static class ResourceRoutes
             .MapPost("/search", SearchResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<ResourceDomain, ResourceCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ResourceDomain, ResourceCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .WithOpenApi(op =>
@@ -186,10 +185,10 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> AddResource(
-        NewResourceDTO request,
-        AddResourceUseCase useCase,
+        [FromBody] NewResourceDTO request,
+        [FromServices] AddResourceUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -201,10 +200,10 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> GetResources(
-        Guid resourceId,
-        ReadResourceUseCase useCase,
+        [FromRoute] Guid resourceId,
+        [FromServices] ReadResourceUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -216,19 +215,19 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> SearchResource(
-        ResourceCriteriaMAPI request,
-        ResourceQueryUseCase useCase,
+        [FromBody] ResourceCriteriaDTO request,
+        [FromServices] ResourceQueryUseCase useCase,
         [FromServices]
             IMapper<
-            ResourceCriteriaMAPI,
+            ResourceCriteriaDTO,
             Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
         [FromServices]
             IMapper<
             PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
-            PaginatedQuery<ResourceSummary, ResourceCriteriaMAPI>
+            PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>
         > resMapper,
-        RoutesUtils utils,
+        [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
     {
@@ -241,10 +240,10 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> DeleteResource(
-        Guid resourceId,
-        DeleteResourceUseCase useCase,
+        [FromRoute] Guid resourceId,
+        [FromServices] DeleteResourceUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -256,10 +255,10 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> UpdateResource(
-        ResourceUpdateDTO request,
-        UpdateResourceUseCase useCase,
+        [FromBody] ResourceUpdateDTO request,
+        [FromServices] UpdateResourceUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -286,8 +285,8 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> DeleteClassResource(
-        Guid resourceId,
-        string classId,
+        [FromRoute] Guid resourceId,
+        [FromRoute] string classId,
         [FromServices] DeleteClassResourceUseCase useCase,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
@@ -302,9 +301,9 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> ReadResourceClass(
-        ClassResourceIdDTO request,
-        ReadClassResourceUseCase useCase,
-        RoutesUtils utils,
+        [FromBody] ClassResourceIdDTO request,
+        [FromServices] ReadClassResourceUseCase useCase,
+        [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
     {

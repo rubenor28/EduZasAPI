@@ -7,7 +7,6 @@ using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
-using MinimalAPI.Application.DTOs.Users;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
@@ -41,7 +40,7 @@ public static class UserRoutes
             .MapPost("/all", SearchUsers)
             .RequireAuthorization("Admin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<PublicUserDTO, UserCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -150,19 +149,19 @@ public static class UserRoutes
     }
 
     public static Task<IResult> SearchUsers(
-        UserCriteriaMAPI criteria,
-        UserQueryUseCase useCase,
+        [FromBody] UserCriteriaDTO criteria,
+        [FromServices] UserQueryUseCase useCase,
         [FromServices]
             IMapper<
-            UserCriteriaMAPI,
+            UserCriteriaDTO,
             Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
-        IMapper<
+        [FromServices] IMapper<
             PaginatedQuery<UserDomain, UserCriteriaDTO>,
-            PaginatedQuery<PublicUserDTO, UserCriteriaMAPI>
+            PaginatedQuery<PublicUserDTO, UserCriteriaDTO>
         > resMapper,
         HttpContext ctx,
-        RoutesUtils utils
+        [FromServices] RoutesUtils utils
     )
     {
         return utils.HandleUseCaseAsync(
@@ -174,17 +173,17 @@ public static class UserRoutes
     }
 
     public static Task<IResult> UpdateUser(
-        UserUpdateMAPI request,
-        UpdateUserUseCase useCase,
+        [FromBody] UserUpdateDTO request,
+        [FromServices] UpdateUserUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils,
+        [FromServices] RoutesUtils utils,
         [FromServices]
             IMapper<
-            UserUpdateMAPI,
+            UserUpdateDTO,
             Executor,
             Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>
         > reqMapper,
-        IMapper<UserDomain, PublicUserDTO> resMapper
+        [FromServices] IMapper<UserDomain, PublicUserDTO> resMapper
     )
     {
         return utils.HandleUseCaseAsync(
@@ -196,11 +195,11 @@ public static class UserRoutes
     }
 
     public static Task<IResult> DeleteUser(
-        ulong userId,
+        [FromRoute] ulong userId,
         [FromServices] DeleteUserUseCase useCase,
         HttpContext ctx,
-        RoutesUtils utils,
-        IMapper<UserDomain, PublicUserDTO> resMapper
+        [FromServices] RoutesUtils utils,
+        [FromServices] IMapper<UserDomain, PublicUserDTO> resMapper
     )
     {
         return utils.HandleUseCaseAsync(
@@ -212,10 +211,10 @@ public static class UserRoutes
     }
 
     public static Task<IResult> GetUserByEmail(
-        string email,
-        ReadUserEmailUseCase useCase,
-        IMapper<UserDomain, PublicUserDTO> resMapper,
-        RoutesUtils utils,
+        [FromRoute] string email,
+        [FromServices] ReadUserEmailUseCase useCase,
+        [FromServices] IMapper<UserDomain, PublicUserDTO> resMapper,
+        [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
     {
@@ -228,10 +227,10 @@ public static class UserRoutes
     }
 
     public static Task<IResult> GetUserById(
-        ulong userId,
-        ReadUserUseCase useCase,
-        IMapper<UserDomain, PublicUserDTO> resMapper,
-        RoutesUtils utils,
+        [FromRoute] ulong userId,
+        [FromServices] ReadUserUseCase useCase,
+        [FromServices] IMapper<UserDomain, PublicUserDTO> resMapper,
+        [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
     {
@@ -251,10 +250,10 @@ public static class UserRoutes
     /// <param name="utils">Utilidad para manejar respuestas y excepciones.</param>
     /// <returns>Un <see cref="IResult"/> con el resultado de la operación.</returns>
     public static async Task<IResult> AddUser(
-        NewUserDTO request,
-        AddUserUseCase useCase,
-        RoutesUtils utils,
-        IMapper<UserDomain, PublicUserDTO> userMapper,
+        [FromBody] NewUserDTO request,
+        [FromServices] AddUserUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        [FromServices] IMapper<UserDomain, PublicUserDTO> userMapper,
         HttpContext ctx
     )
     {

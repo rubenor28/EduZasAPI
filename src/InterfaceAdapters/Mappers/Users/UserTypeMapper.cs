@@ -6,7 +6,7 @@ using InterfaceAdapters.Mappers.Common;
 namespace InterfaceAdapters.Mappers.Users;
 
 public class UserTypeIntMapper
-    : IBidirectionalResultMapper<int, UserType, Unit>,
+    : IMapper<int, Result<UserType, Unit>>,
         IMapper<UserType, int>
 {
     public Result<UserType, Unit> Map(int input) =>
@@ -18,9 +18,7 @@ public class UserTypeIntMapper
             _ => Unit.Value,
         };
 
-    public int Map(UserType input) => MapFrom(input);
-
-    public int MapFrom(UserType input) =>
+    public int Map(UserType input) =>
         input switch
         {
             UserType.STUDENT => 0,
@@ -31,7 +29,7 @@ public class UserTypeIntMapper
 }
 
 public class UserTypeUintMapper
-    : IBidirectionalResultMapper<uint, UserType, Unit>,
+    : IMapper<uint, Result<UserType, Unit>>,
         IMapper<UserType, uint>
 {
     public Result<UserType, Unit> Map(uint input) =>
@@ -43,9 +41,7 @@ public class UserTypeUintMapper
             _ => Unit.Value,
         };
 
-    public uint Map(UserType input) => MapFrom(input);
-
-    public uint MapFrom(UserType input) =>
+    public uint Map(UserType input) =>
         input switch
         {
             UserType.STUDENT => 0,
@@ -56,7 +52,7 @@ public class UserTypeUintMapper
 }
 
 public class UserTypeLongMapper
-    : IBidirectionalResultMapper<long, UserType, Unit>,
+    : IMapper<long, Result<UserType, Unit>>,
         IMapper<UserType, long>
 {
     public Result<UserType, Unit> Map(long input) =>
@@ -68,9 +64,7 @@ public class UserTypeLongMapper
             _ => Unit.Value,
         };
 
-    public long Map(UserType input) => MapFrom(input);
-
-    public long MapFrom(UserType input) =>
+    public long Map(UserType input) =>
         input switch
         {
             UserType.STUDENT => 0,
@@ -81,7 +75,7 @@ public class UserTypeLongMapper
 }
 
 public class UserTypeUlongMapper
-    : IBidirectionalResultMapper<ulong, UserType, Unit>,
+    : IMapper<ulong, Result<UserType, Unit>>,
         IMapper<UserType, ulong>
 {
     public Result<UserType, Unit> Map(ulong input) =>
@@ -93,9 +87,7 @@ public class UserTypeUlongMapper
             _ => Unit.Value,
         };
 
-    public ulong Map(UserType input) => MapFrom(input);
-
-    public ulong MapFrom(UserType input) =>
+    public ulong Map(UserType input) =>
         input switch
         {
             UserType.STUDENT => 0,
@@ -106,7 +98,7 @@ public class UserTypeUlongMapper
 }
 
 public class UserTypeStringMapper
-    : IBidirectionalResultMapper<string, UserType, Unit>,
+    : IMapper<string, Result<UserType, Unit>>,
         IMapper<UserType, string>
 {
     public Result<UserType, Unit> Map(string input) =>
@@ -118,9 +110,7 @@ public class UserTypeStringMapper
             _ => Unit.Value,
         };
 
-    public string Map(UserType input) => MapFrom(input);
-
-    public string MapFrom(UserType input) =>
+    public string Map(UserType input) =>
         input switch
         {
             UserType.STUDENT => "STUDENT",
@@ -130,11 +120,15 @@ public class UserTypeStringMapper
         };
 }
 
-public class OptionalUserTypeUintMapper(IBidirectionalResultMapper<uint, UserType, Unit> mapper)
-    : IBidirectionalResultMapper<uint?, UserType?, Unit>,
+public class OptionalUserTypeUintMapper(
+    IMapper<uint, Result<UserType, Unit>> mapper,
+    IMapper<UserType, uint> reverseMapper
+)
+    : IMapper<uint?, Result<UserType?, Unit>>,
         IMapper<UserType?, uint?>
 {
-    private readonly IBidirectionalResultMapper<uint, UserType, Unit> _mapper = mapper;
+    private readonly IMapper<uint, Result<UserType, Unit>> _mapper = mapper;
+    private readonly IMapper<UserType, uint> _reverseMapper = reverseMapper;
 
     public Result<UserType?, Unit> Map(uint? input)
     {
@@ -144,8 +138,6 @@ public class OptionalUserTypeUintMapper(IBidirectionalResultMapper<uint, UserTyp
         return _mapper.Map(input.Value).Match<Result<UserType?, Unit>>(ok => ok, err => err);
     }
 
-    public uint? Map(UserType? input) => MapFrom(input);
-
-    public uint? MapFrom(UserType? input) =>
-        input.Match<UserType, uint?>(some => _mapper.MapFrom(some), () => null);
+    public uint? Map(UserType? input) =>
+        input.Match<UserType, uint?>(some => _reverseMapper.Map(some), () => null);
 }
