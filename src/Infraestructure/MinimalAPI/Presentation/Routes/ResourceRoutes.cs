@@ -4,8 +4,6 @@ using Application.DTOs.Resources;
 using Application.UseCases.ClassResource;
 using Application.UseCases.Resources;
 using Domain.Entities;
-using Domain.ValueObjects;
-using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Presentation.Filters;
@@ -163,6 +161,7 @@ public static class ResourceRoutes
         group
             .MapPost("/assigned", GetAssignedResources)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<
                 PaginatedQuery<ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>
             >(StatusCodes.Status200OK)
@@ -217,16 +216,6 @@ public static class ResourceRoutes
     public static Task<IResult> SearchResource(
         [FromBody] ResourceCriteriaDTO request,
         [FromServices] ResourceQueryUseCase useCase,
-        [FromServices]
-            IMapper<
-            ResourceCriteriaDTO,
-            Result<ResourceCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > reqMapper,
-        [FromServices]
-            IMapper<
-            PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>,
-            PaginatedQuery<ResourceSummary, ResourceCriteriaDTO>
-        > resMapper,
         [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
@@ -234,8 +223,8 @@ public static class ResourceRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request),
-            mapResponse: (search) => Results.Ok(resMapper.Map(search))
+            mapRequest: () => request,
+            mapResponse: search => Results.Ok(search)
         );
     }
 

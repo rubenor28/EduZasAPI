@@ -6,8 +6,6 @@ using Application.UseCases.Contacts;
 using Application.UseCases.ContactTags;
 using Application.UseCases.Tags;
 using Domain.Entities;
-using Domain.ValueObjects;
-using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
 using MinimalAPI.Presentation.Filters;

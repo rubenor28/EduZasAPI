@@ -2,6 +2,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassResources;
 using Application.DTOs.ClassStudents;
+using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
@@ -64,6 +65,7 @@ public static class MapperServiceCollectionExtensions
 
         // MinimalAPI
         s.AddSingleton<IMapper<UserDomain, PublicUserDTO>, PublicUserMapper>();
+        s.AddSingleton<IMapper<PaginatedQuery<UserDomain, UserCriteriaDTO>, PaginatedQuery<PublicUserDTO, UserCriteriaDTO>>, UserSearchMapper>();
 
         // CLASSES
         // EF

@@ -83,6 +83,7 @@ public static class UserRoutes
         group
             .MapDelete("/{userId:ulong}", DeleteUser)
             .RequireAuthorization("Admin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicUserDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -104,6 +105,7 @@ public static class UserRoutes
         group
             .MapGet("/{email}", GetUserByEmail)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicUserDTO>()
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -126,6 +128,7 @@ public static class UserRoutes
         group
             .MapGet("/{userId:ulong}", GetUserById)
             .RequireAuthorization("Admin")
+            .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicUserDTO>()
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -151,15 +154,7 @@ public static class UserRoutes
     public static Task<IResult> SearchUsers(
         [FromBody] UserCriteriaDTO criteria,
         [FromServices] UserQueryUseCase useCase,
-        [FromServices]
-            IMapper<
-            UserCriteriaDTO,
-            Result<UserCriteriaDTO, IEnumerable<FieldErrorDTO>>
-        > reqMapper,
-        [FromServices] IMapper<
-            PaginatedQuery<UserDomain, UserCriteriaDTO>,
-            PaginatedQuery<PublicUserDTO, UserCriteriaDTO>
-        > resMapper,
+        [FromServices] IMapper<PaginatedQuery<UserDomain, UserCriteriaDTO>, PaginatedQuery<PublicUserDTO, UserCriteriaDTO>> resMapper,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
     )
@@ -167,7 +162,7 @@ public static class UserRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(criteria),
+            mapRequest: () => criteria,
             mapResponse: (search) => Results.Ok(resMapper.Map(search))
         );
     }
