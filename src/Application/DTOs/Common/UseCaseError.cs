@@ -19,7 +19,6 @@ public class UseCaseErrors
     /// </summary>
     private static readonly UnauthorizedError _unauthorized = new();
     private static readonly NotFoundError _notFound = new();
-    private static readonly AlreadyExistsError _exists = new();
 
     /// <summary>
     /// Crea un error que representa una validación de entrada de datos fallida.
@@ -39,7 +38,7 @@ public class UseCaseErrors
     /// </summary>
     public static UseCaseError NotFound() => _notFound;
 
-    public static UseCaseError AlreadyExists() => _exists;
+    public static Conflict Conflict(string msg) => new(msg);
 }
 
 /// <summary>
@@ -58,7 +57,4 @@ public sealed record UnauthorizedError() : UseCaseError;
 /// </summary>
 public sealed record NotFoundError() : UseCaseError;
 
-/// <summary>
-/// Representa que la entidad que trató de crearse ya existe
-/// </summary>
-public sealed record AlreadyExistsError() : UseCaseError;
+public sealed record Conflict(string Message) : UseCaseError;

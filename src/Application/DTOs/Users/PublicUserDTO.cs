@@ -16,6 +16,8 @@ public sealed record PublicUserDTO
     /// <value>Identificador numérico del usuario. Campo obligatorio.</value>
     public required ulong Id { get; init; }
 
+    public required bool Active {get;init;}
+
     /// <summary>
     /// Obtiene o establece el primer nombre del usuario.
     /// </summary>

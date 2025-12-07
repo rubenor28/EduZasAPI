@@ -117,6 +117,25 @@ public class UserUpdateFluentValidatorTest
         Assert.Contains(result.UnwrapErr(), e => e.Field == "email");
     }
 
+    [Fact]
+    public void IsValid_WithNullPassword_ReturnsOk()
+    {
+        var dto = new UserUpdateDTO
+        {
+            Id = 1,
+            FirstName = "JOHN",
+            FatherLastname = "LUKE",
+            Email = "john.doe@example.com",
+            Password = null,
+            Active = true,
+            Role = UserType.ADMIN,
+        };
+
+        var result = _validator.IsValid(dto);
+
+        Assert.True(result.IsOk);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("short")]

@@ -16,6 +16,21 @@ public sealed class UpdateUserUseCase(
     IBusinessValidationService<UserUpdateDTO>? validator = null
 ) : UpdateUseCase<ulong, UserUpdateDTO, UserDomain>(updater, reader, validator)
 {
+    protected override UserActionDTO<UserUpdateDTO> PreValidationFormat(
+        UserActionDTO<UserUpdateDTO> value
+    ) =>
+        new()
+        {
+            Data = value.Data with
+            {
+                FatherLastname = value.Data.FatherLastname.ToUpperInvariant(),
+                MotherLastname = value.Data.MotherLastname?.ToUpperInvariant(),
+                FirstName = value.Data.FirstName.ToUpperInvariant(),
+                MidName = value.Data.MidName?.ToUpperInvariant(),
+            },
+            Executor = value.Executor,
+        };
+
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserUpdateDTO> value,
         UserDomain record

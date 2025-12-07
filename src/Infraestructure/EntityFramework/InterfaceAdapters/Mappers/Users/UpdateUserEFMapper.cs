@@ -17,7 +17,7 @@ public class UpdateUserEFMapper(IMapper<UserType, uint> usrtMapper)
         destination.FirstName = source.FirstName;
         destination.FatherLastname = source.FatherLastname;
         destination.Email = source.Email;
-        destination.Password = source.Password;
+        destination.Password = source.Password ?? destination.Password;
         destination.MidName = source.MidName;
         destination.MotherLastname = source.MotherLastname;
         destination.Active = source.Active;

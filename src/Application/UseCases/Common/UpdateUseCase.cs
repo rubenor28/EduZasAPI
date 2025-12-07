@@ -32,31 +32,31 @@ public abstract class UpdateUseCase<I, UE, E>(
 
     public async Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<UE> request)
     {
-        PreValidationFormat(ref request);
+        var formatted = PreValidationFormat(request);
 
         if (_validator is not null)
         {
-            var validation = _validator.IsValid(request.Data);
+            var validation = _validator.IsValid(formatted.Data);
             if (validation.IsErr)
                 return UseCaseErrors.Input(validation.UnwrapErr());
         }
 
-        var record = await _reader.GetAsync(GetId(request.Data));
+        var record = await _reader.GetAsync(GetId(formatted.Data));
         if (record is null)
             return UseCaseErrors.NotFound();
 
-        var syncCheck = ExtraValidation(request, record);
+        var syncCheck = ExtraValidation(formatted, record);
         if (syncCheck.IsErr)
             return syncCheck.UnwrapErr();
 
-        var asyncCheck = await ExtraValidationAsync(request, record);
+        var asyncCheck = await ExtraValidationAsync(formatted, record);
         if (asyncCheck.IsErr)
             return Result<E, UseCaseError>.Err(asyncCheck.UnwrapErr());
 
-        PostValidationFormat(request, record);
-        await PostValidationFormatAsync(request, record);
+        var formattedSync = PostValidationFormat(formatted, record);
+        var formattedAsync = await PostValidationFormatAsync(formattedSync, record);
 
-        var updatedRecord = await _updater.UpdateAsync(request.Data);
+        var updatedRecord = await _updater.UpdateAsync(formattedAsync.Data);
 
         ExtraTask(request, record, updatedRecord);
         await ExtraTaskAsync(request, record, updatedRecord);
@@ -64,12 +64,15 @@ public abstract class UpdateUseCase<I, UE, E>(
         return updatedRecord;
     }
 
-    protected virtual void PreValidationFormat(ref UserActionDTO<UE> value) { }
+    protected virtual UserActionDTO<UE> PreValidationFormat(UserActionDTO<UE> value) => value;
 
-    protected virtual Task PostValidationFormatAsync(UserActionDTO<UE> value, E original) =>
-        Task.CompletedTask;
+    protected virtual Task<UserActionDTO<UE>> PostValidationFormatAsync(
+        UserActionDTO<UE> value,
+        E original
+    ) => Task.FromResult(value);
 
-    protected virtual void PostValidationFormat(UserActionDTO<UE> value, E original) { }
+    protected virtual UserActionDTO<UE> PostValidationFormat(UserActionDTO<UE> value, E original) =>
+        value;
 
     protected virtual Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<UE> value,

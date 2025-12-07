@@ -303,7 +303,9 @@ public class AddTagToContactUseCaseTest : IDisposable
             }
         ); // Second time should fail
         Assert.True(result.IsErr);
-        Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
+        Assert.IsType<Conflict>(result.UnwrapErr());
+        var err = (Conflict)result.UnwrapErr();
+        Assert.Equal("El recurso ya existe", err.Message);
     }
 
     public void Dispose()

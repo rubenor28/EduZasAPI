@@ -188,7 +188,9 @@ public class AddContactUseCaseTest : IDisposable
         var result = await _useCase.ExecuteAsync(execution);
 
         Assert.True(result.IsErr);
-        Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
+        Assert.IsType<Conflict>(result.UnwrapErr());
+        var err = (Conflict)result.UnwrapErr();
+        Assert.Equal("El recurso ya existe", err.Message);
     }
 
     [Fact]

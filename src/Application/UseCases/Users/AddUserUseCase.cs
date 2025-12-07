@@ -59,7 +59,7 @@ public class AddUserUseCase(
     {
         var user = await _reader.GetAsync(request.Data.Email);
         if (user is not null)
-            return UseCaseErrors.AlreadyExists();
+            return UseCaseErrors.Conflict("El recurso ya existe");
 
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }

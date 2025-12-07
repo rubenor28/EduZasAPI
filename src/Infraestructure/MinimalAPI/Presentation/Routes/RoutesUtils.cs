@@ -33,9 +33,7 @@ public class RoutesUtils
             ),
             UnauthorizedError => Results.Forbid(),
             NotFoundError => Results.NotFound(),
-            AlreadyExistsError => Results.Conflict(
-                new MessageResponse { Message = "El elemento ya existe" }
-            ),
+            Conflict c => Results.Conflict(new MessageResponse { Message = c.Message }),
             _ => throw new NotImplementedException(),
         };
 

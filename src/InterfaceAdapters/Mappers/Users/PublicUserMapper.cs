@@ -10,6 +10,7 @@ public sealed class PublicUserMapper : IMapper<UserDomain, PublicUserDTO>
         new()
         {
             Id = input.Id,
+            Active = input.Active,
             Email = input.Email,
             FatherLastname = input.FatherLastname,
             FirstName = input.FirstName,

@@ -66,7 +66,7 @@ public sealed class AddContactUseCase(
         );
 
         if (contact is not null)
-            return UseCaseErrors.AlreadyExists();
+            return UseCaseErrors.Conflict("El recurso ya existe");
 
         return Unit.Value;
     }

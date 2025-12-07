@@ -44,7 +44,7 @@ public sealed record UserUpdateDTO
     /// Este campo debe contener la contraseña hasheada, no en texto plano.
     /// Para operaciones de cambio de contraseña, considera usar un campo separado.
     /// </remarks>
-    public required string Password { get; init; }
+    public required string? Password { get; init; }
 
     /// <summary>
     /// Obtiene o establece el estado de activación del usuario.

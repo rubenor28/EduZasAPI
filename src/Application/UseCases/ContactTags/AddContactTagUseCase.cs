@@ -83,7 +83,7 @@ public sealed class AddContactTagUseCase(
         );
 
         if (existingAssociation is not null)
-            return UseCaseErrors.AlreadyExists();
+            return UseCaseErrors.Conflict("El recurso ya existe");
 
         return Unit.Value;
     }

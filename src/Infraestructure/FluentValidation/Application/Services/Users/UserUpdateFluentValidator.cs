@@ -44,12 +44,15 @@ public class UserUpdateFluentValidator : FluentValidator<UserUpdateDTO>
             .EmailAddress()
             .WithMessage("Formato inválido");
 
-        RuleFor(x => x.Password)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty()
-            .WithMessage("Campo requerido")
-            .Matches(UserRegexs.Password)
-            .WithMessage("Formato inválido");
+        When(x => x.Password is not null, () =>
+        {
+            RuleFor(x => x.Password)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .WithMessage("La contraseña no puede ser una cadena vacía.")
+                .Matches(UserRegexs.Password)
+                .WithMessage("La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un caracter especial.");
+        });
 
         RuleFor(x => x.MidName)
             .Must(opt =>

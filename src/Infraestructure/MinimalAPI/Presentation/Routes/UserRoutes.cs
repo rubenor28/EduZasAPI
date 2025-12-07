@@ -172,19 +172,13 @@ public static class UserRoutes
         [FromServices] UpdateUserUseCase useCase,
         HttpContext ctx,
         [FromServices] RoutesUtils utils,
-        [FromServices]
-            IMapper<
-            UserUpdateDTO,
-            Executor,
-            Result<UserUpdateDTO, IEnumerable<FieldErrorDTO>>
-        > reqMapper,
         [FromServices] IMapper<UserDomain, PublicUserDTO> resMapper
     )
     {
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => reqMapper.Map(request, utils.GetExecutorFromContext(ctx)),
+            mapRequest: () => request,
             mapResponse: (user) => Results.Ok(resMapper.Map(user))
         );
     }

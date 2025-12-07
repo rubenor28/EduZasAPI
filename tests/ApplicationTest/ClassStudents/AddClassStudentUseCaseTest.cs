@@ -129,7 +129,9 @@ public class AddClassStudentUseCaseTest : IDisposable
         var result = await _useCase.ExecuteAsync(data); // Attempt to enroll again
 
         Assert.True(result.IsErr);
-        Assert.IsType<AlreadyExistsError>(result.UnwrapErr());
+        Assert.IsType<Conflict>(result.UnwrapErr());
+        var err = (Conflict)result.UnwrapErr();
+        Assert.Equal("El recurso ya existe", err.Message);
     }
 
     [Fact]

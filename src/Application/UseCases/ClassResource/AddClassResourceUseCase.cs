@@ -42,7 +42,7 @@ public sealed class AddClassResourceUseCase(
         );
 
         if (classResSearch is not null)
-            return UseCaseErrors.AlreadyExists();
+            return UseCaseErrors.Conflict("El recurso ya existe");
 
         var errors = new List<FieldErrorDTO>();
         (await _classReader.GetAsync(value.Data.ClassId)).IfNull(() =>

@@ -241,7 +241,9 @@ public class AddClassProfessorUseCaseTest : IDisposable
         );
 
         Assert.True(second.IsErr);
-        Assert.IsType<AlreadyExistsError>(second.UnwrapErr());
+        Assert.IsType<Conflict>(second.UnwrapErr());
+        var err = (Conflict)second.UnwrapErr();
+        Assert.Equal("El recurso ya existe", err.Message);
     }
 
     public void Dispose()
