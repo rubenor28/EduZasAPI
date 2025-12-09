@@ -10,8 +10,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.ClassStudents;
 
 /// <summary>
-/// Implementa el caso de uso para añadir un usuario a una clase.
-/// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
+/// Caso de uso para eliminar un estudiante de una clase.
 /// </summary>
 public class DeleteClassStudentUseCase(
     IDeleterAsync<UserClassRelationId, ClassStudentDomain> deleter,
@@ -24,16 +23,7 @@ public class DeleteClassStudentUseCase(
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
 
-    /// <summary>
-    /// Realiza validaciones asincrónicas antes de proceder con la adición de la relación.
-    /// Las validaciones incluyen la existencia de la clase, la existencia del usuario y
-    /// la existencia de la relación.
-    /// </summary>
-    /// <param name="value">El DTO que contiene el ID de usuario y el ID de clase.</param>
-    /// <returns>
-    /// Un <see cref="Result{TSuccess, TFailure}"/> que indica si la validación fue exitosa
-    /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
-    /// </returns>
+    /// <inheritdoc/>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserClassRelationId> value,
         ClassStudentDomain record
@@ -79,7 +69,7 @@ public class DeleteClassStudentUseCase(
     }
 
     /// <summary>
-    /// Funcion que determina si un profesor puede desincribir a un alumno
+    /// Verifica si un profesor tiene permisos para eliminar estudiantes.
     /// </summary>
     private async Task<bool> IsAuthorizedProfessor(ulong professorId, string classId)
     {

@@ -6,6 +6,9 @@ using Domain.Entities;
 
 namespace Application.UseCases.ClassProfessors;
 
+/// <summary>
+/// Caso de uso para buscar profesores de clases.
+/// </summary>
 public sealed class SearchClassProfessorUseCase(
     IQuerierAsync<ClassProfessorDomain, ClassProfessorCriteriaDTO> querier,
     IBusinessValidationService<ClassProfessorCriteriaDTO>? validator = null

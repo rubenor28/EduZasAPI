@@ -1,19 +1,16 @@
 namespace Application.DTOs.UserNotifications;
 
+/// <summary>
+/// Datos para actualizar el estado de una notificación de usuario.
+/// </summary>
 public sealed record UserNotificationUpdateDTO
 {
-    /// <summary>
-    /// Identificador únido de la notificación
-    /// </summary>
+    /// <summary>ID de la notificación.</summary>
     public required ulong NotificationId { get; init; }
 
-    /// <summary>
-    /// Identificador únido del usuario
-    /// </summary>
+    /// <summary>ID del usuario.</summary>
     public required ulong UserId { get; init; }
 
-    /// <summary>
-    /// Indicador de lectura de la notificación por parte del usuario
-    /// </summary>
+    /// <summary>Indica si la notificación fue leída.</summary>
     public required bool Readed { get; init; }
 }

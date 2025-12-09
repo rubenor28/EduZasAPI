@@ -10,12 +10,20 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Users;
 
+/// <summary>
+/// Caso de uso para actualizar información de usuarios.
+/// </summary>
+/// <remarks>
+/// Normaliza nombres a mayúsculas y restringe la operación a administradores.
+/// </remarks>
 public sealed class UpdateUserUseCase(
     IUpdaterAsync<UserDomain, UserUpdateDTO> updater,
     IReaderAsync<ulong, UserDomain> reader,
     IBusinessValidationService<UserUpdateDTO>? validator = null
 ) : UpdateUseCase<ulong, UserUpdateDTO, UserDomain>(updater, reader, validator)
 {
+
+    /// <inheritdoc/>
     protected override UserActionDTO<UserUpdateDTO> PreValidationFormat(
         UserActionDTO<UserUpdateDTO> value
     ) =>
@@ -31,6 +39,7 @@ public sealed class UpdateUserUseCase(
             Executor = value.Executor,
         };
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserUpdateDTO> value,
         UserDomain record
@@ -48,5 +57,6 @@ public sealed class UpdateUserUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override ulong GetId(UserUpdateDTO dto) => dto.Id;
 }

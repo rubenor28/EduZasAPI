@@ -10,6 +10,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassTests;
 
+/// <summary>
+/// Caso de uso para actualizar la asociación de una evaluación con una clase.
+/// </summary>
 public sealed class UpdateClassTestUseCase(
     IUpdaterAsync<ClassTestDomain, ClassTestDTO> updater,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> reader,
@@ -19,6 +22,7 @@ public sealed class UpdateClassTestUseCase(
 {
     private readonly IReaderAsync<Guid, TestDomain> _testReader = testReader;
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassTestDTO> value,
         ClassTestDomain record
@@ -50,6 +54,7 @@ public sealed class UpdateClassTestUseCase(
         return test.ProfessorId == executor.Id;
     }
 
+    /// <inheritdoc/>
     protected override ClassTestIdDTO GetId(ClassTestDTO dto) =>
         new() { ClassId = dto.ClassId, TestId = dto.TestId };
 }

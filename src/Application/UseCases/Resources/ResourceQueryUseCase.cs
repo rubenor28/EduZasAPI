@@ -6,6 +6,9 @@ using Domain.Entities;
 
 namespace Application.UseCases.Resources;
 
+/// <summary>
+/// Caso de uso para consultar recursos.
+/// </summary>
 public sealed class ResourceQueryUseCase(
     IQuerierAsync<ResourceSummary, ResourceCriteriaDTO> querier,
     IBusinessValidationService<ResourceCriteriaDTO>? validator = null

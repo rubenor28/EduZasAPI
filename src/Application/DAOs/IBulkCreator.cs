@@ -1,7 +1,7 @@
 namespace Application.DAOs;
 
 /// <summary>
-/// Interfaz genérica para la creación de entidades a la vez en un repositorio o DAO.
+/// Interfaz genérica para la creación masiva de entidades.
 /// </summary>
 /// <typeparam name="E">Tipo de la entidad que será creada.</typeparam>
 /// <typeparam name="NE">Tipo de los datos necesarios para crear la entidad.</typeparam>

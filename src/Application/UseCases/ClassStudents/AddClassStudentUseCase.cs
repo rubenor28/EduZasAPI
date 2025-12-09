@@ -10,8 +10,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.ClassStudents;
 
 /// <summary>
-/// Implementa el caso de uso para añadir un usuario a una clase.
-/// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
+/// Caso de uso para añadir un estudiante a una clase.
 /// </summary>
 public class AddClassStudentUseCase(
     ICreatorAsync<ClassStudentDomain, UserClassRelationId> creator,
@@ -28,16 +27,7 @@ public class AddClassStudentUseCase(
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
 
-    /// <summary>
-    /// Realiza validaciones asincrónicas antes de proceder con la adición de la relación.
-    /// Las validaciones incluyen la existencia de la clase y la existencia del usuario.
-    /// Las búsquedas de usuario y clase se ejecutan de forma concurrente.
-    /// </summary>
-    /// <param name="value">El DTO que contiene el ID de usuario y el ID de clase.</param>
-    /// <returns>
-    /// Un <see cref="Result{TSuccess, TFailure}"/> que indica si la validación fue exitosa
-    /// (<see cref="Unit.Value"/>) o si contiene una lista de errores de campo (<see cref="FieldErrorDTO"/>).
-    /// </returns>
+    /// <inheritdoc/>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserClassRelationId> value
     )

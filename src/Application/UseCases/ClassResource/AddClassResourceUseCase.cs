@@ -12,6 +12,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassResource;
 
+/// <summary>
+/// Caso de uso para asociar un recurso a una clase.
+/// </summary>
 public sealed class AddClassResourceUseCase(
     ICreatorAsync<ClassResourceDomain, ClassResourceDTO> creator,
     IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> reader,
@@ -33,6 +36,7 @@ public sealed class AddClassResourceUseCase(
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuierier = userQuierier;
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassResourceDTO> value
     )

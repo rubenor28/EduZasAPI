@@ -9,6 +9,13 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Auth;
 
+/// <summary>
+/// Caso de uso para crear el primer usuario administrador (Setup inicial).
+/// </summary>
+/// <remarks>
+/// Solo se ejecuta si no existen usuarios en el sistema.
+/// </remarks>
+
 public sealed class AddFirstAdminUserUseCase(
     IHashService hasher,
     ICreatorAsync<UserDomain, NewUserDTO> creator,

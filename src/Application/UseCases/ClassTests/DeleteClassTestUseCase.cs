@@ -10,6 +10,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassTests;
 
+/// <summary>
+/// Caso de uso para eliminar la asociación de una evaluación con una clase.
+/// </summary>
 public sealed class DeleteClassTestUseCase(
     IDeleterAsync<ClassTestIdDTO, ClassTestDomain> deleter,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> reader,
@@ -30,6 +33,7 @@ public sealed class DeleteClassTestUseCase(
             : test.ProfessorId == executor.Id;
     }
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassTestIdDTO> value,
         ClassTestDomain record
@@ -49,6 +53,7 @@ public sealed class DeleteClassTestUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override Task ExtraTaskAsync(
         UserActionDTO<ClassTestIdDTO> newEntity,
         ClassTestDomain createdEntity

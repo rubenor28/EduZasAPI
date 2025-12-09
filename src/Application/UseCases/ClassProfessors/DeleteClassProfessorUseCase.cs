@@ -9,12 +9,16 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassProfessors;
 
+/// <summary>
+/// Caso de uso para eliminar un profesor de una clase.
+/// </summary>
 public sealed class DeleteClassProfessorUseCase(
     IDeleterAsync<UserClassRelationId, ClassProfessorDomain> deleter,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> reader,
     IBusinessValidationService<UserClassRelationId>? validator = null
 ) : DeleteUseCase<UserClassRelationId, ClassProfessorDomain>(deleter, reader, validator)
 {
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserClassRelationId> value,
         ClassProfessorDomain professor

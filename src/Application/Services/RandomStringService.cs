@@ -9,15 +9,12 @@ public sealed record RandomStringGeneratorArgs
 }
 
 /// <summary>
-/// Proporciona un servicio para generar cadenas aleatorias.
+/// Implementación de servicio para generar cadenas aleatorias.
 /// </summary>
 public class RandomStringGeneratorService(char[] chars, uint strLength)
     : IRandomStringGeneratorService,
         IRandomStringGeneratorService<RandomStringGeneratorArgs?>
 {
-    /// <summary>
-    /// Instancia de la clase Random utilizada para la generación de números aleatorios.
-    /// </summary>
     private readonly Random _rdm = new();
 
     public string Generate()
@@ -34,9 +31,9 @@ public class RandomStringGeneratorService(char[] chars, uint strLength)
     }
 
     /// <summary>
-    /// Genera una cadena aleatoria de la longitud especificada.
+    /// Genera una cadena aleatoria con opciones específicas.
     /// </summary>
-    /// <returns>Una cadena de texto aleatoria.</returns>
+    /// <returns>Cadena generada.</returns>
     public string Generate(RandomStringGeneratorArgs? opts = null)
     {
         var builder = new StringBuilder();

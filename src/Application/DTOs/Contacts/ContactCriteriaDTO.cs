@@ -2,25 +2,20 @@ using Application.DTOs.Common;
 
 namespace Application.DTOs.Contacts;
 
+/// <summary>
+/// Criterios de búsqueda para contactos.
+/// </summary>
 public sealed record ContactCriteriaDTO : CriteriaDTO
 {
-    ///<summary>
-    /// Alias del contacto. Campo opcional.
-    ///</summary>
+    /// <summary>Filtra por alias.</summary>
     public StringQueryDTO? Alias { get; init; }
 
-    ///<summary>
-    /// ID usuario del dueño de la agenda. Campo opcional.
-    ///</summary>
+    /// <summary>Filtra por ID del dueño de la agenda.</summary>
     public ulong? AgendaOwnerId { get; init; }
 
-    ///<summary>
-    /// ID usuario del dueño del contacto registrado. Campo opcional.
-    ///</summary>
+    /// <summary>Filtra por ID del usuario contacto.</summary>
     public ulong? UserId { get; init; }
 
-    ///<summary>
-    /// Etiquetas del usuario. Campo opcional.
-    ///</summary>
+    /// <summary>Filtra por etiquetas.</summary>
     public IEnumerable<string>? Tags { get; init; }
 }

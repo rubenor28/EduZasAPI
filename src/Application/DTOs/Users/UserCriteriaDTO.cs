@@ -18,8 +18,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Obtiene o establece el filtro opcional para el estado de activación del usuario.
     /// </summary>
     /// <value>
-    /// Optional que contiene el valor booleano para filtrar por estado activo/inactivo,
-    /// o None si no se desea filtrar por este campo.
+    /// Valor booleano para filtrar por estado activo/inactivo.
     /// </value>
     public bool? Active { get; init; } 
 
@@ -27,8 +26,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Obtiene o establece el filtro opcional para el tipo o rol del usuario.
     /// </summary>
     /// <value>
-    /// Optional que contiene el <see cref="UserType"/> para filtrar por rol,
-    /// o None si no se desea filtrar por este campo.
+    /// Rol del usuario para filtrar.
     /// </value>
     public UserType? Role { get; init; } 
 

@@ -11,7 +11,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.Classes;
 
 /// <summary>
-/// Caso de uso para actualizar una clase.
+/// Caso de uso para actualizar datos de una clase.
 /// </summary>
 public class UpdateClassUseCase(
     IUpdaterAsync<ClassDomain, ClassUpdateDTO> updater,
@@ -23,11 +23,7 @@ public class UpdateClassUseCase(
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
 
-    /// <summary>
-    /// Realiza validaciones adicionales para la actualización de la clase.
-    /// </summary>
-    /// <param name="value">DTO con los datos de la clase a actualizar.</param>
-    /// <returns>Un resultado que indica si la validación fue exitosa o no.</returns>
+    /// <inheritdoc/>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassUpdateDTO> value,
         ClassDomain record
@@ -56,5 +52,6 @@ public class UpdateClassUseCase(
         return professorSearch is not null && professorSearch.IsOwner;
     }
 
+    /// <inheritdoc/>
     protected override string GetId(ClassUpdateDTO dto) => dto.Id;
 }

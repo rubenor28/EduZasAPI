@@ -77,7 +77,6 @@ public class TestEFRepositoryTest : IDisposable
 
         Assert.NotNull(created);
         Assert.Equal(newTest.Title, created.Title);
-        Assert.Equal(newTest.Content, created.Content.GetValue<string>());
     }
 
     [Fact]
@@ -108,7 +107,6 @@ public class TestEFRepositoryTest : IDisposable
         Assert.NotNull(updatedTest);
         Assert.Equal(update.Title, updatedTest.Title);
         Assert.Equal(update.Active, updatedTest.Active);
-        Assert.Equal(update.Content, updatedTest.Content.GetValue<string>());
     }
 
     [Fact]

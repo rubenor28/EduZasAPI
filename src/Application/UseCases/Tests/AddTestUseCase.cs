@@ -10,6 +10,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Tests;
 
+/// <summary>
+/// Caso de uso para crear una nueva evaluación.
+/// </summary>
 public sealed class AddTestUseCase(
     ICreatorAsync<TestDomain, NewTestDTO> creator,
     IReaderAsync<ulong, UserDomain> userReader,
@@ -18,6 +21,7 @@ public sealed class AddTestUseCase(
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(UserActionDTO<NewTestDTO> value)
     {
         var authorized = value.Executor.Role switch

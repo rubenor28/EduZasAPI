@@ -6,15 +6,12 @@ namespace Application.DTOs.Common;
 public abstract record CriteriaDTO
 {
     /// <summary>
-    /// Obtiene el número de página para la paginación de resultados.
+    /// Obtiene o establece el número de página actual (base 1).
     /// </summary>
-    /// <remarks>El valor por defecto es 1</remarks>
     public int Page { get; set; } = 1;
 
     /// <summary>
-    /// Número de elementos que puede tener una pagina.
+    /// Obtiene o establece la cantidad de elementos por página.
     /// </summary>
-    /// <value>Número de página actual.</value>
-    /// <remarks>El valor por defecto es int.MaxValue</remarks>
     public int PageSize { get; set; } = int.MaxValue;
 }

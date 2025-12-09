@@ -18,6 +18,9 @@ using TagCreator = ICreatorAsync<TagDomain, NewTagDTO>;
 using TagReader = IReaderAsync<string, TagDomain>;
 using UserReader = IReaderAsync<ulong, UserDomain>;
 
+/// <summary>
+/// Caso de uso para añadir una etiqueta a un contacto.
+/// </summary>
 public sealed class AddContactTagUseCase(
     ContactTagCreator creator,
     TagReader tagReader,
@@ -41,6 +44,7 @@ public sealed class AddContactTagUseCase(
             ? Unit.Value
             : new FieldErrorDTO { Field = field, Message = "Usuario no encontrado" };
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewContactTagDTO> value
     )
@@ -88,6 +92,7 @@ public sealed class AddContactTagUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override async Task PrevTaskAsync(UserActionDTO<NewContactTagDTO> newEntity)
     {
         var tagRecord = await _tagReader.GetAsync(newEntity.Data.Tag);

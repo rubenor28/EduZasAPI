@@ -4,6 +4,9 @@ using Domain.Entities;
 
 namespace Application.UseCases.Tests;
 
+/// <summary>
+/// Caso de uso para eliminar una evaluación.
+/// </summary>
 public sealed class DeleteTestUseCase(
     IDeleterAsync<Guid, TestDomain> deleter,
     IReaderAsync<Guid, TestDomain> reader

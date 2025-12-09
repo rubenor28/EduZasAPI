@@ -129,9 +129,9 @@ public class AddContactUseCaseTest : IDisposable
         );
 
         Assert.True(result.IsErr);
-        var error = result.UnwrapErr();
-        Assert.Equal(typeof(InputError), error.GetType());
-        Assert.Contains(((InputError)error).Errors, e => e.Field == "agendaOwnerId");
+        var err = result.UnwrapErr();
+        Assert.IsType<InputError>(err);
+        Assert.Contains(((InputError)err).Errors, e => e.Field == "agendaOwnerId");
     }
 
     [Fact]

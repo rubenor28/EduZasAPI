@@ -12,9 +12,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.ClassProfessors;
 
 /// <summary>
-/// Implementa el caso de uso para añadir un usuario a una clase, validando
-/// que el usuario posea los permisos requeridos (Professor o Administrador).
-/// Utiliza el modelo de programación asincrónica (TAP) para la validación de dependencias.
+/// Caso de uso para añadir un profesor a una clase.
 /// </summary>
 public class AddClassProfessorUseCase(
     ICreatorAsync<ClassProfessorDomain, NewClassProfessorDTO> creator,
@@ -28,6 +26,7 @@ public class AddClassProfessorUseCase(
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewClassProfessorDTO> value
     )

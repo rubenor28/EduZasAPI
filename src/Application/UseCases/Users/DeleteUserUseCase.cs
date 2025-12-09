@@ -10,6 +10,12 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Users;
 
+/// <summary>
+/// Caso de uso para eliminar usuarios.
+/// </summary>
+/// <remarks>
+/// Reglas: Solo administradores pueden eliminar usuarios. No se puede eliminar al último administrador.
+/// </remarks>
 public sealed class DeleteUserUseCase(
     IDeleterAsync<ulong, UserDomain> deleter,
     IReaderAsync<ulong, UserDomain> reader,
@@ -19,6 +25,7 @@ public sealed class DeleteUserUseCase(
 {
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _querier = querier;
 
+    /// <inheritdoc/>
     protected override Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<ulong> value,
         UserDomain record
@@ -29,6 +36,7 @@ public sealed class DeleteUserUseCase(
             _ => UseCaseErrors.Unauthorized(),
         };
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ulong> value,
         UserDomain record

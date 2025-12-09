@@ -28,8 +28,7 @@ public sealed record PublicUserDTO
     /// Obtiene o establece el segundo nombre del usuario (opcional).
     /// </summary>
     /// <value>
-    /// Optional que contiene el segundo nombre si está presente,
-    /// o null si no se proporciona. Valor por defecto: null.
+    /// Segundo nombre del usuario. Valor por defecto: null.
     /// </value>
     public string? MidName { get; init; } = null;
 
@@ -43,8 +42,7 @@ public sealed record PublicUserDTO
     /// Obtiene o establece el apellido materno del usuario (opcional).
     /// </summary>
     /// <value>
-    /// Optional que contiene el apellido materno si está presente,
-    /// o null si no se proporciona. Valor por defecto: null.
+    /// Apellido materno del usuario. Valor por defecto: null.
     /// </value>
     public string? MotherLastname { get; init; } = null;
 

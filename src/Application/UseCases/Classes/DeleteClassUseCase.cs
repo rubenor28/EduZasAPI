@@ -8,12 +8,20 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Classes;
 
+/// <summary>
+/// Caso de uso para eliminar clases.
+/// </summary>
+/// <remarks>
+/// Requiere permisos de Admin o ser el Profesor propietario.
+/// </remarks>
+
 public class DeleteClassUseCase(
     IDeleterAsync<string, ClassDomain> deleter,
     IReaderAsync<string, ClassDomain> reader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> relationReader
 ) : DeleteUseCase<string, ClassDomain>(deleter, reader)
 {
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<string> value,
         ClassDomain record

@@ -10,6 +10,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Resources;
 
+/// <summary>
+/// Caso de uso para añadir un recurso.
+/// </summary>
 public sealed class AddResourceUseCase(
     ICreatorAsync<ResourceDomain, NewResourceDTO> creator,
     IReaderAsync<ulong, UserDomain> userReader,
@@ -18,6 +21,7 @@ public sealed class AddResourceUseCase(
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
+    /// <inheritdoc/>
     protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<NewResourceDTO> value)
     {
         var authorized = value.Executor.Role switch
@@ -34,6 +38,7 @@ public sealed class AddResourceUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewResourceDTO> value
     )

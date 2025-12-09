@@ -8,11 +8,15 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Resources;
 
+/// <summary>
+/// Caso de uso para eliminar un recurso.
+/// </summary>
 public sealed class DeleteResourceUseCase(
     IDeleterAsync<Guid, ResourceDomain> deleter,
     IReaderAsync<Guid, ResourceDomain> reader
 ) : DeleteUseCase<Guid, ResourceDomain>(deleter, reader, null)
 {
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<Guid> value,
         ResourceDomain record

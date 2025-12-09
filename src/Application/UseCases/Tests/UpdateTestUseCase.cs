@@ -10,12 +10,16 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Tests;
 
+/// <summary>
+/// Caso de uso para actualizar una evaluación.
+/// </summary>
 public sealed class UpdateTestUseCase(
     IUpdaterAsync<TestDomain, TestUpdateDTO> updater,
     IReaderAsync<Guid, TestDomain> reader,
     IBusinessValidationService<TestUpdateDTO>? validator = null
 ) : UpdateUseCase<Guid, TestUpdateDTO, TestDomain>(updater, reader, validator)
 {
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<TestUpdateDTO> value,
         TestDomain record
@@ -35,5 +39,6 @@ public sealed class UpdateTestUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override Guid GetId(TestUpdateDTO dto) => dto.Id;
 }

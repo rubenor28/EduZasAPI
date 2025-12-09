@@ -19,6 +19,9 @@ using ContactTagDeleter = IDeleterAsync<ContactTagIdDTO, ContactTagDomain>;
 using TagDeleter = IDeleterAsync<string, TagDomain>;
 using TagQuerier = IQuerierAsync<TagDomain, TagCriteriaDTO>;
 
+/// <summary>
+/// Caso de uso para eliminar un contacto y limpiar etiquetas huérfanas.
+/// </summary>
 public sealed class DeleteContactUseCase(
     ContactDeleter deleter,
     ContactReader reader,
@@ -34,7 +37,7 @@ public sealed class DeleteContactUseCase(
     private readonly TagQuerier _tagQuerier = tagQuerier;
     private readonly TagDeleter _tagDeleter = tagDeleter;
 
-    /// <inheritdoc>
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ContactIdDTO> value,
         ContactDomain record
@@ -54,6 +57,7 @@ public sealed class DeleteContactUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override async Task PrevTaskAsync(
         UserActionDTO<ContactIdDTO> deleteDTO,
         ContactDomain record

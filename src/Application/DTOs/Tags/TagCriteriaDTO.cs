@@ -2,20 +2,17 @@ using Application.DTOs.Common;
 
 namespace Application.DTOs.Tags;
 
+/// <summary>
+/// Criterios de búsqueda para etiquetas.
+/// </summary>
 public sealed record TagCriteriaDTO : CriteriaDTO
 {
-    /// <summary>
-    // Texto de la etiqueta
-    /// </summary>
+    /// <summary>Filtra por texto.</summary>
     public StringQueryDTO? Text { get; init; } 
 
-    /// <summary>
-    // ID de usuario del dueño de la agenda
-    /// </summary>
+    /// <summary>Filtra por ID del dueño de la agenda.</summary>
     public ulong? AgendaOwnerId { get; init; } 
 
-    /// <summary>
-    /// ID de usuario del contacto
-    /// </summary>
+    /// <summary>Filtra por ID de contacto asociado.</summary>
     public ulong? ContactId { get; init; } 
 }

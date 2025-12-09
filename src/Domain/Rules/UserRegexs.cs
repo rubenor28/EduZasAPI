@@ -3,7 +3,7 @@ namespace Domain.Rules;
 /// <summary>
 /// Contiene constantes de expresiones regulares para la validación de datos de usuario.
 /// </summary>
-public static class UserRules
+public static class UserRegexs
 {
     /// <summary>
     /// Valida nombres simples, requiriendo un mínimo de 3 letras mayúsculas.

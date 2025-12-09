@@ -19,6 +19,9 @@ using TagCreator = ICreatorAsync<TagDomain, NewTagDTO>;
 using TagReader = IReaderAsync<string, TagDomain>;
 using UserReader = IReaderAsync<ulong, UserDomain>;
 
+/// <summary>
+/// Caso de uso para añadir un contacto a la agenda.
+/// </summary>
 public sealed class AddContactUseCase(
     ContactCreator creator,
     IReaderAsync<ContactIdDTO, ContactDomain> reader,
@@ -38,16 +41,18 @@ public sealed class AddContactUseCase(
 
     private readonly ContactTagCreator _contactTagCreator = contactTagCreator;
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewContactDTO> request
     )
     {
         List<FieldErrorDTO> errors = [];
 
-        (await SearchUser(request.Data.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
-        (await SearchUser(request.Data.UserId, "userId")).IfErr(errors.Add);
         if (request.Data.UserId == request.Executor.Id)
             errors.Add(new() { Field = "userId", Message = "No puedes agregarte a ti mismo" });
+
+        (await SearchUser(request.Data.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
+        (await SearchUser(request.Data.UserId, "userId")).IfErr(errors.Add);
 
         if (errors.Count != 0)
             return UseCaseErrors.Input(errors);
@@ -71,6 +76,7 @@ public sealed class AddContactUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override async Task ExtraTaskAsync(
         UserActionDTO<NewContactDTO> newEntity,
         ContactDomain createdEntity

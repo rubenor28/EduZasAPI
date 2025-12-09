@@ -10,6 +10,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassStudents;
 
+/// <summary>
+/// Caso de uso para actualizar la relación de un estudiante con una clase.
+/// </summary>
 public sealed class UpdateClassStudentUseCase(
     IUpdaterAsync<ClassStudentDomain, ClassStudentUpdateDTO> updater,
     IReaderAsync<UserClassRelationId, ClassStudentDomain> reader,
@@ -21,6 +24,7 @@ public sealed class UpdateClassStudentUseCase(
         validator
     )
 {
+    /// <inheritdoc/>
     protected override Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<ClassStudentUpdateDTO> value,
         ClassStudentDomain record
@@ -38,6 +42,7 @@ public sealed class UpdateClassStudentUseCase(
         return Unit.Value;
     }
 
+    /// <inheritdoc/>
     protected override UserClassRelationId GetId(ClassStudentUpdateDTO dto) =>
         new() { UserId = dto.UserId, ClassId = dto.ClassId };
 }

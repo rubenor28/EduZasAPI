@@ -11,12 +11,10 @@ using Domain.ValueObjects;
 namespace Application.UseCases.Users;
 
 /// <summary>
-/// Caso de uso específico para la adición de nuevos usuarios al sistema.
+/// Caso de uso para registrar nuevos usuarios.
 /// </summary>
 /// <remarks>
-/// Esta clase extiende la funcionalidad base de <see cref="AddUseCase{NE, E}"/> para aplicar
-/// validaciones y transformaciones específicas para usuarios, como la verificación de unicidad
-/// de email y el hashing de contraseñas.
+/// Aplica reglas de negocio específicas: verificación de unicidad de email y hashing de contraseña.
 /// </remarks>
 public class AddUserUseCase(
     IHashService hasher,
@@ -28,6 +26,7 @@ public class AddUserUseCase(
     private readonly IReaderAsync<string, UserDomain> _reader = reader;
     private readonly IHashService _hasher = hasher;
 
+    /// <inheritdoc/>
     protected override Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<NewUserDTO> newEntity
     )
@@ -38,21 +37,7 @@ public class AddUserUseCase(
         return Unit.Value;
     }
 
-    /// <summary>
-    /// Realiza validación asíncrona adicional para verificar la unicidad del email.
-    /// </summary>
-    /// <param name="request.Data">DTO con los datos del nuevo usuario a validar.</param>
-    /// <returns>
-    /// Un resultado que indica si la validación fue exitosa o contiene errores de email duplicado.
-    /// </returns>
-    /// <exception cref="InvalidDataException">
-    /// Se lanza cuando se detecta más de un usuario con el mismo email en la base de datos.
-    /// </exception>
-    /// <remarks>
-    /// Este método verifica que no exista otro usuario con el mismo email en el sistema.
-    /// Si encuentra exactamente un usuario con el mismo email, retorna un error de validación.
-    /// Si encuentra más de uno, lanza una excepción indicando inconsistencia en los datos.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewUserDTO> request
     )
@@ -64,6 +49,7 @@ public class AddUserUseCase(
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }
 
+    /// <inheritdoc/>
     protected override UserActionDTO<NewUserDTO> PreValidationFormat(UserActionDTO<NewUserDTO> value)
     {
         return value with
@@ -78,15 +64,7 @@ public class AddUserUseCase(
         };
     }
 
-    /// <summary>
-    /// Aplica formato final a los datos del usuario antes de la persistencia.
-    /// </summary>
-    /// <param name="u">DTO con los datos del usuario a formatear.</param>
-    /// <returns>DTO con los datos formateados, incluyendo la contraseña hasheada.</returns>
-    /// <remarks>
-    /// Este método se encarga de aplicar el hashing a la contraseña del usuario
-    /// antes de que sea persistida en la base de datos.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override UserActionDTO<NewUserDTO> PostValidationFormat(UserActionDTO<NewUserDTO> request)
     {
         return request with { Data = request.Data with { Password = _hasher.Hash(request.Data.Password) } };

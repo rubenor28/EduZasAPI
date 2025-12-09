@@ -17,5 +17,11 @@ public interface IDeleterAsync<I, E>
     /// La entidad eliminada
     /// </returns>
     Task<E> DeleteAsync(I id);
+
+    /// <summary>
+    /// Elimina múltiples entidades por sus identificadores.
+    /// </summary>
+    /// <param name="ids">Colección de identificadores de las entidades a eliminar.</param>
+    /// <returns>Colección de las entidades eliminadas.</returns>
     Task<IEnumerable<E>> BulkDelete(IEnumerable<I> ids);
 }

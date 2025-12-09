@@ -8,6 +8,9 @@ using Domain.Entities;
 
 namespace Application.UseCases.Notifications;
 
+/// <summary>
+/// Caso de uso para crear una notificación para todos los alumnos de una clase.
+/// </summary>
 public sealed class AddNotificationUseCase(
     ICreatorAsync<NotificationDomain, NewNotificationDTO> notificationCreator,
     IBulkCreatorAsync<UserNotificationDomain, NewUserNotificationDTO> userNotificationCreator,
@@ -21,6 +24,7 @@ public sealed class AddNotificationUseCase(
 
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuerier = userQuerier;
 
+    /// <inheritdoc/>
     protected override async Task ExtraTaskAsync(
         UserActionDTO<NewNotificationDTO> newE,
         NotificationDomain created

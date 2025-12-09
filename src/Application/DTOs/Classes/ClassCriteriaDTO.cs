@@ -3,33 +3,33 @@ using Application.DTOs.Common;
 namespace Application.DTOs.Classes;
 
 /// <summary>
-/// Representa los criterios de búsqueda para un profesor en una clase.
+/// Criterios de filtrado por profesor.
 /// </summary>
 public sealed record WithProfessorDTO
 {
     /// <summary>
-    /// ID del profesor a buscar.
+    /// Identificador del profesor.
     /// </summary>
     public required ulong Id { get; init; }
 
     /// <summary>
-    /// Indica si el profesor es el propietario de la clase.
+    /// Filtrar por si es propietario de la clase (opcional).
     /// </summary>
     public bool? IsOwner { get; init; }
 }
 
 /// <summary>
-/// Representa los criterios de búsqueda para un estudiante en una clase.
+/// Criterios de filtrado por estudiante.
 /// </summary>
 public sealed record WithStudentDTO
 {
     /// <summary>
-    /// ID del estudiante a buscar.
+    /// Identificador del estudiante.
     /// </summary>
     public required ulong Id { get; init; }
 
     /// <summary>
-    /// Indica si la clase está oculta para el estudiante.
+    /// Filtrar por visibilidad de la clase para el estudiante (opcional).
     /// </summary>
     public bool? Hidden { get; init; }
 }

@@ -9,11 +9,10 @@ using Domain.ValueObjects;
 namespace Application.UseCases.Auth;
 
 /// <summary>
-/// Caso de uso para el proceso de autenticación de usuarios en el sistema.
+/// Caso de uso para autenticación de usuarios.
 /// </summary>
 /// <remarks>
-/// Esta clase implementa la lógica de login, verificando las credenciales del usuario
-/// contra la base de datos y generando un token de autenticación en caso de éxito.
+/// Verifica credenciales contra la base de datos y retorna el usuario si son válidas.
 /// </remarks>
 public class LoginUseCase(
     IHashService hasher,
@@ -24,24 +23,10 @@ public class LoginUseCase(
     private readonly IReaderAsync<string, UserDomain> _userReader = userReader;
 
     /// <summary>
-    /// Ejecuta el proceso de autenticación con las credenciales proporcionadas.
+    /// Ejecuta la autenticación.
     /// </summary>
-    /// <param name="credentials">Credenciales del usuario (email y contraseña).</param>
-    /// <returns>
-    /// Una tarea que representa la operación asíncrona. El resultado contiene un token de autenticación
-    /// si las credenciales son válidas, o un error de campo específico si la autenticación falla.
-    /// </returns>
-    /// <exception cref="InvalidDataException">
-    /// Se lanza cuando se detecta más de un usuario con el mismo email en la base de datos,
-    /// indicando una inconsistencia en los datos.
-    /// </exception>
-    /// <remarks>
-    /// El proceso de autenticación sigue estos pasos:
-    /// 1. Busca el usuario por email exacto
-    /// 2. Verifica que exista exactamente un usuario con ese email
-    /// 3. Compara la contraseña proporcionada con el hash almacenado
-    /// 4. Genera un token de autenticación si las credenciales son correctas
-    /// </remarks>
+    /// <param name="request">Credenciales (email y password).</param>
+    /// <returns>Usuario autenticado o error de credenciales inválidas.</returns>
     public async Task<Result<UserDomain, UseCaseError>> ExecuteAsync(
         UserCredentialsDTO request
     )

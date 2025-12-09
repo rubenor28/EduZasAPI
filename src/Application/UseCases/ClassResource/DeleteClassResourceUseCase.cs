@@ -10,6 +10,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassResource;
 
+/// <summary>
+/// Caso de uso para eliminar la asociación de un recurso con una clase.
+/// </summary>
 public sealed class DeleteClassResourceUseCase(
     IDeleterAsync<ClassResourceIdDTO, ClassResourceDomain> deleter,
     IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> reader,
@@ -24,6 +27,7 @@ public sealed class DeleteClassResourceUseCase(
 {
     private readonly IReaderAsync<Guid, ResourceDomain> _resourceReader = resourceReader;
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassResourceIdDTO> value,
         ClassResourceDomain record

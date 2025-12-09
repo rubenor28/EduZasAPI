@@ -47,8 +47,7 @@ public sealed record NewUserDTO
     /// Obtiene o inicializa el apellido materno del usuario.
     /// </summary>
     /// <value>
-    /// Un objeto de tipo <see cref="string?"/> que contiene el apellido materno
-    /// si se proporciona, o <c>None</c> si no está presente. Se normaliza a mayúsculas invariables.
+    /// Apellido materno del usuario (opcional). Se normaliza a mayúsculas invariables.
     /// </value>
     public string? MotherLastname { get; init; }
 
@@ -56,8 +55,7 @@ public sealed record NewUserDTO
     /// Obtiene o inicializa el segundo nombre del usuario.
     /// </summary>
     /// <value>
-    /// Un objeto de tipo <see cref="string?"/> que contiene el segundo nombre
-    /// si se proporciona, o <c>None</c> si no está presente. Se normaliza a mayúsculas invariables.
+    /// Segundo nombre del usuario (opcional). Se normaliza a mayúsculas invariables.
     /// </value>
     public string? MidName { get; init; }
 }

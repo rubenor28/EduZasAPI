@@ -9,11 +9,19 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Auth;
 
+/// <summary>
+/// Caso de uso para obtener detalles de un usuario.
+/// </summary>
+/// <remarks>
+/// Permite a un usuario leer sus propios datos o a un administrador leer cualquier usuario.
+/// </remarks>
+
 public sealed class ReadUserUseCase(
     IReaderAsync<ulong, UserDomain> reader,
     IBusinessValidationService<ulong> validator
 ) : ReadUseCase<ulong, UserDomain>(reader, validator)
 {
+    /// <inheritdoc/>
     protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<ulong> value)
     {
         var authorized = value.Executor.Role switch

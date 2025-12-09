@@ -1,13 +1,13 @@
 namespace Application.Services;
 
 /// <summary>
-/// Define un contrato para exportar bases de datos.
+/// Contrato para exportar respaldos de la base de datos.
 /// </summary>
 public interface IDatabaseExporter
 {
     /// <summary>
-    /// Exporta una copia de seguridad de la base de datos y la devuelve como un stream.
+    /// Genera y retorna un respaldo de la base de datos.
     /// </summary>
-    /// <returns>Una tarea que representa la operación de exportación asíncrona, conteniendo el stream del respaldo.</returns>
+    /// <returns>Stream con el contenido del respaldo.</returns>
     Task<Stream> ExportBackupAsync();
 }

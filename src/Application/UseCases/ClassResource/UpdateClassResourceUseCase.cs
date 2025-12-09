@@ -6,6 +6,9 @@ using Domain.Entities;
 
 namespace Application.UseCases.ClassResource;
 
+/// <summary>
+/// Caso de uso para actualizar la asociación de un recurso con una clase.
+/// </summary>
 public sealed class UpdateClassResourceUseCase(
     IUpdaterAsync<ClassResourceDomain, ClassResourceDTO> updater,
     IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> reader,
@@ -17,6 +20,7 @@ public sealed class UpdateClassResourceUseCase(
         validator
     )
 {
+    /// <inheritdoc/>
     protected override ClassResourceIdDTO GetId(ClassResourceDTO dto) =>
         new() { ClassId = dto.ClassId, ResourceId = dto.ResourceId };
 }

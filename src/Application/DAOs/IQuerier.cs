@@ -12,7 +12,7 @@ public interface IQuerierAsync<E, C>
     where C : notnull, CriteriaDTO
 {
     /// <summary>
-    /// Tamaño de elementos por página
+    /// Obtiene el tamaño de página configurado para las consultas.
     /// </summary>
     public int PageSize { get; }
 

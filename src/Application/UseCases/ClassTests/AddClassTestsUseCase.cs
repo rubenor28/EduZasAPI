@@ -11,6 +11,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassTests;
 
+/// <summary>
+/// Caso de uso para asociar una evaluación a una clase.
+/// </summary>
 public sealed class AddClassTestUseCase(
     ICreatorAsync<ClassTestDomain, ClassTestDTO> creator,
     IReaderAsync<Guid, TestDomain> testReader,
@@ -27,6 +30,7 @@ public sealed class AddClassTestUseCase(
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
 
+    /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassTestDTO> value
     )

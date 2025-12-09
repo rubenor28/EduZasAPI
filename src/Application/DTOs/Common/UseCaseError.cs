@@ -38,6 +38,11 @@ public class UseCaseErrors
     /// </summary>
     public static UseCaseError NotFound() => _notFound;
 
+    /// <summary>
+    /// Crea un error de conflicto, indicando que la operación no pudo completarse debido al estado actual del recurso.
+    /// </summary>
+    /// <param name="msg">Mensaje descriptivo del conflicto.</param>
+    /// <returns>Una instancia de error de tipo <see cref="Conflict"/>.</returns>
     public static Conflict Conflict(string msg) => new(msg);
 }
 
@@ -57,4 +62,8 @@ public sealed record UnauthorizedError() : UseCaseError;
 /// </summary>
 public sealed record NotFoundError() : UseCaseError;
 
+/// <summary>
+/// Representa un error de conflicto de estado (ej. duplicados, violación de reglas de negocio).
+/// </summary>
+/// <param name="Message">Mensaje descriptivo del conflicto.</param>
 public sealed record Conflict(string Message) : UseCaseError;

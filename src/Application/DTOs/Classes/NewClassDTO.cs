@@ -1,8 +1,18 @@
 namespace Application.DTOs.Classes;
 
+/// <summary>
+/// Representa un profesor asociado a la creación de una clase.
+/// </summary>
 public sealed record Professor
 {
+    /// <summary>
+    /// Identificador del usuario profesor.
+    /// </summary>
     public required ulong UserId { get; init; }
+
+    /// <summary>
+    /// Indica si el profesor es el propietario principal.
+    /// </summary>
     public required bool IsOwner { get; init; }
 };
 
@@ -11,6 +21,9 @@ public sealed record Professor
 /// </summary>
 public sealed record NewClassDTO
 {
+    /// <summary>
+    /// Identificador opcional para la clase (si se conoce de antemano).
+    /// </summary>
     public string Id { get; init; } = string.Empty;
 
     /// <summary>
@@ -29,17 +42,17 @@ public sealed record NewClassDTO
     public string? Section { get; init; }
 
     /// <summary>
-    /// Color de la carta en la UI
+    /// Código de color hexadecimal para la representación visual de la clase.
     /// </summary>
     public required string Color { get; init; }
 
     /// <summary>
-    /// Id del profesor dueño de la clase nueva
+    /// Identificador del profesor propietario de la clase.
     /// </summary>
     public required ulong OwnerId { get; init; }
 
     /// <summary>
-    /// Informacion para agregar profesores durante la creacion
+    /// Lista de profesores adicionales a asociar durante la creación.
     /// </summary>
     public ICollection<Professor> Professors { get; init; } = [];
 }
