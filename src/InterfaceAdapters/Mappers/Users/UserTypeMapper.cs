@@ -5,10 +5,18 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace InterfaceAdapters.Mappers.Users;
 
+/// <summary>
+/// Mapeador bidireccional entre UserType e int.
+/// </summary>
 public class UserTypeIntMapper
     : IMapper<int, Result<UserType, Unit>>,
         IMapper<UserType, int>
 {
+    /// <summary>
+    /// Convierte un entero a UserType.
+    /// </summary>
+    /// <param name="input">Valor entero.</param>
+    /// <returns>UserType o Unit si no es válido.</returns>
     public Result<UserType, Unit> Map(int input) =>
         input switch
         {
@@ -18,6 +26,11 @@ public class UserTypeIntMapper
             _ => Unit.Value,
         };
 
+    /// <summary>
+    /// Convierte un UserType a entero.
+    /// </summary>
+    /// <param name="input">Valor UserType.</param>
+    /// <returns>Representación entera.</returns>
     public int Map(UserType input) =>
         input switch
         {
@@ -28,10 +41,18 @@ public class UserTypeIntMapper
         };
 }
 
+/// <summary>
+/// Mapeador bidireccional entre UserType y uint.
+/// </summary>
 public class UserTypeUintMapper
     : IMapper<uint, Result<UserType, Unit>>,
         IMapper<UserType, uint>
 {
+    /// <summary>
+    /// Convierte un uint a UserType.
+    /// </summary>
+    /// <param name="input">Valor uint.</param>
+    /// <returns>UserType o Unit si no es válido.</returns>
     public Result<UserType, Unit> Map(uint input) =>
         input switch
         {
@@ -41,6 +62,11 @@ public class UserTypeUintMapper
             _ => Unit.Value,
         };
 
+    /// <summary>
+    /// Convierte un UserType a uint.
+    /// </summary>
+    /// <param name="input">Valor UserType.</param>
+    /// <returns>Representación uint.</returns>
     public uint Map(UserType input) =>
         input switch
         {
@@ -51,10 +77,18 @@ public class UserTypeUintMapper
         };
 }
 
+/// <summary>
+/// Mapeador bidireccional entre UserType y long.
+/// </summary>
 public class UserTypeLongMapper
     : IMapper<long, Result<UserType, Unit>>,
         IMapper<UserType, long>
 {
+    /// <summary>
+    /// Convierte un long a UserType.
+    /// </summary>
+    /// <param name="input">Valor long.</param>
+    /// <returns>UserType o Unit si no es válido.</returns>
     public Result<UserType, Unit> Map(long input) =>
         input switch
         {
@@ -64,6 +98,11 @@ public class UserTypeLongMapper
             _ => Unit.Value,
         };
 
+    /// <summary>
+    /// Convierte un UserType a long.
+    /// </summary>
+    /// <param name="input">Valor UserType.</param>
+    /// <returns>Representación long.</returns>
     public long Map(UserType input) =>
         input switch
         {
@@ -74,10 +113,18 @@ public class UserTypeLongMapper
         };
 }
 
+/// <summary>
+/// Mapeador bidireccional entre UserType y ulong.
+/// </summary>
 public class UserTypeUlongMapper
     : IMapper<ulong, Result<UserType, Unit>>,
         IMapper<UserType, ulong>
 {
+    /// <summary>
+    /// Convierte un ulong a UserType.
+    /// </summary>
+    /// <param name="input">Valor ulong.</param>
+    /// <returns>UserType o Unit si no es válido.</returns>
     public Result<UserType, Unit> Map(ulong input) =>
         input switch
         {
@@ -87,6 +134,11 @@ public class UserTypeUlongMapper
             _ => Unit.Value,
         };
 
+    /// <summary>
+    /// Convierte un UserType a ulong.
+    /// </summary>
+    /// <param name="input">Valor UserType.</param>
+    /// <returns>Representación ulong.</returns>
     public ulong Map(UserType input) =>
         input switch
         {
@@ -97,10 +149,18 @@ public class UserTypeUlongMapper
         };
 }
 
+/// <summary>
+/// Mapeador bidireccional entre UserType y string.
+/// </summary>
 public class UserTypeStringMapper
     : IMapper<string, Result<UserType, Unit>>,
         IMapper<UserType, string>
 {
+    /// <summary>
+    /// Convierte un string a UserType.
+    /// </summary>
+    /// <param name="input">Valor string.</param>
+    /// <returns>UserType o Unit si no es válido.</returns>
     public Result<UserType, Unit> Map(string input) =>
         input switch
         {
@@ -110,6 +170,11 @@ public class UserTypeStringMapper
             _ => Unit.Value,
         };
 
+    /// <summary>
+    /// Convierte un UserType a string.
+    /// </summary>
+    /// <param name="input">Valor UserType.</param>
+    /// <returns>Representación string.</returns>
     public string Map(UserType input) =>
         input switch
         {
@@ -120,6 +185,9 @@ public class UserTypeStringMapper
         };
 }
 
+/// <summary>
+/// Mapeador bidireccional opcional entre UserType y uint.
+/// </summary>
 public class OptionalUserTypeUintMapper(
     IMapper<uint, Result<UserType, Unit>> mapper,
     IMapper<UserType, uint> reverseMapper
@@ -130,6 +198,11 @@ public class OptionalUserTypeUintMapper(
     private readonly IMapper<uint, Result<UserType, Unit>> _mapper = mapper;
     private readonly IMapper<UserType, uint> _reverseMapper = reverseMapper;
 
+    /// <summary>
+    /// Convierte un uint nullable a UserType nullable.
+    /// </summary>
+    /// <param name="input">Valor uint nullable.</param>
+    /// <returns>UserType nullable o Unit si no es válido.</returns>
     public Result<UserType?, Unit> Map(uint? input)
     {
         if (input is null)
@@ -138,6 +211,11 @@ public class OptionalUserTypeUintMapper(
         return _mapper.Map(input.Value).Match<Result<UserType?, Unit>>(ok => ok, err => err);
     }
 
+    /// <summary>
+    /// Convierte un UserType nullable a uint nullable.
+    /// </summary>
+    /// <param name="input">Valor UserType nullable.</param>
+    /// <returns>Representación uint nullable.</returns>
     public uint? Map(UserType? input) =>
         input.Match<UserType, uint?>(some => _reverseMapper.Map(some), () => null);
 }
