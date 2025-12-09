@@ -69,6 +69,7 @@ public class TestEFRepositoryTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.UserId,
         };
@@ -86,6 +87,7 @@ public class TestEFRepositoryTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.UserId,
         };
@@ -96,6 +98,7 @@ public class TestEFRepositoryTest : IDisposable
         var update = new TestUpdateDTO
         {
             Id = created.Id,
+            Color = "#ffffff",
             Title = "Updated Test Title",
             Content = "Updated Test Content",
             ProfessorId = professor.UserId,
@@ -116,6 +119,7 @@ public class TestEFRepositoryTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.UserId,
         };
@@ -141,6 +145,7 @@ public class TestEFRepositoryTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.UserId,
         };
@@ -169,6 +174,7 @@ public class TestEFRepositoryTest : IDisposable
         var newTest1 = new NewTestDTO
         {
             Title = "Math Test",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.UserId,
         };
@@ -177,6 +183,7 @@ public class TestEFRepositoryTest : IDisposable
         var newTest2 = new NewTestDTO
         {
             Title = "Science Test",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.UserId,
         };

@@ -14,6 +14,7 @@ public class UpdateTestEFMapper : IUpdateMapper<TestUpdateDTO, Test>
     {
         t.Title = tu.Title;
         t.Content = tu.Content;
+        t.Color = tu.Color;
         t.TimeLimitMinutes = tu.TimeLimitMinutes;
         t.ProfessorId = tu.ProfessorId;
         t.Active = tu.Active;

@@ -13,6 +13,8 @@ public partial class Test
 
     public string Title { get; set; } = null!;
 
+    public string Color { get; set; } = null!;
+
     public JsonNode Content { get; set; } = null!;
 
     public uint? TimeLimitMinutes { get; set; }

@@ -93,6 +93,7 @@ public class ClassTestEFRepositoryTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.Id,
         };

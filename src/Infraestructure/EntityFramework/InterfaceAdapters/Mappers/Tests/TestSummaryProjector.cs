@@ -17,6 +17,7 @@ public class TestSummaryProjector : IEFProjector<Test, TestSummary, TestCriteria
             {
                 Id = t.TestId,
                 Title = t.Title,
+                Color = t.Color,
                 Active = t.Active,
                 ModifiedAt = t.ModifiedAt,
             };

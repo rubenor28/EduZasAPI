@@ -19,6 +19,11 @@ public sealed record TestUpdateDTO
     public required string Title { get; init; }
 
     /// <summary>
+    /// Nuevo color de la evaluación.
+    /// </summary>
+    public required string Color { get; init; }
+
+    /// <summary>
     /// Nuevo contenido de la evaluación (estructura JSON).
     /// </summary>
     public required JsonNode Content { get; init; }

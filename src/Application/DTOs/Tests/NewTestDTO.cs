@@ -13,6 +13,11 @@ public sealed record NewTestDTO
     public required string Title { get; init; }
 
     /// <summary>
+    /// Color de la carta de la evaluación.
+    /// </summary>
+    public required string Color { get; init; }
+
+    /// <summary>
     /// Estructura JSON que define el contenido de la evaluación (bloques, preguntas).
     /// </summary>
     public required JsonNode Content { get; init; }

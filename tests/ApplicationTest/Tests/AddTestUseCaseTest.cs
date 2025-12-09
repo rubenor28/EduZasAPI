@@ -70,6 +70,7 @@ public class AddTestUseCaseTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test content",
             ProfessorId = professor.Id,
         };
@@ -88,6 +89,7 @@ public class AddTestUseCaseTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = user.Id,
         };
@@ -106,6 +108,7 @@ public class AddTestUseCaseTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = 999, // Non-existent professor
         };
@@ -127,6 +130,7 @@ public class AddTestUseCaseTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = student.Id,
         };
@@ -147,6 +151,7 @@ public class AddTestUseCaseTest : IDisposable
         var newTest = new NewTestDTO
         {
             Title = "Test Title",
+            Color = "#ffffff",
             Content = "Test Content",
             ProfessorId = professor.Id,
         };

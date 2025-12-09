@@ -107,6 +107,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
@@ -129,6 +130,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
@@ -150,6 +152,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = Guid.NewGuid(), // Non-existent test
+            Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
@@ -174,6 +177,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
@@ -198,6 +202,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
@@ -226,6 +231,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Color = "#ffffff",
             Active = true,
             Title = "", // Invalid title
             Content = "Updated Content",

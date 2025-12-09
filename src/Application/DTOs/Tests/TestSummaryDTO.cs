@@ -16,6 +16,11 @@ public sealed record TestSummary
     public required string Title { get; set; }
 
     /// <summary>
+    /// Color de la carta de la evaluación.
+    /// </summary>
+    public required string Color { get; set; }
+
+    /// <summary>
     /// Indica si la evaluación está activa.
     /// </summary>
     public required bool Active { get; set; }

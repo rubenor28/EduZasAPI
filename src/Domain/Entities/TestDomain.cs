@@ -27,6 +27,11 @@ public sealed record TestDomain
     public required string Title { get; set; }
 
     /// <summary>
+    /// Obtiene o establece el color de la carta del examen.
+    /// </summary>
+    public required string Color { get; set; }
+
+    /// <summary>
     /// Obtiene o establece el contenido del examen, representado como un nodo JSON.
     /// </summary>
     /// <remarks>

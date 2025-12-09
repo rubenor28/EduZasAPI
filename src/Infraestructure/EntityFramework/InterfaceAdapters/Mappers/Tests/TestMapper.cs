@@ -16,6 +16,7 @@ public class TestMapper : IMapper<Test, TestDomain>
             Id = t.TestId,
             Active = t.Active,
             Title = t.Title,
+            Color = t.Color,
             Content = t.Content,
             TimeLimitMinutes = t.TimeLimitMinutes,
             ProfessorId = t.ProfessorId,
