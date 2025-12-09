@@ -13,6 +13,8 @@ public partial class Resource
 
     public string Title { get; set; } = null!;
 
+    public string Color { get; set; } = null!;
+
     public JsonNode Content { get; set; } = null!;
 
     public ulong ProfessorId { get; set; }

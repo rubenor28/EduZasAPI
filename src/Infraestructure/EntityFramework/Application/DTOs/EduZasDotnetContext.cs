@@ -469,6 +469,11 @@ public partial class EduZasDotnetContext : DbContext
                 contentProperty.HasColumnType("json");
             }
             resourceBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
+            resourceBuilder
+                .Property(e => e.Color)
+                .HasMaxLength(7)
+                .HasColumnName("color")
+                .HasDefaultValueSql("'#1976d2'");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {

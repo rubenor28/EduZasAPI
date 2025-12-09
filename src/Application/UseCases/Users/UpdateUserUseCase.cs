@@ -19,9 +19,11 @@ namespace Application.UseCases.Users;
 public sealed class UpdateUserUseCase(
     IUpdaterAsync<UserDomain, UserUpdateDTO> updater,
     IReaderAsync<ulong, UserDomain> reader,
+    IHashService hasher,
     IBusinessValidationService<UserUpdateDTO>? validator = null
 ) : UpdateUseCase<ulong, UserUpdateDTO, UserDomain>(updater, reader, validator)
 {
+    private readonly IHashService _hasher = hasher;
 
     /// <inheritdoc/>
     protected override UserActionDTO<UserUpdateDTO> PreValidationFormat(
@@ -55,6 +57,25 @@ public sealed class UpdateUserUseCase(
             return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
+    }
+
+    /// <inheritdoc/>
+    protected override UserActionDTO<UserUpdateDTO> PostValidationFormat(
+        UserActionDTO<UserUpdateDTO> value,
+        UserDomain original
+    )
+    {
+        if (!_hasher.Matches(value.Data.Password!, original.Password))
+        {
+            return value with
+            {
+                Data = value.Data with { Password = _hasher.Hash(value.Data.Password!) },
+            };
+        }
+        else
+        {
+            return value with { Data = value.Data with { Password = original.Password } };
+        }
     }
 
     /// <inheritdoc/>

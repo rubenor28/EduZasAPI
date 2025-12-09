@@ -23,6 +23,11 @@ public sealed record ResourceDomain
     public required string Title { get; set; }
 
     /// <summary>
+    /// Obtiene o establece el color de la tarjeta del recurso.
+    /// </summary>
+    public required string Color { get; set; }
+
+    /// <summary>
     /// Obtiene o establece el contenido del recurso en formato JSON.
     /// </summary>
     public required JsonNode Content { get; set; }
@@ -65,6 +70,11 @@ public sealed record ResourceSummary
     /// Obtiene o establece el título del recurso.
     /// </summary>
     public required string Title { get; set; }
+
+    /// <summary>
+    /// Obtiene o establece el color de la tarjeta del recurso.
+    /// </summary>
+    public required string Color { get; set; }
 
     /// <summary>
     /// Obtiene o establece el ID del profesor que creó el recurso.

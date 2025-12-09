@@ -2,13 +2,15 @@ using Application.Services;
 using EntityFramework.Application.DTOs;
 using Mariadb.Application.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MinimalAPI.Extensions;
+namespace Composition.Extensions;
 
 /// <summary>
 /// Métodos de extensión para registrar los servicios de base de datos en el contenedor de dependencias.
 /// </summary>
-public static class DatabaseServiceCollectionExtensions
+internal static class DatabaseServiceCollectionExtensions
 {
     /// <summary>
     /// Registra el contexto de base de datos <see cref="EduZasDotnetContext"/> usando MySQL/MariaDB

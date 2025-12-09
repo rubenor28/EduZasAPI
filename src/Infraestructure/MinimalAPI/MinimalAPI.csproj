@@ -11,23 +11,11 @@
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\..\Application\Application.csproj" />
-    <ProjectReference Include="..\..\InterfaceAdapters\InterfaceAdapters.csproj" />
-    <ProjectReference Include="..\EntityFramework\EntityFramework.csproj" />
-
-    <ProjectReference Include="..\BCrypt\BCrypt.csproj" />
-    <ProjectReference Include="..\FluentValidation\FluentValidationProj.csproj" />
-    <ProjectReference Include="..\Mariadb\Mariadb.csproj" />
-    <ProjectReference Include="..\MailKit\MailKitProj.csproj" />
+    <ProjectReference Include="..\Composition\Composition.csproj" />
   </ItemGroup>
 
 </Project>

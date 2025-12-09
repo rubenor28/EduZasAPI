@@ -32,13 +32,14 @@ using EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Common;
 using InterfaceAdapters.Mappers.Users;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MinimalAPI.Extensions;
+namespace Composition.Extensions;
 
 /// <summary>
 /// Métodos de extensión para registrar los servicios de mapeo en el contenedor de dependencias.
 /// </summary>
-public static class MapperServiceCollectionExtensions
+internal static class MapperServiceCollectionExtensions
 {
     /// <summary>
     /// Registra un mapeador bidireccional que devuelve resultados (Result pattern).

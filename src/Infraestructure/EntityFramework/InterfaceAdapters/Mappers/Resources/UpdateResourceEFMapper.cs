@@ -15,5 +15,6 @@ public class UpdateResourceEFMapper : IUpdateMapper<ResourceUpdateDTO, Resource>
         d.Active = s.Active;
         d.Title = s.Title;
         d.Content = s.Content;
+        d.Color = s.Color;
     }
 }

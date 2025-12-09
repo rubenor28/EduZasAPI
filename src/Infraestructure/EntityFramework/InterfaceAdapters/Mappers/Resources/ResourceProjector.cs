@@ -18,6 +18,7 @@ public class ResourceProjector : IEFProjector<Resource, ResourceDomain, Resource
             {
                 Id = input.ResourceId,
                 Active = input.Active ?? true,
+                Color = input.Color,
                 Content = input.Content,
                 ProfessorId = input.ProfessorId,
                 Title = input.Title,
@@ -39,6 +40,7 @@ public class ResourceSummaryProjector : IEFProjector<Resource, ResourceSummary, 
             new()
             {
                 Id = input.ResourceId,
+                Color = input.Color,
                 Active = input.Active ?? false,
                 ProfessorId = input.ProfessorId,
                 Title = input.Title,

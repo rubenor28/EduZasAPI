@@ -15,6 +15,7 @@ COPY src/Infraestructure/FluentValidation/FluentValidationProj.csproj src/Infrae
 COPY src/Infraestructure/Mariadb/Mariadb.csproj src/Infraestructure/Mariadb/
 COPY src/Infraestructure/MinimalAPI/MinimalAPI.csproj src/Infraestructure/MinimalAPI/
 COPY src/Infraestructure/MailKit/MailKitProj.csproj src/Infraestructure/MailKit/
+COPY src/Infraestructure/Cli/Cli.csproj src/Infraestructure/Cli/
 
 # Elimina los proyectos de prueba de la solución para el build
 # Esto evita que 'dotnet restore' falle al no encontrar los proyectos de prueba,
@@ -31,7 +32,8 @@ COPY src/ src/
 
 # Publica únicamente el proyecto de entrada (API)
 # Usar --no-restore aprovecha la capa de caché del 'dotnet restore' anterior
-RUN dotnet publish "src/Infraestructure/MinimalAPI/MinimalAPI.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist --no-restore
+RUN dotnet publish "src/Infraestructure/MinimalAPI/MinimalAPI.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist/api --no-restore
+RUN dotnet publish "src/Infraestructure/Cli/Cli.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist/cli --no-restore
 
 # Etapa 2: Imagen final para ejecución
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
@@ -52,7 +54,10 @@ USER appuser
 EXPOSE 8080
 
 # Copia la aplicación publicada desde la etapa de construcción
-COPY --from=build /home/build/dist/ .
+COPY --from=build /home/build/dist/api/ ./api/
+COPY --from=build /home/build/dist/cli/ ./cli/
 
 # Define el punto de entrada
-ENTRYPOINT ["dotnet", "MinimalAPI.dll"]
+# No se define un ENTRYPOINT para poder ejecutar tanto la API como el CLI
+# Para ejecutar la API: dotnet api/MinimalAPI.dll
+# Para ejecutar el CLI: dotnet cli/Cli.dll user:reset-password --email <email>

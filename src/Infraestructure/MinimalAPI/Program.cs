@@ -1,4 +1,5 @@
 using DotNetEnv;
+using Composition;
 using MinimalAPI.Extensions;
 using MinimalAPI.Presentation.Constraints;
 using MinimalAPI.Presentation.Routes;
@@ -14,12 +15,11 @@ if (environment != "Production")
 var builder = WebApplication.CreateBuilder();
 builder.Configuration.AddEnvironmentVariables();
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 // Agregar dependencias del proyecto de Extensions/
-builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApiSpecificServices(builder.Configuration);
 
 builder.Services.Configure<RouteOptions>(options =>
 {
@@ -28,7 +28,7 @@ builder.Services.Configure<RouteOptions>(options =>
 
 var app = builder.Build();
 
-// ... (rest of the file is unchanged)
+// Admitir solicitudes provenientes del frontend
 app.UseCors("AllowFrontend");
 
 // Activar rutas protegidas y políticas establecidas
@@ -37,7 +37,7 @@ app.UseAuthorization();
 
 app.UseAntiforgery();
 
-// Configure the HTTP request pipeline.
+// Configurar el pipeline de solicitudes HTTP.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -55,7 +55,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Endpoints API
+// Endpoints de la API
 app.MapUserRoutes();
 app.MapAuthRoutes();
 app.MapClassRoutes();

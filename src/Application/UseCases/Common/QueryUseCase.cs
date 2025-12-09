@@ -6,6 +6,11 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Common;
 
+/// <summary>
+/// Clase base para casos de uso de consulta (Query) con paginación y validación.
+/// </summary>
+/// <typeparam name="C">Tipo de criterio de búsqueda.</typeparam>
+/// <typeparam name="E">Tipo de entidad consultada.</typeparam>
 public class QueryUseCase<C, E>(
     IQuerierAsync<E, C> querier,
     IBusinessValidationService<C>? validator = null
@@ -16,6 +21,7 @@ public class QueryUseCase<C, E>(
     protected readonly IQuerierAsync<E, C> _querier = querier;
     protected readonly IBusinessValidationService<C>? _validator = validator;
 
+    ///<inheritdoc/>
     public async Task<Result<PaginatedQuery<E, C>, UseCaseError>> ExecuteAsync(
         UserActionDTO<C> request
     )
@@ -52,14 +58,32 @@ public class QueryUseCase<C, E>(
         return await _querier.GetByAsync(request.Data);
     }
 
+    /// <summary>
+    /// Realiza validaciones síncronas adicionales específicas del caso de uso.
+    /// </summary>
+    /// <param name="criteria">Criterios de búsqueda con contexto de usuario.</param>
+    /// <returns>Resultado exitoso o error de validación.</returns>
     protected virtual Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<C> criteria) =>
         Unit.Value;
 
+    /// <summary>
+    /// Realiza validaciones asíncronas adicionales específicas del caso de uso.
+    /// </summary>
+    /// <param name="criteria">Criterios de búsqueda con contexto de usuario.</param>
+    /// <returns>Tarea con resultado exitoso o error de validación.</returns>
     protected virtual Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<C> criteria
     ) => Task.FromResult(Result<Unit, UseCaseError>.Ok(Unit.Value));
 
+    /// <summary>
+    /// Permite formatear o modificar los criterios antes de la consulta (síncrono).
+    /// </summary>
+    /// <param name="criteria">Referencia a los criterios de búsqueda.</param>
     protected virtual void PrevFormat(ref UserActionDTO<C> criteria) { }
 
+    /// <summary>
+    /// Permite formatear o modificar los criterios antes de la consulta (asíncrono).
+    /// </summary>
+    /// <param name="criteria">Referencia a los criterios de búsqueda.</param>
     protected virtual Task PrevFormatAsync(ref UserActionDTO<C> criteria) => Task.CompletedTask;
 }

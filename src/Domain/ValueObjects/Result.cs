@@ -148,61 +148,87 @@ public abstract class Result<T, E>
     private sealed class OkResult(T value) : Result<T, E>
     {
         private readonly T _value = value;
+        /// <inheritdoc />
         public override bool IsOk => true;
+        /// <inheritdoc />
         public override bool IsErr => false;
 
+        /// <inheritdoc />
         public override T Unwrap() => _value;
 
+        /// <inheritdoc />
         public override E UnwrapErr() =>
             throw new InvalidOperationException($"Tried to UnwrapErr from Ok: {_value}");
 
+        /// <inheritdoc />
         public override T UnwrapOr(T defaultValue) => _value;
 
+        /// <inheritdoc />
         public override void Match(Action<T> fnOk, Action<E> fnErr) => fnOk(_value);
 
+        /// <inheritdoc />
         public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnOk(_value);
 
+        /// <inheritdoc />
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Ok(fn(_value));
 
+        /// <inheritdoc />
         public override Result<T, F> MapErr<F>(Func<E, F> fn) => Result<T, F>.Ok(_value);
 
+        /// <inheritdoc />
         public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) => fn(_value);
 
+        /// <inheritdoc />
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => Result<T, F>.Ok(_value);
 
+        /// <inheritdoc />
         public override void IfOk(Action<T> action) => action(_value);
 
+        /// <inheritdoc />
         public override void IfErr(Action<E> action) { }
     }
 
     private sealed class ErrResult(E error) : Result<T, E>
     {
         private readonly E _error = error;
+        /// <inheritdoc />
         public override bool IsOk => false;
+        /// <inheritdoc />
         public override bool IsErr => true;
 
+        /// <inheritdoc />
         public override T Unwrap() =>
             throw new InvalidOperationException($"Tried to Unwrap from Err: {_error}");
 
+        /// <inheritdoc />
         public override E UnwrapErr() => _error;
 
+        /// <inheritdoc />
         public override T UnwrapOr(T defaultValue) => defaultValue;
 
+        /// <inheritdoc />
         public override void Match(Action<T> fnOk, Action<E> fnErr) => fnErr(_error);
 
+        /// <inheritdoc />
         public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnErr(_error);
 
+        /// <inheritdoc />
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Err(_error);
 
+        /// <inheritdoc />
         public override Result<T, F> MapErr<F>(Func<E, F> fn) => Result<T, F>.Err(fn(_error));
 
+        /// <inheritdoc />
         public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) =>
             Result<U, E>.Err(_error);
 
+        /// <inheritdoc />
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => fn(_error);
 
+        /// <inheritdoc />
         public override void IfOk(Action<T> action) { }
 
+        /// <inheritdoc />
         public override void IfErr(Action<E> action) => action(_error);
     }
 }

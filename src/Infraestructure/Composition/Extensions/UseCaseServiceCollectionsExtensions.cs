@@ -14,13 +14,14 @@ using Application.UseCases.Tests;
 using Application.UseCases.UserNotifications;
 using Application.UseCases.Users;
 using Domain.Entities;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MinimalAPI.Extensions;
+namespace Composition.Extensions;
 
 /// <summary>
 /// Métodos de extensión para registrar los casos de uso en el contenedor de dependencias.
 /// </summary>
-public static class UseCaseServiceCollectionExtensions
+internal static class UseCaseServiceCollectionExtensions
 {
     /// <summary>
     /// Registra las implementaciones de los casos de uso relacionados con <see cref="UserDomain"/>.

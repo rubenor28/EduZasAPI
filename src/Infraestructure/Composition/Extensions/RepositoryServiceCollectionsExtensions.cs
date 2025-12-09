@@ -28,13 +28,15 @@ using EntityFramework.Application.DAOs.UserNotifications;
 using EntityFramework.Application.DAOs.Users;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MinimalAPI.Extensions;
+namespace Composition.Extensions;
 
 /// <summary>
 /// Métodos de extensión para registrar los repositorios en el contenedor de dependencias.
 /// </summary>
-public static class RepositoryServiceCollectionExtensions
+internal static class RepositoryServiceCollectionExtensions
 {
     /// <summary>
     /// Registra las implementaciones de repositorios en el contenedor de servicios.

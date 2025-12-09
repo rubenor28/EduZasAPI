@@ -23,6 +23,11 @@ public sealed record ResourceUpdateDTO
     public required string Title { get; init; }
 
     /// <summary>
+    /// Nuevo color de la tarjeta del recurso.
+    /// </summary>
+    public required string Color { get; init; }
+
+    /// <summary>
     /// Nuevo contenido del recurso.
     /// </summary>
     public required JsonNode Content { get; init; }

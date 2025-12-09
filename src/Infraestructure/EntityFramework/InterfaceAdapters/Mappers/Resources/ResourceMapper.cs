@@ -10,14 +10,16 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Resources;
 public sealed class ResourceMapper : IMapper<Resource, ResourceDomain>
 {
     /// <inheritdoc/>
-    public ResourceDomain Map(Resource input)
-      => new() {
-  Id = input.ResourceId,
-  Active = input.Active ?? false,
-  Content = input.Content,
-  Title = input.Title,
-  CreatedAt = input.CreatedAt,
-  ModifiedAt = input.ModifiedAt,
-  ProfessorId = input.ProfessorId
-      };
+    public ResourceDomain Map(Resource input) =>
+        new()
+        {
+            Id = input.ResourceId,
+            Color = input.Color,
+            Active = input.Active ?? false,
+            Content = input.Content,
+            Title = input.Title,
+            CreatedAt = input.CreatedAt,
+            ModifiedAt = input.ModifiedAt,
+            ProfessorId = input.ProfessorId,
+        };
 }

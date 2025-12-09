@@ -35,11 +35,7 @@ public abstract class DeleteUseCase<I, E>(
     /// </summary>
     protected readonly IBusinessValidationService<I>? _validator = validator;
 
-    /// <summary>
-    /// Ejecuta el caso de uso para eliminar una entidad.
-    /// </summary>
-    /// <param name="request">El DTO con la información para la eliminación.</param>
-    /// <returns>Un <see cref="Result{T, E}"/> que contiene la entidad eliminada o un error.</returns>
+    /// <inheritdoc/>
     public async Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<I> request)
     {
         if (_validator is not null)
@@ -71,22 +67,54 @@ public abstract class DeleteUseCase<I, E>(
         return record;
     }
 
+    /// <summary>
+    /// Validaciones adicionales síncronas antes de eliminar.
+    /// </summary>
+    /// <param name="value">DTO de entrada.</param>
+    /// <param name="record">Entidad a eliminar.</param>
+    /// <returns>Resultado exitoso o error.</returns>
     protected virtual Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<I> value,
         E record
     ) => Result<Unit, UseCaseError>.Ok(Unit.Value);
 
+    /// <summary>
+    /// Validaciones adicionales asíncronas antes de eliminar.
+    /// </summary>
+    /// <param name="value">DTO de entrada.</param>
+    /// <param name="record">Entidad a eliminar.</param>
+    /// <returns>Tarea con resultado exitoso o error.</returns>
     protected virtual async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<I> value,
         E record
     ) => Unit.Value;
 
+    /// <summary>
+    /// Tarea adicional después de eliminar (síncrono).
+    /// </summary>
+    /// <param name="deleteDTO">DTO de entrada.</param>
+    /// <param name="deletedEntity">Entidad eliminada.</param>
     protected virtual void ExtraTask(UserActionDTO<I> deleteDTO, E deletedEntity) { }
 
+    /// <summary>
+    /// Tarea adicional después de eliminar (asíncrono).
+    /// </summary>
+    /// <param name="deleteDTO">DTO de entrada.</param>
+    /// <param name="deletedEntity">Entidad eliminada.</param>
     protected virtual Task ExtraTaskAsync(UserActionDTO<I> deleteDTO, E deletedEntity) =>
         Task.FromResult(Unit.Value);
 
+    /// <summary>
+    /// Tarea previa a eliminar (síncrono).
+    /// </summary>
+    /// <param name="deleteDTO">DTO de entrada.</param>
+    /// <param name="record">Entidad a eliminar.</param>
     protected virtual void PrevTask(UserActionDTO<I> deleteDTO, E record) { }
 
+    /// <summary>
+    /// Tarea previa a eliminar (asíncrono).
+    /// </summary>
+    /// <param name="deleteDTO">DTO de entrada.</param>
+    /// <param name="record">Entidad a eliminar.</param>
     protected virtual Task PrevTaskAsync(UserActionDTO<I> deleteDTO, E record) => Task.FromResult(Unit.Value);
 }

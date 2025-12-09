@@ -17,11 +17,6 @@ public static class UserRegexs
         @"^(?:DE\s(?:LA|LAS|LOS|EL)|DEL|DE|LA|LAS|LOS|EL|AL)\s[A-ZÁÉÍÓÚÜÑ]{3,}$";
 
     /// <summary>
-    /// Valida matrículas o claves de estudiante con un formato específico.
-    /// </summary>
-    public static readonly string Tuition = @"^[A-ZÁÉÍÓÚÜÑ]{3}[OIPV]\d{6}$";
-
-    /// <summary>
     /// Valida contraseñas seguras: mínimo 8 caracteres, una mayúscula, una minúscula y un símbolo.
     /// </summary>
     public static readonly string Password = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$";

@@ -5,13 +5,14 @@ using FluentValidationProj.Application.Services.Auth;
 using FluentValidationProj.Application.Services.Classes;
 using FluentValidationProj.Application.Services.Common;
 using FluentValidationProj.Application.Services.Users;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MinimalAPI.Extensions;
+namespace Composition.Extensions;
 
 /// <summary>
 /// Métodos de extensión para registrar validadores en el contenedor de dependencias.
 /// </summary>
-public static class ValidatorServiceCollectionExtensions
+internal static class ValidatorServiceCollectionExtensions
 {
     /// <summary>
     /// Registra las implementaciones de validadores basados en <see cref="IBusinessValidationService{T}"/>.

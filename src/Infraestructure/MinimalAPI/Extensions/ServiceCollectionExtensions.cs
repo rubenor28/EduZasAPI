@@ -1,8 +1,4 @@
 using System.Text;
-using Application.Configuration;
-using Application.Services;
-using Bcrypt.Application.Services;
-using MailKitProj;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Application.DTOs.Common;
@@ -17,39 +13,25 @@ namespace MinimalAPI.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Registra todos los servicios de infraestructura necesarios para la aplicación,
-    /// incluyendo base de datos, repositorios, validadores, casos de uso y otros servicios.
+    /// Registra todos los servicios específicos de la API, como autenticación, CORS y Swagger.
     /// </summary>
-    /// <param name="services">La colección de servicios donde se registrarán las dependencias.</param>
-    /// <param name="configuration">Configuración de la aplicación usada para inicializar servicios.</param>
-    /// <returns>La colección de servicios con las dependencias de infraestructura registradas.</returns>
-    public static IServiceCollection AddInfrastructureServices(
+    public static IServiceCollection AddApiSpecificServices(
         this IServiceCollection services,
         IConfiguration configuration
     )
     {
         services
-            .AddOtherInfrastructureServices()
             .AddCorsConfig(configuration)
             .AddAuthSettings(configuration)
-            .AddEmailSender(configuration)
-            .AddDatabaseServices(configuration)
-            .AddRepositories(configuration)
-            .AddValidators()
-            .AddMapperServices()
-            .AddUseCases()
-            .AddSwaggerServices();
+            .AddSwaggerServices()
+            .AddApiServices();
 
         return services;
     }
 
     /// <summary>
-    ///  Registra configuraciones ya sea definidas en codigo o provenientes del
-    ///  appsettings.json de uso general
+    /// Registra configuraciones de autenticación y autorización para la API.
     /// </summary>
-    /// <param name="services">La colección de servicios donde se registrarán las dependencias.</param>
-    /// <param name="cfg">Configuración de la aplicación usada para inicializar servicios.</param>
-    /// <returns></returns>
     private static IServiceCollection AddAuthSettings(
         this IServiceCollection services,
         IConfiguration cfg
@@ -105,23 +87,6 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    /// <summary>
-    /// Registra la configuración y los servicios para el envío de correos electrónicos.
-    /// </summary>
-    /// <param name="services">La colección de servicios donde se registrarán las dependencias.</param>
-    /// <param name="configuration">Configuración de la aplicación usada para obtener los ajustes SMTP.</param>
-    /// <returns>La colección de servicios con el servicio de correo registrado.</returns>
-    private static IServiceCollection AddEmailSender(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
-    {
-        services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
-        services.AddScoped<IEmailSender, SmtpEmailSender>();
-
-        return services;
-    }
-
     public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
@@ -165,24 +130,9 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    /// <summary>
-    /// Registra servicios adicionales de infraestructura que no pertenecen a categorías específicas.
-    /// </summary>
-    /// <param name="services">La colección de servicios donde se registrarán las dependencias.</param>
-    /// <returns>La colección de servicios con los servicios adicionales registrados.</returns>
-    private static IServiceCollection AddOtherInfrastructureServices(
-        this IServiceCollection services
-    )
+    private static IServiceCollection AddApiServices(this IServiceCollection services)
     {
-        services.AddScoped<IHashService, BCryptHasher>();
         services.AddSingleton<RoutesUtils>();
-        services.AddSingleton<IRandomStringGeneratorService, RandomStringGeneratorService>(
-            sp => new RandomStringGeneratorService(
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray(),
-                15
-            )
-        );
-
         return services;
     }
 }
