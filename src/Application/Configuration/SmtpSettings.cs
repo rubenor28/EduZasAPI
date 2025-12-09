@@ -1,3 +1,5 @@
+namespace Application.Configuration;
+
 /// <summary>
 /// Configuración para conexión SMTP.
 /// </summary>
