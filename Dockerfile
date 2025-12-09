@@ -15,6 +15,7 @@ COPY src/Infraestructure/FluentValidation/FluentValidationProj.csproj src/Infrae
 COPY src/Infraestructure/Mariadb/Mariadb.csproj src/Infraestructure/Mariadb/
 COPY src/Infraestructure/MinimalAPI/MinimalAPI.csproj src/Infraestructure/MinimalAPI/
 COPY src/Infraestructure/MailKit/MailKitProj.csproj src/Infraestructure/MailKit/
+COPY src/Infraestructure/Composition/Composition.csproj src/Infraestructure/Composition/
 COPY src/Infraestructure/Cli/Cli.csproj src/Infraestructure/Cli/
 
 # Elimina los proyectos de prueba de la solución para el build
