@@ -1,7 +1,7 @@
 namespace Domain.Enums;
 
 /// <summary>
-/// Enumera los tipos de búsqueda disponibles para cadenas de texto.
+/// Define los modos de comparación para consultas que involucran cadenas de texto.
 /// </summary>
 public enum StringSearchType
 {

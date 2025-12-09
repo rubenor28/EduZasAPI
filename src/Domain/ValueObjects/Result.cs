@@ -1,312 +1,208 @@
 namespace Domain.ValueObjects;
 
 /// <summary>
-/// Métodos de fábrica para crear instancias de <see cref="Result{T, E}"/>.
+/// Proporciona métodos de fábrica para crear instancias de <see cref="Result{T, E}"/>.
 /// </summary>
 public static class Result
 {
     /// <summary>
-    /// Crea un resultado exitoso que contiene un valor.
+    /// Crea un resultado exitoso (`Ok`) con un valor.
     /// </summary>
-    /// <typeparam name="T">Tipo del valor.</typeparam>
-    /// <param name="value">Valor a encapsular.</param>
-    /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
     public static Result<T, Unit> Ok<T>(T value) => Result<T, Unit>.Ok(value);
 
     /// <summary>
-    /// Crea un resultado fallido que contiene un error.
+    /// Crea un resultado fallido (`Err`) con un error.
     /// </summary>
-    /// <typeparam name="E">Tipo del error.</typeparam>
-    /// <param name="error">Error a encapsular.</param>
-    /// <returns>Un resultado fallido con el error proporcionado.</returns>
     public static Result<Unit, E> Err<E>(E error) => Result<Unit, E>.Err(error);
 
     /// <summary>
-    /// Crea un resultado exitoso que contiene un valor.
+    /// Crea un resultado exitoso (`Ok`) con un valor, especificando el tipo de error.
     /// </summary>
-    /// <typeparam name="T">Tipo del valor.</typeparam>
-    /// <typeparam name="E">Tipo del error.</typeparam>
-    /// <param name="value">Valor a encapsular.</param>
-    /// <returns>Un resultado exitoso con el valor proporcionado.</returns>
     public static Result<T, E> Ok<T, E>(T value) => Result<T, E>.Ok(value);
 
     /// <summary>
-    /// Crea un resultado fallido que contiene un error.
+    /// Crea un resultado fallido (`Err`) con un error, especificando el tipo de valor.
     /// </summary>
-    /// <typeparam name="T">Tipo del valor.</typeparam>
-    /// <typeparam name="E">Tipo del error.</typeparam>
-    /// <param name="error">Error a encapsular.</param>
-    /// <returns>Un resultado fallido con el error proporcionado.</returns>
     public static Result<T, E> Err<T, E>(E error) => Result<T, E>.Err(error);
 }
 
 /// <summary>
-/// Representa un resultado que puede ser exitoso (Ok) con un valor de tipo T
-/// o un error (Err) con un valor de tipo E.
+/// Representa un resultado que puede ser exitoso (`Ok`) con un valor de tipo <typeparamref name="T"/>,
+/// o fallido (`Err`) con un error de tipo <typeparamref name="E"/>.
 /// </summary>
 /// <typeparam name="T">Tipo del valor en caso de éxito.</typeparam>
 /// <typeparam name="E">Tipo del error en caso de fallo.</typeparam>
 public abstract class Result<T, E>
 {
     /// <summary>
-    /// Obtiene un valor que indica si el resultado es exitoso (Ok).
+    /// Obtiene un valor que indica si el resultado es `Ok`.
     /// </summary>
-    /// <value>true si el resultado es exitoso; de lo contrario, false.</value>
     public abstract bool IsOk { get; }
 
     /// <summary>
-    /// Obtiene un valor que indica si el resultado es un error (Err).
+    /// Obtiene un valor que indica si el resultado es `Err`.
     /// </summary>
-    /// <value>true si el resultado es un error; de lo contrario, false.</value>
     public abstract bool IsErr { get; }
 
     /// <summary>
-    /// Desenvuelve el valor del resultado exitoso.
+    /// Desenvuelve el valor de un resultado `Ok`.
     /// </summary>
-    /// <returns>El valor contenido en el resultado Ok.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// Se lanza cuando se intenta desenvolver un resultado Err.
-    /// </exception>
+    /// <returns>El valor contenido.</returns>
+    /// <exception cref="InvalidOperationException">Se lanza si el resultado es `Err`.</exception>
     public abstract T Unwrap();
 
     /// <summary>
-    /// Desenvuelve el error del resultado no exitoso.
+    /// Desenvuelve el error de un resultado `Err`.
     /// </summary>
-    /// <returns>El valor contenido en el resultado Err.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// Se lanza cuando se intenta desenvolver un resultado Ok.
-    /// </exception>
+    /// <returns>El error contenido.</returns>
+    /// <exception cref="InvalidOperationException">Se lanza si el resultado es `Ok`.</exception>
     public abstract E UnwrapErr();
 
     /// <summary>
-    /// Desenvuelve el valor del resultado exitoso o devuelve un valor por defecto si es un error.
+    /// Desenvuelve el valor de un resultado `Ok` o devuelve un valor por defecto si es `Err`.
     /// </summary>
     /// <param name="defaultValue">Valor por defecto a devolver en caso de error.</param>
-    /// <returns>
-    /// El valor contenido en el resultado Ok o el valor por defecto si es un Err.
-    /// </returns>
+    /// <returns>El valor contenido o el valor por defecto.</returns>
     public abstract T UnwrapOr(T defaultValue);
 
     /// <summary>
-    /// Ejecuta una acción diferente dependiendo de si el Result es Ok o Err.
+    /// Ejecuta una acción sobre el valor si es `Ok`, o sobre el error si es `Err`.
     /// </summary>
-    /// <param name="fnOk">Acción a ejecutar si el Result es Ok, recibiendo el valor contenido.</param>
-    /// <param name="fnErr">Acción a ejecutar si el Result es Err, recibiendo el error contenido.</param>
-    /// <remarks>
-    /// Este método permite manejar ambos casos (éxito y error) de forma declarativa
-    /// sin necesidad de verificar explícitamente el estado del Result.
-    /// </remarks>
-    /// <example>
-    /// resultado.Match(
-    ///     valor => Console.WriteLine($"Éxito: {valor}"),
-    ///     error => Console.WriteLine($"Error: {error}")
-    /// );
-    /// </example>
+    /// <param name="fnOk">Acción a ejecutar en caso de `Ok`.</param>
+    /// <param name="fnErr">Acción a ejecutar en caso de `Err`.</param>
     public abstract void Match(Action<T> fnOk, Action<E> fnErr);
 
     /// <summary>
-    /// Transforma el Result en un valor de tipo U aplicando una función diferente según su estado.
+    /// Proyecta el resultado a un nuevo valor, aplicando una función según sea `Ok` o `Err`.
     /// </summary>
-    /// <typeparam name="U">Tipo del valor resultante de la transformación.</typeparam>
-    /// <param name="fnOk">Función a aplicar si el Result es Ok, recibiendo el valor contenido.</param>
-    /// <param name="fnErr">Función a aplicar si el Result es Err, recibiendo el error contenido.</param>
-    /// <returns>
-    /// El resultado de aplicar la función correspondiente al estado del Result.
-    /// </returns>
-    /// <remarks>
-    /// Este método permite transformar un Result en otro tipo de valor de forma segura,
-    /// manejando explícitamente ambos casos posibles (éxito y error).
-    /// </remarks>
-    /// <example>
-    /// string mensaje = resultado.Match(
-    ///     valor => $"Operación exitosa: {valor}",
-    ///     error => $"Error en la operación: {error}"
-    /// );
-    /// </example>
+    /// <typeparam name="U">Tipo del valor resultante.</typeparam>
+    /// <param name="fnOk">Función a aplicar en caso de `Ok`.</param>
+    /// <param name="fnErr">Función a aplicar en caso de `Err`.</param>
+    /// <returns>El resultado de aplicar la función correspondiente.</returns>
     public abstract U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr);
 
     /// <summary>
-    /// Aplica una función al valor contenido si el resultado es Ok.
+    /// Transforma el valor de un resultado `Ok` aplicando una función, manteniendo el error si es `Err`.
     /// </summary>
-    /// <typeparam name="U">Tipo del nuevo valor resultante.</typeparam>
+    /// <typeparam name="U">Tipo del nuevo valor.</typeparam>
     /// <param name="fn">Función a aplicar al valor contenido.</param>
-    /// <returns>
-    /// Un nuevo Result con el valor transformado si era Ok, o el mismo error si era Err.
-    /// </returns>
+    /// <returns>Un nuevo `Result` con el valor transformado o el error original.</returns>
     public abstract Result<U, E> Map<U>(Func<T, U> fn);
 
     /// <summary>
-    /// Aplica una función al error contenido si el resultado es Err.
+    /// Transforma el error de un resultado `Err` aplicando una función, manteniendo el valor si es `Ok`.
     /// </summary>
-    /// <typeparam name="F">Tipo del nuevo error resultante.</typeparam>
+    /// <typeparam name="F">Tipo del nuevo error.</typeparam>
     /// <param name="fn">Función a aplicar al error contenido.</param>
-    /// <returns>
-    /// Un nuevo Result con el error transformado si era Err, o el mismo valor si era Ok.
-    /// </returns>
+    /// <returns>Un nuevo `Result` con el error transformado o el valor original.</returns>
     public abstract Result<T, F> MapErr<F>(Func<E, F> fn);
 
     /// <summary>
-    /// Encadena operaciones aplicando una función que devuelve otro Result.
+    /// Encadena una operación que devuelve un `Result`, aplicándola solo si el estado es `Ok`.
     /// </summary>
-    /// <typeparam name="U">Tipo del nuevo valor resultante.</typeparam>
-    /// <param name="fn">Función que toma el valor y devuelve un nuevo Result.</param>
-    /// <returns>
-    /// El Result devuelto por la función si era Ok, o el mismo error si era Err.
-    /// </returns>
+    /// <typeparam name="U">Tipo del nuevo valor.</typeparam>
+    /// <param name="fn">Función que toma el valor y devuelve un nuevo `Result`.</param>
+    /// <returns>El `Result` de la función si era `Ok`, o el mismo error si era `Err`.</returns>
     public abstract Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn);
 
     /// <summary>
-    /// Maneja errores aplicando una función que devuelve otro Result en caso de error.
+    /// Encadena una operación de recuperación que devuelve un `Result`, aplicándola solo si el estado es `Err`.
     /// </summary>
-    /// <typeparam name="F">Tipo del nuevo error resultante.</typeparam>
-    /// <param name="fn">Función que toma el error y devuelve un nuevo Result.</param>
-    /// <returns>
-    /// El Result devuelto por la función si era Err, o el mismo valor si era Ok.
-    /// </returns>
+    /// <typeparam name="F">Tipo del nuevo error.</typeparam>
+    /// <param name="fn">Función que toma el error y devuelve un nuevo `Result`.</param>
+    /// <returns>El `Result` de la función si era `Err`, o el mismo valor si era `Ok`.</returns>
     public abstract Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn);
 
     /// <summary>
-    /// Ejecuta una acción si el resultado es exitoso.
+    /// Ejecuta una acción si el resultado es `Ok`.
     /// </summary>
-    /// <param name="action">Acción a ejecutar con el valor exitoso.</param>
+    /// <param name="action">Acción a ejecutar con el valor.</param>
     public abstract void IfOk(Action<T> action);
 
     /// <summary>
-    /// Ejecuta una acción si el resultado contiene un error.
+    /// Ejecuta una acción si el resultado es `Err`.
     /// </summary>
-    /// <param name="action">Acción a ejecutar con el valor de error.</param>
+    /// <param name="action">Acción a ejecutar con el error.</param>
     public abstract void IfErr(Action<E> action);
 
     /// <summary>
-    /// Crea un resultado exitoso (Ok) con el valor especificado.
+    /// Crea un resultado exitoso (`Ok`) con el valor especificado.
     /// </summary>
-    /// <param name="value">Valor a contener en el resultado exitoso.</param>
-    /// <returns>Una instancia de Result en estado Ok.</returns>
     public static Result<T, E> Ok(T value) => new OkResult(value);
 
     /// <summary>
-    /// Crea un resultado de error (Err) con el error especificado.
+    /// Crea un resultado de error (`Err`) con el error especificado.
     /// </summary>
-    /// <param name="error">Error a contener en el resultado fallido.</param>
-    /// <returns>Una instancia de Result en estado Err.</returns>
     public static Result<T, E> Err(E error) => new ErrResult(error);
 
     /// <summary>
-    /// Convierte implícitamente un valor de tipo <typeparamref name="T"/> en un <see cref="Result{T, E}"/> en estado Ok.
+    /// Convierte implícitamente un valor de tipo <typeparamref name="T"/> a un `Result` `Ok`.
     /// </summary>
-    /// <param name="value">El valor a encapsular como exitoso.</param>
-    /// <returns>Un <see cref="Result{T, E}"/> en estado Ok que contiene el valor.</returns>
     public static implicit operator Result<T, E>(T value) => new OkResult(value);
 
     /// <summary>
-    /// Convierte implícitamente un valor de tipo <typeparamref name="E"/> en un <see cref="Result{T, E}"/> en estado Err.
+    /// Convierte implícitamente un valor de tipo <typeparamref name="E"/> a un `Result` `Err`.
     /// </summary>
-    /// <param name="error">El error a encapsular.</param>
-    /// <returns>Un <see cref="Result{T, E}"/> en estado Err que contiene el error.</returns>
     public static implicit operator Result<T, E>(E error) => new ErrResult(error);
 
-    /// <summary>
-    /// Implementación concreta de Result para el estado Ok.
-    /// </summary>
-    /// <remarks>
-    /// Inicializa una nueva instancia de la clase OkResult.
-    /// </remarks>
-    /// <param name="value">Valor a contener en el resultado exitoso.</param>
     private sealed class OkResult(T value) : Result<T, E>
     {
         private readonly T _value = value;
-
-        /// <inheritdoc/>
         public override bool IsOk => true;
-
-        /// <inheritdoc/>
         public override bool IsErr => false;
 
-        /// <inheritdoc/>
         public override T Unwrap() => _value;
 
-        /// <inheritdoc/>
         public override E UnwrapErr() =>
             throw new InvalidOperationException($"Tried to UnwrapErr from Ok: {_value}");
 
-        /// <inheritdoc/>
         public override T UnwrapOr(T defaultValue) => _value;
 
-        /// <inheritdoc/>
         public override void Match(Action<T> fnOk, Action<E> fnErr) => fnOk(_value);
 
-        /// <inheritdoc/>
         public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnOk(_value);
 
-        /// <inheritdoc/>
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Ok(fn(_value));
 
-        /// <inheritdoc/>
         public override Result<T, F> MapErr<F>(Func<E, F> fn) => Result<T, F>.Ok(_value);
 
-        /// <inheritdoc/>
         public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) => fn(_value);
 
-        /// <inheritdoc/>
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => Result<T, F>.Ok(_value);
 
-        /// <inheritdoc/>
         public override void IfOk(Action<T> action) => action(_value);
 
-        /// <inheritdoc/>
         public override void IfErr(Action<E> action) { }
     }
 
-    /// <summary>
-    /// Implementación concreta de Result para el estado Err.
-    /// </summary>
-    /// <remarks>
-    /// Inicializa una nueva instancia de la clase ErrResult.
-    /// </remarks>
-    /// <param name="error">Error a contener en el resultado fallido.</param>
     private sealed class ErrResult(E error) : Result<T, E>
     {
         private readonly E _error = error;
-
-        /// <inheritdoc/>
         public override bool IsOk => false;
-
-        /// <inheritdoc/>
         public override bool IsErr => true;
 
-        /// <inheritdoc/>
         public override T Unwrap() =>
             throw new InvalidOperationException($"Tried to Unwrap from Err: {_error}");
 
-        /// <inheritdoc/>
         public override E UnwrapErr() => _error;
 
-        /// <inheritdoc/>
         public override T UnwrapOr(T defaultValue) => defaultValue;
 
-        /// <inheritdoc/>
         public override void Match(Action<T> fnOk, Action<E> fnErr) => fnErr(_error);
 
-        /// <inheritdoc/>
         public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnErr(_error);
 
-        /// <inheritdoc/>
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Err(_error);
 
-        /// <inheritdoc/>
         public override Result<T, F> MapErr<F>(Func<E, F> fn) => Result<T, F>.Err(fn(_error));
 
-        /// <inheritdoc/>
         public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) =>
             Result<U, E>.Err(_error);
 
-        /// <inheritdoc/>
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => fn(_error);
 
-        /// <inheritdoc/>
         public override void IfOk(Action<T> action) { }
 
-        /// <inheritdoc/>
         public override void IfErr(Action<E> action) => action(_error);
     }
 }

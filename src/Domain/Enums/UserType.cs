@@ -1,7 +1,7 @@
 namespace Domain.Enums;
 
 /// <summary>
-/// Enumera los tipos de roles o perfiles de usuario disponibles en el sistema.
+/// Define los roles que un usuario puede tener dentro de la aplicación.
 /// </summary>
 public enum UserType
 {

@@ -1,18 +1,17 @@
 namespace Domain.Entities;
 
 /// <summary>
-/// Representa una clase o curso académico.
+/// Representa una clase o curso académico en el sistema.
 /// </summary>
 /// <remarks>
-/// Esta clase implementa la interfaz <see cref="IIdentifiable{T}"/> para garantizar que cada
-/// instancia tenga un identificador único.
+/// Cada clase es un contenedor principal para estudiantes, profesores, recursos y exámenes.
+/// Su identificador único, <see cref="Id"/>, es utilizado para vincularla con estas otras entidades.
 /// </remarks>
 public class ClassDomain
 {
     /// <summary>
     /// Obtiene o establece el identificador único de la clase.
     /// </summary>
-    /// <value>Identificador único de la clase. Se corresponde con <see cref="IIdentifiable{T}.Id"/>.</value>
     public required string Id { get; set; }
 
     /// <summary>
@@ -26,17 +25,17 @@ public class ClassDomain
     public required string ClassName { get; set; }
 
     /// <summary>
-    /// Color de la carta en la UI.
+    /// Obtiene o establece el color asociado a la clase, usado para la UI.
     /// </summary>
     public required string Color { get; set; }
 
     /// <summary>
-    /// Obtiene o establece la materia a la que pertenece la clase.
+    /// Obtiene o establece la materia a la que pertenece la clase (opcional).
     /// </summary>
     public string? Subject { get; set; }
 
     /// <summary>
-    /// Obtiene o establece la sección o grupo de la clase.
+    /// Obtiene o establece la sección o grupo de la clase (opcional).
     /// </summary>
     public string? Section { get; set; }
 
