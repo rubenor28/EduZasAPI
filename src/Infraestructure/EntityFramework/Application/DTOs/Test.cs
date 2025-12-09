@@ -6,6 +6,8 @@ public partial class Test
 {
     public Guid TestId { get; set; }
 
+    public bool Active { get; set; }
+
     public string Title { get; set; } = null!;
 
     public JsonNode Content { get; set; } = null!;

@@ -20,7 +20,7 @@ class MockTestUpdateValidator : IBusinessValidationService<TestUpdateDTO>
     {
         List<FieldErrorDTO> errors = [];
 
-        if (string.IsNullOrEmpty(data.Content.Trim()))
+        if (data.Content is null)
             errors.Add(new() { Field = "content", Message = "Campo obligatorio" });
 
         if (string.IsNullOrEmpty(data.Title.Trim()))
@@ -107,6 +107,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor.Id,
@@ -128,6 +129,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor.Id,
@@ -148,6 +150,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = Guid.NewGuid(), // Non-existent test
+            Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = 1,
@@ -171,17 +174,14 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor.Id,
         };
 
         var result = await _useCase.ExecuteAsync(
-            new()
-            {
-                Data = updateDto,
-                Executor = AsExecutor(student),
-            }
+            new() { Data = updateDto, Executor = AsExecutor(student) }
         );
 
         Assert.True(result.IsErr);
@@ -198,6 +198,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Active = true,
             Title = "Updated Title",
             Content = "Updated Content",
             ProfessorId = professor1.Id,
@@ -225,6 +226,7 @@ public class UpdateTestUseCaseTest : IDisposable
         var updateDto = new TestUpdateDTO
         {
             Id = test.Id,
+            Active = true,
             Title = "", // Invalid title
             Content = "Updated Content",
             ProfessorId = 1,

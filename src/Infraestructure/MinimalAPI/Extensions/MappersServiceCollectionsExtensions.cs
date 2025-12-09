@@ -2,6 +2,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassResources;
 using Application.DTOs.ClassStudents;
+using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
@@ -19,6 +20,7 @@ using EntityFramework.InterfaceAdapters.Mappers.Classes;
 using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 using EntityFramework.InterfaceAdapters.Mappers.ClassResources;
 using EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
+using EntityFramework.InterfaceAdapters.Mappers.ClassTests;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
 using EntityFramework.InterfaceAdapters.Mappers.Contacts;
 using EntityFramework.InterfaceAdapters.Mappers.ContactTags;
@@ -123,6 +125,13 @@ public static class MapperServiceCollectionExtensions
         s.AddSingleton<IUpdateMapper<TestUpdateDTO, Test>, UpdateTestEFMapper>();
         s.AddSingleton<IMapper<Test, TestDomain>, TestMapper>();
         s.AddSingleton<IEFProjector<Test, TestDomain, TestCriteriaDTO>, TestProjector>();
+        s.AddSingleton<IEFProjector<Test, TestSummary, TestCriteriaDTO>, TestSummaryProjector>();
+        s.AddSingleton<IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>, ClassTestAssociationProjector>();
+        
+        // Class Tests
+        s.AddSingleton<IMapper<ClassTestDTO, TestPerClass>, NewClassTestEFMapper>();
+        s.AddSingleton<IUpdateMapper<ClassTestDTO, TestPerClass>, UpdateClassTestEFMapper>();
+        s.AddSingleton<IMapper<TestPerClass, ClassTestDomain>, ClassTestMapper>();
 
         // Resource
         // EF
@@ -135,7 +144,9 @@ public static class MapperServiceCollectionExtensions
         // Class Resource
         // EF
         s.AddSingleton<IMapper<ClassResource, ClassResourceDomain>, ClassResourceMapper>();
-        s.AddSingleton<IMapper<NewClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
+        s.AddSingleton<IMapper<ClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
+        s.AddSingleton<IUpdateMapper<ClassResourceDTO, ClassResource>, ClassResourceUpdateMapper>();
+        s.AddSingleton<IEFProjector<Class, ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>, ClassResourceAssociationProjector>();
 
         return s;
     }

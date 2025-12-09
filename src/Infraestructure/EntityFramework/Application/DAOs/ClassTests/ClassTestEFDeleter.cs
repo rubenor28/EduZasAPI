@@ -12,11 +12,6 @@ public sealed class ClassTestEFDeleter(
     IMapper<TestPerClass, ClassTestDomain> domainMapper
 ) : EFDeleter<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, domainMapper)
 {
-    public override async Task<TestPerClass?> GetTrackedById(ClassTestIdDTO id) =>
-        await _dbSet
-            .AsTracking()
-            .AsQueryable()
-            .Where(ct => ct.TestId == id.TestId)
-            .Where(ct => ct.ClassId == id.ClassId)
-            .FirstOrDefaultAsync();
+    public override Task<TestPerClass?> GetTrackedById(ClassTestIdDTO id) =>
+        _dbSet.AsTracking().FirstOrDefaultAsync(tpc => tpc.TestId == id.TestId && tpc.ClassId == id.ClassId);
 }

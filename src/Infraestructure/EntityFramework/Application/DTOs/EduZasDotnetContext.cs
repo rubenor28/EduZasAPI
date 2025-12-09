@@ -628,6 +628,11 @@ public partial class EduZasDotnetContext : DbContext
             testBuilder.HasKey(e => e.TestId).HasName("PRIMARY");
             testBuilder.ToTable("tests");
             testBuilder.HasIndex(e => e.ProfessorId, "idx_tests_professor_id");
+            testBuilder
+                .Property(e => e.Active)
+                .IsRequired()
+                .HasDefaultValueSql("'1'")
+                .HasColumnName("active");
             var contentProperty = testBuilder
                 .Property(e => e.Content)
                 .HasConversion(new JsonNodeToStringConverter())

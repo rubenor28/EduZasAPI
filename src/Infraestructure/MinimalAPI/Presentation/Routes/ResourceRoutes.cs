@@ -159,11 +159,32 @@ public static class ResourceRoutes
             });
 
         group
+            .MapPut("/association", UpdateClassResource)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Desasociar un recurso de una clase.";
+                op.Description = "Elimina la asociación entre un recurso y una clase.";
+                op.Responses["204"].Description = "Recurso desasociado exitosamente.";
+                op.Responses["400"].Description = "Los datos de la asociación son inválidos.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para realizar esta acción.";
+
+                return op;
+            });
+
+        group
             .MapPost("/assigned", GetAssignedResources)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<
-                PaginatedQuery<ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>
+                PaginatedQuery<ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>
             >(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -259,8 +280,23 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> AddClassResource(
-        [FromBody] NewClassResourceDTO request,
+        [FromBody] ClassResourceDTO request,
         [FromServices] AddClassResourceUseCase useCase,
+        HttpContext ctx,
+        [FromServices] RoutesUtils utils
+    )
+    {
+        return utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () => request,
+            mapResponse: _ => Results.NoContent()
+        );
+    }
+
+    public static Task<IResult> UpdateClassResource(
+        [FromBody] ClassResourceDTO request,
+        [FromServices] UpdateClassResourceUseCase useCase,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
     )
@@ -305,8 +341,8 @@ public static class ResourceRoutes
     }
 
     public static Task<IResult> GetAssignedResources(
-        [FromBody] ClassResourceAssosiationCriteriaDTO request,
-        [FromServices] ClassResourceAssosiationQueryUseCase useCase,
+        [FromBody] ClassResourceAssociationCriteriaDTO request,
+        [FromServices] ClassResourceAssociationQueryUseCase useCase,
         [FromServices] RoutesUtils utils,
         HttpContext ctx
     )

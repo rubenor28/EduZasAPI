@@ -10,6 +10,7 @@ public class TestMapper : IMapper<Test, TestDomain>
         new()
         {
             Id = t.TestId,
+            Active = t.Active,
             Title = t.Title,
             Content = t.Content,
             TimeLimitMinutes = t.TimeLimitMinutes,

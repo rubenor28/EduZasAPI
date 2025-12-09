@@ -3,7 +3,6 @@ using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Application.UseCases.Users;
 using Domain.Entities;
-using Domain.ValueObjects;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;

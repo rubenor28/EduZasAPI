@@ -100,12 +100,14 @@ public class TestEFRepositoryTest : IDisposable
             Title = "Updated Test Title",
             Content = "Updated Test Content",
             ProfessorId = professor.UserId,
+            Active = false
         };
 
         var updatedTest = await _updater.UpdateAsync(update);
 
         Assert.NotNull(updatedTest);
         Assert.Equal(update.Title, updatedTest.Title);
+        Assert.Equal(update.Active, updatedTest.Active);
         Assert.Equal(update.Content, updatedTest.Content.GetValue<string>());
     }
 

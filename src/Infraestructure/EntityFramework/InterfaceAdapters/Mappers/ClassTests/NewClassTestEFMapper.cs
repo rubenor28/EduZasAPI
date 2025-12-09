@@ -6,11 +6,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassTests;
 
 public class NewClassTestEFMapper : IMapper<ClassTestDTO, TestPerClass>
 {
-    public TestPerClass Map(ClassTestDTO nct) =>
+    public TestPerClass Map(ClassTestDTO source) =>
         new()
         {
-            TestId = nct.TestId,
-            ClassId = nct.ClassId,
-            Visible = nct.Visible,
+            TestId = source.TestId,
+            ClassId = source.ClassId,
+            Visible = source.Visible
         };
 }

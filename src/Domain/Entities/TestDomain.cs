@@ -5,6 +5,7 @@ namespace Domain.Entities;
 public sealed record TestDomain
 {
     public required Guid Id { get; set; }
+    public required bool Active { get; set; }
     public required string Title { get; set; }
     public required JsonNode Content { get; set; }
     public uint? TimeLimitMinutes { get; set; }

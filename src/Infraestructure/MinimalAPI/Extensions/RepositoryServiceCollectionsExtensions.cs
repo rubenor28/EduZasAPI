@@ -3,6 +3,7 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassResources;
 using Application.DTOs.ClassStudents;
+using Application.DTOs.ClassTests;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
@@ -16,6 +17,7 @@ using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassResources;
 using EntityFramework.Application.DAOs.ClassStudents;
+using EntityFramework.Application.DAOs.ClassTests;
 using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Notifications;
@@ -145,6 +147,26 @@ public static class RepositoryServiceCollectionExtensions
                 pageSize
             )
         );
+        s.AddScoped<IQuerierAsync<TestSummary, TestCriteriaDTO>>(
+            sp => new TestSummaryEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<Test, TestSummary, TestCriteriaDTO>>(),
+                pageSize
+            )
+        );
+
+        // Class Tests
+        s.AddScoped<IReaderAsync<ClassTestIdDTO, ClassTestDomain>, ClassTestEFReader>();
+        s.AddScoped<ICreatorAsync<ClassTestDomain, ClassTestDTO>, ClassTestEFCreator>();
+        s.AddScoped<IUpdaterAsync<ClassTestDomain, ClassTestDTO>, ClassTestEFUpdater>();
+        s.AddScoped<IDeleterAsync<ClassTestIdDTO, ClassTestDomain>, ClassTestEFDeleter>();
+        s.AddScoped<IQuerierAsync<ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>>(
+            sp => new ClassTestAssociationEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>>(),
+                pageSize
+            )
+        );
 
         // Resource
         s.AddScoped<ICreatorAsync<ResourceDomain, NewResourceDTO>, ResourceEFCreator>();
@@ -160,13 +182,14 @@ public static class RepositoryServiceCollectionExtensions
         );
 
         // Class Resource
-        s.AddScoped<ICreatorAsync<ClassResourceDomain, NewClassResourceDTO>, ClassResourceEFCreator>();
+        s.AddScoped<ICreatorAsync<ClassResourceDomain, ClassResourceDTO>, ClassResourceEFCreator>();
         s.AddScoped<IDeleterAsync<ClassResourceIdDTO, ClassResourceDomain>, ClassResourceEFDeleter>();
+        s.AddScoped<IUpdaterAsync<ClassResourceDomain, ClassResourceDTO>, ClassResourceEFUpdater>();
         s.AddScoped<IReaderAsync<ClassResourceIdDTO, ClassResourceDomain>, ClassResourceEFReader>();
-        s.AddScoped<IQuerierAsync<ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>>(
-            sp => new ClassResourceAssosiationEFQuerier(
+        s.AddScoped<IQuerierAsync<ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>>(
+            sp => new ClassResourceAssociationEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Class, ClassResourceAssosiationDTO, ClassResourceAssosiationCriteriaDTO>>(),
+                sp.GetRequiredService<IEFProjector<Class, ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>>(),
                 pageSize
             )
         );

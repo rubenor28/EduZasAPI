@@ -4,8 +4,13 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.ClassResources;
 
-public sealed class NewClassResourceEFMapper : IMapper<NewClassResourceDTO, ClassResource>
+public sealed class NewClassResourceEFMapper : IMapper<ClassResourceDTO, ClassResource>
 {
-    public ClassResource Map(NewClassResourceDTO input) =>
-        new() { ResourceId = input.ResourceId, ClassId = input.ClassId };
+    public ClassResource Map(ClassResourceDTO input) =>
+        new()
+        {
+            ResourceId = input.ResourceId,
+            ClassId = input.ClassId,
+            Hidden = input.Hidden,
+        };
 }

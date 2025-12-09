@@ -13,7 +13,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.ClassResource;
 
 public sealed class AddClassResourceUseCase(
-    ICreatorAsync<ClassResourceDomain, NewClassResourceDTO> creator,
+    ICreatorAsync<ClassResourceDomain, ClassResourceDTO> creator,
     IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> reader,
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<Guid, ResourceDomain> resourceReader,
@@ -21,8 +21,8 @@ public sealed class AddClassResourceUseCase(
     IEmailSender emailSender,
     IReaderAsync<ulong, UserDomain> userReader,
     IQuerierAsync<UserDomain, UserCriteriaDTO> userQuierier,
-    IBusinessValidationService<NewClassResourceDTO>? validator = null
-) : AddUseCase<NewClassResourceDTO, ClassResourceDomain>(creator, validator)
+    IBusinessValidationService<ClassResourceDTO>? validator = null
+) : AddUseCase<ClassResourceDTO, ClassResourceDomain>(creator, validator)
 {
     private readonly IEmailSender _emailSender = emailSender;
     private readonly IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> _reader = reader;
@@ -34,7 +34,7 @@ public sealed class AddClassResourceUseCase(
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        UserActionDTO<NewClassResourceDTO> value
+        UserActionDTO<ClassResourceDTO> value
     )
     {
         var classResSearch = await _reader.GetAsync(
@@ -79,21 +79,21 @@ public sealed class AddClassResourceUseCase(
         return Unit.Value;
     }
 
-    //TODO: Notificar usuarios por correo
-
-    // protected override async Task ExtraTaskAsync(
-    //     UserActionDTO<NewClassResourceDTO> newEntity,
-    //     ClassResourceDomain createdEntity
-    // )
-    // {
-    //     var user = await _userReader.GetAsync(newEntity.Executor.Id) ?? throw new ArgumentException("No se pudo encontrar el usuario");
-    //     var search = await _userQuierier.GetByAsync(new() { EnrolledInClass = newEntity.Data.ClassId });
-    //     var email = new EmailMessage
-    //     {
-    //         Subject = $"Nuevo recurso compartido por {user.FatherLastname} {user.FirstName}",
-    //         To = [.. search.Results.Select(s => s.Email)],
-    //         Body =
-    //             $"<h1>EduZas</h1><h2>{user.FatherLastname} {user.FirstName} ha publicado un nuevo recurso</h2><a href=\"\">Abrir recurso</a>",
-    //     };
-    // }
+    /*
+     protected override async Task ExtraTaskAsync(
+         UserActionDTO<ClassResourceDTO> newEntity,
+         ClassResourceDomain createdEntity
+     )
+     {
+        var user = await _userReader.GetAsync(newEntity.Executor.Id) ?? throw new ArgumentException("No se pudo encontrar el usuario");
+         var search = await _userQuierier.GetByAsync(new() { EnrolledInClass = newEntity.Data.ClassId });
+         var email = new EmailMessage
+         {
+             Subject = $"Nuevo recurso compartido por {user.FatherLastname} {user.FirstName}",
+             To = [.. search.Results.Select(s => s.Email)],
+             Body =
+                 $"<h1>EduZas</h1><h2>{user.FatherLastname} {user.FirstName} ha publicado un nuevo recurso</h2><a href=\"\">Abrir recurso</a>",
+         };
+     }
+     */
 }

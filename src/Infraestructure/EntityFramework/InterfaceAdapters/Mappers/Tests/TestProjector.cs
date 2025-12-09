@@ -13,6 +13,7 @@ public class TestProjector : IEFProjector<Test, TestDomain, TestCriteriaDTO>
             new()
             {
                 Id = t.TestId,
+                Active = t.Active,
                 Title = t.Title,
                 Content = t.Content,
                 TimeLimitMinutes = t.TimeLimitMinutes,

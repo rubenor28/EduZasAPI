@@ -9,9 +9,9 @@ namespace EntityFramework.Application.DAOs.ClassResources;
 public sealed class ClassResourceEFCreator(
     EduZasDotnetContext ctx,
     IMapper<ClassResource, ClassResourceDomain> domainMapper,
-    IMapper<NewClassResourceDTO, ClassResource> newEntityMapper
+    IMapper<ClassResourceDTO, ClassResource> newEntityMapper
 )
-    : EFCreator<ClassResourceDomain, NewClassResourceDTO, ClassResource>(
+    : EFCreator<ClassResourceDomain, ClassResourceDTO, ClassResource>(
         ctx,
         domainMapper,
         newEntityMapper

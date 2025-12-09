@@ -6,12 +6,13 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassTests;
 
 public class ClassTestMapper : IMapper<TestPerClass, ClassTestDomain>
 {
-    public ClassTestDomain Map(TestPerClass tpc) =>
+    public ClassTestDomain Map(TestPerClass source) =>
         new()
         {
-            ClassId = tpc.ClassId,
-            TestId = tpc.TestId,
-            Visible = tpc.Visible,
-            CreatedAt = tpc.CreatedAt,
+            TestId = source.TestId,
+            ClassId = source.ClassId,
+            Visible = source.Visible,
+            CreatedAt = source.CreatedAt,
         };
 }
+

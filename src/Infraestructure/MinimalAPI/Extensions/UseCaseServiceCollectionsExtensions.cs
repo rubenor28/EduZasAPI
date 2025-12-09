@@ -3,6 +3,7 @@ using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassResource;
 using Application.UseCases.ClassStudents;
+using Application.UseCases.ClassTests;
 using Application.UseCases.Contacts;
 using Application.UseCases.ContactTags;
 using Application.UseCases.Database;
@@ -84,8 +85,15 @@ public static class UseCaseServiceCollectionExtensions
         s.AddTransient<AddTestUseCase>();
         s.AddTransient<DeleteTestUseCase>();
         s.AddTransient<QueryTestUseCase>();
+        s.AddTransient<QueryTestSummaryUseCase>();
         s.AddTransient<ReadTestUseCase>();
         s.AddTransient<UpdateTestUseCase>();
+        s.AddTransient<QueryClassTestAssociationUseCase>();
+
+        // Class Tests
+        s.AddTransient<AddClassTestUseCase>();
+        s.AddTransient<UpdateClassTestUseCase>();
+        s.AddTransient<DeleteClassTestUseCase>();
 
         // Resource
         s.AddTransient<AddResourceUseCase>();
@@ -98,7 +106,8 @@ public static class UseCaseServiceCollectionExtensions
         s.AddTransient<AddClassResourceUseCase>();
         s.AddTransient<DeleteClassResourceUseCase>();
         s.AddTransient<ReadClassResourceUseCase>();
-        s.AddTransient<ClassResourceAssosiationQueryUseCase>();
+        s.AddTransient<UpdateClassResourceUseCase>();
+        s.AddTransient<ClassResourceAssociationQueryUseCase>();
 
         return s;
     }
