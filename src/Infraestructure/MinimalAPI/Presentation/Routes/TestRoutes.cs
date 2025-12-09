@@ -10,8 +10,16 @@ using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
 
+/// <summary>
+/// Define las rutas relacionadas con las evaluaciones (tests).
+/// </summary>
 public static class TestRoutes
 {
+    /// <summary>
+    /// Mapea los endpoints para la gestión de evaluaciones.
+    /// </summary>
+    /// <param name="app">La aplicación web.</param>
+    /// <returns>El grupo de rutas configurado.</returns>
     public static RouteGroupBuilder MapTestRoutes(this WebApplication app)
     {
         var group = app.MapGroup("").WithTags("Usuarios");

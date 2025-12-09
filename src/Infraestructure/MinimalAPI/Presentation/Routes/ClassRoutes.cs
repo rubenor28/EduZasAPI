@@ -12,8 +12,16 @@ using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
 
+/// <summary>
+/// Define las rutas relacionadas con la gestión de clases.
+/// </summary>
 public static class ClassRoutes
 {
+    /// <summary>
+    /// Mapea los endpoints para la gestión de clases.
+    /// </summary>
+    /// <param name="app">La aplicación web.</param>
+    /// <returns>El grupo de rutas configurado.</returns>
     public static RouteGroupBuilder MapClassRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/classes").WithTags("Clases");

@@ -5,8 +5,12 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.ClassResources;
 
+/// <summary>
+/// Proyector de consultas para asociaciones de recursos de clase.
+/// </summary>
 public class ClassResourceAssociationProjector : IEFProjector<Class, ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<Class, ClassResourceAssociationDTO>> GetProjection(ClassResourceAssociationCriteriaDTO criteria) =>
         c =>
             new()

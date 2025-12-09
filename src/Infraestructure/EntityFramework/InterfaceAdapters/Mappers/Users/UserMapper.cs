@@ -5,6 +5,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Users;
 
+/// <summary>
+/// Mapeador de entidad EF a dominio para usuarios.
+/// </summary>
 public class UserMapper : IMapper<User, UserDomain>
 {
     private static UserType MapRole(uint? role) =>
@@ -15,6 +18,7 @@ public class UserMapper : IMapper<User, UserDomain>
             _ => UserType.STUDENT,
         };
 
+    /// <inheritdoc/>
     public UserDomain Map(User source) =>
         new()
         {

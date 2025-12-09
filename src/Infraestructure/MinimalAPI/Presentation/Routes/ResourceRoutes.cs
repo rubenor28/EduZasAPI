@@ -10,8 +10,16 @@ using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
 
+/// <summary>
+/// Define las rutas relacionadas con los recursos académicos.
+/// </summary>
 public static class ResourceRoutes
 {
+    /// <summary>
+    /// Mapea los endpoints para la gestión de recursos académicos.
+    /// </summary>
+    /// <param name="app">La aplicación web.</param>
+    /// <returns>El grupo de rutas configurado.</returns>
     public static RouteGroupBuilder MapResourceRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/resources").WithTags("Recursos académicos");

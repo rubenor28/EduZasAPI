@@ -8,13 +8,12 @@ using FluentValidationProj.Application.Services.Common;
 namespace FluentValidationProj.Application.Services.Users;
 
 /// <summary>
-/// Validador para la actualización de usuarios (<see cref="UserUpdateDTO"/>).
-/// Aplica reglas de negocio y formato sobre las propiedades actualizables.
+/// Validador para actualización de usuarios.
 /// </summary>
 public class UserUpdateFluentValidator : FluentValidator<UserUpdateDTO>
 {
     /// <summary>
-    /// Inicializa las reglas de validación para <see cref="UserUpdateDTO"/>.
+    /// Inicializa reglas de validación.
     /// </summary>
     public UserUpdateFluentValidator()
     {

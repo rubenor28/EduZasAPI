@@ -9,12 +9,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassTests;
 
+/// <summary>
+/// Implementación de actualización de relaciones Clase-Examen usando EF.
+/// </summary>
 public sealed class ClassTestEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<TestPerClass, ClassTestDomain> domainMapper,
     IUpdateMapper<ClassTestDTO, TestPerClass> updateMapper
 ) : EFUpdater<ClassTestDomain, ClassTestDTO, TestPerClass>(ctx, domainMapper, updateMapper)
 {
+    /// <inheritdoc/>
     protected override Task<TestPerClass?> GetTrackedByDTO(ClassTestDTO value) =>
         _dbSet.AsTracking().FirstOrDefaultAsync(tpc => tpc.TestId == value.TestId && tpc.ClassId == value.ClassId);
 }

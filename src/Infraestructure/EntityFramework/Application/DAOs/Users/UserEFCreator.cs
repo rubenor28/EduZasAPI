@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Users;
 
+/// <summary>
+/// Implementación de creación de usuarios usando EF.
+/// </summary>
 public class UserEFCreator(
     EduZasDotnetContext ctx,
     IMapper<User, UserDomain> domainMapper,

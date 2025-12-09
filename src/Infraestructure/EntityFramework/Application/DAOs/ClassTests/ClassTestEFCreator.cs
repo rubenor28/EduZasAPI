@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassTests;
 
+/// <summary>
+/// Implementación de creación de relaciones Clase-Examen usando EF.
+/// </summary>
 public sealed class ClassTestEFCreator(
     EduZasDotnetContext ctx,
     IMapper<TestPerClass, ClassTestDomain> domainMapper,

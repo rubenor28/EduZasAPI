@@ -7,6 +7,9 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Users;
 
+/// <summary>
+/// Proyector de consultas para usuarios.
+/// </summary>
 public class UserProjector : IEFProjector<User, UserDomain, UserCriteriaDTO>
 {
     private static UserType MapRole(uint? role) =>
@@ -17,6 +20,7 @@ public class UserProjector : IEFProjector<User, UserDomain, UserCriteriaDTO>
             _ => UserType.STUDENT,
         };
 
+    /// <inheritdoc/>
     public Expression<Func<User, UserDomain>> GetProjection(UserCriteriaDTO criteria) =>
         source =>
             new()

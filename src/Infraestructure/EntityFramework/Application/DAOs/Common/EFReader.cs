@@ -6,6 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Common;
 
+/// <summary>
+/// Implementación base para leer entidades por ID usando EF.
+/// </summary>
+/// <typeparam name="I">Tipo del ID.</typeparam>
+/// <typeparam name="DomainEntity">Entidad de dominio.</typeparam>
+/// <typeparam name="EFEntity">Entidad de EF.</typeparam>
 public abstract class EFReader<I, DomainEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> mapper
@@ -16,6 +22,7 @@ public abstract class EFReader<I, DomainEntity, EFEntity>(
 {
     private readonly IMapper<EFEntity, DomainEntity> _mapper = mapper;
 
+    /// <inheritdoc/>
     public Task<DomainEntity?> GetAsync(I id) =>
         _dbSet
             .AsNoTracking()
@@ -23,5 +30,8 @@ public abstract class EFReader<I, DomainEntity, EFEntity>(
             .Select(e => _mapper.Map(e))
             .FirstOrDefaultAsync();
 
+    /// <summary>
+    /// Obtiene el predicado para filtrar por ID.
+    /// </summary>
     protected abstract Expression<Func<EFEntity, bool>> GetIdPredicate(I id);
 }

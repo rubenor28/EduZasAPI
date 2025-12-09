@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Notifications;
 
+/// <summary>
+/// Implementación de consulta de notificaciones usando EF.
+/// </summary>
 public class NotificationEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Notification, NotificationDomain, NotificationCriteriaDTO> projector,
@@ -19,6 +22,7 @@ public class NotificationEFQuerier(
         pageSize
     )
 {
+    /// <inheritdoc/>
     public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()

@@ -2,35 +2,27 @@ using Application.Services;
 
 namespace Bcrypt.Application.Services;
 
-// Si no está dentro del namespace 
-// no funciona esta cosa
+
 
 /// <summary>
-/// Implementación del servicio de hashing utilizando el algoritmo BCrypt.
+/// Implementación del servicio de hashing utilizando BCrypt.
 /// </summary>
-/// <remarks>
-/// Esta clase proporciona funcionalidades de hashing y verificación de contraseñas
-/// utilizando la biblioteca BCrypt.Net, que es una implementación del algoritmo
-/// de hashing BCrypt conocido por su seguridad frente a ataques de fuerza bruta.
-/// </remarks>
 public class BCryptHasher : IHashService
 {
     /// <summary>
-    /// Genera un hash BCrypt a partir de una cadena de texto de entrada.
+    /// Genera un hash BCrypt.
     /// </summary>
-    /// <param name="input">Cadena de texto original a hashear.</param>
-    /// <returns>El hash BCrypt generado a partir de la cadena de entrada.</returns>
+    /// <param name="input">Texto a hashear.</param>
+    /// <returns>Hash generado.</returns>
     public string Hash(string input) =>
         BCrypt.Net.BCrypt.HashPassword(input);
 
     /// <summary>
-    /// Verifica si una cadena de texto coincide con un hash BCrypt dado.
+    /// Verifica si el texto coincide con el hash.
     /// </summary>
-    /// <param name="input">Cadena de texto original a verificar.</param>
-    /// <param name="hash">Hash BCrypt contra el cual se compara la cadena de texto.</param>
-    /// <returns>
-    /// true si la cadena de texto coincide con el hash BCrypt proporcionado; false en caso contrario.
-    /// </returns>
+    /// <param name="input">Texto a verificar.</param>
+    /// <param name="hash">Hash contra el cual comparar.</param>
+    /// <returns>True si coinciden, false en caso contrario.</returns>
     public bool Matches(string input, string hash) =>
         BCrypt.Net.BCrypt.Verify(input, hash);
 }

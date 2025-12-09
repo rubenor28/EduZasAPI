@@ -1,5 +1,8 @@
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de relación Contacto-Etiqueta.
+/// </summary>
 public partial class ContactTag
 {
     public string TagText { get; set; } = null!;

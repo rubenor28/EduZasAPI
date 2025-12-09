@@ -6,8 +6,12 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 
+/// <summary>
+/// Proyector de consultas para exámenes.
+/// </summary>
 public class TestProjector : IEFProjector<Test, TestDomain, TestCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<Test, TestDomain>> GetProjection(TestCriteriaDTO criteria) =>
         t =>
             new()

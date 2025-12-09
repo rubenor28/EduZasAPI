@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
+/// <summary>
+/// Implementación de actualización de relaciones Clase-Profesor usando EF.
+/// </summary>
 public class ClassProfessorsEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<ClassProfessor, ClassProfessorDomain> domainMapper,
@@ -19,6 +22,7 @@ public class ClassProfessorsEFUpdater(
         updateMapper
     )
 {
+    /// <inheritdoc/>
     protected override async Task<ClassProfessor?> GetTrackedByDTO(ClassProfessorUpdateDTO value) =>
         await _dbSet
             .AsTracking()

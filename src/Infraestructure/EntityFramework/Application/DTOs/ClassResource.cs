@@ -1,5 +1,8 @@
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de relación Clase-Recurso.
+/// </summary>
 public partial class ClassResource
 {
     public string ClassId { get; set; } = null!;

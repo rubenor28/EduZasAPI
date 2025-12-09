@@ -9,12 +9,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Contacts;
 
+/// <summary>
+/// Implementación de consulta de contactos usando EF.
+/// </summary>
 public sealed class ContactEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<AgendaContact, ContactDomain, ContactCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<ContactDomain, ContactCriteriaDTO, AgendaContact>(ctx, projector, pageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO criteria)
     {
         var query = _dbSet

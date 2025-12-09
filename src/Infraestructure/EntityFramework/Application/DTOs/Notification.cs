@@ -1,5 +1,8 @@
 ﻿namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de notificación.
+/// </summary>
 public partial class Notification
 {
     public ulong NotificationId { get; set; }

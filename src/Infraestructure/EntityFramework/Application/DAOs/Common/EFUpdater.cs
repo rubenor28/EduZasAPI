@@ -5,6 +5,12 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Common;
 
+/// <summary>
+/// Implementación base para actualizar entidades usando EF.
+/// </summary>
+/// <typeparam name="DomainEntity">Entidad de dominio.</typeparam>
+/// <typeparam name="UpdateEntity">DTO de actualización.</typeparam>
+/// <typeparam name="EFEntity">Entidad de EF.</typeparam>
 public abstract class EFUpdater<DomainEntity, UpdateEntity, EFEntity>(
     EduZasDotnetContext ctx,
     IMapper<EFEntity, DomainEntity> domainMapper,
@@ -17,6 +23,7 @@ public abstract class EFUpdater<DomainEntity, UpdateEntity, EFEntity>(
     protected readonly IMapper<EFEntity, DomainEntity> _domainMapper = domainMapper;
     protected readonly IUpdateMapper<UpdateEntity, EFEntity> _updateMapper = updateMapper;
 
+    /// <inheritdoc/>
     public async Task<DomainEntity> UpdateAsync(UpdateEntity updateData)
     {
         var tracked =
@@ -29,5 +36,8 @@ public abstract class EFUpdater<DomainEntity, UpdateEntity, EFEntity>(
         return _domainMapper.Map(tracked);
     }
 
+    /// <summary>
+    /// Obtiene la entidad rastreada a partir del DTO de actualización.
+    /// </summary>
     protected abstract Task<EFEntity?> GetTrackedByDTO(UpdateEntity value);
 }

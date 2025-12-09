@@ -5,8 +5,12 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.ClassTests;
 
+/// <summary>
+/// Proyector de consultas para asociaciones de exámenes de clase.
+/// </summary>
 public class ClassTestAssociationProjector : IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<Class, ClassTestAssociationDTO>> GetProjection(ClassTestAssociationCriteriaDTO criteria) =>
         c =>
             new()

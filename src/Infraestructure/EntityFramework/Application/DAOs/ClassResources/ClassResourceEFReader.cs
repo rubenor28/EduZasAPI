@@ -7,11 +7,15 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassResources;
 
+/// <summary>
+/// Implementación de lectura de relaciones Clase-Recurso por ID usando EF.
+/// </summary>
 public sealed class ClassResourceEFReader(
     EduZasDotnetContext ctx,
     IMapper<ClassResource, ClassResourceDomain> mapper
 ) : EFReader<ClassResourceIdDTO, ClassResourceDomain, ClassResource>(ctx, mapper)
 {
+    /// <inheritdoc/>
     protected override Expression<Func<ClassResource, bool>> GetIdPredicate(
         ClassResourceIdDTO id
     ) => cr => cr.ClassId == id.ClassId && cr.ResourceId == id.ResourceId;

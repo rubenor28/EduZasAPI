@@ -2,6 +2,9 @@
 
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de examen.
+/// </summary>
 public partial class Test
 {
     public Guid TestId { get; set; }

@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
+/// <summary>
+/// Implementación de consulta de relaciones Clase-Profesor usando EF.
+/// </summary>
 public sealed class ClassProfessorEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<ClassProfessor, ClassProfessorDomain, ClassProfessorCriteriaDTO> projector,
@@ -19,6 +22,7 @@ public sealed class ClassProfessorEFQuerier(
         maxPageSize
     )
 {
+    /// <inheritdoc/>
     public override IQueryable<ClassProfessor> BuildQuery(ClassProfessorCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()

@@ -7,11 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassResources;
 
+/// <summary>
+/// Implementación de eliminación de relaciones Clase-Recurso usando EF.
+/// </summary>
 public sealed class ClassResourceEFDeleter(
     EduZasDotnetContext ctx,
     IMapper<ClassResource, ClassResourceDomain> domainMapper
 ) : EFDeleter<ClassResourceIdDTO, ClassResourceDomain, ClassResource>(ctx, domainMapper)
 {
+    /// <inheritdoc/>
     public override async Task<ClassResource?> GetTrackedById(ClassResourceIdDTO id) =>
         await _dbSet
             .AsTracking()

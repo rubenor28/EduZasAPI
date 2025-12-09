@@ -1,5 +1,8 @@
 ﻿namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de relación Clase-Estudiante.
+/// </summary>
 public partial class ClassStudent
 {
     public string ClassId { get; set; } = null!;

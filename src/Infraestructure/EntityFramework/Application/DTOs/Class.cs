@@ -1,5 +1,8 @@
 ﻿namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de clase.
+/// </summary>
 public partial class Class
 {
     public string ClassId { get; set; } = null!;

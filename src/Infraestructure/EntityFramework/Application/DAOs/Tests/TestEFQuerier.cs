@@ -8,12 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Tests;
 
+/// <summary>
+/// Implementación de consulta de exámenes usando EF.
+/// </summary>
 public sealed class TestEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Test, TestDomain, TestCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<TestDomain, TestCriteriaDTO, Test>(ctx, projector, pageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<Test> BuildQuery(TestCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()

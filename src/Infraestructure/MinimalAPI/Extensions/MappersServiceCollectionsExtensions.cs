@@ -35,8 +35,20 @@ using InterfaceAdapters.Mappers.Users;
 
 namespace MinimalAPI.Extensions;
 
+/// <summary>
+/// Métodos de extensión para registrar los servicios de mapeo en el contenedor de dependencias.
+/// </summary>
 public static class MapperServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registra un mapeador bidireccional que devuelve resultados (Result pattern).
+    /// </summary>
+    /// <typeparam name="TImplementation">Tipo de la implementación del mapeador.</typeparam>
+    /// <typeparam name="TIn">Tipo de entrada.</typeparam>
+    /// <typeparam name="TOut">Tipo de salida.</typeparam>
+    /// <typeparam name="TError">Tipo de error.</typeparam>
+    /// <param name="services">Colección de servicios.</param>
+    /// <returns>La colección de servicios actualizada.</returns>
     private static IServiceCollection RegisterBidirectionalResultMappers<
         TImplementation,
         TIn,
@@ -54,6 +66,11 @@ public static class MapperServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Registra todos los servicios de mapeo de la aplicación.
+    /// </summary>
+    /// <param name="s">Colección de servicios.</param>
+    /// <returns>La colección de servicios actualizada.</returns>
     public static IServiceCollection AddMapperServices(this IServiceCollection s)
     {
         // USERS

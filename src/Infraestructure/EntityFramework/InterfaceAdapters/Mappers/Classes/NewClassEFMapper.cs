@@ -4,8 +4,12 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 
+/// <summary>
+/// Mapeador de creación para clases.
+/// </summary>
 public class NewClassEFMapper : IMapper<NewClassDTO, Class>
 {
+    /// <inheritdoc/>
     public Class Map(NewClassDTO nc) =>
         new()
         {

@@ -8,12 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Resources;
 
+/// <summary>
+/// Implementación de consulta de resumen de recursos usando EF.
+/// </summary>
 public class ResourceSummaryEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Resource, ResourceSummary, ResourceCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<ResourceSummary, ResourceCriteriaDTO, Resource>(ctx, projector, pageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<Resource> BuildQuery(ResourceCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()

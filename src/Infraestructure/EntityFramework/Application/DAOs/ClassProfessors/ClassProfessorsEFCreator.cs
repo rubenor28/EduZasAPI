@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
+/// <summary>
+/// Implementación de creación de relaciones Clase-Profesor usando EF.
+/// </summary>
 public class ClassProfessorsEFCreator(
     EduZasDotnetContext ctx,
     IMapper<ClassProfessor, ClassProfessorDomain> domainMapper,

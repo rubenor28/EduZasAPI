@@ -8,12 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Classes;
 
+/// <summary>
+/// Implementación de consulta de clases usando EF.
+/// </summary>
 public class ClassEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Class, ClassDomain, ClassCriteriaDTO> projector,
     int maxPageSize
 ) : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>(ctx, projector, maxPageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<Class> BuildQuery(ClassCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()

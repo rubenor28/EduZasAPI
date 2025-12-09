@@ -8,13 +8,12 @@ using FluentValidationProj.Application.Services.Common;
 namespace FluentValidationProj.Application.Services.Auth;
 
 /// <summary>
-/// Validador para la creación de un nuevo usuario,
-/// aplicando reglas específicas a cada propiedad del DTO.
+/// Validador para creación de usuarios.
 /// </summary>
 public class NewUserFluentValidator : FluentValidator<NewUserDTO>
 {
     /// <summary>
-    /// Inicializa las reglas de validación para <see cref="NewUserDTO"/>.
+    /// Inicializa reglas de validación.
     /// </summary>
     public NewUserFluentValidator()
     {

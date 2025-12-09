@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.UserNotifications;
 
+/// <summary>
+/// Implementación de creación de notificaciones de usuario usando EF.
+/// </summary>
 public class UserNotificationEFCreator(
     EduZasDotnetContext ctx,
     IMapper<NotificationPerUser, UserNotificationDomain> domainMapper,

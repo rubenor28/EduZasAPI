@@ -6,9 +6,13 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Notifications;
 
+/// <summary>
+/// Proyector de consultas para notificaciones.
+/// </summary>
 public class NotificationProjector
     : IEFProjector<Notification, NotificationDomain, NotificationCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<Notification, NotificationDomain>> GetProjection(
         NotificationCriteriaDTO criteria
     ) =>

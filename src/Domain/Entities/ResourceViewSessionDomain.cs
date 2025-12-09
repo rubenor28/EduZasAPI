@@ -1,10 +1,11 @@
 namespace Domain.Entities;
 
 /// <summary>
-/// Registra una sesión de visualización de un recurso por parte de un usuario en una clase específica.
+/// Representa la metadata de uso de un recurso por un usuario.
 /// </summary>
 /// <remarks>
-/// Esta entidad permite rastrear el tiempo que un usuario interactúa con un recurso educativo.
+/// Se utiliza para recopilar cuánto tiempo pasa un usuario viendo un recurso,
+/// con el fin de generar reportes y análisis de participación.
 /// </remarks>
 public sealed record ResourceViewSession
 {

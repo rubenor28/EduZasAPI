@@ -5,10 +5,16 @@ using Microsoft.Extensions.Configuration;
 
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Contexto de base de datos principal de la aplicación.
+/// </summary>
 public partial class EduZasDotnetContext : DbContext
 {
     private readonly IConfiguration _cfg;
 
+    /// <summary>
+    /// Inicializa el contexto cargando la configuración.
+    /// </summary>
     public EduZasDotnetContext()
     {
         var environment = Environment.GetEnvironmentVariable("ServerOptions__Environment");
@@ -22,6 +28,10 @@ public partial class EduZasDotnetContext : DbContext
         _cfg = new ConfigurationBuilder().AddEnvironmentVariables().Build();
     }
 
+    /// <summary>
+    /// Inicializa el contexto con opciones y configuración.
+    /// </summary>
+    /// <param name="options">Opciones del contexto.</param>
     public EduZasDotnetContext(DbContextOptions<EduZasDotnetContext> options)
         : base(options)
     {
@@ -36,20 +46,35 @@ public partial class EduZasDotnetContext : DbContext
         _cfg = new ConfigurationBuilder().AddEnvironmentVariables().Build();
     }
 
+    /// <summary>Contactos de agenda.</summary>
     public virtual DbSet<AgendaContact> AgendaContacts { get; set; }
+    /// <summary>Respuestas de exámenes.</summary>
     public virtual DbSet<Answer> Answers { get; set; }
+    /// <summary>Clases.</summary>
     public virtual DbSet<Class> Classes { get; set; }
+    /// <summary>Profesores por clase.</summary>
     public virtual DbSet<ClassProfessor> ClassProfessors { get; set; }
+    /// <summary>Estudiantes por clase.</summary>
     public virtual DbSet<ClassStudent> ClassStudents { get; set; }
+    /// <summary>Notificaciones.</summary>
     public virtual DbSet<Notification> Notifications { get; set; }
+    /// <summary>Notificaciones por usuario.</summary>
     public virtual DbSet<NotificationPerUser> NotificationPerUsers { get; set; }
+    /// <summary>Recursos.</summary>
     public virtual DbSet<Resource> Resources { get; set; }
+    /// <summary>Recursos por clase.</summary>
     public virtual DbSet<ClassResource> ClassResources { get; set; }
+    /// <summary>Etiquetas.</summary>
     public virtual DbSet<Tag> Tags { get; set; }
+    /// <summary>Etiquetas de contactos.</summary>
     public virtual DbSet<ContactTag> ContactTags { get; set; }
+    /// <summary>Exámenes.</summary>
     public virtual DbSet<Test> Tests { get; set; }
+    /// <summary>Exámenes por clase.</summary>
     public virtual DbSet<TestPerClass> TestsPerClasses { get; set; }
+    /// <summary>Usuarios.</summary>
     public virtual DbSet<User> Users { get; set; }
+    /// <summary>Sesiones de vista de recursos (metadata de uso y tiempo de visualización).</summary>
     public virtual DbSet<ResourceViewSession> ResourceViewSessions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

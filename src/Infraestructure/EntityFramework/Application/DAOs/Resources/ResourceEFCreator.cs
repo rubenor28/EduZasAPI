@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Resources;
 
+/// <summary>
+/// Implementación de creación de recursos usando EF.
+/// </summary>
 public sealed class ResourceEFCreator(
     EduZasDotnetContext ctx,
     IMapper<Resource, ResourceDomain> domainMapper,

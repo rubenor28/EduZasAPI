@@ -6,20 +6,16 @@ using FluentValidation;
 namespace FluentValidationProj.Application.Services.Common;
 
 /// <summary>
-/// Clase base abstracta para validadores que usan FluentValidation
-/// e implementan el contrato <see cref="IBusinessValidationService{T}"/>.
+/// Clase base para validadores FluentValidation.
 /// </summary>
-/// <typeparam name="T">Tipo de objeto a validar.</typeparam>
+/// <typeparam name="T">Tipo a validar.</typeparam>
 public abstract class FluentValidator<T> : AbstractValidator<T>, IBusinessValidationService<T>
 {
     /// <summary>
-    /// Ejecuta la validación sobre una instancia del tipo <typeparamref name="T"/>.
+    /// Ejecuta la validación.
     /// </summary>
-    /// <param name="data">Instancia a validar.</param>
-    /// <returns>
-    /// Resultado exitoso si el objeto es válido,
-    /// de lo contrario un resultado con la lista de errores de campo.
-    /// </returns>
+    /// <param name="data">Objeto a validar.</param>
+    /// <returns>Unit si es válido, lista de errores si no.</returns>
     public Result<Unit, IEnumerable<FieldErrorDTO>> IsValid(T data)
     {
         var validation = Validate(data);

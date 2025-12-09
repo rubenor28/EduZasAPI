@@ -4,9 +4,13 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 
+/// <summary>
+/// Mapeador de actualización para notificaciones de usuario.
+/// </summary>
 public class UpdateUserNotificationEFMapper
     : IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>
 {
+    /// <inheritdoc/>
     public void Map(UserNotificationUpdateDTO s, NotificationPerUser d)
     {
         d.UserId = s.UserId;

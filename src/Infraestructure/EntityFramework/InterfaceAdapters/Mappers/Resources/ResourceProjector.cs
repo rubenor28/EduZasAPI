@@ -6,8 +6,12 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Resources;
 
+/// <summary>
+/// Proyector de consultas para recursos.
+/// </summary>
 public class ResourceProjector : IEFProjector<Resource, ResourceDomain, ResourceCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<Resource, ResourceDomain>> GetProjection(ResourceCriteriaDTO criteria) =>
         input =>
             new()
@@ -22,8 +26,12 @@ public class ResourceProjector : IEFProjector<Resource, ResourceDomain, Resource
             };
 }
 
+/// <summary>
+/// Proyector de consultas para resúmenes de recursos.
+/// </summary>
 public class ResourceSummaryProjector : IEFProjector<Resource, ResourceSummary, ResourceCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<Resource, ResourceSummary>> GetProjection(
         ResourceCriteriaDTO criteria
     ) =>

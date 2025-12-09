@@ -6,11 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ContactTags;
 
+/// <summary>
+/// Implementación de eliminación de etiquetas de contacto usando EF.
+/// </summary>
 public sealed class ContactTagEFDeleter(
     EduZasDotnetContext ctx,
     IMapper<ContactTag, ContactTagDomain> domainMapper
 ) : EFDeleter<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, domainMapper)
 {
+    /// <inheritdoc/>
     public override async Task<ContactTag?> GetTrackedById(ContactTagIdDTO id) =>
         await _dbSet
             .AsTracking()

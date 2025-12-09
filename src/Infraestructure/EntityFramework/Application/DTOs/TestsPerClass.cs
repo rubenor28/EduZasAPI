@@ -1,5 +1,8 @@
 ﻿namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de relación Examen-Clase.
+/// </summary>
 public partial class TestPerClass
 {
     public Guid TestId { get; set; }

@@ -4,8 +4,12 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.ContactTags;
 
+/// <summary>
+/// Mapeador de creación para etiquetas de contacto.
+/// </summary>
 public class NewContactTagEFMapper : IMapper<NewContactTagDTO, ContactTag>
 {
+    /// <inheritdoc/>
     public ContactTag Map(NewContactTagDTO input) =>
         new()
         {

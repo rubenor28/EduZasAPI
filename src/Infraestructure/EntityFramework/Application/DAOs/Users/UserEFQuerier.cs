@@ -8,12 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Users;
 
+/// <summary>
+/// Implementación de consulta de usuarios usando EF.
+/// </summary>
 public class UserEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<User, UserDomain, UserCriteriaDTO> projector,
     int pageSize
 ) : EFQuerier<UserDomain, UserCriteriaDTO, User>(ctx, projector, pageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<User> BuildQuery(UserCriteriaDTO c)
     {
         var query = _dbSet

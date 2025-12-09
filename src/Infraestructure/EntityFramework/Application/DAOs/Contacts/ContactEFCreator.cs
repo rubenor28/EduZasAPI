@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Contacts;
 
+/// <summary>
+/// Implementación de creación de contactos usando EF.
+/// </summary>
 public sealed class ContactEFCreator(
     EduZasDotnetContext ctx,
     IMapper<AgendaContact, ContactDomain> domainMapper,

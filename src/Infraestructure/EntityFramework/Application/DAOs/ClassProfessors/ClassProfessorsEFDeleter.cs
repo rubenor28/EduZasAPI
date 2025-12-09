@@ -6,11 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassProfessors;
 
+/// <summary>
+/// Implementación de eliminación de relaciones Clase-Profesor usando EF.
+/// </summary>
 public class ClassProfessorsEFDeleter(
     EduZasDotnetContext ctx,
     IMapper<ClassProfessor, ClassProfessorDomain> domainMapper
 ) : EFDeleter<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(ctx, domainMapper)
 {
+    /// <inheritdoc/>
     public override async Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet
             .AsTracking()

@@ -6,8 +6,12 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 
+/// <summary>
+/// Proyector de consultas para clases.
+/// </summary>
 public class ClassProjector : IEFProjector<Class, ClassDomain, ClassCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<Class, ClassDomain>> GetProjection(ClassCriteriaDTO _) =>
         ef =>
             new()

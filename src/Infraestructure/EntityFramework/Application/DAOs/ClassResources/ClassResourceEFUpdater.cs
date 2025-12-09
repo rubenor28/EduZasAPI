@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassResources;
 
+/// <summary>
+/// Implementación de actualización de relaciones Clase-Recurso usando EF.
+/// </summary>
 public sealed class ClassResourceEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<ClassResource, ClassResourceDomain> domainMapper,
@@ -19,6 +22,7 @@ public sealed class ClassResourceEFUpdater(
         updateMapper
     )
 {
+    /// <inheritdoc/>
     protected override Task<ClassResource?> GetTrackedByDTO(ClassResourceDTO value) =>
         _dbSet
             .AsTracking()

@@ -4,8 +4,12 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Notifications;
 
+/// <summary>
+/// Mapeador de entidad EF a dominio para notificaciones.
+/// </summary>
 public class NotificationMapper : IMapper<Notification, NotificationDomain>
 {
+    /// <inheritdoc/>
     public NotificationDomain Map(Notification s) =>
         new()
         {

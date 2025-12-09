@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassStudents;
 
+/// <summary>
+/// Implementación de actualización de relaciones Clase-Estudiante usando EF.
+/// </summary>
 public class ClassStudentsEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<ClassStudent, ClassStudentDomain> domainMapper,
@@ -19,6 +22,7 @@ public class ClassStudentsEFUpdater(
         updateMapper
     )
 {
+    /// <inheritdoc/>
     protected override async Task<ClassStudent?> GetTrackedByDTO(ClassStudentUpdateDTO value) =>
         await _dbSet
             .AsTracking()

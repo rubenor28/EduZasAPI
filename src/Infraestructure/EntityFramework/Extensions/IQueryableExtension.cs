@@ -6,19 +6,19 @@ using Microsoft.EntityFrameworkCore;
 namespace EntityFramework.Extensions;
 
 /// <summary>
-/// Métodos de extensión para construir consultas dinámicas sobre <see cref="IQueryable{T}"/>.
+/// Extensiones para consultas dinámicas en <see cref="IQueryable{T}"/>.
 /// </summary>
 public static class IQueryableExtensions
 {
     /// <summary>
-    /// Aplica una condición <c>Where</c> a la consulta si el valor (clase) no es nulo.
+    /// Aplica Where si el valor (clase) no es nulo.
     /// </summary>
-    /// <typeparam name="T">Tipo de la entidad en la consulta.</typeparam>
-    /// <typeparam name="V">Tipo del valor, debe ser una clase.</typeparam>
-    /// <param name="source">Fuente de datos a consultar.</param>
-    /// <param name="value">Valor que determina si se aplica la condición.</param>
-    /// <param name="predicateFactory">Función que construye la expresión de filtro en base al valor.</param>
-    /// <returns>La consulta original si el valor es nulo, o una consulta filtrada si no es nulo.</returns>
+    /// <typeparam name="T">Entidad.</typeparam>
+    /// <typeparam name="V">Valor (clase).</typeparam>
+    /// <param name="source">Consulta.</param>
+    /// <param name="value">Valor condicional.</param>
+    /// <param name="predicateFactory">Fábrica de predicado.</param>
+    /// <returns>Consulta filtrada o original.</returns>
     public static IQueryable<T> WhereOptional<T, V>(
         this IQueryable<T> source,
         V? value,
@@ -30,14 +30,14 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
-    /// Aplica una condición <c>Where</c> a la consulta si el valor (struct) no es nulo.
+    /// Aplica Where si el valor (struct) no es nulo.
     /// </summary>
-    /// <typeparam name="T">Tipo de la entidad en la consulta.</typeparam>
-    /// <typeparam name="V">Tipo del valor, debe ser un struct.</typeparam>
-    /// <param name="source">Fuente de datos a consultar.</param>
-    /// <param name="value">Valor anulable que determina si se aplica la condición.</param>
-    /// <param name="predicateFactory">Función que construye la expresión de filtro en base al valor.</param>
-    /// <returns>La consulta original si el valor es nulo, o una consulta filtrada si tiene valor.</returns>
+    /// <typeparam name="T">Entidad.</typeparam>
+    /// <typeparam name="V">Valor (struct).</typeparam>
+    /// <param name="source">Consulta.</param>
+    /// <param name="value">Valor condicional.</param>
+    /// <param name="predicateFactory">Fábrica de predicado.</param>
+    /// <returns>Consulta filtrada o original.</returns>
     public static IQueryable<T> WhereOptional<T, V>(
         this IQueryable<T> source,
         V? value,
@@ -49,14 +49,14 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
-    /// Aplica un filtro de texto sobre un campo string de la entidad, usando un <see cref="StringQueryDTO"/>.
+    /// Aplica filtro de texto usando <see cref="StringQueryDTO"/>.
     /// </summary>
-    /// <typeparam name="T">Tipo de la entidad en la consulta.</typeparam>
-    /// <param name="source">Fuente de datos a consultar.</param>
-    /// <param name="strQuery">Consulta de texto opcional con el tipo de búsqueda y el valor.</param>
-    /// <param name="selector">Selector de la propiedad string a filtrar.</param>
-    /// <returns>Consulta filtrada según el tipo de búsqueda especificado, o sin cambios si no hay valor.</returns>
-    /// <exception cref="InvalidDataException">Si el tipo de búsqueda no está soportado.</exception>
+    /// <typeparam name="T">Entidad.</typeparam>
+    /// <param name="source">Consulta.</param>
+    /// <param name="strQuery">Criterio de búsqueda.</param>
+    /// <param name="selector">Propiedad a filtrar.</param>
+    /// <returns>Consulta filtrada.</returns>
+    /// <exception cref="InvalidDataException">Tipo de búsqueda no soportado.</exception>
     public static IQueryable<T> WhereStringQuery<T>(
         this IQueryable<T> source,
         StringQueryDTO? strQuery,
@@ -73,7 +73,7 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
-    /// Construye una expresión que compara igualdad exacta entre una propiedad string y un texto dado.
+    /// Construye expresión de igualdad exacta.
     /// </summary>
     private static Expression<Func<T, bool>> BuildEquals<T>(Expression<Func<T, string?>> selector, string text)
     {
@@ -83,7 +83,7 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
-    /// Construye una expresión que aplica un patrón LIKE sobre una propiedad string.
+    /// Construye expresión LIKE.
     /// </summary>
     private static Expression<Func<T, bool>> BuildLike<T>(Expression<Func<T, string?>> selector, string text)
     {
@@ -106,10 +106,10 @@ public static class IQueryableExtensions
     }
 
     /// <summary>
-    /// Escapa caracteres especiales para usarlos en un patrón LIKE de SQL.
+    /// Escapa caracteres para LIKE SQL.
     /// </summary>
-    /// <param name="input">Texto a escapar.</param>
-    /// <returns>Texto con caracteres escapados.</returns>
+    /// <param name="input">Texto.</param>
+    /// <returns>Texto escapado.</returns>
     public static string EscapeLike(string input) =>
         input.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");
 }

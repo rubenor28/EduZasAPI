@@ -7,12 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Tests;
 
+/// <summary>
+/// Implementación de consulta de resumen de exámenes usando EF.
+/// </summary>
 public sealed class TestSummaryEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Test, TestSummary, TestCriteriaDTO> projector,
     int maxPageSize
 ) : EFQuerier<TestSummary, TestCriteriaDTO, Test>(ctx, projector, maxPageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<Test> BuildQuery(TestCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()

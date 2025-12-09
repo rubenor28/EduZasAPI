@@ -1,5 +1,8 @@
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de etiqueta.
+/// </summary>
 public partial class Tag
 {
     public string Text { get; set; } = null!;

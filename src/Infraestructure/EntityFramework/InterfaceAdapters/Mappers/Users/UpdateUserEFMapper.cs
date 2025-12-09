@@ -6,11 +6,15 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Users;
 
+/// <summary>
+/// Mapeador de actualización para usuarios.
+/// </summary>
 public class UpdateUserEFMapper(IMapper<UserType, uint> usrtMapper)
     : IUpdateMapper<UserUpdateDTO, User>
 {
     private readonly IMapper<UserType, uint> _usrtMapper = usrtMapper;
 
+    /// <inheritdoc/>
     public void Map(UserUpdateDTO source, User destination)
     {
         destination.UserId = source.Id;

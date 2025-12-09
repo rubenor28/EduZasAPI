@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Tags;
 
+/// <summary>
+/// Implementación de creación de etiquetas usando EF.
+/// </summary>
 public sealed class TagEFCreator(
     EduZasDotnetContext ctx,
     IMapper<Tag, TagDomain> domainMapper,

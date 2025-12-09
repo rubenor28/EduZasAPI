@@ -7,8 +7,16 @@ using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
 
+/// <summary>
+/// Define las rutas para operaciones de base de datos (respaldo y restauración).
+/// </summary>
 public static class DatabaseRoutes
 {
+    /// <summary>
+    /// Mapea los endpoints para operaciones de base de datos.
+    /// </summary>
+    /// <param name="app">La aplicación web.</param>
+    /// <returns>El grupo de rutas configurado.</returns>
     public static RouteGroupBuilder MapDatabaseRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/database").WithTags("Respaldo y Restauracion");

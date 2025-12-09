@@ -10,22 +10,19 @@ using MimeKit.Text;
 namespace MailKitProj;
 
 /// <summary>
-/// Implementación del servicio de envío de correos utilizando MailKit y un servidor SMTP.
+/// Implementación del servicio de envío de correos utilizando MailKit.
 /// </summary>
-/// <remarks>
-/// Inicializa una new instancia de la clase <see cref="SmtpEmailSender"/>.
-/// </remarks>
-/// <param name="smtpSettings">La configuración SMTP inyectada a través del patrón de opciones.</param>
+/// <param name="smtpSettings">Configuración SMTP.</param>
 public class SmtpEmailSender(IOptions<SmtpSettings> smtpSettings) : IEmailSender
 {
     private readonly SmtpSettings _smtpSettings = smtpSettings.Value;
 
     /// <summary>
-    /// Envía un correo electrónico de forma asíncrona utilizando la configuración SMTP proporcionada.
+    /// Envía un correo electrónico de forma asíncrona.
     /// </summary>
-    /// <param name="message">El mensaje de correo electrónico a enviar.</param>
-    /// <param name="cancellationToken">El token para monitorear solicitudes de cancelación.</param>
-    /// <returns>Una tarea que representa la operación de envío asíncrona.</returns>
+    /// <param name="message">Mensaje a enviar.</param>
+    /// <param name="cancellationToken">Token de cancelación.</param>
+    /// <returns>Tarea asíncrona.</returns>
     public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
     {
         var mimeMessage = new MimeMessage();

@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ContactTags;
 
+/// <summary>
+/// Implementación de creación de etiquetas de contacto usando EF.
+/// </summary>
 public sealed class ContactTagEFCreator(
     EduZasDotnetContext ctx,
     IMapper<ContactTag, ContactTagDomain> domainMapper,

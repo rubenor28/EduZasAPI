@@ -1,5 +1,8 @@
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de respuesta de examen.
+/// </summary>
 public partial class Answer
 {
     public string Content { get; set; } = null!;

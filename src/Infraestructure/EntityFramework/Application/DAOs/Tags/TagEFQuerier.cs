@@ -8,12 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Tags;
 
+/// <summary>
+/// Implementación de consulta de etiquetas usando EF.
+/// </summary>
 public class TagEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Tag, TagDomain, TagCriteriaDTO> projector,
     int maxPageSize
 ) : EFQuerier<TagDomain, TagCriteriaDTO, Tag>(ctx, projector, maxPageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<Tag> BuildQuery(TagCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()

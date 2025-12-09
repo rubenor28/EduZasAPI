@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassResources;
 
+/// <summary>
+/// Implementación de creación de relaciones Clase-Recurso usando EF.
+/// </summary>
 public sealed class ClassResourceEFCreator(
     EduZasDotnetContext ctx,
     IMapper<ClassResource, ClassResourceDomain> domainMapper,

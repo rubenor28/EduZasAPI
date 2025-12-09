@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.UserNotifications;
 
+/// <summary>
+/// Implementación de actualización de notificaciones de usuario usando EF.
+/// </summary>
 public class UserNotificationEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<NotificationPerUser, UserNotificationDomain> domainMapper,
@@ -19,6 +22,7 @@ public class UserNotificationEFUpdater(
         NotificationPerUser
     >(ctx, domainMapper, updateMapper)
 {
+    /// <inheritdoc/>
     protected override async Task<NotificationPerUser?> GetTrackedByDTO(UserNotificationUpdateDTO dto) =>
         await _dbSet
             .AsTracking()

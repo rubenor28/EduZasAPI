@@ -3,14 +3,12 @@ using FluentValidation;
 namespace FluentValidationProj.Application.Services.Common;
 
 /// <summary>
-/// Validador para valores de tipo <see cref="ulong"/>.
-/// Se asegura de que el valor sea mayor o igual a 1.
+/// Validador para IDs (ulong).
 /// </summary>
 public class ULongFluentValidator : FluentValidator<ulong>
 {
     /// <summary>
-    /// Inicializa una nueva instancia de <see cref="ULongFluentValidator"/>
-    /// configurando la regla de validación.
+    /// Inicializa el validador de IDs.
     /// </summary>
     public ULongFluentValidator()
     {

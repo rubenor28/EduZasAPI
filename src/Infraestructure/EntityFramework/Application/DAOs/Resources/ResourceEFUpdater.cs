@@ -8,12 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Resources;
 
+/// <summary>
+/// Implementación de actualización de recursos usando EF.
+/// </summary>
 public sealed class ResourceEFUpdater(
     EduZasDotnetContext ctx,
     IMapper<Resource, ResourceDomain> domainMapper,
     IUpdateMapper<ResourceUpdateDTO, Resource> updateMapper
 ) : EFUpdater<ResourceDomain, ResourceUpdateDTO, Resource>(ctx, domainMapper, updateMapper)
 {
+    /// <inheritdoc/>
     protected override Task<Resource?> GetTrackedByDTO(ResourceUpdateDTO value) =>
         _dbSet
             .AsTracking()

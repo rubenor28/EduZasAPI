@@ -4,8 +4,12 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 
+/// <summary>
+/// Mapeador de actualización para exámenes.
+/// </summary>
 public class UpdateTestEFMapper : IUpdateMapper<TestUpdateDTO, Test>
 {
+    /// <inheritdoc/>
     public void Map(TestUpdateDTO tu, Test t)
     {
         t.Title = tu.Title;

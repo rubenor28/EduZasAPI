@@ -1,5 +1,8 @@
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de contacto en agenda.
+/// </summary>
 public partial class AgendaContact
 {
     

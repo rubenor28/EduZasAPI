@@ -1,5 +1,8 @@
 ﻿namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de usuario.
+/// </summary>
 public partial class User
 {
     public ulong UserId { get; set; }

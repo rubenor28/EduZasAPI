@@ -6,6 +6,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.Classes;
 
+/// <summary>
+/// Implementación de creación de clases usando EF.
+/// </summary>
 public class ClassEFCreator(
     EduZasDotnetContext ctx,
     IMapper<Class, ClassDomain> domainMapper,

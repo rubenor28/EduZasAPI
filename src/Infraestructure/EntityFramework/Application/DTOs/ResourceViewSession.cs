@@ -1,5 +1,9 @@
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad que representa la metadata de uso de un recurso por parte de un usuario.
+/// Registra el tiempo de visualización para fines de reportes y análisis.
+/// </summary>
 public partial class ResourceViewSession
 {
     public Guid Id { get; set; }

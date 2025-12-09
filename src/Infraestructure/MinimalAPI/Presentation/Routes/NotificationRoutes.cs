@@ -9,8 +9,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalAPI.Presentation.Routes;
 
+/// <summary>
+/// Define las rutas relacionadas con las notificaciones.
+/// </summary>
 public static class NotificationRoutes
 {
+    /// <summary>
+    /// Mapea los endpoints para la gestión de notificaciones.
+    /// </summary>
+    /// <param name="app">La aplicación web.</param>
+    /// <returns>El grupo de rutas configurado.</returns>
     public static RouteGroupBuilder MapNotificationRoutes(this WebApplication app)
     {
         var group = app.MapGroup("/notifications").WithTags("Notifications");

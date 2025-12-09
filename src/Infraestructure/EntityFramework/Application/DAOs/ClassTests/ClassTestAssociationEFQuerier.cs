@@ -7,12 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassTests;
 
+/// <summary>
+/// Implementación de consulta de asociaciones Clase-Examen usando EF.
+/// </summary>
 public sealed class ClassTestAssociationEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO> projector,
     int maxPageSize
 ) : EFQuerier<ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO, Class>(ctx, projector, maxPageSize)
 {
+    /// <inheritdoc/>
     public override IQueryable<Class> BuildQuery(ClassTestAssociationCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()

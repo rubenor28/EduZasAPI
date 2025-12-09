@@ -4,9 +4,15 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Tests;
 
-public sealed class TestUpdateFluentValdiator : FluentValidator<TestUpdateDTO>
+/// <summary>
+/// Validador para actualización de exámenes.
+/// </summary>
+public sealed class TestUpdateFluentValidator : FluentValidator<TestUpdateDTO>
 {
-    public TestUpdateFluentValdiator()
+    /// <summary>
+    /// Inicializa reglas de validación.
+    /// </summary>
+    public TestUpdateFluentValidator()
     {
         RuleFor(t => t.Title)
             .NotEmpty()

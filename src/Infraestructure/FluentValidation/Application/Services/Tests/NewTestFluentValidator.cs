@@ -4,8 +4,14 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Tests;
 
+/// <summary>
+/// Validador para creación de exámenes.
+/// </summary>
 public sealed class NewTestFluentValidator : FluentValidator<NewTestDTO>
 {
+    /// <summary>
+    /// Inicializa reglas de validación.
+    /// </summary>
     public NewTestFluentValidator()
     {
         RuleFor(t => t.Title)

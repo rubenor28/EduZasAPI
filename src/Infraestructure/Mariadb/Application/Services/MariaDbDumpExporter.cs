@@ -6,8 +6,7 @@ using MySql.Data.MySqlClient;
 namespace Mariadb.Application.Services;
 
 /// <summary>
-/// Implementación de <see cref="IDatabaseExporter"/> que utiliza la utilidad `mariadb-dump` (o `mysqldump`)
-/// para exportar una base de datos MariaDB/MySQL.
+/// Exportador de base de datos usando `mariadb-dump`.
 /// </summary>
 public sealed class MariaDbDumpExporter : IDatabaseExporter
 {
@@ -19,10 +18,10 @@ public sealed class MariaDbDumpExporter : IDatabaseExporter
     private readonly uint _port;
 
     /// <summary>
-    /// Inicializa una nueva instancia de la clase <see cref="MariaDbDumpExporter"/> utilizando una cadena de conexión.
+    /// Inicializa usando una cadena de conexión.
     /// </summary>
-    /// <param name="connectionString">La cadena de conexión a la base de datos.</param>
-    /// <param name="dumpPath">La ruta al ejecutable `mariadb-dump` o `mysqldump`.</param>
+    /// <param name="connectionString">Cadena de conexión.</param>
+    /// <param name="dumpPath">Ruta al ejecutable `mariadb-dump`.</param>
     public MariaDbDumpExporter(string connectionString, string dumpPath)
     {
         _dumpPath = dumpPath;
@@ -36,14 +35,14 @@ public sealed class MariaDbDumpExporter : IDatabaseExporter
     }
 
     /// <summary>
-    /// Inicializa una nueva instancia de la clase <see cref="MariaDbDumpExporter"/> con parámetros de conexión explícitos.
+    /// Inicializa con parámetros explícitos.
     /// </summary>
-    /// <param name="user">El nombre de usuario para la conexión a la base de datos.</param>
-    /// <param name="password">La contraseña para la conexión a la base de datos.</param>
-    /// <param name="database">El nombre de la base de datos a exportar.</param>
-    /// <param name="host">El host de la base de datos. El valor predeterminado es "localhost".</param>
-    /// <param name="dumpPath">La ruta al ejecutable `mariadb-dump` o `mysqldump`. El valor predeterminado es "mariadb-dump".</param>
-    /// <param name="port">El puerto de conexión a la base de datos. El valor predeterminado es 3306.</param>
+    /// <param name="user">Usuario.</param>
+    /// <param name="password">Contraseña.</param>
+    /// <param name="database">Base de datos.</param>
+    /// <param name="host">Host (default: localhost).</param>
+    /// <param name="dumpPath">Ruta ejecutable (default: mariadb-dump).</param>
+    /// <param name="port">Puerto (default: 3306).</param>
     public MariaDbDumpExporter(
         string user,
         string password,
@@ -62,10 +61,10 @@ public sealed class MariaDbDumpExporter : IDatabaseExporter
     }
 
     /// <summary>
-    /// Exporta una copia de seguridad de la base de datos a un stream de forma asíncrona utilizando `mariadb-dump`.
+    /// Exporta el respaldo de la base de datos.
     /// </summary>
-    /// <returns>Una tarea que representa la operación y que contiene un stream para leer el respaldo.</returns>
-    /// <exception cref="InvalidOperationException">Se lanza si no se puede iniciar el proceso `mariadb-dump` o si el proceso falla.</exception>
+    /// <returns>Stream con el contenido del respaldo.</returns>
+    /// <exception cref="InvalidOperationException">Si falla el proceso de dump.</exception>
     public async Task<Stream> ExportBackupAsync()
     {
         var tempFilePath = Path.GetTempFileName();

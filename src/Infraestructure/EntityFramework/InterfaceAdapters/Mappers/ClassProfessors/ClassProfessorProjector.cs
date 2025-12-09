@@ -6,9 +6,13 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 
+/// <summary>
+/// Proyector de consultas para profesores de clase.
+/// </summary>
 public class ClassProfessorProjector
     : IEFProjector<ClassProfessor, ClassProfessorDomain, ClassProfessorCriteriaDTO>
 {
+    /// <inheritdoc/>
     public Expression<Func<ClassProfessor, ClassProfessorDomain>> GetProjection(
         ClassProfessorCriteriaDTO _
     ) =>

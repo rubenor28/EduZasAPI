@@ -5,8 +5,14 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Classes;
 
+/// <summary>
+/// Validador para creación de clases.
+/// </summary>
 public class NewClassFluentValidator : FluentValidator<NewClassDTO>
 {
+    /// <summary>
+    /// Inicializa reglas de validación.
+    /// </summary>
     public NewClassFluentValidator()
     {
         RuleFor(c => c.ClassName)

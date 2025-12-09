@@ -2,6 +2,9 @@
 
 namespace EntityFramework.Application.DTOs;
 
+/// <summary>
+/// Entidad de recurso.
+/// </summary>
 public partial class Resource
 {
     public Guid ResourceId { get; set; }

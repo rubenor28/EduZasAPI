@@ -6,8 +6,7 @@ using MySql.Data.MySqlClient;
 namespace Mariadb.Application.Services;
 
 /// <summary>
-/// Implementación de <see cref="IDatabaseImporter"/> que utiliza la utilidad `mysql` (o `mariadb`)
-/// para importar/restaurar una base de datos MariaDB/MySQL desde un archivo SQL.
+/// Importador de base de datos usando `mysql` (o `mariadb`).
 /// </summary>
 public sealed class MariaDbImporter : IDatabaseImporter
 {
@@ -19,10 +18,10 @@ public sealed class MariaDbImporter : IDatabaseImporter
     private readonly uint _port;
 
     /// <summary>
-    /// Inicializa una nueva instancia de la clase <see cref="MariaDbImporter"/> utilizando una cadena de conexión.
+    /// Inicializa usando una cadena de conexión.
     /// </summary>
-    /// <param name="connectionString">La cadena de conexión a la base de datos.</param>
-    /// <param name="mysqlPath">La ruta al ejecutable `mysql` o `mariadb`.</param>
+    /// <param name="connectionString">Cadena de conexión.</param>
+    /// <param name="mysqlPath">Ruta al ejecutable `mysql`.</param>
     public MariaDbImporter(string connectionString, string mysqlPath)
     {
         _mysqlPath = mysqlPath;
@@ -36,14 +35,14 @@ public sealed class MariaDbImporter : IDatabaseImporter
     }
 
     /// <summary>
-    /// Inicializa una nueva instancia de la clase <see cref="MariaDbImporter"/> con parámetros de conexión explícitos.
+    /// Inicializa con parámetros explícitos.
     /// </summary>
-    /// <param name="user">El nombre de usuario para la conexión a la base de datos.</param>
-    /// <param name="password">La contraseña para la conexión a la base de datos.</param>
-    /// <param name="database">El nombre de la base de datos a importar.</param>
-    /// <param name="host">El host de la base de datos. El valor predeterminado es "localhost".</param>
-    /// <param name="mysqlPath">La ruta al ejecutable `mysql` o `mariadb`. El valor predeterminado es "mysql".</param>
-    /// <param name="port">El puerto de conexión a la base de datos. El valor predeterminado es 3306.</param>
+    /// <param name="user">Usuario.</param>
+    /// <param name="password">Contraseña.</param>
+    /// <param name="database">Base de datos.</param>
+    /// <param name="host">Host (default: localhost).</param>
+    /// <param name="mysqlPath">Ruta ejecutable (default: mysql).</param>
+    /// <param name="port">Puerto (default: 3306).</param>
     public MariaDbImporter(
         string user,
         string password,
@@ -62,11 +61,11 @@ public sealed class MariaDbImporter : IDatabaseImporter
     }
 
     /// <summary>
-    /// Restaura la base de datos desde un stream de forma asíncrona utilizando `mysql`.
+    /// Restaura la base de datos desde un stream.
     /// </summary>
-    /// <param name="input">El stream que contiene el archivo SQL de respaldo.</param>
-    /// <returns>Una tarea que representa la operación de importación asíncrona.</returns>
-    /// <exception cref="InvalidOperationException">Se lanza si no se puede iniciar el proceso `mysql` o si el proceso falla.</exception>
+    /// <param name="input">Stream con el archivo SQL.</param>
+    /// <returns>Tarea asíncrona.</returns>
+    /// <exception cref="InvalidOperationException">Si falla el proceso de importación.</exception>
     public async Task RestoreAsync(Stream input)
     {
         var args = new StringBuilder();

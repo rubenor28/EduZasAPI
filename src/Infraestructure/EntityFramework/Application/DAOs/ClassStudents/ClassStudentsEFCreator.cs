@@ -5,6 +5,9 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.Application.DAOs.ClassStudents;
 
+/// <summary>
+/// Implementación de creación de relaciones Clase-Estudiante usando EF.
+/// </summary>
 public class ClassStudentEFCreator(
     EduZasDotnetContext ctx,
     IMapper<ClassStudent, ClassStudentDomain> domainMapper,

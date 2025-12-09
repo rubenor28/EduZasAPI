@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.ClassResources;
 
+/// <summary>
+/// Implementación de consulta de asociaciones Clase-Recurso usando EF.
+/// </summary>
 public sealed class ClassResourceAssociationEFQuerier(
     EduZasDotnetContext ctx,
     IEFProjector<Class, ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO> projector,
@@ -17,6 +20,7 @@ public sealed class ClassResourceAssociationEFQuerier(
         maxPageSize
     )
 {
+    /// <inheritdoc/>
     public override IQueryable<Class> BuildQuery(ClassResourceAssociationCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()

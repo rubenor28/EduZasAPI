@@ -4,8 +4,12 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 
+/// <summary>
+/// Mapeador de creación para exámenes.
+/// </summary>
 public class NewTestEFMapper : IMapper<NewTestDTO, Test>
 {
+    /// <inheritdoc/>
     public Test Map(NewTestDTO nt) =>
         new()
         {

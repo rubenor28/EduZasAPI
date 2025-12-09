@@ -4,8 +4,12 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 
+/// <summary>
+/// Mapeador de entidad EF a dominio para exámenes.
+/// </summary>
 public class TestMapper : IMapper<Test, TestDomain>
 {
+    /// <inheritdoc/>
     public TestDomain Map(Test t) =>
         new()
         {

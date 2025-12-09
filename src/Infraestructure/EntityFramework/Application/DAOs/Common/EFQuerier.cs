@@ -6,6 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Application.DAOs.Common;
 
+/// <summary>
+/// Implementación base para consultar entidades usando EF.
+/// </summary>
+/// <typeparam name="DomainEntity">Entidad de dominio.</typeparam>
+/// <typeparam name="EntityCriteria">Criterios de búsqueda.</typeparam>
+/// <typeparam name="EFEntity">Entidad de EF.</typeparam>
 public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
     EduZasDotnetContext ctx,
     IEFProjector<EFEntity, DomainEntity, EntityCriteria> projector,
@@ -20,8 +26,12 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
     protected readonly int _maxPageSize = maxPageSize;
     private readonly IEFProjector<EFEntity, DomainEntity, EntityCriteria> _projector = projector;
 
+    /// <inheritdoc/>
     public int PageSize => _maxPageSize;
 
+    /// <summary>
+    /// Calcula el offset para la paginación.
+    /// </summary>
     protected int CalcOffset(int pageNumber)
     {
         if (pageNumber < 1)
@@ -29,7 +39,7 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
         return (pageNumber - 1) * _maxPageSize;
     }
 
-    ///<inheritdoc>
+    /// <inheritdoc/>
     public async Task<PaginatedQuery<DomainEntity, EntityCriteria>> GetByAsync(
         EntityCriteria criteria
     )
@@ -64,14 +74,14 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
         };
     }
 
-    ///<inheritdoc>
+    /// <inheritdoc/>
     public Task<int> CountAsync(EntityCriteria criteria) => BuildQuery(criteria).AsNoTracking().CountAsync();
 
-    ///<inheritdoc>
+    /// <inheritdoc/>
     public Task<bool> AnyAsync(EntityCriteria criteria) => BuildQuery(criteria).AsNoTracking().AnyAsync();
 
     /// <summary>
-    /// Método encargado de contruir un IQueryable<EFEntity> a partir de un criterio.
+    /// Construye la consulta base a partir de los criterios.
     /// </summary>
     public abstract IQueryable<EFEntity> BuildQuery(EntityCriteria criteria);
 }

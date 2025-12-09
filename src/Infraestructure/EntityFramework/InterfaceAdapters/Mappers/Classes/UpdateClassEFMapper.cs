@@ -4,8 +4,12 @@ using EntityFramework.InterfaceAdapters.Mappers.Common;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 
+/// <summary>
+/// Mapeador de actualización para clases.
+/// </summary>
 public class UpdateClassEFMapper : IUpdateMapper<ClassUpdateDTO, Class>
 {
+    /// <inheritdoc/>
     public void Map(ClassUpdateDTO cu, Class c)
     {
         c.ClassId = cu.Id;
