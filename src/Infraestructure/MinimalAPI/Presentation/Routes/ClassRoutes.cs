@@ -289,6 +289,24 @@ public static class ClassRoutes
             });
 
         group
+            .MapGet("/students/{classId}/{userId:ulong}", ReadStudent)
+            .WithName("Leer relacion usuario estudiante - clase")
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<ClassStudentDomain>()
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Búsqueda de relacion clase - estudiante";
+                op.Responses["200"].Description = "Si la búsqueda fue exitosa";
+                op.Responses["401"].Description = "Si el usuario no está autenticado";
+                op.Responses["404"].Description = "Si no se encontró la relación";
+
+                return op;
+            });
+
+        group
             .MapPost("/{classId}/professors/{userId:ulong}", ProfessorsInClass)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
@@ -532,5 +550,19 @@ public static class ClassRoutes
             useCase,
             mapRequest: () => criteria,
             mapResponse: cc => Results.Ok(cc)
+        );
+
+    public static Task<IResult> ReadStudent(
+        [FromRoute] string classId,
+        [FromRoute] ulong userId,
+        [FromServices] ReadClassStudentUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () => new UserClassRelationId { ClassId = classId, UserId = userId },
+            mapResponse: cs => Results.Ok(cs)
         );
 }

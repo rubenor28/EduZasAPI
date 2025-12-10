@@ -45,6 +45,7 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddTransient<AddFirstAdminUserUseCase>();
         s.AddTransient<UserQueryUseCase>();
         s.AddTransient<UpdateUserUseCase>();
+        s.AddTransient<DeleteUserUseCase>();
 
         // Class use cases
         s.AddTransient<AddClassUseCase>();
@@ -58,6 +59,7 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddTransient<AddClassStudentUseCase>();
         s.AddTransient<DeleteClassStudentUseCase>();
         s.AddTransient<UpdateClassStudentUseCase>();
+        s.AddTransient<ReadClassStudentUseCase>();
 
         // Class professors
         s.AddTransient<AddClassProfessorUseCase>();

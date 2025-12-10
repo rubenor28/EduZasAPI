@@ -9,13 +9,14 @@ namespace Domain.Entities;
 public sealed record ClassStudentDomain
 {
     /// <summary>
-    /// Obtiene o establece el identificador compuesto de la relación.
+    /// Obtiene o establece el identificador del usuario en la relación.
     /// </summary>
-    /// <remarks>
-    /// Contiene las claves foráneas <see cref="UserClassRelationId.UserId"/> y <see cref="UserClassRelationId.ClassId"/>
-    /// que juntas forman la clave primaria de esta entidad.
-    /// </remarks>
-    public required UserClassRelationId Id { get; set; }
+    public required ulong UserId { get; set; }
+
+    /// <summary>
+    /// Obtiene o establece el identificador de la clase en la relación.
+    /// </summary>
+    public required string ClassId { get; set; }
 
     /// <summary>
     /// Obtiene o establece un valor que indica si la relación está oculta (ej. para el profesor).

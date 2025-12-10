@@ -53,7 +53,7 @@ public class DeleteClassStudentUseCase(
             // Admin puede eliminar de una clase a cualquiera
             UserType.ADMIN => true,
             // El alumno solo puede eliminarse a sí mismo
-            UserType.STUDENT => student.Id.UserId == value.Executor.Id,
+            UserType.STUDENT => student.UserId == value.Executor.Id,
             // El profesor solo puede eliminar si tiene los permisos adecuados
             UserType.PROFESSOR => await IsAuthorizedProfessor(
                 value.Executor.Id,

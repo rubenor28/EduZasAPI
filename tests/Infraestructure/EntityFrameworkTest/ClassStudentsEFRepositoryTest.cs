@@ -76,8 +76,8 @@ public class StudentPerClassEFRepositoryTest : IDisposable
         var created = await _creator.AddAsync(newRelation);
 
         Assert.NotNull(created);
-        Assert.Equal(newRelation.ClassId, created.Id.ClassId);
-        Assert.Equal(newRelation.UserId, created.Id.UserId);
+        Assert.Equal(newRelation.ClassId, created.ClassId);
+        Assert.Equal(newRelation.UserId, created.UserId);
     }
 
     [Fact]
@@ -102,11 +102,13 @@ public class StudentPerClassEFRepositoryTest : IDisposable
 
         var created = await _creator.AddAsync(newRelation);
 
-        var found = await _reader.GetAsync(created.Id);
+        var found = await _reader.GetAsync(
+            new() { ClassId = created.ClassId, UserId = created.UserId }
+        );
 
         Assert.NotNull(found);
-        Assert.Equal(newRelation.UserId, found.Id.UserId);
-        Assert.Equal(newRelation.ClassId, found.Id.ClassId);
+        Assert.Equal(newRelation.UserId, found.UserId);
+        Assert.Equal(newRelation.ClassId, found.ClassId);
     }
 
     [Fact]
@@ -128,8 +130,8 @@ public class StudentPerClassEFRepositoryTest : IDisposable
 
         var toUpdate = new ClassStudentUpdateDTO
         {
-            ClassId = created.Id.ClassId,
-            UserId = created.Id.UserId,
+            ClassId = created.ClassId,
+            UserId = created.UserId,
             Hidden = true,
         };
 
@@ -162,12 +164,18 @@ public class StudentPerClassEFRepositoryTest : IDisposable
 
         var created = await _creator.AddAsync(newRelation);
 
-        var deleted = await _deleter.DeleteAsync(created.Id);
+        var deleted = await _deleter.DeleteAsync(
+            new() { ClassId = created.ClassId, UserId = created.UserId }
+        );
 
         Assert.NotNull(deleted);
-        Assert.Equal(created.Id, deleted.Id);
+        Assert.Equal(created.ClassId, deleted.ClassId);
+        Assert.Equal(created.UserId, deleted.UserId);
 
-        var found = await _reader.GetAsync(created.Id);
+        var found = await _reader.GetAsync(
+            new() { ClassId = created.ClassId, UserId = created.UserId }
+        );
+
         Assert.Null(found);
     }
 
