@@ -52,10 +52,10 @@ public class QueryUseCase<C, E>(
         if (validationAsync.IsErr)
             return validationAsync.UnwrapErr();
 
-        PrevFormat(ref request);
-        await PrevFormatAsync(ref request);
+        var formatSync = PrevFormat(request);
+        var formatAsync = await PrevFormatAsync(formatSync);
 
-        return await _querier.GetByAsync(request.Data);
+        return await _querier.GetByAsync(formatAsync.Data);
     }
 
     /// <summary>
@@ -79,11 +79,11 @@ public class QueryUseCase<C, E>(
     /// Permite formatear o modificar los criterios antes de la consulta (síncrono).
     /// </summary>
     /// <param name="criteria">Referencia a los criterios de búsqueda.</param>
-    protected virtual void PrevFormat(ref UserActionDTO<C> criteria) { }
+    protected virtual UserActionDTO<C> PrevFormat(UserActionDTO<C> criteria) => criteria;
 
     /// <summary>
     /// Permite formatear o modificar los criterios antes de la consulta (asíncrono).
     /// </summary>
     /// <param name="criteria">Referencia a los criterios de búsqueda.</param>
-    protected virtual Task PrevFormatAsync(ref UserActionDTO<C> criteria) => Task.CompletedTask;
+    protected virtual Task<UserActionDTO<C>> PrevFormatAsync(UserActionDTO<C> criteria) => Task.FromResult(criteria);
 }

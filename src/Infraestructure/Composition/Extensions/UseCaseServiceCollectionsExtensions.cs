@@ -1,4 +1,5 @@
 using Application.UseCases.Auth;
+using Application.UseCases.ClassContent;
 using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassResource;
@@ -112,6 +113,9 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddTransient<ReadClassResourceUseCase>();
         s.AddTransient<UpdateClassResourceUseCase>();
         s.AddTransient<ClassResourceAssociationQueryUseCase>();
+
+        // Class content
+        s.AddTransient<QueryClassContentUseCase>();
 
         return s;
     }

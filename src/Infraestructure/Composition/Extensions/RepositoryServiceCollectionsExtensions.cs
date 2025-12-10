@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs.ClassContent;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassResources;
@@ -13,6 +14,7 @@ using Application.DTOs.Tests;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
+using EntityFramework.Application.DAOs.ClassContent;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DAOs.ClassResources;
@@ -213,6 +215,14 @@ internal static class RepositoryServiceCollectionExtensions
             sp => new ClassResourceAssociationEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
                 sp.GetRequiredService<IEFProjector<Class, ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>>(),
+                pageSize
+            )
+        );
+
+        // Class content
+        s.AddScoped<IQuerierAsync<ClassContentDTO, ClassContentCriteriaDTO>>(
+            sp => new ClassContentEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
                 pageSize
             )
         );

@@ -1,7 +1,9 @@
+using Application.DTOs.ClassContent;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
+using Application.UseCases.ClassContent;
 using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
@@ -291,6 +293,11 @@ public static class ClassRoutes
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
+        group
+            .MapPost("/content", SearchClassContent)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
         return group;
     }
 
@@ -512,5 +519,18 @@ public static class ClassRoutes
                     PageSize = criteria.PageSize,
                 },
             mapResponse: ps => Results.Ok(ps)
+        );
+
+    public static Task<IResult> SearchClassContent(
+        [FromBody] ClassContentCriteriaDTO criteria,
+        [FromServices] QueryClassContentUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () => criteria,
+            mapResponse: cc => Results.Ok(cc)
         );
 }
