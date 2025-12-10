@@ -27,6 +27,11 @@ public sealed class ContactEFQuerier(
             .WhereStringQuery(criteria.Alias, c => c.Alias)
             .WhereOptional(criteria.UserId, userId => contact => contact.UserId == userId)
             .WhereOptional(
+                criteria.NotProfessorInClass,
+                classId =>
+                    contact => contact.Contact.ClassProfessors.Any(cp => cp.ClassId != classId)
+            )
+            .WhereOptional(
                 criteria.AgendaOwnerId,
                 ownerId => contact => contact.AgendaOwnerId == ownerId
             );

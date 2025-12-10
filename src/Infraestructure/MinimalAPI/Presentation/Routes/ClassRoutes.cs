@@ -221,26 +221,6 @@ public static class ClassRoutes
             });
 
         group
-            .MapPost("/professors", EnrolledClasses)
-            .WithName("Buscar relaciones clase-professor")
-            .RequireAuthorization("ProfessorOrAdmin")
-            .AddEndpointFilter<ExecutorFilter>()
-            .Produces(StatusCodes.Status401Unauthorized)
-            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaDTO>>(StatusCodes.Status200OK)
-            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
-            .WithOpenApi(op =>
-            {
-                op.Summary = "Búsqueda de clases inscritas por filtros";
-                op.Description =
-                    "Obtener las clases inscritas de un usuario, la búsuqeda considera el usuario activo como el profesor a considerar para la búsqueda";
-                op.Responses["200"].Description = "Si la búsqueda fue exitosa";
-                op.Responses["400"].Description = "Si el formato de entrada no es adecuado";
-                op.Responses["401"].Description = "Si el usuario no está autenticado";
-
-                return op;
-            });
-
-        group
             .MapGet("/professors/{classId}/{userId:ulong}", ReadProfessor)
             .WithName("Leer relacion usuario professor - clase")
             .RequireAuthorization("ProfessorOrAdmin")
@@ -306,6 +286,11 @@ public static class ClassRoutes
                 return op;
             });
 
+        group
+            .MapPost("/{classId}/professors/{userId:ulong}", ProfessorsInClass)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
         return group;
     }
 
@@ -355,8 +340,8 @@ public static class ClassRoutes
     }
 
     public static Task<IResult> EnrolledClasses(
-        [FromBody] ClassCriteriaDTO request,
-        [FromServices] QueryClassUseCase useCase,
+        [FromBody] StudentClassesSummaryCriteriaDTO request,
+        [FromServices] QueryStudentClassesSummaryUseCase useCase,
         [FromServices] RoutesUtils utils,
         HttpContext ctx
     )
@@ -364,16 +349,7 @@ public static class ClassRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () =>
-                    request with
-                    {
-                        WithStudent = new()
-                        {
-                            Id = utils.GetExecutorFromContext(ctx).Id,
-                            Hidden = request.WithStudent?.Hidden,
-                        },
-                    }
-                ,
+            mapRequest: () => request,
             mapResponse: search => Results.Ok(search)
         );
     }
@@ -454,27 +430,19 @@ public static class ClassRoutes
         );
     }
 
-    public static async Task<IResult> ProfessorClasses( 
-        [FromBody] ClassCriteriaDTO criteria, 
-        [FromServices] QueryClassUseCase useCase,
+    public static async Task<IResult> ProfessorClasses(
+        [FromBody] ProfessorClassesSummaryCriteriaDTO criteria,
+        [FromServices] QueryProfessorClassesSummaryUseCase useCase,
         [FromServices] RoutesUtils utils,
-        HttpContext ctx)
+        HttpContext ctx
+    )
     {
-            return await utils.HandleUseCaseAsync(
-                ctx,
-                useCase,
-                mapRequest: () =>
-                        criteria with
-                        {
-                            WithProfessor = new()
-                            {
-                                Id = utils.GetExecutorFromContext(ctx).Id,
-                                IsOwner = criteria.WithProfessor?.IsOwner,
-                            },
-                        }
-                    ,
-                mapResponse: search => Results.Ok(search)
-            );
+        return await utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () => criteria,
+            mapResponse: search => Results.Ok(search)
+        );
     }
 
     public static Task<IResult> SearchClassProfessors(
@@ -523,4 +491,26 @@ public static class ClassRoutes
             mapResponse: _ => Results.NoContent()
         );
     }
+
+    public static Task<IResult> ProfessorsInClass(
+        [FromRoute] string classId,
+        [FromRoute] ulong userId,
+        [FromBody] CriteriaDTO criteria,
+        [FromServices] QueryClassProfessorSummaryUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () =>
+                new ClassProfessorSummaryCriteriaDTO
+                {
+                    ClassId = classId,
+                    ProfessorId = userId,
+                    Page = criteria.Page,
+                    PageSize = criteria.PageSize,
+                },
+            mapResponse: ps => Results.Ok(ps)
+        );
 }

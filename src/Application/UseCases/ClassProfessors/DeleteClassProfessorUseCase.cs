@@ -27,7 +27,8 @@ public sealed class DeleteClassProfessorUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => professor is not null && professor.IsOwner,
+            UserType.PROFESSOR => professor is not null
+                && (professor.IsOwner || professor.UserId == value.Executor.Id),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };

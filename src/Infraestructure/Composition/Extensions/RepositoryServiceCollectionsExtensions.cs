@@ -73,6 +73,20 @@ internal static class RepositoryServiceCollectionExtensions
                 pageSize
              )
         );
+        s.AddScoped<IQuerierAsync<ProfessorClassesSummaryDTO, ProfessorClassesSummaryCriteriaDTO>>(
+            sp => new ProfessorClassesEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<Class, ProfessorClassesSummaryDTO, ProfessorClassesSummaryCriteriaDTO>>(),
+                pageSize
+             )
+        );
+        s.AddScoped<IQuerierAsync<StudentClassesSummaryDTO, StudentClassesSummaryCriteriaDTO>>(
+            sp => new StudentClassesSummaryEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<Class, StudentClassesSummaryDTO, StudentClassesSummaryCriteriaDTO>>(),
+                pageSize
+             )
+        );
 
         // CLASS PROFESSORS
         s.AddScoped<ICreatorAsync<ClassProfessorDomain, NewClassProfessorDTO>, ClassProfessorsEFCreator>();
@@ -86,6 +100,13 @@ internal static class RepositoryServiceCollectionExtensions
         s.AddScoped<IReaderAsync<UserClassRelationId, ClassStudentDomain>, ClassStudentsEFReader>();
         s.AddScoped<IUpdaterAsync<ClassStudentDomain, ClassStudentUpdateDTO>, ClassStudentsEFUpdater>();
         s.AddScoped<IDeleterAsync<UserClassRelationId, ClassStudentDomain>, ClassStudentsEFDeleter>();
+        s.AddScoped<IQuerierAsync<ClassProfessorSummaryDTO, ClassProfessorSummaryCriteriaDTO>>(
+            sp => new ClassProfessorSummaryEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<User, ClassProfessorSummaryDTO, ClassProfessorSummaryCriteriaDTO>>(),
+                pageSize
+             )
+        );
 
         // NOTIFICATIONS
         s.AddScoped<NotificationEFCreator>();

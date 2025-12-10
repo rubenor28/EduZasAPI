@@ -93,6 +93,8 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IUpdateMapper<ClassUpdateDTO, Class>, UpdateClassEFMapper>();
         s.AddSingleton<IMapper<Class, ClassDomain>, ClassMapper>();
         s.AddSingleton<IEFProjector<Class, ClassDomain, ClassCriteriaDTO>, ClassProjector>();
+        s.AddSingleton<IEFProjector<Class, ProfessorClassesSummaryDTO, ProfessorClassesSummaryCriteriaDTO>, ProfessorClassesSummaryProjector>();
+        s.AddSingleton<IEFProjector<Class, StudentClassesSummaryDTO, StudentClassesSummaryCriteriaDTO>, StudentClassesSummaryProjector>();
 
         // CLASS PROFESSOR
         // EF
@@ -100,6 +102,7 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IUpdateMapper<ClassProfessorUpdateDTO, ClassProfessor>, UpdateClassProfessorEFMapper>();
         s.AddSingleton<IMapper<ClassProfessor, ClassProfessorDomain>, ClassProfessorMapper>();
         s.AddSingleton<IEFProjector<ClassProfessor, ClassProfessorDomain, ClassProfessorCriteriaDTO>, ClassProfessorProjector>();
+        s.AddSingleton<IEFProjector<User, ClassProfessorSummaryDTO, ClassProfessorSummaryCriteriaDTO>, ClassProfessorSummaryProjector>();
 
         // CLASS STUDENTS
         // EF
