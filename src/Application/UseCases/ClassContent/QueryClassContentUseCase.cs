@@ -1,4 +1,3 @@
-using System.Reflection;
 using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.ClassContent;
@@ -10,6 +9,10 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassContent;
 
+///<summary>
+/// Define una entidad encargada de buscar los recursos o evaluaciones asociadas a una
+/// clase
+///<summary/>
 public sealed class QueryClassContentUseCase(
     IQuerierAsync<ClassContentDTO, ClassContentCriteriaDTO> querier,
     IReaderAsync<UserClassRelationId, ClassStudentDomain> studentReader,
@@ -22,6 +25,7 @@ public sealed class QueryClassContentUseCase(
         professorReader;
     private UserType? _userTypeOnClass = null;
 
+    ///<inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassContentCriteriaDTO> criteria
     )
@@ -48,6 +52,7 @@ public sealed class QueryClassContentUseCase(
         return Unit.Value;
     }
 
+    ///<inheritdoc/>
     protected override UserActionDTO<ClassContentCriteriaDTO> PrevFormat(
         UserActionDTO<ClassContentCriteriaDTO> criteria
     )

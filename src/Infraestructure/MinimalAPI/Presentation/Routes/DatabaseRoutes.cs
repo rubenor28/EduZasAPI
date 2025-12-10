@@ -1,7 +1,5 @@
-using Application.DTOs.Common;
 using Application.UseCases.Database;
 using Domain.ValueObjects;
-using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Presentation.Filters;
 
@@ -86,7 +84,6 @@ public static class DatabaseRoutes
     public static async Task<IResult> RestoreFromBackup(
         [FromServices] RestoreUseCase useCase,
         [FromServices] RoutesUtils utils,
-        [FromServices] IMapper<UseCaseError, IResult> useCaseErrorsMapper,
         HttpContext httpContext,
         IFormFile file
     )
@@ -108,7 +105,7 @@ public static class DatabaseRoutes
             );
 
             if (result.IsErr)
-                return useCaseErrorsMapper.Map(result.UnwrapErr());
+                return RoutesUtils.MapError(result.UnwrapErr());
 
             return Results.Ok("Restauración completada con éxito.");
         });
