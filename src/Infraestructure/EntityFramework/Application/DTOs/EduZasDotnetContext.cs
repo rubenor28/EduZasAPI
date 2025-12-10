@@ -369,7 +369,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("active");
             notificationBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
-            notificationBuilder.Property(e => e.Title).HasMaxLength(20).HasColumnName("title");
+            notificationBuilder.Property(e => e.Title).HasMaxLength(60).HasColumnName("title");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
@@ -482,7 +482,7 @@ public partial class EduZasDotnetContext : DbContext
             {
                 contentProperty.HasColumnType("json");
             }
-            resourceBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
+            resourceBuilder.Property(e => e.Title).HasMaxLength(60).HasColumnName("title");
             resourceBuilder
                 .Property(e => e.Color)
                 .HasMaxLength(7)
@@ -693,7 +693,7 @@ public partial class EduZasDotnetContext : DbContext
                 contentProperty.HasColumnType("json");
             }
 
-            testBuilder.Property(e => e.Title).HasMaxLength(35).HasColumnName("title");
+            testBuilder.Property(e => e.Title).HasMaxLength(60).HasColumnName("title");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {

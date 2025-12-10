@@ -71,6 +71,9 @@ internal static class UseCaseServiceCollectionExtensions
 
         // Notifications
         s.AddTransient<SearchNotificationUseCase>();
+        s.AddTransient<QueryNotificationSummaryUseCase>();
+        s.AddTransient<HasUnreadNotificationUseCase>();
+        s.AddTransient<UpdateUserNotificationUseCase>();
 
         // User notifications
         s.AddTransient<UpdateUserNotificationUseCase>();

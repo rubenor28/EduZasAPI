@@ -2,6 +2,8 @@ using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.ClassResources;
 using Application.DTOs.Common;
+using Application.DTOs.Notifications;
+using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Application.Services;
 using Application.UseCases.Common;
@@ -21,20 +23,28 @@ public sealed class AddClassResourceUseCase(
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<Guid, ResourceDomain> resourceReader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader,
-    IEmailSender emailSender,
+    ICreatorAsync<NotificationDomain, NewNotificationDTO> notificationCreator,
+    IBulkCreatorAsync<UserNotificationDomain, NewUserNotificationDTO> usrNotificationCreator,
     IReaderAsync<ulong, UserDomain> userReader,
     IQuerierAsync<UserDomain, UserCriteriaDTO> userQuierier,
     IBusinessValidationService<ClassResourceDTO>? validator = null
 ) : AddUseCase<ClassResourceDTO, ClassResourceDomain>(creator, validator)
 {
-    private readonly IEmailSender _emailSender = emailSender;
     private readonly IReaderAsync<ClassResourceIdDTO, ClassResourceDomain> _reader = reader;
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
     private readonly IReaderAsync<Guid, ResourceDomain> _resourceReader = resourceReader;
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
+
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuierier = userQuierier;
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
+
+    private readonly ICreatorAsync<NotificationDomain, NewNotificationDTO> _notificationCreator =
+        notificationCreator;
+    private readonly IBulkCreatorAsync<
+        UserNotificationDomain,
+        NewUserNotificationDTO
+    > _usrNotificationCreator = usrNotificationCreator;
 
     /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
@@ -83,21 +93,47 @@ public sealed class AddClassResourceUseCase(
         return Unit.Value;
     }
 
-    /*
-     protected override async Task ExtraTaskAsync(
-         UserActionDTO<ClassResourceDTO> newEntity,
-         ClassResourceDomain createdEntity
-     )
-     {
-        var user = await _userReader.GetAsync(newEntity.Executor.Id) ?? throw new ArgumentException("No se pudo encontrar el usuario");
-         var search = await _userQuierier.GetByAsync(new() { EnrolledInClass = newEntity.Data.ClassId });
-         var email = new EmailMessage
-         {
-             Subject = $"Nuevo recurso compartido por {user.FatherLastname} {user.FirstName}",
-             To = [.. search.Results.Select(s => s.Email)],
-             Body =
-                 $"<h1>EduZas</h1><h2>{user.FatherLastname} {user.FirstName} ha publicado un nuevo recurso</h2><a href=\"\">Abrir recurso</a>",
-         };
-     }
-     */
+    protected override async Task ExtraTaskAsync(
+        UserActionDTO<ClassResourceDTO> newEntity,
+        ClassResourceDomain createdEntity
+    )
+    {
+        var user = await _userReader.GetAsync(newEntity.Executor.Id);
+        var @class = await _classReader.GetAsync(newEntity.Data.ClassId);
+
+        var notification = await _notificationCreator.AddAsync(
+            new()
+            {
+                ClassId = newEntity.Data.ClassId,
+                Title =
+                    $"{user!.FirstName} {user.FatherLastname} ha agregado un nuevo recurso en ${@class!.ClassName}",
+            }
+        );
+
+        var usersToNotify = new List<Task>();
+        var page = 1;
+        PaginatedQuery<UserDomain, UserCriteriaDTO> result;
+
+        do
+        {
+            result = await _userQuierier.GetByAsync(
+                new()
+                {
+                    Page = page,
+                    Active = true,
+                    EnrolledInClass = newEntity.Data.ClassId,
+                }
+            );
+
+            var newNotifications = result.Results.Select(u => new NewUserNotificationDTO
+            {
+                UserId = u.Id,
+                NotificationId = notification.Id,
+            });
+
+            await _usrNotificationCreator.AddRangeAsync(newNotifications);
+
+            page++;
+        } while (result.Page <= result.TotalPages);
+    }
 }

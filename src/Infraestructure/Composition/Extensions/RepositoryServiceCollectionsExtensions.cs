@@ -122,6 +122,13 @@ internal static class RepositoryServiceCollectionExtensions
                 pageSize
             )
         );
+        s.AddScoped<IQuerierAsync<NotificationSummaryDTO, NotificationSummaryCriteriaDTO>>(
+            sp => new NotificationSummaryEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<NotificationPerUser, NotificationSummaryDTO, NotificationSummaryCriteriaDTO>>(),
+                pageSize
+            )
+        );
 
         // USER NOTIFICATIONS
         s.AddScoped<UserNotificationEFCreator>();

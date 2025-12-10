@@ -12,4 +12,6 @@ public sealed record NotificationCriteriaDTO : CriteriaDTO
 
     /// <summary>Filtra por ID de usuario.</summary>
     public ulong? UserId { get; init; }
+
+    public bool? Readed {get;init;}
 }

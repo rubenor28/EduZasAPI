@@ -115,6 +115,8 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<Notification, NotificationDomain>, NotificationMapper>();
         s.AddSingleton<IMapper<NewNotificationDTO, Notification>, NewNotificationEFMapper>();
         s.AddSingleton<IEFProjector<Notification, NotificationDomain, NotificationCriteriaDTO>, NotificationProjector>();
+        s.AddSingleton<IEFProjector<NotificationPerUser, NotificationSummaryDTO, NotificationSummaryCriteriaDTO>, NotificationSummaryProjector>();
+
 
         // USER NOTIFICATIONS
         // EF
