@@ -32,9 +32,8 @@ RUN dotnet restore EduZasAPI.sln
 COPY src/ src/
 
 # Publica únicamente el proyecto de entrada (API)
-# Usar --no-restore aprovecha la capa de caché del 'dotnet restore' anterior
-RUN dotnet publish "src/Infraestructure/MinimalAPI/MinimalAPI.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist/api --no-restore
-RUN dotnet publish "src/Infraestructure/Cli/Cli.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist/cli --no-restore
+RUN dotnet publish "src/Infraestructure/MinimalAPI/MinimalAPI.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist/api
+RUN dotnet publish "src/Infraestructure/Cli/Cli.csproj" -c ${BUILD_CONFIGURATION} -o /home/build/dist/cli
 
 # Etapa 2: Imagen final para ejecución
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
