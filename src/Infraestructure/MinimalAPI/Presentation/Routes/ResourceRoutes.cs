@@ -176,8 +176,8 @@ public static class ResourceRoutes
             .Produces(StatusCodes.Status403Forbidden)
             .WithOpenApi(op =>
             {
-                op.Summary = "Desasociar un recurso de una clase.";
-                op.Description = "Elimina la asociación entre un recurso y una clase.";
+                op.Summary = "Actualizar la relacion un recurso de una clase.";
+                op.Description = "Actualiza la asociación entre un recurso y una clase.";
                 op.Responses["204"].Description = "Recurso desasociado exitosamente.";
                 op.Responses["400"].Description = "Los datos de la asociación son inválidos.";
                 op.Responses["401"].Description = "Usuario no autenticado.";
