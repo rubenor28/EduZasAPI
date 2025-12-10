@@ -76,8 +76,8 @@ public class AgendaContactEFRepositoryTest : IDisposable
         Assert.NotNull(created);
         Assert.Equal(newContact.Alias, created.Alias);
         Assert.Equal(newContact.Notes, created.Notes);
-        Assert.Equal(newContact.AgendaOwnerId, created.Id.AgendaOwnerId);
-        Assert.Equal(newContact.UserId, created.Id.UserId);
+        Assert.Equal(newContact.AgendaOwnerId, created.AgendaOwnerId);
+        Assert.Equal(newContact.UserId, created.UserId);
     }
 
     [Fact]
@@ -118,10 +118,13 @@ public class AgendaContactEFRepositoryTest : IDisposable
         };
         var created = await _creator.AddAsync(newContact);
 
-        var found = await _reader.GetAsync(created.Id);
+        var found = await _reader.GetAsync(
+            new() { UserId = created.UserId, AgendaOwnerId = created.AgendaOwnerId }
+        );
 
         Assert.NotNull(found);
-        Assert.Equal(created.Id, found.Id);
+        Assert.Equal(created.UserId, found.UserId);
+        Assert.Equal(created.AgendaOwnerId, found.AgendaOwnerId);
     }
 
     [Fact]
@@ -147,8 +150,8 @@ public class AgendaContactEFRepositoryTest : IDisposable
 
         var update = new ContactUpdateDTO
         {
-            AgendaOwnerId = created.Id.AgendaOwnerId,
-            UserId = created.Id.UserId,
+            AgendaOwnerId = created.AgendaOwnerId,
+            UserId = created.UserId,
             Alias = "Updated Alias",
             Notes = "Updated notes",
         };
@@ -156,10 +159,8 @@ public class AgendaContactEFRepositoryTest : IDisposable
         var updated = await _updater.UpdateAsync(update);
 
         Assert.NotNull(updated);
-        Assert.Equal(
-            new ContactIdDTO { UserId = update.UserId, AgendaOwnerId = update.AgendaOwnerId },
-            updated.Id
-        );
+        Assert.Equal(update.UserId, updated.UserId);
+        Assert.Equal(update.AgendaOwnerId, updated.AgendaOwnerId);
         Assert.Equal(update.Alias, updated.Alias);
         Assert.Equal(update.Notes, updated.Notes);
     }

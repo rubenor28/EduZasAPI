@@ -14,6 +14,7 @@ public sealed class ClassProfessorSummaryProjector
         ef =>
             new(
                 UserId: ef.UserId,
+                Email: ef.Email,
                 Alias: ef.AgendaContactContacts.Where(ac =>
                         ac.UserId == ef.UserId && ac.AgendaOwnerId == criteria.ProfessorId
                     )
@@ -24,7 +25,7 @@ public sealed class ClassProfessorSummaryProjector
                 FatherLastName: ef.FatherLastname,
                 MotherLastname: ef.MotherLastname,
                 Owner: ef.ClassProfessors.Where(cp =>
-                        cp.ClassId == criteria.ClassId && cp.ProfessorId == criteria.ProfessorId
+                        cp.ClassId == criteria.ClassId && cp.ProfessorId == ef.UserId
                     )
                     .Select(cp => cp.IsOwner)
                     .FirstOrDefault()

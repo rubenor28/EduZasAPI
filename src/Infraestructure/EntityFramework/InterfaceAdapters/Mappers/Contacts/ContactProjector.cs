@@ -16,7 +16,8 @@ public class ContactProjector : IEFProjector<AgendaContact, ContactDomain, Conta
         input =>
             new()
             {
-                Id = new() { AgendaOwnerId = input.AgendaOwnerId, UserId = input.UserId },
+                AgendaOwnerId = input.AgendaOwnerId,
+                UserId = input.UserId,
                 Alias = input.Alias,
                 Notes = input.Notes,
                 CreatedAt = input.CreatedAt,

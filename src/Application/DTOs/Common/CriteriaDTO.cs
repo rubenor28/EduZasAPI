@@ -3,7 +3,7 @@ namespace Application.DTOs.Common;
 /// <summary>
 /// Define la interfaz para los criterios de consulta y paginación.
 /// </summary>
-public abstract record CriteriaDTO
+public record CriteriaDTO
 {
     /// <summary>
     /// Obtiene o establece el número de página actual (base 1).

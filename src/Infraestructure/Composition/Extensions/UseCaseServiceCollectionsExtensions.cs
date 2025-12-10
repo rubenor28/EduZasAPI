@@ -64,6 +64,7 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddTransient<UpdateClassProfessorUseCase>();
         s.AddTransient<DeleteClassProfessorUseCase>();
         s.AddTransient<QueryProfessorClassesSummaryUseCase>();
+        s.AddTransient<QueryClassProfessorSummaryUseCase>();
 
         // Notifications
         s.AddTransient<SearchNotificationUseCase>();

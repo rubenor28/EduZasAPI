@@ -1,9 +1,13 @@
 namespace Domain.Entities;
 
 /// <summary>
-/// Representa el identificador compuesto para un contacto en la agenda.
+/// Representa un contacto en la agenda de un usuario.
 /// </summary>
-public sealed record ContactIdDTO
+/// <remarks>
+/// Esta entidad almacena la relación entre un propietario de agenda y otro usuario
+/// (el contacto), junto con metadatos como un alias y notas.
+/// </remarks>
+public sealed record ContactDomain
 {
     /// <summary>
     /// Obtiene o establece el ID del propietario de la agenda.
@@ -14,21 +18,6 @@ public sealed record ContactIdDTO
     /// Obtiene o establece el ID del usuario que es el contacto.
     /// </summary>
     public required ulong UserId { get; set; }
-}
-
-/// <summary>
-/// Representa un contacto en la agenda de un usuario.
-/// </summary>
-/// <remarks>
-/// Esta entidad almacena la relación entre un propietario de agenda y otro usuario
-/// (el contacto), junto con metadatos como un alias y notas.
-/// </remarks>
-public sealed record ContactDomain
-{
-    /// <summary>
-    /// Obtiene o establece el identificador compuesto del contacto.
-    /// </summary>
-    public required ContactIdDTO Id { get; set; }
 
     /// <summary>
     /// Obtiene o establece el alias o apodo para el contacto.

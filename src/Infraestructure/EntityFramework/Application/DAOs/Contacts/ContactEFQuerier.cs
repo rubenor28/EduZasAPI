@@ -29,7 +29,7 @@ public sealed class ContactEFQuerier(
             .WhereOptional(
                 criteria.NotProfessorInClass,
                 classId =>
-                    contact => contact.Contact.ClassProfessors.Any(cp => cp.ClassId != classId)
+                    contact => !contact.Contact.ClassProfessors.Any(cp => cp.ClassId == classId)
             )
             .WhereOptional(
                 criteria.AgendaOwnerId,

@@ -214,7 +214,7 @@ public static class ContactRoutes
             ctx,
             useCase,
             mapRequest: () => request,
-            mapResponse: c => Results.Created($"/contacts/{c.Id}", c)
+            mapResponse: c => Results.Created($"/contacts/{c.AgendaOwnerId}/{c.UserId}", c)
         );
     }
 

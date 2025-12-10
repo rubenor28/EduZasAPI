@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Application.DTOs.Contacts;
 using Domain.Entities;
 using EntityFramework.Application.DAOs.Common;
 using EntityFramework.Application.DTOs;

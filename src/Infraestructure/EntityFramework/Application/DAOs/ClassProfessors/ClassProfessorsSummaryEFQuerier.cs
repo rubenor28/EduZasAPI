@@ -20,6 +20,5 @@ public class ClassProfessorSummaryEFQuerier(
     public override IQueryable<User> BuildQuery(ClassProfessorSummaryCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()
-            .Where(c => c.ClassProfessors.Any(cp => cp.ProfessorId == criteria.ProfessorId))
             .Where(c => c.ClassProfessors.Any(cp => cp.ClassId == criteria.ClassId));
 }

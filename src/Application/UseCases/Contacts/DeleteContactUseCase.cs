@@ -46,7 +46,7 @@ public sealed class DeleteContactUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => record.Id.AgendaOwnerId == value.Executor.Id,
+            UserType.PROFESSOR => record.AgendaOwnerId == value.Executor.Id,
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
