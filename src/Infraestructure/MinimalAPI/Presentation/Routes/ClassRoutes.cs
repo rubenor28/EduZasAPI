@@ -313,7 +313,7 @@ public static class ClassRoutes
 
         group
             .MapPost("/content", SearchClassContent)
-            .RequireAuthorization("ProfessorOrAdmin")
+            .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>();
 
         return group;

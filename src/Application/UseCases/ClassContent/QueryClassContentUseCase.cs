@@ -89,9 +89,9 @@ public sealed class QueryClassContentUseCase(
     ///<summary>
     /// Obtener el tipo de usuario de un estudiante sobre una clase especifica
     ///</summary>
-    private async Task<UserType?> CheckStudentClassUserType(ulong professorId, string classId)
+    private async Task<UserType?> CheckStudentClassUserType(ulong studentId, string classId)
     {
-        var id = new UserClassRelationId { ClassId = classId, UserId = professorId };
+        var id = new UserClassRelationId { ClassId = classId, UserId = studentId };
 
         var student = await _studentReader.GetAsync(id);
         if (student is not null)
