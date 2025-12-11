@@ -1,9 +1,11 @@
 using Application.DTOs.Classes;
+using Application.DTOs.Contacts;
 using Application.DTOs.Users;
 using Application.Services;
 using FluentValidationProj.Application.Services.Auth;
 using FluentValidationProj.Application.Services.Classes;
 using FluentValidationProj.Application.Services.Common;
+using FluentValidationProj.Application.Services.Contacts;
 using FluentValidationProj.Application.Services.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -50,6 +52,10 @@ internal static class ValidatorServiceCollectionExtensions
             IBusinessValidationService<ClassUpdateDTO>,
             ClassUpdateFluentValidator
         >();
+
+        // Contact validators
+        services.AddSingleton<IBusinessValidationService<NewContactDTO>, NewContactFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<ContactUpdateDTO>, ContactUpdateFluentValidator>();
 
         return services;
     }
