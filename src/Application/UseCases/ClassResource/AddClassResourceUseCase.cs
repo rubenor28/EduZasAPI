@@ -98,6 +98,9 @@ public sealed class AddClassResourceUseCase(
         ClassResourceDomain createdEntity
     )
     {
+        if (newEntity.Data.Hidden)
+            return;
+
         var user = await _userReader.GetAsync(newEntity.Executor.Id);
         var @class = await _classReader.GetAsync(newEntity.Data.ClassId);
 
