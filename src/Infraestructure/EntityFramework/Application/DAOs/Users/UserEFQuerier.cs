@@ -43,7 +43,7 @@ public class UserEFQuerier(
 
         if (_ctx.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
         {
-            query = query.OrderBy(u => u.UserId);
+            query = query.OrderBy(u => u.FatherLastname);
         }
 
         return query;
