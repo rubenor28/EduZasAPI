@@ -22,6 +22,7 @@ public sealed class TestSummaryEFQuerier(
             .AsNoTracking()
             .AsQueryable()
             .WhereStringQuery(criteria.Title, c => c.Title)
+            .WhereOptional(criteria.Active, active => c => c.Active == active)
             .WhereOptional(criteria.TimeLimitMinutes, time => test => test.TimeLimitMinutes == time)
             .WhereOptional(criteria.ProfessorId, id => test => test.ProfessorId == id)
             .WhereOptional(
