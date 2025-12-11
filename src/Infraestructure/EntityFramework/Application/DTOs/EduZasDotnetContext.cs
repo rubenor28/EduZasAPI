@@ -153,12 +153,12 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(e => e.AgendaOwner)
                 .WithMany(e => e.AgendaContactAgendaOwners)
                 .HasForeignKey(e => e.AgendaOwnerId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
             agendaContactBuilder
                 .HasOne(e => e.Contact)
                 .WithMany(e => e.AgendaContactContacts)
                 .HasForeignKey(e => e.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Answer>(answerBuilder =>
@@ -205,11 +205,12 @@ public partial class EduZasDotnetContext : DbContext
                     .HasColumnName("modified_at");
             }
 
-            answerBuilder.HasOne(e => e.User).WithMany(e => e.Answers).HasForeignKey(e => e.UserId);
+            answerBuilder.HasOne(e => e.User).WithMany(e => e.Answers).HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             answerBuilder
                 .HasOne(e => e.TestPerClass)
                 .WithMany(e => e.Answers)
-                .HasForeignKey(e => new { e.TestId, e.ClassId });
+                .HasForeignKey(e => new { e.TestId, e.ClassId })
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Class>(classBuilder =>
@@ -303,11 +304,13 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Class)
                 .WithMany(p => p.ClassProfessors)
                 .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("class_professors_ibfk_1");
             classProfessorBuilder
                 .HasOne(d => d.Professor)
                 .WithMany(p => p.ClassProfessors)
                 .HasForeignKey(d => d.ProfessorId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("class_professors_ibfk_2");
         });
 
@@ -350,11 +353,13 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Class)
                 .WithMany(p => p.ClassStudents)
                 .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("class_students_ibfk_1");
             classStudentBuilder
                 .HasOne(d => d.Student)
                 .WithMany(p => p.ClassStudents)
                 .HasForeignKey(d => d.StudentId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("class_students_ibfk_2");
         });
 
@@ -399,6 +404,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Class)
                 .WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("notifications_ibfk_1");
         });
 
@@ -456,11 +462,13 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Notification)
                 .WithMany(p => p.NotificationPerUsers)
                 .HasForeignKey(d => d.NotificationId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("notification_per_user_ibfk_1");
             notificationPerUserBuilder
                 .HasOne(d => d.User)
                 .WithMany(p => p.NotificationPerUsers)
                 .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("notification_per_user_ibfk_2");
         });
 
@@ -531,6 +539,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Professor)
                 .WithMany(p => p.Resources)
                 .HasForeignKey(d => d.ProfessorId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("resources_ibfk_1");
         });
 
@@ -580,12 +589,14 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Class)
                 .WithMany(p => p.ClassResources)
                 .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("class_resources_ibfk_1");
 
             classResourceBuilder
                 .HasOne(d => d.Resource)
                 .WithMany(p => p.ClassResources)
                 .HasForeignKey(d => d.ResourceId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("class_resources_ibfk_2");
         });
 
@@ -660,11 +671,13 @@ public partial class EduZasDotnetContext : DbContext
             contactTagBuilder
                 .HasOne(e => e.Tag)
                 .WithMany(e => e.ContactTags)
-                .HasForeignKey(e => e.TagText);
+                .HasForeignKey(e => e.TagText)
+                .OnDelete(DeleteBehavior.Cascade);
             contactTagBuilder
                 .HasOne(e => e.AgendaContact)
                 .WithMany(e => e.ContactTags)
-                .HasForeignKey(e => new { e.AgendaOwnerId, e.UserId });
+                .HasForeignKey(e => new { e.AgendaOwnerId, e.UserId })
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Test>(testBuilder =>
@@ -742,6 +755,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Professor)
                 .WithMany(p => p.Tests)
                 .HasForeignKey(d => d.ProfessorId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("tests_ibfk_1");
         });
 
@@ -780,11 +794,13 @@ public partial class EduZasDotnetContext : DbContext
                 .HasOne(d => d.Class)
                 .WithMany(p => p.TestsPerClasses)
                 .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("tests_per_class_ibfk_2");
             testPerClassBuilder
                 .HasOne(d => d.Test)
                 .WithMany(p => p.TestsPerClasses)
                 .HasForeignKey(d => d.TestId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("tests_per_class_ibfk_1");
         });
 
@@ -907,15 +923,18 @@ public partial class EduZasDotnetContext : DbContext
             builder
                 .HasOne(d => d.User)
                 .WithMany(p => p.ResourceViewSessions)
-                .HasForeignKey(d => d.UserId);
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
             builder
                 .HasOne(d => d.Resource)
                 .WithMany(p => p.ResourceViewSessions)
-                .HasForeignKey(d => d.ResourceId);
+                .HasForeignKey(d => d.ResourceId)
+                .OnDelete(DeleteBehavior.Cascade);
             builder
                 .HasOne(d => d.Class)
                 .WithMany(p => p.ResourceViewSessions)
-                .HasForeignKey(d => d.ClassId);
+                .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         OnModelCreatingPartial(modelBuilder);
