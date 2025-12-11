@@ -78,20 +78,20 @@ public class AddClassUseCase(
             errors.Add(new() { Field = "ownerId", Message = "No se encontró el usuario" })
         );
 
-        var validationTasks = value.Data.Professors.Select(async professor =>
+        var invalidProfessorIds = new List<ulong>();
+        foreach (var professor in value.Data.Professors)
         {
             var userResult = await userReader.GetAsync(professor.UserId);
-            return userResult.Match(
+            var invalidId = userResult.Match(
                 user => user.Role == UserType.STUDENT ? professor.UserId : (ulong?)null,
                 () => professor.UserId
             );
-        });
 
-        var invalidIdResults = await Task.WhenAll(validationTasks);
-        var invalidProfessorIds = invalidIdResults
-            .Where(id => id is not null)
-            .Select(id => id!.Value)
-            .ToList();
+            if (invalidId.HasValue)
+            {
+                invalidProfessorIds.Add(invalidId.Value);
+            }
+        }
 
         if (invalidProfessorIds.Count > 0)
         {
