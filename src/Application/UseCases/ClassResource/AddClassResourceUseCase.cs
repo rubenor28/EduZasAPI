@@ -106,7 +106,7 @@ public sealed class AddClassResourceUseCase(
             {
                 ClassId = newEntity.Data.ClassId,
                 Title =
-                    $"{user!.FirstName} {user.FatherLastname} ha agregado un nuevo recurso en ${@class!.ClassName}",
+                    $"{user!.FirstName} {user.FatherLastname} ha agregado un nuevo recurso en {@class!.ClassName}",
             }
         );
 

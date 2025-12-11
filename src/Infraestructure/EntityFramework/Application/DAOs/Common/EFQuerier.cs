@@ -69,7 +69,7 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
         {
             Page = criteria.Page,
             TotalPages = totalPages,
-            Criteria = criteria,
+            Criteria = criteria with { PageSize = pageSize, Page = pageNumber },
             Results = results,
         };
     }
