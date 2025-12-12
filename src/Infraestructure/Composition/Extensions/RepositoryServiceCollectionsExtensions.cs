@@ -214,6 +214,7 @@ internal static class RepositoryServiceCollectionExtensions
         s.AddScoped<IUpdaterAsync<ResourceDomain, ResourceUpdateDTO>, ResourceEFUpdater>();
         s.AddScoped<IDeleterAsync<Guid, ResourceDomain>, ResourceEFDeleter>();
         s.AddScoped<IReaderAsync<Guid, ResourceDomain>, ResourceEFReader>();
+        s.AddScoped<IReaderAsync<ReadResourceDTO, ResourceDomain>, PublicResourceEFReader>();
         s.AddScoped<IQuerierAsync<ResourceSummary, ResourceCriteriaDTO>>(
             sp => new ResourceSummaryEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),

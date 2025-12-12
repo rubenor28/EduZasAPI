@@ -209,6 +209,27 @@ public static class ResourceRoutes
                 return op;
             });
 
+        group
+            .MapGet("/{resourceId}/{classId}", PublicResourceRead)
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<ResourceDomain>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Obtener un recurso por ID de clase y recurso.";
+                op.Description = "Recupera la información de un recurso académico dada la clase.";
+                op.Responses["200"].Description = "Recurso obtenido exitosamente.";
+                op.Responses["401"].Description = "Usuario no autenticado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permisos para leer el recurso";
+                op.Responses["404"].Description =
+                    "No se encontró un recurso con el ID proporcionado.";
+                return op;
+            });
+
         return group;
     }
 
@@ -362,4 +383,23 @@ public static class ResourceRoutes
             mapResponse: (results) => Results.Ok(results)
         );
     }
+
+    public static Task<IResult> PublicResourceRead(
+        [FromRoute] Guid resourceId,
+        [FromRoute] string classId,
+        [FromServices] PublicReadResourceUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () =>
+                new ReadResourceDTO(
+                    UserId: utils.GetExecutorFromContext(ctx).Id,
+                    ClassId: classId,
+                    ResourceId: resourceId
+                ),
+            mapResponse: t => Results.Ok(t)
+        );
 }

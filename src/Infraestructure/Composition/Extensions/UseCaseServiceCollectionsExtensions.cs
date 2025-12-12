@@ -111,6 +111,7 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddTransient<ResourceQueryUseCase>();
         s.AddTransient<DeleteResourceUseCase>();
         s.AddTransient<UpdateResourceUseCase>();
+        s.AddTransient<PublicReadResourceUseCase>();
 
         // Class resource
         s.AddTransient<AddClassResourceUseCase>();
