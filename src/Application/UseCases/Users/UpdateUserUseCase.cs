@@ -65,20 +65,22 @@ public sealed class UpdateUserUseCase(
         UserDomain original
     )
     {
-        if (
-            value.Data.Password is not null
+        var passwordFormat =
+            // If changing password
+            value.Data.Password
+                is not null
             && !_hasher.Matches(value.Data.Password, original.Password)
-        )
-        {
-            return value with
-            {
-                Data = value.Data with { Password = _hasher.Hash(value.Data.Password) },
-            };
-        }
+                // Hash pwd
+                ? value with
+                {
+                    Data = value.Data with { Password = _hasher.Hash(value.Data.Password) },
+                }
+                // Do nothing
+                : value;
 
-        return value with
+        return passwordFormat with
         {
-            Data = value.Data with { Password = original.Password },
+            Data = value.Data with { Email = value.Data.Email },
         };
     }
 
