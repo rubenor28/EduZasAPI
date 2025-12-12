@@ -90,12 +90,33 @@ public static class ClassRoutes
             });
 
         group
+            .MapPost("/all", SearchClasses)
+            .RequireAuthorization("Admin")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaDTO>>(StatusCodes.Status200OK)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Búsqueda de clases asesoradas por filtros";
+                op.Description =
+                    "Obtener las clases asesoradas de un usuario, la búsuqeda considera el usuario activo como el profesor a considerar para la búsqueda";
+                op.Responses["200"].Description = "Si la búsqueda fue exitosa";
+                op.Responses["400"].Description = "Si el formato de entrada no es adecuado";
+                op.Responses["401"].Description = "Si el usuario no está autenticado";
+                op.Responses["403"].Description =
+                    "Si el usaurio no cumple con la política de acceso";
+                return op;
+            });
+
+        group
             .MapPost("/assigned", ProfessorClasses)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
-            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaDTO>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ProfessorClassesSummaryDTO, ProfessorClassesSummaryCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -116,7 +137,7 @@ public static class ClassRoutes
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces<PaginatedQuery<ClassDomain, ClassCriteriaDTO>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<StudentClassesSummaryDTO, StudentClassesSummaryCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .WithOpenApi(op =>
             {
@@ -452,6 +473,21 @@ public static class ClassRoutes
             useCase,
             mapRequest: () => request,
             mapResponse: _ => Results.NoContent()
+        );
+    }
+
+    public static async Task<IResult> SearchClasses(
+        [FromBody] ClassCriteriaDTO criteria,
+        [FromServices] QueryClassUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    )
+    {
+        return await utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () => criteria,
+            mapResponse: search => Results.Ok(search)
         );
     }
 

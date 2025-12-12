@@ -10,6 +10,9 @@ public sealed record ContactCriteriaDTO : CriteriaDTO
     /// <summary>Filtra por alias.</summary>
     public StringQueryDTO? Alias { get; init; }
 
+    /// <summary>Filtra por email.</summary>
+    public StringQueryDTO? Email { get; init; }
+
     /// <summary>Filtra por ID del dueño de la agenda.</summary>
     public ulong? AgendaOwnerId { get; init; }
 

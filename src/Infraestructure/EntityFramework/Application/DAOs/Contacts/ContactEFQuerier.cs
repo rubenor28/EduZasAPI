@@ -24,6 +24,7 @@ public sealed class ContactEFQuerier(
         var query = _dbSet
             .AsNoTracking()
             .AsQueryable()
+            .WhereStringQuery(criteria.Email, c => c.Contact.Email)
             .WhereStringQuery(criteria.Alias, c => c.Alias)
             .WhereOptional(criteria.UserId, userId => contact => contact.UserId == userId)
             .WhereOptional(
