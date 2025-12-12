@@ -46,7 +46,7 @@ public static class ResourceRoutes
             });
 
         group
-            .MapGet("/{resourceId:guid}", GetResources)
+            .MapGet("/{resourceId:guid}", GetResource)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<ResourceDomain>(StatusCodes.Status200OK)
@@ -248,7 +248,7 @@ public static class ResourceRoutes
         );
     }
 
-    public static Task<IResult> GetResources(
+    public static Task<IResult> GetResource(
         [FromRoute] Guid resourceId,
         [FromServices] ReadResourceUseCase useCase,
         HttpContext ctx,
