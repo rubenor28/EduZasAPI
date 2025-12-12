@@ -8,7 +8,7 @@ public sealed record ContactTagIdDTO
     /// <summary>
     /// Obtiene o establece el texto de la etiqueta.
     /// </summary>
-    public required string Tag { get; set; }
+    public required ulong TagId { get; set; }
 
     /// <summary>
     /// Obtiene o establece el ID del propietario de la agenda.

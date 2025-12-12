@@ -47,6 +47,11 @@ public sealed class ContactEFQuerier(
             }
         });
 
+        if (_ctx.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+        {
+            query = query.OrderBy(u => u.Alias);
+        }
+
         return query;
     }
 }

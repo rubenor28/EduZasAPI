@@ -13,5 +13,11 @@ public class TagProjector : IEFProjector<Tag, TagDomain, TagCriteriaDTO>
 {
     /// <inheritdoc/>
     public Expression<Func<Tag, TagDomain>> GetProjection(TagCriteriaDTO criteria) =>
-        input => new() { Text = input.Text, CreatedAt = input.CreatedAt };
+        input =>
+            new()
+            {
+                Id = input.TagId,
+                Text = input.Text,
+                CreatedAt = input.CreatedAt,
+            };
 }

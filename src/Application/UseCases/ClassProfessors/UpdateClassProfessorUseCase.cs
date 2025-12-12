@@ -25,12 +25,18 @@ public sealed class UpdateClassProfessorUseCase(
     )
 {
     /// <inheritdoc/>
-    protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<ClassProfessorUpdateDTO> value, ClassProfessorDomain record)
+    protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        UserActionDTO<ClassProfessorUpdateDTO> value,
+        ClassProfessorDomain record
+    )
     {
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => value.Data.UserId == value.Executor.Id,
+            UserType.PROFESSOR => await IsProfessorAuthorized(
+                value.Executor.Id,
+                value.Data.ClassId
+            ),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -44,4 +50,17 @@ public sealed class UpdateClassProfessorUseCase(
     /// <inheritdoc/>
     protected override UserClassRelationId GetId(ClassProfessorUpdateDTO dto) =>
         new() { UserId = dto.UserId, ClassId = dto.ClassId };
+
+    ///<summary>
+    /// Valida que un profesor que intenta modificar los profesores en una clase
+    /// pertenezca a la clase y sea dueño
+    ///</summary>
+    private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
+    {
+        var classProfessor = await _reader.GetAsync(
+            new() { UserId = professorId, ClassId = classId }
+        );
+
+        return classProfessor is not null && classProfessor.IsOwner;
+    }
 }

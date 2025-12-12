@@ -5,7 +5,7 @@ namespace EntityFramework.Application.DTOs;
 /// </summary>
 public partial class ContactTag
 {
-    public string TagText { get; set; } = null!;
+    public ulong TagId { get; set; }
     public ulong AgendaOwnerId { get; set; }
     public ulong UserId { get; set; }
     public DateTime CreatedAt { get; set; }

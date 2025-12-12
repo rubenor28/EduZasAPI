@@ -14,7 +14,8 @@ using ContactQuerier = IQuerierAsync<ContactDomain, ContactCriteriaDTO>;
 using ContactTagDeleter = IDeleterAsync<ContactTagIdDTO, ContactTagDomain>;
 using ContactTagReader = IReaderAsync<ContactTagIdDTO, ContactTagDomain>;
 using ContactTagValidator = IBusinessValidationService<ContactTagIdDTO>;
-using TagDeleter = IDeleterAsync<string, TagDomain>;
+using TagDeleter = IDeleterAsync<ulong, TagDomain>;
+using TagReader = IReaderAsync<ulong, TagDomain>;
 
 /// <summary>
 /// Caso de uso para eliminar una etiqueta de un contacto.
@@ -24,11 +25,13 @@ public sealed class DeleteContactTagUseCase(
     ContactTagReader reader,
     ContactQuerier contactQuerier,
     TagDeleter tagDeleter,
+    TagReader tagReader,
     ContactTagValidator? validator = null
 ) : DeleteUseCase<ContactTagIdDTO, ContactTagDomain>(deleter, reader, validator)
 {
     private readonly ContactQuerier _contactQuerier = contactQuerier;
     private readonly TagDeleter _tagDeleter = tagDeleter;
+    private readonly TagReader _tagReader = tagReader;
 
     /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
@@ -56,12 +59,13 @@ public sealed class DeleteContactTagUseCase(
         ContactTagDomain deletedEntity
     )
     {
-        var tagSearch = new[] { deleteDTO.Data.Tag };
-        var otherContactsUseTag = (
-            await _contactQuerier.GetByAsync(new() { Tags = tagSearch })
-        ).Results.Any();
+        var tag =
+            await _tagReader.GetAsync(deleteDTO.Data.TagId)
+            ?? throw new Exception("Etiqueta no deberia ser null");
 
-        if (!otherContactsUseTag)
-            await _tagDeleter.DeleteAsync(deleteDTO.Data.Tag);
+        var otherUsesTag = await _contactQuerier.AnyAsync(new() { Tags = [tag.Text] });
+
+        if (!otherUsesTag)
+            await _tagDeleter.DeleteAsync(deleteDTO.Data.TagId);
     }
 }

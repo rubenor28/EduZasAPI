@@ -129,13 +129,13 @@ public class TagEFRepositoryTest : IDisposable
             {
                 AgendaOwnerId = contact.AgendaOwnerId,
                 UserId = contact.UserId,
-                TagText = tag1.Text,
+                TagId = tag1.TagId,
             },
             new ContactTag
             {
                 AgendaOwnerId = contact.AgendaOwnerId,
                 UserId = contact.UserId,
-                TagText = tag2.Text,
+                TagId = tag2.TagId,
             }
         );
         await _ctx.SaveChangesAsync();

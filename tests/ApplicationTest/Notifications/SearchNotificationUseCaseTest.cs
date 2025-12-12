@@ -121,7 +121,7 @@ public class SearchNotificationUseCaseTest
             new() { Data = notification, Executor = AsExecutor(admin) }
         );
 
-        var criteria = new NotificationCriteriaDTO { UserId = user.Id };
+        var criteria = new NotificationCriteriaDTO { PageSize = 10, UserId = user.Id };
 
         var result = await _useCase.ExecuteAsync(
             new() { Data = criteria, Executor = AsExecutor(admin) }
@@ -144,7 +144,7 @@ public class SearchNotificationUseCaseTest
     public async Task SearchUserNotification_ByStudent_ReturnsEmtpy()
     {
         var admin = await SeedUser(UserType.ADMIN);
-        var criteria = new NotificationCriteriaDTO { UserId = 1 };
+        var criteria = new NotificationCriteriaDTO { PageSize = 10, UserId = 1 };
 
         var result = await _useCase.ExecuteAsync(
             new() { Data = criteria, Executor = AsExecutor(admin) }
@@ -169,7 +169,7 @@ public class SearchNotificationUseCaseTest
             new() { Data = notification, Executor = AsExecutor(admin) }
         );
 
-        var criteria = new NotificationCriteriaDTO { ClassId = cls.Id };
+        var criteria = new NotificationCriteriaDTO { PageSize = 10, ClassId = cls.Id };
         var result = await _useCase.ExecuteAsync(
             new() { Data = criteria, Executor = AsExecutor(admin) }
         );
@@ -190,7 +190,7 @@ public class SearchNotificationUseCaseTest
     public async Task SearchUserNotification_ByClass_ReturnsEmtpy()
     {
         var admin = await SeedUser(UserType.ADMIN);
-        var criteria = new NotificationCriteriaDTO { ClassId = "Test-Class" };
+        var criteria = new NotificationCriteriaDTO { PageSize = 10, ClassId = "Test-Class" };
         var result = await _useCase.ExecuteAsync(
             new() { Data = criteria, Executor = AsExecutor(admin) }
         );

@@ -23,6 +23,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
 
     private readonly UserMapper _userMapper = new();
     private readonly ContactMapper _contactMapper = new();
+    private readonly TagMapper _tagMapper = new();
 
     public DeleteContactTagUseCaseTest()
     {
@@ -38,8 +39,8 @@ public class DeleteContactTagUseCaseTest : IDisposable
         var contactProjector = new ContactProjector();
         var contactQuerier = new ContactEFQuerier(_ctx, contactProjector, 10);
 
-        var tagMapper = new TagMapper();
-        var tagDeleter = new TagEFDeleter(_ctx, tagMapper);
+        var tagDeleter = new TagEFDeleter(_ctx, _tagMapper);
+        var tagReader = new TagEFReader(_ctx, _tagMapper);
 
         var contactTagMapper = new ContactTagMapper();
         var contactTagDeleter = new ContactTagEFDeleter(_ctx, contactTagMapper);
@@ -49,7 +50,8 @@ public class DeleteContactTagUseCaseTest : IDisposable
             contactTagDeleter,
             contactTagReader,
             contactQuerier,
-            tagDeleter
+            tagDeleter,
+            tagReader
         );
     }
 
@@ -85,14 +87,20 @@ public class DeleteContactTagUseCaseTest : IDisposable
         return _contactMapper.Map(contact);
     }
 
-    private async Task CreateContactTag(ulong ownerId, ulong userId, string tag)
+    private async Task<TagDomain> CreateTag(string text)
     {
-        if (!await _ctx.Tags.AnyAsync(t => t.Text == tag))
-            _ctx.Tags.Add(new Tag { Text = tag });
+        var tag = new Tag { Text = text };
+        _ctx.Tags.Add(tag);
+        await _ctx.SaveChangesAsync();
 
+        return _tagMapper.Map(tag);
+    }
+
+    private async Task CreateContactTag(ulong ownerId, ulong userId, ulong tagId)
+    {
         var contactTag = new ContactTag
         {
-            TagText = tag,
+            TagId = tagId,
             AgendaOwnerId = ownerId,
             UserId = userId,
         };
@@ -110,15 +118,15 @@ public class DeleteContactTagUseCaseTest : IDisposable
         // Arrange
         var owner = await CreateUser("owner@test.com");
         var contactUser = await CreateUser("contact@test.com");
+        var tag = await CreateTag("test-tag");
         await CreateContact(owner.Id, contactUser.Id);
-        const string tag = "test-tag";
-        await CreateContactTag(owner.Id, contactUser.Id, tag);
+        await CreateContactTag(owner.Id, contactUser.Id, tag.Id);
 
         var dto = new ContactTagIdDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = tag,
+            TagId = tag.Id,
         };
 
         // Act
@@ -139,17 +147,18 @@ public class DeleteContactTagUseCaseTest : IDisposable
         var owner = await CreateUser("owner@test.com");
         var contactUser1 = await CreateUser("contact1@test.com");
         var contactUser2 = await CreateUser("contact2@test.com");
+        var tag = await CreateTag("test-tag");
+
         await CreateContact(owner.Id, contactUser1.Id);
         await CreateContact(owner.Id, contactUser2.Id);
-        const string tag = "test-tag";
-        await CreateContactTag(owner.Id, contactUser1.Id, tag);
-        await CreateContactTag(owner.Id, contactUser2.Id, tag);
+        await CreateContactTag(owner.Id, contactUser1.Id, tag.Id);
+        await CreateContactTag(owner.Id, contactUser2.Id, tag.Id);
 
         var dto = new ContactTagIdDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser1.Id,
-            Tag = tag,
+            TagId = tag.Id,
         };
 
         // Act
@@ -175,7 +184,7 @@ public class DeleteContactTagUseCaseTest : IDisposable
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = "non-existent-tag",
+            TagId = 999,
         };
 
         // Act
@@ -195,15 +204,16 @@ public class DeleteContactTagUseCaseTest : IDisposable
         var owner = await CreateUser("owner@test.com");
         var contactUser = await CreateUser("contact@test.com");
         var unauthorized = await CreateUser("unauthorized@test.com");
+        var tag = await CreateTag("test-tag");
+        
         await CreateContact(owner.Id, contactUser.Id);
-        const string tag = "test-tag";
-        await CreateContactTag(owner.Id, contactUser.Id, tag);
+        await CreateContactTag(owner.Id, contactUser.Id, tag.Id);
 
         var dto = new ContactTagIdDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = tag,
+            TagId = tag.Id,
         };
 
         // Act
@@ -223,15 +233,15 @@ public class DeleteContactTagUseCaseTest : IDisposable
         var owner = await CreateUser("owner@test.com");
         var contactUser = await CreateUser("contact@test.com");
         var admin = await CreateUser("admin@test.com", UserType.ADMIN);
+        var tag = await CreateTag("test-tag");
         await CreateContact(owner.Id, contactUser.Id);
-        const string tag = "test-tag";
-        await CreateContactTag(owner.Id, contactUser.Id, tag);
+        await CreateContactTag(owner.Id, contactUser.Id, tag.Id);
 
         var dto = new ContactTagIdDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = tag,
+            TagId = tag.Id,
         };
 
         // Act
@@ -251,15 +261,15 @@ public class DeleteContactTagUseCaseTest : IDisposable
         var owner = await CreateUser("owner@test.com");
         var contactUser = await CreateUser("contact@test.com");
         var student = await CreateUser("student@test.com", UserType.STUDENT);
+        var tag = await CreateTag("test-tag");
         await CreateContact(owner.Id, contactUser.Id);
-        const string tag = "test-tag";
-        await CreateContactTag(owner.Id, contactUser.Id, tag);
+        await CreateContactTag(owner.Id, contactUser.Id, tag.Id);
 
         var dto = new ContactTagIdDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = tag,
+            TagId = tag.Id,
         };
 
         // Act

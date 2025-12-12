@@ -134,7 +134,7 @@ public static class UserRoutes
 
         group
             .MapGet("/{userId:ulong}", GetUserById)
-            .RequireAuthorization("Admin")
+            .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<PublicUserDTO>()
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)

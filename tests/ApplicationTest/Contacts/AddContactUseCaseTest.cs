@@ -45,7 +45,7 @@ public class AddContactUseCaseTest : IDisposable
         var contactCreator = new ContactEFCreator(_ctx, contactMapper, new NewContactEFMapper());
         var userReader = new UserEFReader(_ctx, _userMapper);
         var tagMapper = new TagMapper();
-        var tagReader = new TagEFReader(_ctx, tagMapper);
+        var tagReader = new TagStringEFReader(_ctx, tagMapper);
         var tagCreator = new TagEFCreator(_ctx, tagMapper, new NewTagEFMapper());
         var contactTagMapper = new ContactTagMapper();
         var contactTagCreator = new ContactTagEFCreator(
@@ -67,7 +67,7 @@ public class AddContactUseCaseTest : IDisposable
         );
     }
 
-    private async Task<UserDomain> CreateUser(string email, UserType role = UserType.STUDENT)
+    private async Task<UserDomain> CreateUser(string email, UserType role = UserType.PROFESSOR)
     {
         var user = new NewUserDTO
         {
@@ -104,6 +104,35 @@ public class AddContactUseCaseTest : IDisposable
         );
 
         Assert.True(result.IsOk);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithStudentContact_ReturnsInputError()
+    {
+        var agendaOwner = await CreateUser("owner@example.com");
+        var contactUser = await CreateUser("student@example.com", UserType.STUDENT);
+
+        var newContact = new NewContactDTO
+        {
+            Alias = "Test",
+            Notes = "Test note",
+            AgendaOwnerId = agendaOwner.Id,
+            UserId = contactUser.Id,
+            Tags = [],
+        };
+
+        var result = await _useCase.ExecuteAsync(
+            new()
+            {
+                Data = newContact,
+                Executor = new Executor { Id = agendaOwner.Id, Role = UserType.ADMIN },
+            }
+        );
+
+        Assert.True(result.IsErr);
+        Assert.IsType<InputError>(result.UnwrapErr());
+        var err = (InputError)result.UnwrapErr();
+        Assert.Contains("userId", err.Errors.Select(e => e.Field));
     }
 
     [Fact]
@@ -339,8 +368,9 @@ public class AddContactUseCaseTest : IDisposable
         Assert.True(result.IsOk);
         Assert.Equal(2, await _ctx.Tags.CountAsync()); // One new tag created
         Assert.Equal(2, await _ctx.ContactTags.CountAsync());
-        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.TagText == "existing-tag"));
-        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.TagText == "new-tag"));
+
+        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.Tag.Text == "existing-tag"));
+        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.Tag.Text == "new-tag"));
     }
 
     [Fact]

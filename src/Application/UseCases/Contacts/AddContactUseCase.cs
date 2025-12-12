@@ -52,7 +52,18 @@ public sealed class AddContactUseCase(
             errors.Add(new() { Field = "userId", Message = "No puedes agregarte a ti mismo" });
 
         (await SearchUser(request.Data.AgendaOwnerId, "agendaOwnerId")).IfErr(errors.Add);
-        (await SearchUser(request.Data.UserId, "userId")).IfErr(errors.Add);
+
+        var user = await _userReader.GetAsync(request.Data.UserId);
+        if (user is null)
+            errors.Add(new() { Field = "userId", Message = "No se encontró el usuario" });
+        else if (user.Role == UserType.STUDENT)
+            errors.Add(
+                new()
+                {
+                    Field = "userId",
+                    Message = "No se puede agregar un estudiante como contacto",
+                }
+            );
 
         if (errors.Count != 0)
             return UseCaseErrors.Input(errors);
@@ -86,20 +97,18 @@ public sealed class AddContactUseCase(
             async (tags) =>
             {
                 var normalizedTags = tags.Distinct().ToList();
-                foreach (var t in normalizedTags)
+                foreach (var tagText in normalizedTags)
                 {
-                    var tag = await _tagReader.GetAsync(t);
-                    if (tag is null)
-                    {
-                        await _tagCreator.AddAsync(new() { Text = t });
-                    }
+                    // Buscar o crear etiquetas si no existen
+                    var tag = await _tagReader.GetAsync(tagText);
+                    tag ??= await _tagCreator.AddAsync(new() { Text = tagText });
 
                     await _contactTagCreator.AddAsync(
                         new()
                         {
                             AgendaOwnerId = newEntity.Data.AgendaOwnerId,
                             UserId = newEntity.Data.UserId,
-                            Tag = t,
+                            TagId = tag.Id,
                         }
                     );
                 }

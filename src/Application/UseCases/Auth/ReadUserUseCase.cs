@@ -26,7 +26,7 @@ public sealed class ReadUserUseCase(
     {
         var authorized = value.Executor.Role switch
         {
-            UserType.ADMIN => true,
+            UserType.ADMIN or UserType.PROFESSOR => true,
             _ => value.Data == value.Executor.Id,
         };
 

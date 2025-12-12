@@ -10,15 +10,15 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ContactTags;
 public class ContactTagMapper : IMapper<ContactTag, ContactTagDomain>
 {
     /// <inheritdoc/>
-    public ContactTagDomain Map(ContactTag input) => 
-            new()
+    public ContactTagDomain Map(ContactTag input) =>
+        new()
+        {
+            Id = new()
             {
-                Id = new()
-                {
-                    Tag = input.TagText,
-                    AgendaOwnerId = input.AgendaOwnerId,
-                    UserId = input.UserId,
-                },
-                CreatedAt = input.CreatedAt,
-            };
+                TagId = input.TagId,
+                AgendaOwnerId = input.AgendaOwnerId,
+                UserId = input.UserId,
+            },
+            CreatedAt = input.CreatedAt,
+        };
 }

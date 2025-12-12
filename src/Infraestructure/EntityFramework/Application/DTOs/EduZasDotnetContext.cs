@@ -602,12 +602,20 @@ public partial class EduZasDotnetContext : DbContext
 
         modelBuilder.Entity<Tag>(tagBuilder =>
         {
-            tagBuilder.HasKey(e => e.Text).HasName("PRIMARY");
+            tagBuilder.HasKey(e => e.TagId).HasName("PRIMARY");
             tagBuilder.ToTable("tags");
+
+            tagBuilder.HasIndex(e => e.Text, "idx_tags_text").IsUnique();
+
             tagBuilder.Property(e => e.Text).HasMaxLength(30).HasColumnName("text");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
+                tagBuilder
+                    .Property(e => e.TagId)
+                    .HasColumnType("bigint(20) unsigned")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("tag_id");
                 tagBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
@@ -616,6 +624,7 @@ public partial class EduZasDotnetContext : DbContext
             }
             else
             {
+                tagBuilder.Property(e => e.TagId).ValueGeneratedOnAdd().HasColumnName("tag_id");
                 tagBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -628,7 +637,7 @@ public partial class EduZasDotnetContext : DbContext
             contactTagBuilder
                 .HasKey(e => new
                 {
-                    e.TagText,
+                    e.TagId,
                     e.AgendaOwnerId,
                     e.UserId,
                 })
@@ -638,9 +647,9 @@ public partial class EduZasDotnetContext : DbContext
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 contactTagBuilder
-                    .Property(e => e.TagText)
-                    .HasMaxLength(30)
-                    .HasColumnName("tag_text");
+                    .Property(e => e.TagId)
+                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnName("tag_id");
                 contactTagBuilder
                     .Property(e => e.AgendaOwnerId)
                     .HasColumnType("bigint(20) unsigned")
@@ -658,7 +667,7 @@ public partial class EduZasDotnetContext : DbContext
             }
             else
             {
-                contactTagBuilder.Property(e => e.TagText).HasColumnName("tag_text");
+                contactTagBuilder.Property(e => e.TagId).HasColumnName("tag_id");
                 contactTagBuilder.Property(e => e.AgendaOwnerId).HasColumnName("agenda_owner_id");
                 contactTagBuilder.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -671,7 +680,7 @@ public partial class EduZasDotnetContext : DbContext
             contactTagBuilder
                 .HasOne(e => e.Tag)
                 .WithMany(e => e.ContactTags)
-                .HasForeignKey(e => e.TagText)
+                .HasForeignKey(e => e.TagId)
                 .OnDelete(DeleteBehavior.Cascade);
             contactTagBuilder
                 .HasOne(e => e.AgendaContact)

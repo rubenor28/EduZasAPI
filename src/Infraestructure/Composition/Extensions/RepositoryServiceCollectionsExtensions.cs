@@ -139,8 +139,10 @@ internal static class RepositoryServiceCollectionExtensions
 
         // TAGS
         s.AddScoped<ICreatorAsync<TagDomain, NewTagDTO>, TagEFCreator>();
-        s.AddScoped<IDeleterAsync<string, TagDomain>, TagEFDeleter>();
-        s.AddScoped<IReaderAsync<string, TagDomain>, TagEFReader>();
+        s.AddScoped<IDeleterAsync<ulong, TagDomain>, TagEFDeleter>();
+        s.AddScoped<IReaderAsync<ulong, TagDomain>, TagEFReader>();
+        s.AddScoped<IDeleterAsync<string, TagDomain>, TagStringEFDeleter>();
+        s.AddScoped<IReaderAsync<string, TagDomain>, TagStringEFReader>();
         s.AddScoped<IQuerierAsync<TagDomain, TagCriteriaDTO>>(
             sp => new TagEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),

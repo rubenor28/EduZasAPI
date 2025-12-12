@@ -13,7 +13,7 @@ public class NewContactTagEFMapper : IMapper<NewContactTagDTO, ContactTag>
     public ContactTag Map(NewContactTagDTO input) =>
         new()
         {
-            TagText = input.Tag,
+            TagId = input.TagId,
             AgendaOwnerId = input.AgendaOwnerId,
             UserId = input.UserId,
         };

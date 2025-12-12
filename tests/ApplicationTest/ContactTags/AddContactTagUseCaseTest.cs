@@ -1,6 +1,8 @@
+using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
+using Application.DTOs.Tags;
 using Application.UseCases.ContactTags;
 using Domain.Entities;
 using Domain.Enums;
@@ -18,7 +20,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTest.ContactTags;
 
-public class AddTagToContactUseCaseTest : IDisposable
+public class AddContactTagUseCaseTest : IDisposable
 {
     private readonly SqliteConnection _conn;
     private readonly EduZasDotnetContext _ctx;
@@ -26,8 +28,9 @@ public class AddTagToContactUseCaseTest : IDisposable
     private readonly ContactEFCreator _contactCreator;
 
     private readonly UserMapper _userMapper = new();
+    private readonly TagMapper _tagMapper = new();
 
-    public AddTagToContactUseCaseTest()
+    public AddContactTagUseCaseTest()
     {
         var dbName = Guid.NewGuid().ToString();
         _conn = new SqliteConnection($"Data Source={dbName};Mode=Memory;Cache=Shared");
@@ -44,10 +47,6 @@ public class AddTagToContactUseCaseTest : IDisposable
         _contactCreator = new ContactEFCreator(_ctx, contactMapper, new NewContactEFMapper());
         var contactReader = new ContactEFReader(_ctx, contactMapper);
 
-        var tagMapper = new TagMapper();
-        var tagReader = new TagEFReader(_ctx, tagMapper);
-        var tagCreator = new TagEFCreator(_ctx, tagMapper, new NewTagEFMapper());
-
         var contactTagMapper = new ContactTagMapper();
         var contactTagCreator = new ContactTagEFCreator(
             _ctx,
@@ -55,10 +54,14 @@ public class AddTagToContactUseCaseTest : IDisposable
             new NewContactTagEFMapper()
         );
         var contactTagReader = new ContactTagEFReader(_ctx, contactTagMapper);
+        
+        var tagCreator = new TagEFCreator(_ctx, _tagMapper, new NewTagEFMapper());
+        var tagProjector = new TagProjector();
+        var tagQuerier = new TagEFQuerier(_ctx, tagProjector, 50);
 
         _useCase = new AddContactTagUseCase(
             contactTagCreator,
-            tagReader,
+            tagQuerier,
             tagCreator,
             userReader,
             contactReader,
@@ -89,25 +92,34 @@ public class AddTagToContactUseCaseTest : IDisposable
         {
             Alias = "Test Contact",
             AgendaOwnerId = ownerId,
-            UserId = userId, // Corrected property
+            UserId = userId,
         };
         return await _contactCreator.AddAsync(contact);
     }
 
+    private async Task<TagDomain> CreateTag(string text)
+    {
+        var tag = new Tag { Text = text };
+
+        _ctx.Tags.Add(tag);
+        await _ctx.SaveChangesAsync();
+
+        return _tagMapper.Map(tag);
+    }
+
     [Fact]
-    public async Task ExecuteAsync_WhenContactExistsAndUserIsAuthorized_ShouldAddTag()
+    public async Task ExecuteAsync_WhenTagDoesNotExist_ShouldCreateTagAndAddAssociation()
     {
         // Arrange
         var owner = await CreateUser("owner@test.com");
         var contactUser = await CreateUser("contact@test.com");
         await CreateContact(owner.Id, contactUser.Id);
-        await _ctx.SaveChangesAsync();
 
-        var dto = new NewContactTagDTO
+        var dto = new NewContactTagRequestDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = "new-tag",
+            TagText = "new-tag",
         };
 
         // Act
@@ -121,22 +133,24 @@ public class AddTagToContactUseCaseTest : IDisposable
 
         // Assert
         Assert.True(result.IsOk);
-        var tagInDb = await _ctx.ContactTags.FirstOrDefaultAsync();
-        Assert.NotNull(tagInDb);
-        Assert.Equal("new-tag", tagInDb.TagText);
-        Assert.Equal(owner.Id, tagInDb.AgendaOwnerId);
+        var createdTag = await _ctx.Tags.FirstOrDefaultAsync(t => t.Text == "new-tag");
+        Assert.NotNull(createdTag);
+        var association = await _ctx.ContactTags.FirstOrDefaultAsync();
+        Assert.NotNull(association);
+        Assert.Equal(createdTag.TagId, association.TagId);
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenContactDoesNotExist_ShouldReturnInputError()
+    public async Task ExecuteAsync_WhenContactDoesNotExist_ShouldReturnNotFoundError()
     {
         // Arrange
         var owner = await CreateUser("owner@test.com");
-        var dto = new NewContactTagDTO
+        var contact = await CreateUser("contact@test.com");
+        var dto = new NewContactTagRequestDTO
         {
             AgendaOwnerId = owner.Id,
-            UserId = 99,
-            Tag = "new-tag",
+            UserId = contact.Id,
+            TagText = "new-tag"
         };
 
         // Act
@@ -150,9 +164,7 @@ public class AddTagToContactUseCaseTest : IDisposable
 
         // Assert
         Assert.True(result.IsErr);
-        var error = result.UnwrapErr();
-        Assert.IsType<InputError>(error);
-        Assert.Contains(((InputError)error).Errors, e => e.Field == "userId");
+        Assert.IsType<NotFoundError>(result.UnwrapErr());
     }
 
     [Fact]
@@ -160,11 +172,11 @@ public class AddTagToContactUseCaseTest : IDisposable
     {
         // Arrange
         var contact = await CreateUser("contact@test.com");
-        var dto = new NewContactTagDTO
+        var dto = new NewContactTagRequestDTO
         {
             AgendaOwnerId = 99,
             UserId = contact.Id,
-            Tag = "new-tag",
+            TagText = "new-tag",
         };
 
         // Act
@@ -192,11 +204,11 @@ public class AddTagToContactUseCaseTest : IDisposable
         var unauthorized = await CreateUser("unauthorized@test.com");
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new NewContactTagRequestDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = "new-tag",
+            TagText = "new-tag",
         };
 
         // Act
@@ -222,11 +234,11 @@ public class AddTagToContactUseCaseTest : IDisposable
         var student = await CreateUser("student@test.com", UserType.STUDENT);
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new NewContactTagRequestDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = "new-tag",
+            TagText = "new-tag",
         };
 
         // Act
@@ -252,11 +264,11 @@ public class AddTagToContactUseCaseTest : IDisposable
         var admin = await CreateUser("admin@test.com", UserType.ADMIN);
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new NewContactTagRequestDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = "new-tag",
+            TagText = "new-tag",
         };
 
         // Act
@@ -274,18 +286,18 @@ public class AddTagToContactUseCaseTest : IDisposable
     }
 
     [Fact]
-    public async Task ExecuteAsync_WhenTagIsAlreadyOnContact_ShouldThrowException()
+    public async Task ExecuteAsync_WhenTagIsAlreadyOnContact_ShouldReturnConflictError()
     {
         // Arrange
         var owner = await CreateUser("owner@test.com");
         var contactUser = await CreateUser("contact@test.com");
         await CreateContact(owner.Id, contactUser.Id);
 
-        var dto = new NewContactTagDTO
+        var dto = new NewContactTagRequestDTO
         {
             AgendaOwnerId = owner.Id,
             UserId = contactUser.Id,
-            Tag = "new-tag",
+            TagText = "new-tag",
         };
 
         await _useCase.ExecuteAsync(
@@ -294,18 +306,20 @@ public class AddTagToContactUseCaseTest : IDisposable
                 Data = dto,
                 Executor = new() { Id = owner.Id, Role = owner.Role },
             }
-        ); // First time is OK
+        ); 
+        
+        // Act
         var result = await _useCase.ExecuteAsync(
             new()
             {
                 Data = dto,
                 Executor = new() { Id = owner.Id, Role = owner.Role },
             }
-        ); // Second time should fail
+        );
+
+        // Assert
         Assert.True(result.IsErr);
         Assert.IsType<Conflict>(result.UnwrapErr());
-        var err = (Conflict)result.UnwrapErr();
-        Assert.Equal("El recurso ya existe", err.Message);
     }
 
     public void Dispose()

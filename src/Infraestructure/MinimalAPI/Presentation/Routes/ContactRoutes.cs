@@ -137,7 +137,7 @@ public static class ContactRoutes
             .MapPost("/tags/search", TagsQuery)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<string, TagCriteriaDTO>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<TagDomain, TagCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
@@ -180,7 +180,7 @@ public static class ContactRoutes
             });
 
         group
-            .MapDelete("/tags/{agendaOwnerId:ulong}/{userId:ulong}/{tag}", DeleteContactTag)
+            .MapDelete("/tags/{agendaOwnerId:ulong}/{userId:ulong}/{tagId:ulong}", DeleteContactTag)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
@@ -299,8 +299,9 @@ public static class ContactRoutes
         );
     }
 
+
     private static Task<IResult> AddContactTag(
-        [FromBody] ContactTagIdDTO value,
+        [FromBody] NewContactTagRequestDTO value,
         [FromServices] AddContactTagUseCase useCase,
         [FromServices] RoutesUtils utils,
         HttpContext ctx
@@ -309,13 +310,7 @@ public static class ContactRoutes
         return utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () =>
-                new NewContactTagDTO
-                {
-                    UserId = value.UserId,
-                    Tag = value.Tag,
-                    AgendaOwnerId = value.AgendaOwnerId,
-                },
+            mapRequest: () => value,
             mapResponse: (_) => Results.NoContent()
         );
     }
@@ -323,7 +318,7 @@ public static class ContactRoutes
     private static Task<IResult> DeleteContactTag(
         [FromRoute] ulong agendaOwnerId,
         [FromRoute] ulong userId,
-        [FromRoute] string tag,
+        [FromRoute] ulong tagId,
         [FromServices] DeleteContactTagUseCase useCase,
         HttpContext ctx,
         [FromServices] RoutesUtils utils
@@ -337,7 +332,7 @@ public static class ContactRoutes
                 {
                     AgendaOwnerId = agendaOwnerId,
                     UserId = userId,
-                    Tag = tag,
+                    TagId = tagId,
                 },
             mapResponse: _ => Results.NoContent()
         );

@@ -9,6 +9,11 @@ namespace Domain.Entities;
 public sealed record TagDomain
 {
     /// <summary>
+    /// Obtiene el identificador único de la etiqueta, que es su texto.
+    /// </summary>
+    public required ulong Id { get; set; }
+
+    /// <summary>
     /// Obtiene o establece el texto único de la etiqueta, que actúa como su clave primaria.
     /// </summary>
     public required string Text { get; set; }
@@ -17,9 +22,4 @@ public sealed record TagDomain
     /// Obtiene o establece la fecha y hora de creación de la etiqueta.
     /// </summary>
     public required DateTime CreatedAt { get; set; }
-
-    /// <summary>
-    /// Obtiene el identificador único de la etiqueta, que es su texto.
-    /// </summary>
-    public string Id => Text;
 }

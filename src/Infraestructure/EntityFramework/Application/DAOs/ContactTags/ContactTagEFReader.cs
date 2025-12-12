@@ -17,7 +17,7 @@ public sealed class ContactTagEFReader(
     /// <inheritdoc/>
     protected override Expression<Func<ContactTag, bool>> GetIdPredicate(ContactTagIdDTO id) =>
         tpu =>
-            tpu.TagText == id.Tag
+            tpu.TagId == id.TagId
             && tpu.AgendaOwnerId == id.AgendaOwnerId
             && tpu.UserId == id.UserId;
 }

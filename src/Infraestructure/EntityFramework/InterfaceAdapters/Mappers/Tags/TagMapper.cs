@@ -10,5 +10,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Tags;
 public class TagMapper : IMapper<Tag, TagDomain>
 {
     /// <inheritdoc/>
-    public TagDomain Map(Tag input) => new() { Text = input.Text, CreatedAt = input.CreatedAt };
+    public TagDomain Map(Tag input) =>
+        new()
+        {
+            Id = input.TagId,
+            Text = input.Text,
+            CreatedAt = input.CreatedAt,
+        };
 }

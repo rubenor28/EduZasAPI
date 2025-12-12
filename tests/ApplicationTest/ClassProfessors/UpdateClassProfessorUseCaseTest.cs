@@ -115,11 +115,11 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
     }
 
     [Fact]
-    public async Task ExecuteAsync_AsProfessorUpdatingSelf_UpdatesSuccessfully()
+    public async Task ExecuteAsync_AsOwnerProfessorUpdatingSelf_UpdatesSuccessfully()
     {
         var professor = await SeedUser();
         var cls = await SeedClass();
-        var relation = await SeedClassProfessor(cls.Id, professor.Id, false);
+        var relation = await SeedClassProfessor(cls.Id, professor.Id, true);
 
         var dto = new ClassProfessorUpdateDTO
         {
@@ -135,6 +135,28 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
         Assert.True(result.IsOk);
         await _ctx.Entry(relation).ReloadAsync();
         Assert.True(relation.IsOwner);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_AsNonOwnerProfessorUpdatingSelf_ReturnsError()
+    {
+        var professor = await SeedUser();
+        var cls = await SeedClass();
+        await SeedClassProfessor(cls.Id, professor.Id, false);
+
+        var dto = new ClassProfessorUpdateDTO
+        {
+            ClassId = cls.Id,
+            UserId = professor.Id,
+            IsOwner = true,
+        };
+
+        var result = await _useCase.ExecuteAsync(
+            new() { Data = dto, Executor = AsExecutor(professor) }
+        );
+
+        Assert.True(result.IsErr);
+        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
 
     [Fact]
