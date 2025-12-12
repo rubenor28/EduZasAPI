@@ -52,7 +52,6 @@ public sealed class UpdateClassProfessorUseCase(
         {
             var c = new ClassProfessorCriteriaDTO { IsOwner = true, ClassId = current.Data.ClassId };
             var ownersCount = await _querier.CountAsync(c);
-            Console.WriteLine($"[UpdateClassProfessorUseCase] ownership previa {prev.IsOwner} a actualizar {current.Data.IsOwner} numero actual de owners {ownersCount}");
             if (ownersCount <= 1)
                 return UseCaseErrors.Conflict("Debe haber al menos un dueño de la clase");
         }
