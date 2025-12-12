@@ -16,6 +16,7 @@ namespace Application.UseCases.ClassProfessors;
 public sealed class UpdateClassProfessorUseCase(
     IUpdaterAsync<ClassProfessorDomain, ClassProfessorUpdateDTO> updater,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> reader,
+    IQuerierAsync<ClassProfessorDomain, ClassProfessorCriteriaDTO> querier,
     IBusinessValidationService<ClassProfessorUpdateDTO>? validator = null
 )
     : UpdateUseCase<UserClassRelationId, ClassProfessorUpdateDTO, ClassProfessorDomain>(
@@ -24,18 +25,21 @@ public sealed class UpdateClassProfessorUseCase(
         validator
     )
 {
+    private readonly IQuerierAsync<ClassProfessorDomain, ClassProfessorCriteriaDTO> _querier =
+        querier;
+
     /// <inheritdoc/>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        UserActionDTO<ClassProfessorUpdateDTO> value,
-        ClassProfessorDomain record
+        UserActionDTO<ClassProfessorUpdateDTO> current,
+        ClassProfessorDomain prev
     )
     {
-        var authorized = value.Executor.Role switch
+        var authorized = current.Executor.Role switch
         {
             UserType.ADMIN => true,
             UserType.PROFESSOR => await IsProfessorAuthorized(
-                value.Executor.Id,
-                value.Data.ClassId
+                current.Executor.Id,
+                current.Data.ClassId
             ),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
@@ -43,6 +47,15 @@ public sealed class UpdateClassProfessorUseCase(
 
         if (!authorized)
             return UseCaseErrors.Unauthorized();
+
+        if (prev.IsOwner && !current.Data.IsOwner)
+        {
+            var c = new ClassProfessorCriteriaDTO { IsOwner = true, ClassId = current.Data.ClassId };
+            var ownersCount = await _querier.CountAsync(c);
+            Console.WriteLine($"[UpdateClassProfessorUseCase] ownership previa {prev.IsOwner} a actualizar {current.Data.IsOwner} numero actual de owners {ownersCount}");
+            if (ownersCount <= 1)
+                return UseCaseErrors.Conflict("Debe haber al menos un dueño de la clase");
+        }
 
         return Unit.Value;
     }

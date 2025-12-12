@@ -27,6 +27,7 @@ public sealed class ClassProfessorEFQuerier(
         _dbSet
             .AsNoTracking()
             .AsQueryable()
+            .WhereOptional(c.IsOwner, owner => cp => cp.IsOwner == owner)
             .WhereOptional(c.UserId, id => cp => cp.ProfessorId == id)
             .WhereOptional(c.ClassId, id => cp => cp.ClassId == id);
 }

@@ -96,6 +96,13 @@ internal static class RepositoryServiceCollectionExtensions
         s.AddScoped<IUpdaterAsync<ClassProfessorDomain, ClassProfessorUpdateDTO>, ClassProfessorsEFUpdater>();
         s.AddScoped<IReaderAsync<UserClassRelationId, ClassProfessorDomain>, ClassProfessorsEFReader>();
         s.AddScoped<IDeleterAsync<UserClassRelationId, ClassProfessorDomain>, ClassProfessorsEFDeleter>();
+        s.AddScoped<IQuerierAsync<ClassProfessorDomain, ClassProfessorCriteriaDTO>>(
+            sp => new ClassProfessorEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<ClassProfessor, ClassProfessorDomain, ClassProfessorCriteriaDTO>>(),
+                pageSize
+             )
+        );
 
         // CLASS STUDENTS
         s.AddScoped<ICreatorAsync<ClassStudentDomain, UserClassRelationId>, ClassStudentEFCreator>();
