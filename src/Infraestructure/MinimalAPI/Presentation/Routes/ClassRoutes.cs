@@ -3,10 +3,12 @@ using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.Common;
+using Application.DTOs.Users;
 using Application.UseCases.ClassContent;
 using Application.UseCases.Classes;
 using Application.UseCases.ClassProfessors;
 using Application.UseCases.ClassStudents;
+using Application.UseCases.Users;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs.Common;
@@ -337,6 +339,15 @@ public static class ClassRoutes
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>();
 
+        group
+            .MapPost("/{classId}/students", SearchStudents)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<PaginatedQuery<PublicUserDTO, UserCriteriaDTO>>(StatusCodes.Status200OK)
+            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden);
+
         return group;
     }
 
@@ -506,6 +517,7 @@ public static class ClassRoutes
         );
     }
 
+
     public static Task<IResult> SearchClassProfessors(
         [FromBody] ClassProfessorCriteriaDTO request,
         [FromServices] SearchClassProfessorUseCase useCase,
@@ -599,6 +611,20 @@ public static class ClassRoutes
             ctx,
             useCase,
             mapRequest: () => new UserClassRelationId { ClassId = classId, UserId = userId },
+            mapResponse: cs => Results.Ok(cs)
+        );
+
+    public static Task<IResult> SearchStudents(
+        [FromRoute] string classId,
+        [FromBody] CriteriaDTO criteria,
+        [FromServices] UserQueryUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            useCase,
+            mapRequest: () => new UserCriteriaDTO { Page = criteria.Page, PageSize = criteria.PageSize, EnrolledInClass = classId },
             mapResponse: cs => Results.Ok(cs)
         );
 }
