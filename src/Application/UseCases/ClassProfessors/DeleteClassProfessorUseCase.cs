@@ -27,8 +27,11 @@ public sealed class DeleteClassProfessorUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            UserType.PROFESSOR => professor is not null
-                && (professor.IsOwner || professor.UserId == value.Executor.Id),
+            UserType.PROFESSOR => await IsProfessorAuthorized(
+                value.Executor.Id,
+                value.Data.UserId,
+                value.Data.ClassId
+            ),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
         };
@@ -37,5 +40,16 @@ public sealed class DeleteClassProfessorUseCase(
             return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
+    }
+
+    private async Task<bool> IsProfessorAuthorized(
+        ulong professorId,
+        ulong executorId,
+        string classId
+    )
+    {
+        var professor = await _reader.GetAsync(new() { ClassId = classId, UserId = executorId });
+
+        return professor is not null && (professor.IsOwner || professor.UserId == professorId);
     }
 }

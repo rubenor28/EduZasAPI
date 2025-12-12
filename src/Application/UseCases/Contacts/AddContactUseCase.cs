@@ -96,9 +96,10 @@ public sealed class AddContactUseCase(
         await newEntity.Data.Tags.IfSome(
             async (tags) =>
             {
-                var normalizedTags = tags.Distinct().ToList();
+                var normalizedTags = tags.Select(t => t.ToUpperInvariant()).Distinct().ToList();
                 foreach (var tagText in normalizedTags)
                 {
+                    Console.WriteLine($"[AddContactUseCase] CREANDO LA ETIQUETA {tagText}");
                     // Buscar o crear etiquetas si no existen
                     var tag = await _tagReader.GetAsync(tagText);
                     tag ??= await _tagCreator.AddAsync(new() { Text = tagText });

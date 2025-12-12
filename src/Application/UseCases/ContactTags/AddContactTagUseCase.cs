@@ -57,7 +57,7 @@ public sealed class AddContactTagUseCase(
         );
 
         var tag = tags.Results.FirstOrDefault();
-        tag ??= await _tagCreator.AddAsync(new() { Text = value.Data.TagText.Trim() });
+        tag ??= await _tagCreator.AddAsync(new() { Text = value.Data.TagText.Trim().ToUpperInvariant() });
 
         var association = await _contactTagReader.GetAsync(
             new()
