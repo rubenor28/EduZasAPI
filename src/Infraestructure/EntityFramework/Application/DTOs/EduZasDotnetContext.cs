@@ -879,11 +879,11 @@ public partial class EduZasDotnetContext : DbContext
         modelBuilder.Entity<ResourceViewSession>(builder =>
         {
             builder.HasKey(e => e.Id).HasName("PRIMARY");
-            builder.ToTable("ResourceViewSessions");
+            builder.ToTable("resource_view_sessions");
 
-            builder.HasIndex(e => e.UserId, "idx_resourceviewsessions_user_id");
-            builder.HasIndex(e => e.ResourceId, "idx_resourceviewsessions_resource_id");
-            builder.HasIndex(e => e.ClassId, "idx_resourceviewsessions_class_id");
+            builder.HasIndex(e => e.UserId, "idx_resource_view_sessions_user_id");
+            builder.HasIndex(e => e.ResourceId, "idx_resource_view_sessions_resource_id");
+            builder.HasIndex(e => e.ClassId, "idx_resource_view_sessions_class_id");
 
             builder.Property(e => e.Id).HasColumnType("char(36)").HasColumnName("id");
             builder.Property(e => e.StartTimeUtc).HasColumnName("start_time_utc");

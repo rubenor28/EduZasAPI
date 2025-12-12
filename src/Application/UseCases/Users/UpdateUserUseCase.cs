@@ -50,7 +50,7 @@ public sealed class UpdateUserUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            _ => false,
+            _ => value.Data.Id == value.Executor.Id,
         };
 
         if (!authorized)
