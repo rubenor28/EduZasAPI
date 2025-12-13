@@ -79,10 +79,10 @@ public sealed class UpdateUserUseCase(
 
         return passwordFormat with
         {
-            // Asegurarse que no cambien el Email
-            Data = value.Data with
+            // Asegurarse que no cambie el Email
+            Data = passwordFormat.Data with
             {
-                Email = value.Data.Email,
+                Email = original.Email,
             },
         };
     }
