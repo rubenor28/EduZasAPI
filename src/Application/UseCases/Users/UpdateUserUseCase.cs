@@ -73,7 +73,7 @@ public sealed class UpdateUserUseCase(
     )
     {
         var passwordFormat = value.Data.Password.Match(
-            (pwd) => value with { Data = value.Data with { Password = pwd } },
+            (pwd) => value with { Data = value.Data with { Password = _hasher.Hash(pwd) } },
             () => value
         );
 
