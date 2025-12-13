@@ -6,6 +6,7 @@ using Application.Services;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.Users;
@@ -53,6 +54,12 @@ public sealed class UpdateUserUseCase(
             _ => value.Data.Id == value.Executor.Id,
         };
 
+        var pwdInput = value.Data.Password;
+        if (pwdInput is not null && _hasher.Matches(pwdInput, record.Password))
+            return UseCaseErrors.Input([
+                new() { Field = "password", Message = "La contraseña no puede ser la misma" },
+            ]);
+
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
@@ -65,22 +72,18 @@ public sealed class UpdateUserUseCase(
         UserDomain original
     )
     {
-        var passwordFormat =
-            // If changing password
-            value.Data.Password
-                is not null
-            && !_hasher.Matches(value.Data.Password, original.Password)
-                // Hash pwd
-                ? value with
-                {
-                    Data = value.Data with { Password = _hasher.Hash(value.Data.Password) },
-                }
-                // Do nothing
-                : value;
+        var passwordFormat = value.Data.Password.Match(
+            (pwd) => value with { Data = value.Data with { Password = pwd } },
+            () => value
+        );
 
         return passwordFormat with
         {
-            Data = value.Data with { Email = value.Data.Email },
+            // Asegurarse que no cambien el Email
+            Data = value.Data with
+            {
+                Email = value.Data.Email,
+            },
         };
     }
 

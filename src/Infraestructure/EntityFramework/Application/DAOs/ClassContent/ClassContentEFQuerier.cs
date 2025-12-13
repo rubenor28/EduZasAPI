@@ -78,6 +78,7 @@ public sealed class ClassContentEFQuerier(EduZasDotnetContext ctx, int maxPageSi
                 Id = tpc.Test.TestId,
                 Title = tpc.Test.Title,
                 Type = ContentType.TEST,
+                Hidden = !tpc.Visible,
                 PublishDate = tpc.CreatedAt,
             });
 
@@ -92,6 +93,7 @@ public sealed class ClassContentEFQuerier(EduZasDotnetContext ctx, int maxPageSi
                 Id = cr.Resource.ResourceId,
                 Title = cr.Resource.Title,
                 Type = ContentType.RESOURCE,
+                Hidden = cr.Hidden,
                 PublishDate = cr.CreatedAt,
             });
 

@@ -11,5 +11,6 @@ public sealed class ClassContentDTO
     public required Guid Id { get; set; }
     public required string Title { get; set; }
     public required ContentType Type { get; set; }
+    public required bool Hidden { get; set; }
     public required DateTime PublishDate { get; set; }
 }
