@@ -20,7 +20,6 @@ static string? ReadUserInput(string? message = null)
 
     Console.Write("> ");
     var input = Console.ReadLine();
-    Console.Clear();
 
     if (input is null)
         Console.WriteLine("No se proporcionó entrada");
@@ -102,6 +101,7 @@ try
         Console.WriteLine("1) Ingresar el email a restablecer");
         Console.WriteLine("2) Salir");
         opt = ReadUserInput();
+        Console.Clear();
 
         if (string.IsNullOrEmpty(opt))
             continue;
