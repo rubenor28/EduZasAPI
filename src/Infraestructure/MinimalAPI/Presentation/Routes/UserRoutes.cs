@@ -5,7 +5,7 @@ using Application.UseCases.Users;
 using Domain.Entities;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;

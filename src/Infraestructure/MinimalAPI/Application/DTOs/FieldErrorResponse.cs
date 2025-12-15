@@ -1,6 +1,6 @@
 using Application.DTOs.Common;
 
-namespace MinimalAPI.Application.DTOs.Common;
+namespace MinimalAPI.Application.DTOs;
 
 /// <summary>
 /// Representa la respuesta estándar que se devuelve cuando ocurre

@@ -1,6 +1,6 @@
 using Domain.Enums;
 
-namespace MinimalAPI.Application.DTOs.Common;
+namespace MinimalAPI.Application.DTOs;
 
 /// <summary>
 /// Representa la carga útil de autenticación utilizada para generar y validar tokens JWT.
@@ -19,3 +19,4 @@ public sealed record AuthPayload
     /// <value>Un valor de <see cref="UserType"/> que indica el rol asignado al usuario.</value>
     public required UserType Role { get; set; }
 }
+

@@ -1,7 +1,9 @@
+using System.Net;
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs;
 using MinimalAPI.Application.Services;
 using MinimalAPI.Presentation.Routes;
 
@@ -15,6 +17,9 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registra todos los servicios específicos de la API, como autenticación, CORS y Swagger.
     /// </summary>
+    /// <param name="services">La colección de servicios a la que se agregarán los servicios.</param>
+    /// <param name="configuration">La configuración de la aplicación para obtener valores necesarios.</param>
+    /// <returns>La misma colección de servicios con los servicios agregados para permitir el encadenamiento.</returns>
     public static IServiceCollection AddApiSpecificServices(
         this IServiceCollection services,
         IConfiguration configuration
@@ -23,6 +28,7 @@ public static class ServiceCollectionExtensions
         services
             .AddCorsConfig(configuration)
             .AddAuthSettings(configuration)
+            .AddRateLimit(configuration)
             .AddSwaggerServices()
             .AddApiServices();
 
@@ -32,6 +38,9 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registra configuraciones de autenticación y autorización para la API.
     /// </summary>
+    /// <param name="services">La colección de servicios a la que se agregarán los servicios.</param>
+    /// <param name="cfg">La configuración de la aplicación para obtener los ajustes de JWT.</param>
+    /// <returns>La misma colección de servicios con los servicios de autenticación y autorización agregados.</returns>
     private static IServiceCollection AddAuthSettings(
         this IServiceCollection services,
         IConfiguration cfg
@@ -87,6 +96,11 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Registra los servicios de Swagger para la generación de documentación de la API.
+    /// </summary>
+    /// <param name="services">La colección de servicios a la que se agregarán los servicios de Swagger.</param>
+    /// <returns>La misma colección de servicios con los servicios de Swagger agregados.</returns>
     public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
@@ -106,6 +120,12 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Configura las políticas de CORS para permitir solicitudes desde el frontend.
+    /// </summary>
+    /// <param name="services">La colección de servicios a la que se agregará la configuración de CORS.</param>
+    /// <param name="cfg">La configuración de la aplicación para obtener la URL del frontend.</param>
+    /// <returns>La misma colección de servicios con la configuración de CORS agregada.</returns>
     public static IServiceCollection AddCorsConfig(
         this IServiceCollection services,
         IConfiguration cfg
@@ -130,10 +150,76 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Registra servicios de utilidad específicos de la API, como 'RoutesUtils'.
+    /// </summary>
+    /// <param name="services">La colección de servicios.</param>
+    /// <returns>La misma colección de servicios con los servicios de utilidad agregados.</returns>
     private static IServiceCollection AddApiServices(this IServiceCollection services)
     {
         services.AddSingleton<RoutesUtils>();
         return services;
     }
-}
 
+    /// <summary>
+    /// Configura el middleware de limitación de velocidad (Rate Limiting) para la API.
+    /// </summary>
+    /// <param name="services">La colección de servicios a la que se agregará la configuración.</param>
+    /// <param name="config">La configuración de la aplicación para obtener los ajustes de Rate Limiting.</param>
+    /// <returns>La misma colección de servicios con la configuración de Rate Limiting agregada.</returns>
+    private static IServiceCollection AddRateLimit(
+        this IServiceCollection services,
+        IConfiguration config
+    )
+    {
+        var cfg = config.GetRequiredSection("RateLimitSettings").Get<RateLimitSettings>();
+        ArgumentNullException.ThrowIfNull(
+            cfg,
+            "RateLimitSettings must be defined on appsettings.json"
+        );
+
+        services.AddRateLimiter(options =>
+        {
+            // CONFIGURACIÓN GLOBAL
+            // Usamos GlobalLimiter con PartitionedRateLimiter.
+            // <HttpContext, string> significa: Entra el contexto HTTP, la clave de partición es un string (la IP).
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
+                httpContext =>
+                {
+                    // Obtener la IP (Clave de partición)
+                    // Si es nula (ej. localhost a veces), usamos Loopback o una cadena fija.
+                    var remoteIpAddress =
+                        httpContext.Connection.RemoteIpAddress?.ToString()
+                        ?? IPAddress.Loopback.ToString();
+
+                    // Crear la regla de límite (Ventana Fija)
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: remoteIpAddress,
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = cfg.PermitLimit,
+                            Window = TimeSpan.FromSeconds(cfg.WindowSeconds),
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = cfg.QueueLimit,
+                        }
+                    );
+                }
+            );
+
+            // Código de estado al rechazar (429)
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            // Personalizar el mensaje de error
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                await context.HttpContext.Response.WriteAsync(
+                    "Has excedido el límite de solicitudes permitidas.",
+                    token
+                );
+            };
+        });
+
+        return services;
+    }
+}

@@ -5,7 +5,7 @@ using Application.UseCases.ClassTests;
 using Application.UseCases.Tests;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;

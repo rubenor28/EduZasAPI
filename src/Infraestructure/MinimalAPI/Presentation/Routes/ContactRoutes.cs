@@ -7,7 +7,7 @@ using Application.UseCases.ContactTags;
 using Application.UseCases.Tags;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;

@@ -6,7 +6,7 @@ using Domain.Entities;
 using InterfaceAdapters.Mappers.Common;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs;
 using MinimalAPI.Application.Services;
 using MinimalAPI.Presentation.Filters;
 

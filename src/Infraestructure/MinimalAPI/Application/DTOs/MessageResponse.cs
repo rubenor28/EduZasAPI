@@ -1,4 +1,4 @@
-namespace MinimalAPI.Application.DTOs.Common;
+namespace MinimalAPI.Application.DTOs;
 
 /// <summary>
 /// Representa una respuesta simple de la API que solo contiene un mensaje,

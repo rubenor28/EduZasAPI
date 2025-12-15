@@ -1,4 +1,4 @@
-namespace MinimalAPI.Application.DTOs.Common;
+namespace MinimalAPI.Application.DTOs;
 
 /// <summary>
 /// Configuración utilizada para la generación y validación de tokens JWT.

@@ -1,4 +1,4 @@
-namespace MinimalAPI.Application.DTOs.Common;
+namespace MinimalAPI.Application.DTOs;
 
 /// <summary>
 /// Representa una respuesta de la API que incluye un mensaje y datos de tipo <typeparamref name="T"/>.

@@ -1,4 +1,3 @@
-using Application.DAOs;
 using Application.DTOs.Common;
 using Application.DTOs.Notifications;
 using Application.DTOs.UserNotifications;
@@ -6,7 +5,7 @@ using Application.UseCases.Notifications;
 using Application.UseCases.UserNotifications;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPI.Application.DTOs.Common;
+using MinimalAPI.Application.DTOs;
 using MinimalAPI.Presentation.Filters;
 
 namespace MinimalAPI.Presentation.Routes;
