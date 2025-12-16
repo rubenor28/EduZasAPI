@@ -302,8 +302,8 @@ public class AddContactUseCaseTest : IDisposable
         Assert.True(result.IsOk);
         Assert.Equal(2, await _ctx.Tags.CountAsync());
         Assert.Equal(2, await _ctx.ContactTags.CountAsync());
-        Assert.True(await _ctx.Tags.AnyAsync(t => t.Text == "tag1"));
-        Assert.True(await _ctx.Tags.AnyAsync(t => t.Text == "tag2"));
+        Assert.True(await _ctx.Tags.AnyAsync(t => t.Text == "TAG1"));
+        Assert.True(await _ctx.Tags.AnyAsync(t => t.Text == "TAG2"));
     }
 
     [Fact]
@@ -313,7 +313,7 @@ public class AddContactUseCaseTest : IDisposable
         var contactUser = await CreateUser("contact@example.com");
 
         // Pre-existing tag
-        _ctx.Tags.Add(new Tag { Text = "existing-tag", CreatedAt = DateTime.UtcNow });
+        _ctx.Tags.Add(new Tag { Text = "EXISTING-TAG", CreatedAt = DateTime.UtcNow });
         await _ctx.SaveChangesAsync();
 
         var newContact = new NewContactDTO
@@ -345,7 +345,7 @@ public class AddContactUseCaseTest : IDisposable
         var contactUser = await CreateUser("contact@example.com");
 
         // Pre-existing tag
-        _ctx.Tags.Add(new Tag { Text = "existing-tag", CreatedAt = DateTime.UtcNow });
+        _ctx.Tags.Add(new Tag { Text = "EXISTING-TAG", CreatedAt = DateTime.UtcNow });
         await _ctx.SaveChangesAsync();
 
         var newContact = new NewContactDTO
@@ -369,8 +369,8 @@ public class AddContactUseCaseTest : IDisposable
         Assert.Equal(2, await _ctx.Tags.CountAsync()); // One new tag created
         Assert.Equal(2, await _ctx.ContactTags.CountAsync());
 
-        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.Tag.Text == "existing-tag"));
-        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.Tag.Text == "new-tag"));
+        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.Tag.Text == "EXISTING-TAG"));
+        Assert.True(await _ctx.ContactTags.AnyAsync(ct => ct.Tag.Text == "NEW-TAG"));
     }
 
     [Fact]

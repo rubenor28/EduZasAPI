@@ -41,7 +41,13 @@ public class UpdateClassProfessorUseCaseTest : IDisposable
             new UpdateClassProfessorEFMapper()
         );
 
-        _useCase = new UpdateClassProfessorUseCase(updater, reader, null);
+        var classProfessorQuerier = new ClassProfessorEFQuerier(
+            _ctx,
+            new ClassProfessorProjector(),
+            10
+        );
+
+        _useCase = new UpdateClassProfessorUseCase(updater, reader, classProfessorQuerier);
     }
 
     private async Task<UserDomain> SeedUser(UserType role = UserType.PROFESSOR)

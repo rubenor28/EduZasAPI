@@ -38,7 +38,7 @@ public sealed class AddTestUseCase(
         var userSearch = await _userReader.GetAsync(value.Data.ProfessorId);
         if (userSearch is null)
             return UseCaseErrors.Input([
-                new() { Field = "profesorId", Message = "No se encontró el usuario" },
+                new() { Field = "professorId", Message = "No se encontró el usuario" },
             ]);
 
         return Unit.Value;

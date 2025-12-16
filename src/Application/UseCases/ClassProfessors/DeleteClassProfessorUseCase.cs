@@ -28,6 +28,7 @@ public sealed class DeleteClassProfessorUseCase(
         {
             UserType.ADMIN => true,
             UserType.PROFESSOR => await IsProfessorAuthorized(
+                value.Data.UserId,
                 value.Executor.Id,
                 value.Data.ClassId
             ),
@@ -42,12 +43,13 @@ public sealed class DeleteClassProfessorUseCase(
     }
 
     private async Task<bool> IsProfessorAuthorized(
+        ulong professorId,
         ulong executorId,
         string classId
     )
     {
         var professor = await _reader.GetAsync(new() { ClassId = classId, UserId = executorId });
 
-        return professor is not null && (professor.IsOwner || professor.UserId == executorId);
+        return professor is not null && (professor.IsOwner || professorId == executorId);
     }
 }

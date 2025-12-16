@@ -1,5 +1,6 @@
 using Application.DTOs.Common;
 using Application.DTOs.Tests;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
@@ -40,7 +41,7 @@ public class TestEFRepositoryTest : IDisposable
         _querier = new(_ctx, testProjector, 10);
         _deleter = new(_ctx, testMapper);
     }
-    
+
     private async Task<User> CreateProfessor(ulong id = 1)
     {
         var professor = new User
@@ -49,18 +50,17 @@ public class TestEFRepositoryTest : IDisposable
             Email = $"professor{id}@example.com",
             FirstName = "Test",
             FatherLastname = "Professor",
-            Password = "hashedpassword", 
+            Password = "hashedpassword",
             Role = (uint)UserType.PROFESSOR,
             Active = true,
             CreatedAt = DateTime.UtcNow,
-            ModifiedAt = DateTime.UtcNow
+            ModifiedAt = DateTime.UtcNow,
         };
         _ctx.Users.Add(professor);
         await _ctx.SaveChangesAsync();
         _ctx.ChangeTracker.Clear();
         return professor;
     }
-
 
     [Fact]
     public async Task AddTest_ReturnsTest()
@@ -70,7 +70,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professor.UserId,
         };
 
@@ -88,21 +88,26 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professor.UserId,
         };
 
         var created = await _creator.AddAsync(newTest);
         _ctx.ChangeTracker.Clear();
 
+        created.Content.Add(
+            Guid.NewGuid(),
+            new OpenQuestion() { Title = "test", ImageUrl = "testImage" }
+        );
+
         var update = new TestUpdateDTO
         {
             Id = created.Id,
             Color = "#ffffff",
             Title = "Updated Test Title",
-            Content = "Updated Test Content",
+            Content = created.Content,
             ProfessorId = professor.UserId,
-            Active = false
+            Active = false,
         };
 
         var updatedTest = await _updater.UpdateAsync(update);
@@ -120,7 +125,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professor.UserId,
         };
         var created = await _creator.AddAsync(newTest);
@@ -146,7 +151,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professor.UserId,
         };
         var created = await _creator.AddAsync(newTest);
@@ -175,7 +180,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Math Test",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professor.UserId,
         };
         await _creator.AddAsync(newTest1);
@@ -184,7 +189,7 @@ public class TestEFRepositoryTest : IDisposable
         {
             Title = "Science Test",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professor.UserId,
         };
         await _creator.AddAsync(newTest2);

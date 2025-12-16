@@ -3,6 +3,7 @@ using Application.DTOs.ClassTests;
 using Application.DTOs.Tests;
 using Application.DTOs.Users;
 using Domain.Entities;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassTests;
@@ -94,7 +95,7 @@ public class ClassTestEFRepositoryTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professor.Id,
         };
         return await _testCreator.AddAsync(newTest);

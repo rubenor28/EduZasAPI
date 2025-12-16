@@ -113,9 +113,10 @@ public class DeleteClassProfessorUseCaseTest : IDisposable
         var result = await _useCase.ExecuteAsync(
             new() { Data = dto, Executor = AsExecutor(ownerProfessor) }
         );
+        var found = await _ctx.ClassProfessors.FindAsync(cls.Id, professorToDelete.Id);
 
-        Assert.True(result.IsErr);
-        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
+        Assert.True(result.IsOk);
+        Assert.Null(found);
     }
 
     [Fact]

@@ -2,6 +2,7 @@ using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.UseCases.Tests;
 using Domain.Entities;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
@@ -69,21 +70,21 @@ public class QueryTestUseCaseTest : IDisposable
             {
                 TestId = Guid.NewGuid(),
                 Title = "Math Test",
-                Content = "Test for algebra",
+                Content = new Dictionary<Guid, IQuestion>(),
                 ProfessorId = professor1.Id,
             },
             new Test
             {
                 TestId = Guid.NewGuid(),
                 Title = "Science Test",
-                Content = "Test for biology",
+                Content = new Dictionary<Guid, IQuestion>(),
                 ProfessorId = professor1.Id,
             },
             new Test
             {
                 TestId = Guid.NewGuid(),
                 Title = "History Test",
-                Content = "Test for world history",
+                Content = new Dictionary<Guid, IQuestion>(),
                 ProfessorId = professor2.Id,
             }
         );

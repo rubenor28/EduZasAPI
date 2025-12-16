@@ -3,6 +3,7 @@ using Application.DTOs.Tests;
 using Application.Services;
 using Application.UseCases.Tests;
 using Domain.Entities;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Tests;
@@ -82,12 +83,15 @@ public class UpdateTestUseCaseTest : IDisposable
         return _userMapper.Map(user);
     }
 
-    private async Task<TestDomain> SeedTest(ulong professorId)
+    private async Task<TestDomain> SeedTest(
+        ulong professorId,
+        IDictionary<Guid, IQuestion>? content = null
+    )
     {
         var test = new Test
         {
             Title = "Original Title",
-            Content = "Original Content",
+            Content = content ?? new Dictionary<Guid, IQuestion>(),
             ProfessorId = professorId,
         };
         _ctx.Tests.Add(test);
@@ -102,7 +106,36 @@ public class UpdateTestUseCaseTest : IDisposable
     {
         var admin = await SeedUser(UserType.ADMIN);
         var professor = await SeedUser();
-        var test = await SeedTest(professor.Id);
+
+        var initialQuestionId = Guid.NewGuid();
+        var initialContent = new Dictionary<Guid, IQuestion>
+        {
+            {
+                initialQuestionId,
+                new MultipleChoiseQuestion
+                {
+                    Title = "Initial Question",
+                    ImageUrl = null,
+                    Options = new Dictionary<Guid, string>(),
+                    CorrectOption = Guid.Empty,
+                }
+            },
+        };
+
+        var test = await SeedTest(professor.Id, initialContent);
+
+        var updatedQuestionId = Guid.NewGuid();
+        var updatedContent = new Dictionary<Guid, IQuestion>
+        {
+            {
+                updatedQuestionId,
+                new OpenQuestion()
+                {
+                    Title = "Updated Open Question",
+                    ImageUrl = "http://updated.image/path",
+                }
+            },
+        };
 
         var updateDto = new TestUpdateDTO
         {
@@ -110,7 +143,7 @@ public class UpdateTestUseCaseTest : IDisposable
             Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
-            Content = "Updated Content",
+            Content = updatedContent, 
             ProfessorId = professor.Id,
         };
 
@@ -119,6 +152,20 @@ public class UpdateTestUseCaseTest : IDisposable
         );
 
         Assert.True(result.IsOk);
+        var testUpdated = result.Unwrap();
+
+        Assert.Equal("Updated Title", testUpdated.Title);
+        Assert.Equal("#ffffff", testUpdated.Color);
+        Assert.True(testUpdated.Active);
+        Assert.Equal(professor.Id, testUpdated.ProfessorId);
+
+        Assert.Single(testUpdated.Content);
+        Assert.True(testUpdated.Content.ContainsKey(updatedQuestionId));
+
+        var updatedQuestion = testUpdated.Content[updatedQuestionId];
+        Assert.IsType<OpenQuestion>(updatedQuestion);
+        Assert.Equal("Updated Open Question", updatedQuestion.Title);
+        Assert.Equal("http://updated.image/path", updatedQuestion.ImageUrl);
     }
 
     [Fact]
@@ -133,7 +180,7 @@ public class UpdateTestUseCaseTest : IDisposable
             Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
-            Content = "Updated Content",
+            Content = test.Content,
             ProfessorId = professor.Id,
         };
 
@@ -151,11 +198,11 @@ public class UpdateTestUseCaseTest : IDisposable
 
         var updateDto = new TestUpdateDTO
         {
-            Id = Guid.NewGuid(), // Non-existent test
+            Id = Guid.NewGuid(), 
             Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
-            Content = "Updated Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = 1,
         };
 
@@ -180,7 +227,7 @@ public class UpdateTestUseCaseTest : IDisposable
             Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
-            Content = "Updated Content",
+            Content = test.Content,
             ProfessorId = professor.Id,
         };
 
@@ -205,7 +252,7 @@ public class UpdateTestUseCaseTest : IDisposable
             Color = "#ffffff",
             Active = true,
             Title = "Updated Title",
-            Content = "Updated Content",
+            Content = test.Content,
             ProfessorId = professor1.Id,
         };
 
@@ -233,8 +280,8 @@ public class UpdateTestUseCaseTest : IDisposable
             Id = test.Id,
             Color = "#ffffff",
             Active = true,
-            Title = "", // Invalid title
-            Content = "Updated Content",
+            Title = "",
+            Content = test.Content,
             ProfessorId = 1,
         };
 

@@ -133,7 +133,7 @@ public class AddContactTagUseCaseTest : IDisposable
 
         // Assert
         Assert.True(result.IsOk);
-        var createdTag = await _ctx.Tags.FirstOrDefaultAsync(t => t.Text == "new-tag");
+        var createdTag = await _ctx.Tags.FirstOrDefaultAsync(t => t.Text == "new-tag".ToUpperInvariant());
         Assert.NotNull(createdTag);
         var association = await _ctx.ContactTags.FirstOrDefaultAsync();
         Assert.NotNull(association);

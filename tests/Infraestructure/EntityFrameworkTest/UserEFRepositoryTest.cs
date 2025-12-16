@@ -106,7 +106,7 @@ public class UserEFRepositoryTest : IDisposable
         var update = new UserUpdateDTO
         {
             Id = created.Id,
-            Email = "update@test.com",
+            Email = created.Email,
             FirstName = "update",
             Password = "update",
             FatherLastname = "update",
@@ -129,7 +129,7 @@ public class UserEFRepositoryTest : IDisposable
     }
 
     [Fact]
-    public async Task UpdateUser_RepeatedEmail_ThrowsDbUpdateException()
+    public async Task UpdateUser_UpdateEmail_EmailShouldDontChange()
     {
         var newUser = new NewUserDTO
         {
@@ -140,16 +140,6 @@ public class UserEFRepositoryTest : IDisposable
             Role = UserType.STUDENT,
         };
 
-        var otherUser = new NewUserDTO
-        {
-            Email = "test2@test.com",
-            Password = "securepwd1234",
-            FirstName = "test",
-            FatherLastname = "test",
-            Role = UserType.STUDENT,
-        };
-
-        await _creator.AddAsync(otherUser);
         var created = await _creator.AddAsync(newUser);
 
         var updateEmailRepeated = new UserUpdateDTO
@@ -165,9 +155,8 @@ public class UserEFRepositoryTest : IDisposable
             Role = created.Role,
         };
 
-        await Assert.ThrowsAsync<DbUpdateException>(() =>
-            _updater.UpdateAsync(updateEmailRepeated)
-        );
+        var updated = await _updater.UpdateAsync(updateEmailRepeated);
+        Assert.Equal(created.Email, updated.Email);
     }
 
     [Fact]

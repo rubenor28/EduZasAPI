@@ -1,6 +1,7 @@
 using Application.DTOs.Common;
 using Application.UseCases.Tests;
 using Domain.Entities;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
@@ -62,7 +63,7 @@ public class DeleteTestUseCaseTest : IDisposable
         {
             TestId = Guid.NewGuid(),
             Title = "Original Title",
-            Content = "Original Content",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professorId,
         };
         _ctx.Tests.Add(test);

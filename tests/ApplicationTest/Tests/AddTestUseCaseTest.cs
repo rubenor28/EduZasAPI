@@ -2,6 +2,7 @@ using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.UseCases.Tests;
 using Domain.Entities;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DAOs.Users;
@@ -62,6 +63,14 @@ public class AddTestUseCaseTest : IDisposable
 
     private static Executor AsExecutor(UserDomain user) => new() { Id = user.Id, Role = user.Role };
 
+    private static Dictionary<Guid, IQuestion> GetValidTestContent()
+    {
+        return new Dictionary<Guid, IQuestion>
+        {
+            { Guid.NewGuid(), new OpenQuestion { Title = "Valid Question", ImageUrl = null } }
+        };
+    }
+
     [Fact]
     public async Task ExecuteAsync_WithValidDataAndAdminRole_ReturnsOk()
     {
@@ -71,7 +80,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test content",
+            Content = GetValidTestContent(),
             ProfessorId = professor.Id,
         };
 
@@ -90,7 +99,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = GetValidTestContent(),
             ProfessorId = user.Id,
         };
 
@@ -109,8 +118,8 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
-            ProfessorId = 999, // Non-existent professor
+            Content = GetValidTestContent(),
+            ProfessorId = 999,
         };
 
         var result = await _useCase.ExecuteAsync(
@@ -120,7 +129,7 @@ public class AddTestUseCaseTest : IDisposable
         Assert.True(result.IsErr);
         var err = result.UnwrapErr();
         Assert.IsType<InputError>(err);
-        Assert.Contains(((InputError)err).Errors, e => e.Field == "profesorId");
+        Assert.Contains(((InputError)err).Errors, e => e.Field == "professorId");
     }
 
     [Fact]
@@ -131,7 +140,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = GetValidTestContent(),
             ProfessorId = student.Id,
         };
 
@@ -152,7 +161,7 @@ public class AddTestUseCaseTest : IDisposable
         {
             Title = "Test Title",
             Color = "#ffffff",
-            Content = "Test Content",
+            Content = GetValidTestContent(),
             ProfessorId = professor.Id,
         };
 
@@ -161,7 +170,7 @@ public class AddTestUseCaseTest : IDisposable
         );
 
         Assert.True(result.IsErr);
-        Assert.Equal(typeof(UnauthorizedError), result.UnwrapErr().GetType());
+        Assert.IsType<UnauthorizedError>(result.UnwrapErr());
     }
 
     public void Dispose()

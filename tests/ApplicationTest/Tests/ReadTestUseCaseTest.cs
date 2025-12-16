@@ -1,6 +1,7 @@
 using Application.DTOs.Common;
 using Application.UseCases.Tests;
 using Domain.Entities;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DTOs;
@@ -61,7 +62,7 @@ public class ReadTestUseCaseTest : IDisposable
         var test = new Test
         {
             Title = "Original Title",
-            Content = "Original Description",
+            Content = new Dictionary<Guid, IQuestion>(),
             ProfessorId = professorId,
         };
         _ctx.Tests.Add(test);

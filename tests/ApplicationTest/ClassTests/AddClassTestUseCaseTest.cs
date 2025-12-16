@@ -2,6 +2,7 @@ using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
 using Application.UseCases.ClassTests;
 using Domain.Entities;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
@@ -90,7 +91,7 @@ public class AddClassTestUseCaseTest : IDisposable
             TestId = Guid.NewGuid(),
             Title = "Test Title",
             ProfessorId = professorId,
-            Content = "[]",
+            Content = new Dictionary<Guid, IQuestion>(),
         };
         _ctx.Tests.Add(test);
         await _ctx.SaveChangesAsync();
