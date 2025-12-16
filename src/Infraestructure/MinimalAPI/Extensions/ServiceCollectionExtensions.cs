@@ -1,9 +1,11 @@
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Application.DTOs;
+using MinimalAPI.Application.DTOs.RateLimit;
 using MinimalAPI.Application.Services;
 using MinimalAPI.Presentation.Routes;
 
@@ -182,25 +184,43 @@ public static class ServiceCollectionExtensions
         {
             // CONFIGURACIÓN GLOBAL
             // Usamos GlobalLimiter con PartitionedRateLimiter.
-            // <HttpContext, string> significa: Entra el contexto HTTP, la clave de partición es un string (la IP).
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
                 httpContext =>
                 {
-                    // Obtener la IP (Clave de partición)
-                    // Si es nula (ej. localhost a veces), usamos Loopback o una cadena fija.
+                    // Intentar obtener el ID del usuario autenticado.
+                    // Esto funciona porque el middleware de RateLimiter se ejecuta DESPUÉS del de Autenticación.
+                    var userId = (string?)httpContext.Items["UserId"];
+
+                    // Si el usuario está autenticado, su ID es la clave de partición.
+                    // Cada usuario tiene sus propio rate limit.
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        return RateLimitPartition.GetFixedWindowLimiter(
+                            partitionKey: userId,
+                            factory: _ => new FixedWindowRateLimiterOptions
+                            {
+                                PermitLimit = cfg.Authenticated.PermitLimit,
+                                Window = TimeSpan.FromSeconds(cfg.Authenticated.WindowSeconds),
+                                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                                QueueLimit = cfg.Authenticated.QueueLimit,
+                            }
+                        );
+                    }
+
+                    // Si el usuario es anónimo, usamos la IP como fallback.
+                    // Todos los usuarios anónimos en la misma IP compartirán el mismo rate limit.
                     var remoteIpAddress =
                         httpContext.Connection.RemoteIpAddress?.ToString()
                         ?? IPAddress.Loopback.ToString();
 
-                    // Crear la regla de límite (Ventana Fija)
                     return RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: remoteIpAddress,
                         factory: _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = cfg.PermitLimit,
-                            Window = TimeSpan.FromSeconds(cfg.WindowSeconds),
+                            PermitLimit = cfg.Guest.PermitLimit,
+                            Window = TimeSpan.FromSeconds(cfg.Guest.WindowSeconds),
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                            QueueLimit = cfg.QueueLimit,
+                            QueueLimit = cfg.Guest.QueueLimit,
                         }
                     );
                 }
