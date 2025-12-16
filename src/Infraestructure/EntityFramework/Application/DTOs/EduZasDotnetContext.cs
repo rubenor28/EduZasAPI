@@ -1,5 +1,6 @@
 using DotNetEnv;
 using EntityFramework.InterfaceAdapters.ValueConverters;
+using InterfaceAdapters.Mappers.Tests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -707,7 +708,7 @@ public partial class EduZasDotnetContext : DbContext
 
             var contentProperty = testBuilder
                 .Property(e => e.Content)
-                .HasConversion(new JsonNodeToStringConverter())
+                .HasConversion(new QuestionsDictionaryValueConverter())
                 .HasColumnName("content");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")

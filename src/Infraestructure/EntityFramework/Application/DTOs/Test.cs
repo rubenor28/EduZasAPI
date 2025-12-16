@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Nodes;
+﻿using Domain.Entities.Questions;
 
 namespace EntityFramework.Application.DTOs;
 
@@ -15,7 +15,7 @@ public partial class Test
 
     public string Color { get; set; } = null!;
 
-    public JsonNode Content { get; set; } = null!;
+    public IDictionary<Guid, IQuestion> Content { get; set; } = null!;
 
     public uint? TimeLimitMinutes { get; set; }
 
