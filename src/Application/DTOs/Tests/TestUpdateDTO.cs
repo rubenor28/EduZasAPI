@@ -1,5 +1,4 @@
-
-using System.Text.Json.Nodes;
+using Domain.Entities.Questions;
 
 namespace Application.DTOs.Tests;
 
@@ -26,12 +25,12 @@ public sealed record TestUpdateDTO
     /// <summary>
     /// Nuevo contenido de la evaluación (estructura JSON).
     /// </summary>
-    public required JsonNode Content { get; init; }
+    public required IDictionary<Guid, IQuestion> Content { get; init; }
 
     /// <summary>
     /// Nuevo límite de tiempo en minutos (opcional).
     /// </summary>
-    public uint? TimeLimitMinutes { get; init; } 
+    public uint? TimeLimitMinutes { get; init; }
 
     /// <summary>
     /// Identificador del profesor (para validación de propiedad).

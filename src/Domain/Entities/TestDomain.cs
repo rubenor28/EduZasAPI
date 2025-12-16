@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using Domain.Entities.Questions;
 
 namespace Domain.Entities;
 
@@ -37,7 +38,7 @@ public sealed record TestDomain
     /// <remarks>
     /// La estructura JSON puede contener preguntas, instrucciones y otros elementos del examen.
     /// </remarks>
-    public required JsonNode Content { get; set; }
+    public required IDictionary<Guid, IQuestion> Content { get; set; }
 
     /// <summary>
     /// Obtiene o establece el límite de tiempo para completar el examen, en minutos.

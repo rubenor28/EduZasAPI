@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+using Domain.Entities.Questions;
 
 namespace Application.DTOs.Tests;
 
@@ -20,7 +20,7 @@ public sealed record NewTestDTO
     /// <summary>
     /// Estructura JSON que define el contenido de la evaluación (bloques, preguntas).
     /// </summary>
-    public required JsonNode Content { get; init; }
+    public required IDictionary<Guid, IQuestion> Content { get; init; }
 
     /// <summary>
     /// Límite de tiempo en minutos para completar la evaluación (opcional).
