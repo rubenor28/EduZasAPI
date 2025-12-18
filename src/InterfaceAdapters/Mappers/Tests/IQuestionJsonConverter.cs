@@ -35,17 +35,18 @@ public class IQuestionJsonConverter : JsonConverter<IQuestion>
         // Basado en el tipo, delegamos al deserializador estándar para que cree la clase correcta.
         IQuestion? question = typeName switch
         {
-            "multipleChoise" => JsonSerializer.Deserialize<MultipleChoiseQuestion>(
+            QuestionTypes.MultipleChoise => JsonSerializer.Deserialize<MultipleChoiseQuestion>(
                 jsonText,
                 options
             ),
-            "multipleSelection" => JsonSerializer.Deserialize<MultipleSelectionQuestion>(
+            QuestionTypes.MultipleSelection =>
+                JsonSerializer.Deserialize<MultipleSelectionQuestion>(jsonText, options),
+            QuestionTypes.Ordering => JsonSerializer.Deserialize<OrderingQuestion>(
                 jsonText,
                 options
             ),
-            "ordering" => JsonSerializer.Deserialize<OrderingQuestion>(jsonText, options),
-            "openQuestion" => JsonSerializer.Deserialize<OpenQuestion>(jsonText, options),
-            "conceptRelation" => JsonSerializer.Deserialize<ConceptRelationQuestion>(
+            QuestionTypes.Open => JsonSerializer.Deserialize<OpenQuestion>(jsonText, options),
+            QuestionTypes.ConceptRelation => JsonSerializer.Deserialize<ConceptRelationQuestion>(
                 jsonText,
                 options
             ),
@@ -72,11 +73,11 @@ public class IQuestionJsonConverter : JsonConverter<IQuestion>
         // Determinamos qué tipo de objeto es para escribir
         var typeName = value switch
         {
-            MultipleChoiseQuestion => "multipleChoise",
-            MultipleSelectionQuestion => "multipleSelection",
-            OrderingQuestion => "ordering",
-            OpenQuestion => "openQuestion",
-            ConceptRelationQuestion => "conceptRelation",
+            MultipleChoiseQuestion => QuestionTypes.MultipleChoise,
+            MultipleSelectionQuestion => QuestionTypes.MultipleSelection,
+            OrderingQuestion => QuestionTypes.Ordering,
+            OpenQuestion => QuestionTypes.Open,
+            ConceptRelationQuestion => QuestionTypes.ConceptRelation,
             _ => throw new NotSupportedException(
                 $"El tipo '{value.GetType()}' no puede ser serializado por IQuestionJsonConverter."
             ),

@@ -1,7 +1,9 @@
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Threading.RateLimiting;
+using InterfaceAdapters.Mappers.Tests;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Application.DTOs;
@@ -28,12 +30,28 @@ public static class ServiceCollectionExtensions
     )
     {
         services
+            .AddJsonSerialization()
             .AddCorsConfig(configuration)
             .AddAuthSettings(configuration)
             .AddRateLimit(configuration)
             .AddSwaggerServices()
             .AddApiServices();
 
+        return services;
+    }
+    
+    /// <summary>
+    /// Configura las opciones de serialización JSON para la aplicación.
+    /// </summary>
+    /// <param name="services">La colección de servicios.</param>
+    /// <returns>La misma colección de servicios para encadenamiento.</returns>
+    private static IServiceCollection AddJsonSerialization(this IServiceCollection services)
+    {
+        services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+        {
+            options.SerializerOptions.Converters.Add(new IQuestionJsonConverter());
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        });
         return services;
     }
 
@@ -243,3 +261,4 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
+
