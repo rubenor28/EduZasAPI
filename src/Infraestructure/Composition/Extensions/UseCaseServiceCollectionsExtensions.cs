@@ -97,6 +97,7 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddTransient<QueryTestUseCase>();
         s.AddTransient<QueryTestSummaryUseCase>();
         s.AddTransient<ReadTestUseCase>();
+        s.AddTransient<ReadPublicTestUseCase>();
         s.AddTransient<UpdateTestUseCase>();
         s.AddTransient<QueryClassTestAssociationUseCase>();
 

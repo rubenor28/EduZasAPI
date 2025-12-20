@@ -13,6 +13,8 @@ using Application.DTOs.Tests;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
+using Domain.Entities.PublicQuestions;
+using Domain.Entities.Questions;
 using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
@@ -31,6 +33,7 @@ using EntityFramework.InterfaceAdapters.Mappers.Tests;
 using EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 using EntityFramework.InterfaceAdapters.Mappers.Users;
 using InterfaceAdapters.Mappers.Common;
+using InterfaceAdapters.Mappers.Tests;
 using InterfaceAdapters.Mappers.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -143,10 +146,13 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>, NewContactTagEFMapper>();
 
         // TESTS
+        s.AddSingleton<IMapper<IQuestion, IPublicQuestion>, PublicQuestionMapper>();
+        
         // EF
         s.AddSingleton<IMapper<NewTestDTO, Test>, NewTestEFMapper>();
         s.AddSingleton<IUpdateMapper<TestUpdateDTO, Test>, UpdateTestEFMapper>();
         s.AddSingleton<IMapper<Test, TestDomain>, TestMapper>();
+        s.AddSingleton<IMapper<Test, PublicTestDTO>, PublicTestMapper>();
         s.AddSingleton<IEFProjector<Test, TestDomain, TestCriteriaDTO>, TestProjector>();
         s.AddSingleton<IEFProjector<Test, TestSummary, TestCriteriaDTO>, TestSummaryProjector>();
         s.AddSingleton<IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>, ClassTestAssociationProjector>();

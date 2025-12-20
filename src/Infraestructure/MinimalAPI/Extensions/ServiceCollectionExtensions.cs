@@ -50,6 +50,7 @@ public static class ServiceCollectionExtensions
         services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
         {
             options.SerializerOptions.Converters.Add(new IQuestionJsonConverter());
+            options.SerializerOptions.Converters.Add(new IPublicQuestionJsonConverter());
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
         return services;

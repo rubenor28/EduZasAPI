@@ -22,7 +22,7 @@ public static class TestRoutes
     /// <returns>El grupo de rutas configurado.</returns>
     public static RouteGroupBuilder MapTestRoutes(this WebApplication app)
     {
-        var group = app.MapGroup("").WithTags("Usuarios");
+        var group = app.MapGroup("").WithTags("Tests");
 
         group
             .MapPost("/test", AddTest)
@@ -129,21 +129,25 @@ public static class TestRoutes
                 op.Responses["404"].Description = "Si la evaluacion no existe";
                 return op;
             });
-        
+
         group
             .MapPost("/tests/assigned", SearchClassTestAssociations)
             .WithName("Buscar asociaciones de tests y clases")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>>(
+                StatusCodes.Status200OK
+            )
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .WithOpenApi(op =>
             {
-                op.Summary = "Obtener una lista paginada de todas las clases de un profesor, indicando si una evaluación específica está asociada a cada una.";
+                op.Summary =
+                    "Obtener una lista paginada de todas las clases de un profesor, indicando si una evaluación específica está asociada a cada una.";
                 op.Responses["200"].Description = "La lista de asociaciones.";
                 op.Responses["401"].Description = "Si el usuario no está autenticado.";
-                op.Responses["403"].Description = "Si el usuario no tiene permisos para realizar esta acción.";
+                op.Responses["403"].Description =
+                    "Si el usuario no tiene permisos para realizar esta acción.";
                 return op;
             });
 
@@ -199,7 +203,29 @@ public static class TestRoutes
                 op.Responses["204"].Description = "Si la operación fue exitosa.";
                 op.Responses["400"].Description = "Si los campos no son válidos.";
                 op.Responses["401"].Description = "Si el usuario no está autenticado.";
-                op.Responses["403"].Description = "Si el usuario no tiene permisos para realizar esta acción.";
+                op.Responses["403"].Description =
+                    "Si el usuario no tiene permisos para realizar esta acción.";
+                return op;
+            });
+
+        group
+            .MapGet("tests/{testId:guid}/{classId}", ReadPublicTest)
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<PublicTestDTO>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithOpenApi(op =>
+            {
+                op.Summary = "Obtener la evaluación asociada a una clase.";
+                op.Description =
+                    "Obtener la evaluación asociada a una clase con preguntas y respuestas mezcladas.";
+                op.Responses["200"].Description = "La sesión se cerró exitosamente.";
+                op.Responses["401"].Description = "El usuario no está autenticado.";
+                op.Responses["403"].Description =
+                    "El usuario no tiene permiso para leer la evaluación.";
+                op.Responses["404"].Description = "No se encontró la evaluación.";
                 return op;
             });
 
@@ -317,10 +343,19 @@ public static class TestRoutes
         [FromServices] RoutesUtils utils,
         HttpContext ctx
     ) =>
+        utils.HandleUseCaseAsync(ctx, useCase, mapRequest: () => criteria, mapResponse: Results.Ok);
+
+    public static Task<IResult> ReadPublicTest(
+        [FromRoute] Guid testId,
+        [FromRoute] string classId,
+        [FromServices] ReadPublicTestUseCase useCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
         utils.HandleUseCaseAsync(
             ctx,
             useCase,
-            mapRequest: () => criteria,
-            mapResponse: Results.Ok
+            mapRequest: () => new PublicTestIdDTO { TestId = testId, ClassId = classId },
+            mapResponse: t => Results.Ok(t)
         );
 }

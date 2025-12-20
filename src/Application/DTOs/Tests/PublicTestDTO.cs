@@ -1,15 +1,14 @@
-using Domain.Entities.Questions;
+using Domain.Entities.PublicQuestions;
 
-namespace Domain.Entities;
+namespace Application.DTOs.Tests;
 
-/// <summary>
-/// Representa un examen o evaluación en el sistema.
-/// </summary>
-/// <remarks>
-/// Un examen contiene una estructura de contenido flexible en formato JSON,
-/// un título, y metadatos como el límite de tiempo y el profesor que lo creó.
-/// </remarks>
-public sealed record TestDomain
+public record PublicQuestionDTO
+{
+    public Guid Id { get; set; }
+    public required IPublicQuestion Data { get; set; }
+}
+
+public sealed record PublicTestDTO
 {
     /// <summary>
     /// Obtiene o establece el identificador único del examen (GUID).
@@ -32,12 +31,12 @@ public sealed record TestDomain
     public required string Color { get; set; }
 
     /// <summary>
-    /// Obtiene o establece el contenido del examen, representado como un nodo JSON.
+    /// Obtiene o establece el contenido del examen.
     /// </summary>
     /// <remarks>
     /// La estructura JSON puede contener preguntas, instrucciones y otros elementos del examen.
     /// </remarks>
-    public required IDictionary<Guid, IQuestion> Content { get; set; }
+    public required IEnumerable<PublicQuestionDTO> Content { get; set; }
 
     /// <summary>
     /// Obtiene o establece el límite de tiempo para completar el examen, en minutos.
@@ -49,14 +48,4 @@ public sealed record TestDomain
     /// Obtiene o establece el identificador del profesor que creó el examen.
     /// </summary>
     public required ulong ProfessorId { get; set; }
-
-    /// <summary>
-    /// Obtiene o establece la fecha y hora de creación del examen.
-    /// </summary>
-    public required DateTime CreatedAt { get; set; }
-
-    /// <summary>
-    /// Obtiene o establece la fecha y hora de la última modificación del examen.
-    /// </summary>
-    public required DateTime ModifiedAt { get; set; }
 }

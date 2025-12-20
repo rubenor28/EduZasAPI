@@ -181,6 +181,7 @@ internal static class RepositoryServiceCollectionExtensions
         s.AddScoped<IUpdaterAsync<TestDomain, TestUpdateDTO>, TestEFUpdater>();
         s.AddScoped<IDeleterAsync<Guid, TestDomain>, TestEFDeleter>();
         s.AddScoped<IReaderAsync<Guid, TestDomain>, TestEFReader>();
+        s.AddScoped<IReaderAsync<PublicTestIdDTO, PublicTestDTO>, PublicTestEFReader>();
         s.AddScoped<IQuerierAsync<TestDomain, TestCriteriaDTO>>(
             sp => new TestEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
