@@ -18,13 +18,6 @@ COPY src/Infraestructure/MailKit/MailKitProj.csproj src/Infraestructure/MailKit/
 COPY src/Infraestructure/Composition/Composition.csproj src/Infraestructure/Composition/
 COPY src/Infraestructure/Cli/Cli.csproj src/Infraestructure/Cli/
 
-# Elimina los proyectos de prueba de la solución para el build
-# Esto evita que 'dotnet restore' falle al no encontrar los proyectos de prueba,
-# que no se copian en esta etapa.
-RUN dotnet sln EduZasAPI.sln remove tests/ApplicationTest/ApplicationTest.csproj
-RUN dotnet sln EduZasAPI.sln remove tests/Infraestructure/EntityFrameworkTest/EntityFrameworkTest.csproj
-RUN dotnet sln EduZasAPI.sln remove tests/Infraestructure/FluentValidationTest/FluentValidationTest.csproj
-
 # Restaura las dependencias de la solución
 RUN dotnet restore EduZasAPI.sln
 
