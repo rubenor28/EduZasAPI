@@ -1,6 +1,6 @@
 using DotNetEnv;
 using EntityFramework.InterfaceAdapters.ValueConverters;
-using InterfaceAdapters.Mappers.Tests;
+using EntityFramework.InterfaceAdapters.ValueGenerators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -497,7 +497,8 @@ public partial class EduZasDotnetContext : DbContext
             {
                 var resourceIdProperty = resourceBuilder
                     .Property(e => e.ResourceId)
-                    .HasColumnType("char(36)")
+                    .HasColumnType("binary(16)")
+                    .HasValueGenerator<GuidV7ValueGenerator>()
                     .HasColumnName("resource_id");
                 resourceBuilder
                     .Property(e => e.ProfessorId)
@@ -517,7 +518,7 @@ public partial class EduZasDotnetContext : DbContext
             }
             else
             {
-                resourceBuilder.Property(e => e.ResourceId).HasColumnName("resource_id");
+                resourceBuilder.Property(e => e.ResourceId).HasColumnName("resource_id").HasValueGenerator<GuidV7ValueGenerator>();
                 resourceBuilder.Property(e => e.ProfessorId).HasColumnName("professor_id");
                 resourceBuilder
                     .Property(e => e.CreatedAt)
@@ -561,7 +562,7 @@ public partial class EduZasDotnetContext : DbContext
 
                 classResourceBuilder
                     .Property(e => e.ResourceId)
-                    .HasColumnType("char(36)")
+                    .HasColumnType("binary(16)")
                     .HasColumnName("resource_id");
 
                 classResourceBuilder
@@ -715,7 +716,8 @@ public partial class EduZasDotnetContext : DbContext
             {
                 testBuilder
                     .Property(e => e.TestId)
-                    .HasColumnType("char(36)")
+                    .HasColumnType("binary(16)")
+                    .HasValueGenerator<GuidV7ValueGenerator>()
                     .HasColumnName("test_id");
                 testBuilder
                     .Property(e => e.ProfessorId)
@@ -739,7 +741,7 @@ public partial class EduZasDotnetContext : DbContext
             }
             else
             {
-                testBuilder.Property(e => e.TestId).HasColumnName("test_id");
+                testBuilder.Property(e => e.TestId).HasColumnName("test_id").HasValueGenerator<GuidV7ValueGenerator>();
                 testBuilder.Property(e => e.ProfessorId).HasColumnName("professor_id");
                 testBuilder.Property(e => e.TimeLimitMinutes).HasColumnName("time_limit_minutes");
                 testBuilder
@@ -774,7 +776,7 @@ public partial class EduZasDotnetContext : DbContext
                 testPerClassBuilder.HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
                 testPerClassBuilder
                     .Property(e => e.TestId)
-                    .HasColumnType("char(36)")
+                    .HasColumnType("binary(16)")
                     .HasColumnName("test_id");
                 testPerClassBuilder
                     .Property(e => e.CreatedAt)
@@ -876,7 +878,7 @@ public partial class EduZasDotnetContext : DbContext
             builder.HasIndex(e => e.ResourceId, "idx_resource_view_sessions_resource_id");
             builder.HasIndex(e => e.ClassId, "idx_resource_view_sessions_class_id");
 
-            builder.Property(e => e.Id).HasColumnType("char(36)").HasColumnName("id");
+            builder.Property(e => e.Id).HasColumnType("binary(16)").HasColumnName("id").HasValueGenerator<GuidV7ValueGenerator>();
             builder.Property(e => e.StartTimeUtc).HasColumnName("start_time_utc");
             builder.Property(e => e.EndTimeUtc).HasColumnName("end_time_utc");
             builder.Property(e => e.DurationSeconds).HasColumnName("duration_seconds");
@@ -889,7 +891,7 @@ public partial class EduZasDotnetContext : DbContext
                     .HasColumnName("user_id");
                 builder
                     .Property(e => e.ResourceId)
-                    .HasColumnType("char(36)")
+                    .HasColumnType("binary(16)")
                     .HasColumnName("resource_id");
                 builder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
                 builder
