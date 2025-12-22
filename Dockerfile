@@ -18,6 +18,9 @@ COPY src/Infraestructure/MailKit/MailKitProj.csproj src/Infraestructure/MailKit/
 COPY src/Infraestructure/Composition/Composition.csproj src/Infraestructure/Composition/
 COPY src/Infraestructure/Cli/Cli.csproj src/Infraestructure/Cli/
 
+# Eliminar los test de la solucion
+RUN dotnet sln remove Tests/
+
 # Restaura las dependencias de la solución
 RUN dotnet restore EduZasAPI.sln
 

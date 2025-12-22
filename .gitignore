@@ -4,7 +4,7 @@
 # Carpetas y contenido
 !/src/
 !/src/**
-!/tests/
+!/Tests/
 !/tests/**
 !/.devcontainer/
 !/.devcontainer/**
