@@ -20,10 +20,10 @@ public sealed class PublicQuestionMapper
         var columnA = new List<string>(count);
         var columnB = new List<string>(count);
 
-        foreach (var concept in q.Concepts.Values)
+        foreach (var pair in q.Concepts)
         {
-            columnA.Add(concept.ConceptA);
-            columnB.Add(concept.ConceptB);
+            columnA.Add(pair.ConceptA);
+            columnB.Add(pair.ConceptB);
         }
 
         Random.Shared.Shuffle(CollectionsMarshal.AsSpan(columnA));

@@ -70,6 +70,7 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddTransient<QueryClassProfessorSummaryUseCase>();
 
         // Notifications
+        s.AddTransient<AddNotificationUseCase>();
         s.AddTransient<SearchNotificationUseCase>();
         s.AddTransient<QueryNotificationSummaryUseCase>();
         s.AddTransient<HasUnreadNotificationUseCase>();

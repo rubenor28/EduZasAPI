@@ -499,6 +499,7 @@ public partial class EduZasDotnetContext : DbContext
                     .Property(e => e.ResourceId)
                     .HasColumnType("binary(16)")
                     .HasValueGenerator<GuidV7ValueGenerator>()
+                    .HasConversion<GuidToBigEndianBinaryConverter>()
                     .HasColumnName("resource_id");
                 resourceBuilder
                     .Property(e => e.ProfessorId)
@@ -518,7 +519,11 @@ public partial class EduZasDotnetContext : DbContext
             }
             else
             {
-                resourceBuilder.Property(e => e.ResourceId).HasColumnName("resource_id").HasValueGenerator<GuidV7ValueGenerator>();
+                resourceBuilder
+                    .Property(e => e.ResourceId)
+                    .HasColumnName("resource_id")
+                    .HasValueGenerator<GuidV7ValueGenerator>()
+                    .HasConversion<GuidToBigEndianBinaryConverter>();
                 resourceBuilder.Property(e => e.ProfessorId).HasColumnName("professor_id");
                 resourceBuilder
                     .Property(e => e.CreatedAt)
@@ -718,6 +723,7 @@ public partial class EduZasDotnetContext : DbContext
                     .Property(e => e.TestId)
                     .HasColumnType("binary(16)")
                     .HasValueGenerator<GuidV7ValueGenerator>()
+                    .HasConversion<GuidToBigEndianBinaryConverter>()
                     .HasColumnName("test_id");
                 testBuilder
                     .Property(e => e.ProfessorId)
@@ -741,7 +747,11 @@ public partial class EduZasDotnetContext : DbContext
             }
             else
             {
-                testBuilder.Property(e => e.TestId).HasColumnName("test_id").HasValueGenerator<GuidV7ValueGenerator>();
+                testBuilder
+                    .Property(e => e.TestId)
+                    .HasColumnName("test_id")
+                    .HasValueGenerator<GuidV7ValueGenerator>()
+                    .HasConversion<GuidToBigEndianBinaryConverter>();
                 testBuilder.Property(e => e.ProfessorId).HasColumnName("professor_id");
                 testBuilder.Property(e => e.TimeLimitMinutes).HasColumnName("time_limit_minutes");
                 testBuilder
@@ -878,7 +888,12 @@ public partial class EduZasDotnetContext : DbContext
             builder.HasIndex(e => e.ResourceId, "idx_resource_view_sessions_resource_id");
             builder.HasIndex(e => e.ClassId, "idx_resource_view_sessions_class_id");
 
-            builder.Property(e => e.Id).HasColumnType("binary(16)").HasColumnName("id").HasValueGenerator<GuidV7ValueGenerator>();
+            builder
+                .Property(e => e.Id)
+                .HasColumnType("binary(16)")
+                .HasColumnName("id")
+                .HasValueGenerator<GuidV7ValueGenerator>()
+                .HasConversion<GuidToBigEndianBinaryConverter>();
             builder.Property(e => e.StartTimeUtc).HasColumnName("start_time_utc");
             builder.Property(e => e.EndTimeUtc).HasColumnName("end_time_utc");
             builder.Property(e => e.DurationSeconds).HasColumnName("duration_seconds");
