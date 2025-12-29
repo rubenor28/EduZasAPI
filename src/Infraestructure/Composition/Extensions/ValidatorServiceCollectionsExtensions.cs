@@ -1,11 +1,15 @@
 using Application.DTOs.Classes;
 using Application.DTOs.Contacts;
+using Application.DTOs.Tests;
 using Application.DTOs.Users;
 using Application.Services;
+using Domain.Entities.Questions;
 using FluentValidationProj.Application.Services.Auth;
 using FluentValidationProj.Application.Services.Classes;
 using FluentValidationProj.Application.Services.Common;
 using FluentValidationProj.Application.Services.Contacts;
+using FluentValidationProj.Application.Services.Tests;
+using FluentValidationProj.Application.Services.Tests.Questions;
 using FluentValidationProj.Application.Services.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,35 +31,31 @@ internal static class ValidatorServiceCollectionExtensions
         services.AddSingleton<IBusinessValidationService<string>, EmailFluentValidator>();
 
         // Auth validators
-        services.AddSingleton<
-            IBusinessValidationService<UserCredentialsDTO>,
-            UserCredentialsFluentValidator
-        >();
-
+        services.AddSingleton<IBusinessValidationService<UserCredentialsDTO>, UserCredentialsFluentValidator>();
         services.AddSingleton<IBusinessValidationService<NewUserDTO>, NewUserFluentValidator>();
 
         // User validators
-        services.AddSingleton<
-            IBusinessValidationService<UserUpdateDTO>,
-            UserUpdateFluentValidator
-        >();
-
-        services.AddSingleton<
-            IBusinessValidationService<UserCredentialsDTO>,
-            UserCredentialsFluentValidator
-        >();
+        services.AddSingleton<IBusinessValidationService<UserUpdateDTO>, UserUpdateFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<UserCredentialsDTO>, UserCredentialsFluentValidator>();
 
         // Class validators
         services.AddSingleton<IBusinessValidationService<NewClassDTO>, NewClassFluentValidator>();
-
-        services.AddSingleton<
-            IBusinessValidationService<ClassUpdateDTO>,
-            ClassUpdateFluentValidator
-        >();
+        services.AddSingleton<IBusinessValidationService<ClassUpdateDTO>, ClassUpdateFluentValidator>();
 
         // Contact validators
         services.AddSingleton<IBusinessValidationService<NewContactDTO>, NewContactFluentValidator>();
         services.AddSingleton<IBusinessValidationService<ContactUpdateDTO>, ContactUpdateFluentValidator>();
+
+        // Test validators
+        services.AddSingleton<IBusinessValidationService<NewTestDTO>, NewTestFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<TestUpdateDTO>, TestUpdateFluentValidator>();
+
+        // Questions validator
+        services.AddSingleton<IBusinessValidationService<ConceptRelationQuestion>, ConceptRelationFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<MultipleChoiseQuestion>, MultipleChoiseQuestionFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<MultipleSelectionQuestion>, MultipleSelectionQuestionFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<OpenQuestion>, OpenQuestionFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<OrderingQuestion>, OrderingQuestionFluentValidator>();
 
         return services;
     }

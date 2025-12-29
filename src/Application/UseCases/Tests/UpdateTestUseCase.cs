@@ -16,7 +16,7 @@ namespace Application.UseCases.Tests;
 public sealed class UpdateTestUseCase(
     IUpdaterAsync<TestDomain, TestUpdateDTO> updater,
     IReaderAsync<Guid, TestDomain> reader,
-    IBusinessValidationService<TestUpdateDTO>? validator = null
+    IBusinessValidationService<TestUpdateDTO> validator
 ) : UpdateUseCase<Guid, TestUpdateDTO, TestDomain>(updater, reader, validator)
 {
     /// <inheritdoc/>

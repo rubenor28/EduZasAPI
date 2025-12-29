@@ -9,7 +9,9 @@ public class MultipleChoiseQuestionFluentValidator : QuestionFluentValidator<Mul
             .NotNull()
             .WithMessage("Campo requerido")
             .NotEmpty()
-            .WithMessage("Campo requerido");
+            .WithMessage("Campo requerido")
+            .Must(opts => opts.Count >= 2)
+            .WithMessage("Al menos 2 opciones");
 
         RuleFor(q => q.CorrectOption)
             .Must((q, cOpt) => q.Options.ContainsKey(cOpt))

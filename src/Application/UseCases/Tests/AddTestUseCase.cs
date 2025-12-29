@@ -16,13 +16,15 @@ namespace Application.UseCases.Tests;
 public sealed class AddTestUseCase(
     ICreatorAsync<TestDomain, NewTestDTO> creator,
     IReaderAsync<ulong, UserDomain> userReader,
-    IBusinessValidationService<NewTestDTO>? validator = null
+    IBusinessValidationService<NewTestDTO> validator
 ) : AddUseCase<NewTestDTO, TestDomain>(creator, validator)
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
     /// <inheritdoc/>
-    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(UserActionDTO<NewTestDTO> value)
+    protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
+        UserActionDTO<NewTestDTO> value
+    )
     {
         var authorized = value.Executor.Role switch
         {

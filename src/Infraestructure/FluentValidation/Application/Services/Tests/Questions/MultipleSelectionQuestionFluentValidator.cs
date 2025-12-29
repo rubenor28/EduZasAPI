@@ -12,7 +12,9 @@ public class MultipleSelectionQuestionFluentValidator
             .NotNull()
             .WithMessage("Campo requerido")
             .NotEmpty()
-            .WithMessage("Campo requerido");
+            .WithMessage("Campo requerido")
+            .Must(opts => opts.Count >= 2)
+            .WithMessage("Al menos 2 opciones");
 
         RuleForEach(q => q.CorrectOptions)
             .NotNull()
