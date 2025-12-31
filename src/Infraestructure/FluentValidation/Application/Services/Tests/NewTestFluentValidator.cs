@@ -41,7 +41,7 @@ public sealed class NewTestFluentValidator : FluentValidator<NewTestDTO>
             .MinimumLength(3)
             .WithMessage("Al menos 3 caracteres");
 
-        RuleFor(t => t.Content).NotEmpty().WithMessage("Campo requerido");
+        RuleFor(t => t.Content).NotEmpty().WithMessage("Una evaluacion no puede estar vacía");
 
         RuleForEach(t => t.Content)
             .Custom(
