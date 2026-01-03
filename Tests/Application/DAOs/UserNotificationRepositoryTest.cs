@@ -1,18 +1,17 @@
 using Application.DAOs;
 using Application.DTOs.UserNotifications;
 using Domain.Entities;
-using Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class UserNotificationEFRepositoryTest : BaseTest
+public class UserNotificationRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<UserNotificationDomain, NewUserNotificationDTO> _creator;
     private readonly IReaderAsync<UserNotificationIdDTO, UserNotificationDomain> _reader;
     private readonly IUpdaterAsync<UserNotificationDomain, UserNotificationUpdateDTO> _updater;
 
-    public UserNotificationEFRepositoryTest()
+    public UserNotificationRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<UserNotificationDomain, NewUserNotificationDTO>>();
         _reader = _sp.GetRequiredService<IReaderAsync<UserNotificationIdDTO, UserNotificationDomain>>();
@@ -106,7 +105,7 @@ public class UserNotificationEFRepositoryTest : BaseTest
         };
         
         // Act & Assert
-        await Assert.ThrowsAsync<System.ArgumentException>(() => _updater.UpdateAsync(toUpdate));
+        await Assert.ThrowsAsync<ArgumentException>(() => _updater.UpdateAsync(toUpdate));
     }
 }
 

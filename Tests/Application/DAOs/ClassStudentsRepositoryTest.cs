@@ -1,20 +1,18 @@
 using Application.DAOs;
 using Application.DTOs.ClassStudents;
-using Application.DTOs.Common;
 using Domain.Entities;
-using Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class ClassStudentsEFRepositoryTest : BaseTest
+public class ClassStudentsRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<ClassStudentDomain, UserClassRelationId> _creator;
     private readonly IReaderAsync<UserClassRelationId, ClassStudentDomain> _reader;
     private readonly IUpdaterAsync<ClassStudentDomain, ClassStudentUpdateDTO> _updater;
     private readonly IDeleterAsync<UserClassRelationId, ClassStudentDomain> _deleter;
 
-    public ClassStudentsEFRepositoryTest()
+    public ClassStudentsRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<ClassStudentDomain, UserClassRelationId>>();
         _reader = _sp.GetRequiredService<IReaderAsync<UserClassRelationId, ClassStudentDomain>>();

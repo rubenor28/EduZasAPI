@@ -6,13 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class NotificationEFRepositoryTest : BaseTest
+public class NotificationRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<NotificationDomain, NewNotificationDTO> _creator;
     private readonly IReaderAsync<ulong, NotificationDomain> _reader;
     private readonly IQuerierAsync<NotificationDomain, NotificationCriteriaDTO> _querier;
 
-    public NotificationEFRepositoryTest()
+    public NotificationRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<NotificationDomain, NewNotificationDTO>>();
         _reader = _sp.GetRequiredService<IReaderAsync<ulong, NotificationDomain>>();

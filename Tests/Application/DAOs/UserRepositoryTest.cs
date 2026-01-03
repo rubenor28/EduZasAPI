@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class UserEFRepositoryTest : BaseTest
+public class UserRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<UserDomain, NewUserDTO> _creator;
     private readonly IUpdaterAsync<UserDomain, UserUpdateDTO> _updater;
@@ -15,7 +15,7 @@ public class UserEFRepositoryTest : BaseTest
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _querier;
     private readonly IDeleterAsync<ulong, UserDomain> _deleter;
 
-    public UserEFRepositoryTest()
+    public UserRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<UserDomain, NewUserDTO>>();
         _updater = _sp.GetRequiredService<IUpdaterAsync<UserDomain, UserUpdateDTO>>();

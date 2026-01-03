@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class TestEFRepositoryTest : BaseTest
+public class TestRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<TestDomain, NewTestDTO> _creator;
     private readonly IUpdaterAsync<TestDomain, TestUpdateDTO> _updater;
@@ -16,7 +16,7 @@ public class TestEFRepositoryTest : BaseTest
     private readonly IQuerierAsync<TestDomain, TestCriteriaDTO> _querier;
     private readonly IDeleterAsync<Guid, TestDomain> _deleter;
 
-    public TestEFRepositoryTest()
+    public TestRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<TestDomain, NewTestDTO>>();
         _updater = _sp.GetRequiredService<IUpdaterAsync<TestDomain, TestUpdateDTO>>();

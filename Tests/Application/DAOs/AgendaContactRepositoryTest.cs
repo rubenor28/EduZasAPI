@@ -7,14 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class AgendaContactEFRepositoryTest : BaseTest
+public class AgendaContactRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<ContactDomain, NewContactDTO> _creator;
     private readonly IReaderAsync<ContactIdDTO, ContactDomain> _reader;
     private readonly IUpdaterAsync<ContactDomain, ContactUpdateDTO> _updater;
     private readonly IQuerierAsync<ContactDomain, ContactCriteriaDTO> _querier;
 
-    public AgendaContactEFRepositoryTest()
+    public AgendaContactRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<ContactDomain, NewContactDTO>>();
         _reader = _sp.GetRequiredService<IReaderAsync<ContactIdDTO, ContactDomain>>();

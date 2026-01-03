@@ -1,19 +1,18 @@
 using Application.DAOs;
 using Application.DTOs.ContactTags;
-using Application.DTOs.Common;
 using Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Domain.Entities;
 
 namespace Tests.Application.DAOs;
 
-public class ContactTagEFRepositoryTest : BaseTest
+public class ContactTagRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<ContactTagDomain, NewContactTagDTO> _creator;
     private readonly IReaderAsync<ContactTagIdDTO, ContactTagDomain> _reader;
     private readonly IDeleterAsync<ContactTagIdDTO, ContactTagDomain> _deleter;
 
-    public ContactTagEFRepositoryTest()
+    public ContactTagRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<ContactTagDomain, NewContactTagDTO>>();
         _reader = _sp.GetRequiredService<IReaderAsync<ContactTagIdDTO, ContactTagDomain>>();

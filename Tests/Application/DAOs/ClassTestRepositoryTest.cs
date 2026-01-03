@@ -1,20 +1,19 @@
 using Application.DAOs;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class ClassTestEFRepositoryTest : BaseTest
+public class ClassTestRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<ClassTestDomain, ClassTestDTO> _creator;
     private readonly IUpdaterAsync<ClassTestDomain, ClassTestDTO> _updater;
     private readonly IDeleterAsync<ClassTestIdDTO, ClassTestDomain> _deleter;
     private readonly IReaderAsync<ClassTestIdDTO, ClassTestDomain> _reader;
 
-    public ClassTestEFRepositoryTest()
+    public ClassTestRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<ClassTestDomain, ClassTestDTO>>();
         _updater = _sp.GetRequiredService<IUpdaterAsync<ClassTestDomain, ClassTestDTO>>();

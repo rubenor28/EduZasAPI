@@ -7,12 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;
 
-public class TagEFRepositoryTest : BaseTest
+public class TagRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<TagDomain, NewTagDTO> _creator;
     private readonly IQuerierAsync<TagDomain, TagCriteriaDTO> _querier;
 
-    public TagEFRepositoryTest()
+    public TagRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<TagDomain, NewTagDTO>>();
         _querier = _sp.GetRequiredService<IQuerierAsync<TagDomain, TagCriteriaDTO>>();
