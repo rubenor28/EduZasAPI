@@ -1,3 +1,6 @@
+using Domain.Entities;
+using Domain.Entities.QuestionAnswers;
+
 namespace EntityFramework.Application.DTOs;
 
 /// <summary>
@@ -5,10 +8,11 @@ namespace EntityFramework.Application.DTOs;
 /// </summary>
 public partial class Answer
 {
-    public string Content { get; set; } = null!;
     public ulong UserId { get; set; }
     public Guid TestId { get; set; }
     public string ClassId { get; set; } = null!;
+    public IDictionary<Guid, IQuestionAnswer> Content { get; set; } = null!;
+    public AnswerMetadata Metadata { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
 

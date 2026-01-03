@@ -169,7 +169,21 @@ public partial class EduZasDotnetContext : DbContext
                 .HasName("PRIMARY");
             answerBuilder.ToTable("answer");
 
-            answerBuilder.Property(e => e.Content).HasColumnType("json").HasColumnName("content");
+            var contentProperty = answerBuilder
+                .Property(e => e.Content)
+                .HasConversion(new QuestionAnswerDictionaryValueConverter())
+                .HasColumnName("content");
+            
+            var metadataProperty = answerBuilder
+                .Property(e => e.Metadata)
+                .HasConversion(new AnswerMetadataJsonConverter())
+                .HasColumnName("metadata");
+            
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                contentProperty.HasColumnType("json");
+                metadataProperty.HasColumnType("json");
+            }
             answerBuilder.Property(e => e.UserId).HasColumnName("user_id");
             answerBuilder.Property(e => e.TestId).HasColumnName("test_id");
             answerBuilder.Property(e => e.ClassId).HasColumnName("class_id");

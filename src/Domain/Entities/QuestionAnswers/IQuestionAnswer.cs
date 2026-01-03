@@ -1,6 +1,3 @@
 namespace Domain.Entities.QuestionAnswers;
 
-public interface IQuestionAnswer
-{
-    public Guid QuestionId { get; }
-}
+public interface IQuestionAnswer;
