@@ -19,7 +19,7 @@ COPY src/Infraestructure/Composition/Composition.csproj src/Infraestructure/Comp
 COPY src/Infraestructure/Cli/Cli.csproj src/Infraestructure/Cli/
 
 # Eliminar los test de la solucion
-RUN dotnet sln remove Tests/
+RUN dotnet sln remove "Tests/Tests.csproj"
 
 # Restaura las dependencias de la solución
 RUN dotnet restore EduZasAPI.sln
