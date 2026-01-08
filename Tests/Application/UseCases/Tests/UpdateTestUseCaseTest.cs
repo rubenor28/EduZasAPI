@@ -1,6 +1,5 @@
 using Application.DTOs.Common;
 using Application.DTOs.Tests;
-using Application.Services;
 using Application.UseCases.Tests;
 using Domain.Entities;
 using Domain.Entities.Questions;
@@ -8,9 +7,7 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 using Application.DAOs;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Application.Services.Validators;
 
 namespace Tests.Application.UseCases.Tests;
 

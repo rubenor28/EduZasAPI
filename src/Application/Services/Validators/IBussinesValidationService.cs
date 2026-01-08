@@ -1,7 +1,7 @@
 using Application.DTOs.Common;
 using Domain.ValueObjects;
 
-namespace Application.Services;
+namespace Application.Services.Validators;
 
 /// <summary>
 /// Contrato para servicios de validación de reglas de negocio.
@@ -15,4 +15,18 @@ public interface IBusinessValidationService<T>
     /// <param name="data">Datos a validar.</param>
     /// <returns>Éxito (Unit) o lista de errores por campo.</returns>
     Result<Unit, IEnumerable<FieldErrorDTO>> IsValid(T data);
+}
+
+/// <summary>
+/// Contrato para servicios de validación de reglas de negocio.
+/// </summary>
+/// <typeparam name="T">Tipo de datos a validar.</typeparam>
+public interface IBusinessValidationService<T, M>
+{
+    /// <summary>
+    /// Valida si los datos cumplen las reglas de negocio.
+    /// </summary>
+    /// <param name="data">Datos a validar.</param>
+    /// <returns>Éxito (Unit) o lista de errores por campo.</returns>
+    Result<Unit, IEnumerable<FieldErrorDTO>> IsValid(T data, M metaData);
 }

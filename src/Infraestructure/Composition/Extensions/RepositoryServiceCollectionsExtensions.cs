@@ -1,4 +1,5 @@
 using Application.DAOs;
+using Application.DTOs.Answers;
 using Application.DTOs.ClassContent;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
@@ -14,6 +15,7 @@ using Application.DTOs.Tests;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
 using Domain.Entities;
+using EntityFramework.Application.DAOs.Answers;
 using EntityFramework.Application.DAOs.ClassContent;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DAOs.ClassProfessors;
@@ -241,6 +243,19 @@ internal static class RepositoryServiceCollectionExtensions
         s.AddScoped<IQuerierAsync<ClassContentDTO, ClassContentCriteriaDTO>>(
             sp => new ClassContentEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
+                pageSize
+            )
+        );
+
+        // Answers
+        s.AddScoped<ICreatorAsync<AnswerDomain, AnswerIdDTO>, AnswerEFCreator>();
+        s.AddScoped<IReaderAsync<AnswerIdDTO, AnswerDomain>, AnswerEFReader>();
+        s.AddScoped<IUpdaterAsync<AnswerDomain, AnswerUpdateStudentDTO>, AnswerStudentEFUpdater>();
+        s.AddScoped<IUpdaterAsync<AnswerDomain, AnswerUpdateProfessorDTO>, AnswerProfessorEFUpdater>();
+        s.AddScoped<IQuerierAsync<AnswerDomain, AnswerCriteriaDTO>>(
+            sp => new AnswerEFQuerier(
+                sp.GetRequiredService<EduZasDotnetContext>(),
+                sp.GetRequiredService<IEFProjector<Answer, AnswerDomain, AnswerCriteriaDTO>>(),
                 pageSize
             )
         );

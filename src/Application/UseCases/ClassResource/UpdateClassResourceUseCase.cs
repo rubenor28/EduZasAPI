@@ -5,7 +5,7 @@ using Application.DTOs.Common;
 using Application.DTOs.Notifications;
 using Application.DTOs.UserNotifications;
 using Application.DTOs.Users;
-using Application.Services;
+using Application.Services.Validators;
 using Application.UseCases.Common;
 using Domain.Entities;
 

@@ -1,3 +1,4 @@
+using Application.DTOs.Answers;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassResources;
@@ -18,6 +19,7 @@ using Domain.Entities.Questions;
 using Domain.Enums;
 using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
+using EntityFramework.InterfaceAdapters.Mappers.Answers;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
 using EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 using EntityFramework.InterfaceAdapters.Mappers.ClassResources;
@@ -176,6 +178,13 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<ClassResourceDTO, ClassResource>, NewClassResourceEFMapper>();
         s.AddSingleton<IUpdateMapper<ClassResourceDTO, ClassResource>, ClassResourceUpdateMapper>();
         s.AddSingleton<IEFProjector<Class, ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>, ClassResourceAssociationProjector>();
+
+        // Answers
+        s.AddSingleton<IMapper<Answer, AnswerDomain>,  AnswerMapper>();
+        s.AddSingleton<IMapper<AnswerIdDTO, Answer>, NewAnswerEFMapper>();
+        s.AddSingleton<IEFProjector<Answer, AnswerDomain, AnswerCriteriaDTO>, AnswerEFProjector>();
+        s.AddSingleton<IUpdateMapper<AnswerUpdateProfessorDTO, Answer>, AnswerProfessorUpdateEFMapper>();
+        s.AddSingleton<IUpdateMapper<AnswerUpdateStudentDTO, Answer>, AnswerStudentUpdateEFMapper>();
 
         return s;
     }

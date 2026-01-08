@@ -1,5 +1,5 @@
 using Application.DTOs.Common;
-using Application.Services;
+using Application.Services.Validators;
 using Domain.ValueObjects;
 using FluentValidation;
 
@@ -26,7 +26,7 @@ public abstract class FluentValidator<T> : AbstractValidator<T>, IBusinessValida
         var errors = validation
             .Errors.Select(error =>
             {
-                var field = char.ToLower(error.PropertyName[0]) + error.PropertyName.Substring(1);
+                var field = char.ToLower(error.PropertyName[0]) + error.PropertyName[1..];
                 return new FieldErrorDTO { Field = field, Message = error.ErrorMessage };
             })
             .ToList();

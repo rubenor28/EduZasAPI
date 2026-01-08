@@ -2,7 +2,7 @@ using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.Common;
 using Application.DTOs.Contacts;
-using Application.Services;
+using Application.Services.Validators;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;

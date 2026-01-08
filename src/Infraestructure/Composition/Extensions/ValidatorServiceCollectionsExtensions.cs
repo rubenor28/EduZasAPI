@@ -2,8 +2,9 @@ using Application.DTOs.Classes;
 using Application.DTOs.Contacts;
 using Application.DTOs.Tests;
 using Application.DTOs.Users;
-using Application.Services;
+using Application.Services.Validators;
 using Domain.Entities.Questions;
+using FluentValidationProj.Application.Services.Answers;
 using FluentValidationProj.Application.Services.Auth;
 using FluentValidationProj.Application.Services.Classes;
 using FluentValidationProj.Application.Services.Common;
@@ -56,6 +57,11 @@ internal static class ValidatorServiceCollectionExtensions
         services.AddSingleton<IBusinessValidationService<MultipleSelectionQuestion>, MultipleSelectionQuestionFluentValidator>();
         services.AddSingleton<IBusinessValidationService<OpenQuestion>, OpenQuestionFluentValidator>();
         services.AddSingleton<IBusinessValidationService<OrderingQuestion>, OrderingQuestionFluentValidator>();
+
+        // AnswerValidators
+        services.AddSingleton<IAnswerUpdateStudentValidator, AnswerUpdateStudentFluentValidator>();
+
+        // Question answer validators
 
         return services;
     }
