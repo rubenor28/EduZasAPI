@@ -1,7 +1,7 @@
 using Application.DTOs.Users;
 using FluentValidationProj.Application.Services.Auth;
 
-namespace FluentValidationTest.Auth;
+namespace Tests.Application.Services.Auth;
 
 public class UserCredentialsFluentValidatorTest
 {

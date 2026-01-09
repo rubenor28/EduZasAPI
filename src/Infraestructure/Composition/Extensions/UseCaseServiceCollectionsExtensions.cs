@@ -1,3 +1,4 @@
+using Application.UseCases.Answers;
 using Application.UseCases.Auth;
 using Application.UseCases.ClassContent;
 using Application.UseCases.Classes;
@@ -36,94 +37,97 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddScoped<RestoreUseCase>();
 
         // Auth use cases
-        s.AddTransient<AddUserUseCase>();
-        s.AddTransient<LoginUseCase>();
-        s.AddTransient<ReadUserUseCase>();
-        s.AddTransient<ReadUserEmailUseCase>();
+        s.AddScoped<AddUserUseCase>();
+        s.AddScoped<LoginUseCase>();
+        s.AddScoped<ReadUserUseCase>();
+        s.AddScoped<ReadUserEmailUseCase>();
 
         // Users
-        s.AddTransient<AddFirstAdminUserUseCase>();
-        s.AddTransient<UserQueryUseCase>();
-        s.AddTransient<UpdateUserUseCase>();
-        s.AddTransient<DeleteUserUseCase>();
+        s.AddScoped<AddFirstAdminUserUseCase>();
+        s.AddScoped<UserQueryUseCase>();
+        s.AddScoped<UpdateUserUseCase>();
+        s.AddScoped<DeleteUserUseCase>();
 
         // Class use cases
-        s.AddTransient<AddClassUseCase>();
-        s.AddTransient<QueryClassUseCase>();
-        s.AddTransient<UpdateClassUseCase>();
-        s.AddTransient<DeleteClassUseCase>();
-        s.AddTransient<QueryProfessorClassesSummaryUseCase>();
-        s.AddTransient<QueryStudentClassesSummaryUseCase>();
+        s.AddScoped<AddClassUseCase>();
+        s.AddScoped<QueryClassUseCase>();
+        s.AddScoped<UpdateClassUseCase>();
+        s.AddScoped<DeleteClassUseCase>();
+        s.AddScoped<QueryProfessorClassesSummaryUseCase>();
+        s.AddScoped<QueryStudentClassesSummaryUseCase>();
 
         // Class Students
-        s.AddTransient<AddClassStudentUseCase>();
-        s.AddTransient<DeleteClassStudentUseCase>();
-        s.AddTransient<UpdateClassStudentUseCase>();
-        s.AddTransient<ReadClassStudentUseCase>();
+        s.AddScoped<AddClassStudentUseCase>();
+        s.AddScoped<DeleteClassStudentUseCase>();
+        s.AddScoped<UpdateClassStudentUseCase>();
+        s.AddScoped<ReadClassStudentUseCase>();
 
         // Class professors
-        s.AddTransient<AddClassProfessorUseCase>();
-        s.AddTransient<ReadClassProfessorUseCase>();
-        s.AddTransient<UpdateClassProfessorUseCase>();
-        s.AddTransient<DeleteClassProfessorUseCase>();
-        s.AddTransient<QueryProfessorClassesSummaryUseCase>();
-        s.AddTransient<QueryClassProfessorSummaryUseCase>();
+        s.AddScoped<AddClassProfessorUseCase>();
+        s.AddScoped<ReadClassProfessorUseCase>();
+        s.AddScoped<UpdateClassProfessorUseCase>();
+        s.AddScoped<DeleteClassProfessorUseCase>();
+        s.AddScoped<QueryProfessorClassesSummaryUseCase>();
+        s.AddScoped<QueryClassProfessorSummaryUseCase>();
 
         // Notifications
-        s.AddTransient<AddNotificationUseCase>();
-        s.AddTransient<SearchNotificationUseCase>();
-        s.AddTransient<QueryNotificationSummaryUseCase>();
-        s.AddTransient<HasUnreadNotificationUseCase>();
-        s.AddTransient<UpdateUserNotificationUseCase>();
+        s.AddScoped<AddNotificationUseCase>();
+        s.AddScoped<SearchNotificationUseCase>();
+        s.AddScoped<QueryNotificationSummaryUseCase>();
+        s.AddScoped<HasUnreadNotificationUseCase>();
+        s.AddScoped<UpdateUserNotificationUseCase>();
 
         // User notifications
-        s.AddTransient<UpdateUserNotificationUseCase>();
+        s.AddScoped<UpdateUserNotificationUseCase>();
 
         // Contact
-        s.AddTransient<AddContactUseCase>();
-        s.AddTransient<ContactQueryUseCase>();
-        s.AddTransient<DeleteContactUseCase>();
-        s.AddTransient<UpdateContactUseCase>();
+        s.AddScoped<AddContactUseCase>();
+        s.AddScoped<ContactQueryUseCase>();
+        s.AddScoped<DeleteContactUseCase>();
+        s.AddScoped<UpdateContactUseCase>();
 
         // Tags
-        s.AddTransient<TagQueryUseCase>();
+        s.AddScoped<TagQueryUseCase>();
 
         // Contact Tag
-        s.AddTransient<AddContactTagUseCase>();
-        s.AddTransient<DeleteContactTagUseCase>();
+        s.AddScoped<AddContactTagUseCase>();
+        s.AddScoped<DeleteContactTagUseCase>();
 
         // Tests
-        s.AddTransient<AddTestUseCase>();
-        s.AddTransient<DeleteTestUseCase>();
-        s.AddTransient<QueryTestUseCase>();
-        s.AddTransient<QueryTestSummaryUseCase>();
-        s.AddTransient<ReadTestUseCase>();
-        s.AddTransient<ReadPublicTestUseCase>();
-        s.AddTransient<UpdateTestUseCase>();
-        s.AddTransient<QueryClassTestAssociationUseCase>();
+        s.AddScoped<AddTestUseCase>();
+        s.AddScoped<DeleteTestUseCase>();
+        s.AddScoped<QueryTestUseCase>();
+        s.AddScoped<QueryTestSummaryUseCase>();
+        s.AddScoped<ReadTestUseCase>();
+        s.AddScoped<ReadPublicTestUseCase>();
+        s.AddScoped<UpdateTestUseCase>();
+        s.AddScoped<QueryClassTestAssociationUseCase>();
 
         // Class Tests
-        s.AddTransient<AddClassTestUseCase>();
-        s.AddTransient<UpdateClassTestUseCase>();
-        s.AddTransient<DeleteClassTestUseCase>();
+        s.AddScoped<AddClassTestUseCase>();
+        s.AddScoped<UpdateClassTestUseCase>();
+        s.AddScoped<DeleteClassTestUseCase>();
 
         // Resource
-        s.AddTransient<AddResourceUseCase>();
-        s.AddTransient<ReadResourceUseCase>();
-        s.AddTransient<ResourceQueryUseCase>();
-        s.AddTransient<DeleteResourceUseCase>();
-        s.AddTransient<UpdateResourceUseCase>();
-        s.AddTransient<PublicReadResourceUseCase>();
+        s.AddScoped<AddResourceUseCase>();
+        s.AddScoped<ReadResourceUseCase>();
+        s.AddScoped<ResourceQueryUseCase>();
+        s.AddScoped<DeleteResourceUseCase>();
+        s.AddScoped<UpdateResourceUseCase>();
+        s.AddScoped<PublicReadResourceUseCase>();
 
         // Class resource
-        s.AddTransient<AddClassResourceUseCase>();
-        s.AddTransient<DeleteClassResourceUseCase>();
-        s.AddTransient<ReadClassResourceUseCase>();
-        s.AddTransient<UpdateClassResourceUseCase>();
-        s.AddTransient<ClassResourceAssociationQueryUseCase>();
+        s.AddScoped<AddClassResourceUseCase>();
+        s.AddScoped<DeleteClassResourceUseCase>();
+        s.AddScoped<ReadClassResourceUseCase>();
+        s.AddScoped<UpdateClassResourceUseCase>();
+        s.AddScoped<ClassResourceAssociationQueryUseCase>();
 
         // Class content
-        s.AddTransient<QueryClassContentUseCase>();
+        s.AddScoped<QueryClassContentUseCase>();
+
+        // Answers
+        s.AddScoped<AddAnswerUseCase>();
 
         return s;
     }

@@ -148,7 +148,7 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IMapper<NewContactTagDTO, ContactTag>, NewContactTagEFMapper>();
 
         // TESTS
-        s.AddSingleton<IMapper<IQuestion, IPublicQuestion>, PublicQuestionMapper>();
+        s.AddSingleton<IMapper<Guid, IQuestion, IPublicQuestion>, PublicQuestionMapper>();
         
         // EF
         s.AddSingleton<IMapper<NewTestDTO, Test>, NewTestEFMapper>();

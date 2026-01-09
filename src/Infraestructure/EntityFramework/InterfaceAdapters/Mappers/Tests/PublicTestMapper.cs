@@ -4,10 +4,10 @@ using Domain.Entities.Questions;
 using EntityFramework.Application.DTOs;
 using InterfaceAdapters.Mappers.Common;
 
-public class PublicTestMapper(IMapper<IQuestion, IPublicQuestion> questionMapper)
+public class PublicTestMapper(IMapper<Guid, IQuestion, IPublicQuestion> questionMapper)
     : IMapper<Test, PublicTestDTO>
 {
-    private readonly IMapper<IQuestion, IPublicQuestion> _questionMapper = questionMapper;
+    private readonly IMapper<Guid, IQuestion, IPublicQuestion> _questionMapper = questionMapper;
 
     public PublicTestDTO Map(Test input) =>
         new()
@@ -18,10 +18,6 @@ public class PublicTestMapper(IMapper<IQuestion, IPublicQuestion> questionMapper
             Title = input.Title,
             Color = input.Color,
             TimeLimitMinutes = input.TimeLimitMinutes,
-            Content = input.Content.Select(q => new PublicQuestionDTO
-            {
-                Id = q.Key,
-                Data = _questionMapper.Map(q.Value),
-            }),
+            Content = input.Content.Select(q => _questionMapper.Map(q.Key, q.Value)),
         };
 }

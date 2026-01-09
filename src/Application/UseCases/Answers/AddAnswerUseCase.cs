@@ -15,19 +15,23 @@ using ClassReader = IReaderAsync<string, ClassDomain>;
 using ClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using TestReader = IReaderAsync<Guid, TestDomain>;
 using UserReader = IReaderAsync<ulong, UserDomain>;
+using StudentReader = IReaderAsync<UserClassRelationId, ClassStudentDomain>;
 
 public sealed class AddAnswerUseCase(
     AnswerCreator creator,
     TestReader testReader,
     ClassReader classReader,
     ClassTestReader classTestReader,
-    UserReader userReader
+    UserReader userReader,
+    StudentReader studentReader
 ) : AddUseCase<AnswerIdDTO, AnswerDomain>(creator, null)
 {
     private readonly TestReader _testReader = testReader;
     private readonly ClassReader _classReader = classReader;
     private readonly UserReader _userReader = userReader;
     private readonly ClassTestReader _classTestReader = classTestReader;
+
+    private readonly StudentReader _studentReader = studentReader;
 
     private async Task ItemExists<I, E>(
         I id,
@@ -69,6 +73,14 @@ public sealed class AddAnswerUseCase(
 
         if (classTest is null)
             return UseCaseErrors.Unauthorized();
+
+        var student = await _studentReader.GetAsync(new()
+        {
+            ClassId = value.Data.ClassId,
+            UserId = value.Data.UserId,
+        });
+
+        if(student is null) return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
     }

@@ -1,3 +1,5 @@
+using Domain.Entities.PublicQuestions;
+
 namespace Application.DTOs.Tests;
 
 public sealed record PublicTestDTO
@@ -28,7 +30,7 @@ public sealed record PublicTestDTO
     /// <remarks>
     /// La estructura JSON puede contener preguntas, instrucciones y otros elementos del examen.
     /// </remarks>
-    public required IEnumerable<PublicQuestionDTO> Content { get; set; }
+    public required IEnumerable<IPublicQuestion> Content { get; set; }
 
     /// <summary>
     /// Obtiene o establece el límite de tiempo para completar el examen, en minutos.

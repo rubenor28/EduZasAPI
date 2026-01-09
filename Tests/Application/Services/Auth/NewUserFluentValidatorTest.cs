@@ -2,7 +2,7 @@ using Application.DTOs.Users;
 using Domain.Enums;
 using FluentValidationProj.Application.Services.Auth;
 
-namespace FluentValidationTest.Auth;
+namespace Tests.Application.Services.Auth;
 
 public class NewUserFluentValidatorTest
 {

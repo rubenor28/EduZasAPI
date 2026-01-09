@@ -1,7 +1,7 @@
 using Application.DTOs.Classes;
 using FluentValidationProj.Application.Services.Classes;
 
-namespace FluentValidationTest.Classes;
+namespace Tests.Application.Services.Classes;
 
 public class NewClassFluentValidatorTest
 {
