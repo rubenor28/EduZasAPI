@@ -9,14 +9,12 @@ namespace Tests.Application.DAOs;
 public class ClassTestRepositoryTest : BaseTest
 {
     private readonly ICreatorAsync<ClassTestDomain, ClassTestDTO> _creator;
-    private readonly IUpdaterAsync<ClassTestDomain, ClassTestDTO> _updater;
     private readonly IDeleterAsync<ClassTestIdDTO, ClassTestDomain> _deleter;
     private readonly IReaderAsync<ClassTestIdDTO, ClassTestDomain> _reader;
 
     public ClassTestRepositoryTest()
     {
         _creator = _sp.GetRequiredService<ICreatorAsync<ClassTestDomain, ClassTestDTO>>();
-        _updater = _sp.GetRequiredService<IUpdaterAsync<ClassTestDomain, ClassTestDTO>>();
         _deleter = _sp.GetRequiredService<IDeleterAsync<ClassTestIdDTO, ClassTestDomain>>();
         _reader = _sp.GetRequiredService<IReaderAsync<ClassTestIdDTO, ClassTestDomain>>();
     }
@@ -33,7 +31,6 @@ public class ClassTestRepositoryTest : BaseTest
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
-            Visible = true,
         };
 
         // Act
@@ -43,37 +40,6 @@ public class ClassTestRepositoryTest : BaseTest
         Assert.NotNull(created);
         Assert.Equal(newClassTest.ClassId, created.ClassId);
         Assert.Equal(newClassTest.TestId, created.TestId);
-    }
-
-    [Fact]
-    public async Task UpdateClassTest_ReturnsUpdatedClassTest()
-    {
-        // Arrange
-        var professor = await SeedUser(UserType.PROFESSOR);
-        var createdClass = await SeedClass(professor.Id);
-        var createdTest = await SeedTest(professor.Id);
-
-        var newClassTestDto = new ClassTestDTO
-        {
-            ClassId = createdClass.Id,
-            TestId = createdTest.Id,
-            Visible = true,
-        };
-        await _creator.AddAsync(newClassTestDto);
-
-        var updateDto = new ClassTestDTO
-        {
-            ClassId = createdClass.Id,
-            TestId = createdTest.Id,
-            Visible = false,
-        };
-
-        // Act
-        var updatedClassTest = await _updater.UpdateAsync(updateDto);
-
-        // Assert
-        Assert.NotNull(updatedClassTest);
-        Assert.Equal(updateDto.Visible, updatedClassTest.Visible);
     }
 
     [Fact]
@@ -88,7 +54,6 @@ public class ClassTestRepositoryTest : BaseTest
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
-            Visible = true,
         };
 
         await _creator.AddAsync(newClassTestDto);

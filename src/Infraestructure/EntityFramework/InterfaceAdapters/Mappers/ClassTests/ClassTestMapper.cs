@@ -15,7 +15,6 @@ public class ClassTestMapper : IMapper<TestPerClass, ClassTestDomain>
         {
             TestId = source.TestId,
             ClassId = source.ClassId,
-            Visible = source.Visible,
             CreatedAt = source.CreatedAt,
         };
 }

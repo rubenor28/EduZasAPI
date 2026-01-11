@@ -21,11 +21,6 @@ public sealed class ClassTestDomain
     public required string ClassId { get; set; }
 
     /// <summary>
-    /// Obtiene o establece un valor que indica si el examen es visible para los estudiantes de esta clase.
-    /// </summary>
-    public required bool Visible { get; set; }
-
-    /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la asignación.
     /// </summary>
     public required DateTime CreatedAt { get; set; }

@@ -15,6 +15,5 @@ public class NewClassTestEFMapper : IMapper<ClassTestDTO, TestPerClass>
         {
             TestId = source.TestId,
             ClassId = source.ClassId,
-            Visible = source.Visible
         };
 }

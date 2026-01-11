@@ -71,14 +71,12 @@ public sealed class ClassContentEFQuerier(EduZasDotnetContext ctx, int maxPageSi
         var testsQuery = _ctx
             .TestsPerClasses.AsNoTracking()
             .Where(tpc => tpc.ClassId == criteria.ClassId)
-            .WhereOptional(criteria.Visible, v => tpc => tpc.Visible == v)
             .WhereStringQuery(criteria.Title, tpc => tpc.Test.Title)
             .Select(tpc => new ClassContentDTO
             {
                 Id = tpc.Test.TestId,
                 Title = tpc.Test.Title,
                 Type = ContentType.TEST,
-                Hidden = !tpc.Visible,
                 PublishDate = tpc.CreatedAt,
             });
 

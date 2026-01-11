@@ -131,7 +131,6 @@ public abstract class BaseTest : IDisposable
             {
                 ClassId = classId,
                 TestId = testId,
-                Visible = true
             }
         );
     

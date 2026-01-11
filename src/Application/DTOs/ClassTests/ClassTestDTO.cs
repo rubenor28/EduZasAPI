@@ -10,7 +10,4 @@ public sealed record ClassTestDTO
 
     /// <summary>ID de la clase.</summary>
     public required string ClassId { get; init; }
-
-    /// <summary>Indica si la evaluación debe ser visible.</summary>
-    public required bool Visible { get; init; }
 }

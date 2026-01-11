@@ -9,8 +9,6 @@ public partial class TestPerClass
 
     public string ClassId { get; set; } = null!;
 
-    public bool Visible { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public virtual Class Class { get; set; } = null!;

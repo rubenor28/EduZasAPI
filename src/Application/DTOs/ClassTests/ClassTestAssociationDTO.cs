@@ -13,7 +13,4 @@ public sealed record ClassTestAssociationDTO
 
     /// <summary>Indica si la evaluación está asociada a esta clase.</summary>
     public required bool IsAssociated { get; init; }
-
-    /// <summary>Indica si la evaluación es visible para los estudiantes.</summary>
-    public required bool IsVisible { get; init; }
 }

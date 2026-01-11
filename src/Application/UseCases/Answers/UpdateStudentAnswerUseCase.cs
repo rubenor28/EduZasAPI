@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.Answers;
+using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
 using Application.Services.Validators;
 using Application.UseCases.Common;
@@ -12,18 +14,21 @@ namespace Application.UseCases.Answers;
 
 using AnswerReader = IReaderAsync<AnswerIdDTO, AnswerDomain>;
 using AnswerValidator = IBusinessValidationService<AnswerUpdateStudentDTO, TestDomain>;
+using ClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using StudentAnswerUpdater = IUpdaterAsync<AnswerDomain, AnswerUpdateStudentDTO>;
 using TestReader = IReaderAsync<Guid, TestDomain>;
 
-public sealed class StudentUpdateAnswerUseCase(
+public sealed class UpdateStudentAnswerUseCase(
     StudentAnswerUpdater updater,
     AnswerReader reader,
     TestReader testReader,
+    ClassTestReader classTestReader,
     AnswerValidator answerValidator
 ) : UpdateUseCase<AnswerIdDTO, AnswerUpdateStudentDTO, AnswerDomain>(updater, reader, null)
 {
     private readonly TestReader _testReader = testReader;
     private readonly AnswerValidator _answerValidator = answerValidator;
+    private readonly ClassTestReader _classTestReader = classTestReader;
 
     protected override AnswerIdDTO GetId(AnswerUpdateStudentDTO dto) =>
         new()
@@ -41,7 +46,7 @@ public sealed class StudentUpdateAnswerUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            _ => value.Data.UserId == value.Data.UserId,
+            _ => await IsCommonUserAuthorized(value),
         };
 
         if (!authorized)
@@ -59,4 +64,36 @@ public sealed class StudentUpdateAnswerUseCase(
 
         return Unit.Value;
     }
+
+    private async Task<bool> IsCommonUserAuthorized(UserActionDTO<AnswerUpdateStudentDTO> value)
+      => false;
+      /*
+    {
+        if (value.Data.UserId != value.Executor.Id)
+            return false;
+
+        var test =
+            await _testReader.GetAsync(value.Data.TestId)
+            ?? throw new InvalidDataException(
+                $"El test con ID {value.Data.TestId} deberia existir en este punto"
+            );
+
+        if (test.TimeLimitMinutes is null)
+            return true;
+
+        var classTest =
+            await _classTestReader.GetAsync(
+                new() { ClassId = value.Data.ClassId, TestId = value.Data.TestId }
+            )
+            ?? throw new InvalidDataException(
+                $"El la relacion clase - evaluacion con ID de clase {value.Data.ClassId} y ID de evaluación {value.Data.TestId} deberia existir en este punto"
+            );
+
+        // Fecha en la que
+        var assignedDate = classTest.CreatedAt;
+
+        var testTimeLimit = TimeSpan.FromMinutes((double)test.TimeLimitMinutes);
+        var answerTimeSpan = new TimeSpan();
+    }
+    */
 }

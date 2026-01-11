@@ -161,7 +161,6 @@ internal static class MapperServiceCollectionExtensions
         
         // Class Tests
         s.AddSingleton<IMapper<ClassTestDTO, TestPerClass>, NewClassTestEFMapper>();
-        s.AddSingleton<IUpdateMapper<ClassTestDTO, TestPerClass>, UpdateClassTestEFMapper>();
         s.AddSingleton<IMapper<TestPerClass, ClassTestDomain>, ClassTestMapper>();
 
         // Resource
