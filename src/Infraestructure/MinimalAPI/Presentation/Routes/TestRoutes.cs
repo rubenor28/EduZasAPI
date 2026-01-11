@@ -171,25 +171,6 @@ public static class TestRoutes
             });
 
         group
-            .MapPut("tests/classes", UpdateClassTest)
-            .RequireAuthorization("ProfessorOrAdmin")
-            .AddEndpointFilter<ExecutorFilter>()
-            .Produces<TestDomain>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status401Unauthorized)
-            .Produces(StatusCodes.Status403Forbidden)
-            .Produces<FieldErrorResponse>(StatusCodes.Status400BadRequest)
-            .WithOpenApi(op =>
-            {
-                op.Summary = "Actualizar la relacion clase - evaluacion";
-                op.Responses["200"].Description = "Si la operación fue exitosa";
-                op.Responses["400"].Description = "Si los campos no son válidos";
-                op.Responses["401"].Description = "Si el usuario no está autenticado";
-                op.Responses["403"].Description =
-                    "Si el usuario no tiene permisos para realizar esta acción";
-                return op;
-            });
-
-        group
             .MapDelete("tests/{testId:guid}/{classId}", DeleteClassTest)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
@@ -307,19 +288,6 @@ public static class TestRoutes
             ctx,
             addClassTestUseCase,
             mapRequest: () => newClassTest,
-            mapResponse: _ => Results.NoContent()
-        );
-
-    public static Task<IResult> UpdateClassTest(
-        [FromBody] ClassTestDTO updateClassTest,
-        [FromServices] UpdateClassTestUseCase updateClassTestUseCase,
-        [FromServices] RoutesUtils utils,
-        HttpContext ctx
-    ) =>
-        utils.HandleUseCaseAsync(
-            ctx,
-            updateClassTestUseCase,
-            mapRequest: () => updateClassTest,
             mapResponse: _ => Results.NoContent()
         );
 

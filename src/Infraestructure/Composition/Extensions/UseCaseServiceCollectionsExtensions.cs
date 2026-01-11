@@ -105,7 +105,6 @@ internal static class UseCaseServiceCollectionExtensions
 
         // Class Tests
         s.AddScoped<AddClassTestUseCase>();
-        s.AddScoped<UpdateClassTestUseCase>();
         s.AddScoped<DeleteClassTestUseCase>();
 
         // Resource
