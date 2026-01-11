@@ -11,16 +11,33 @@ public static class AnswerRoutes
 {
     public static RouteGroupBuilder MapAnswerRoutes(this WebApplication app)
     {
-        var group = app.MapGroup("").WithTags("Answers");
+        var group = app.MapGroup("/answers").WithTags("Answers");
 
         group
-            .MapPost("/answers", AddAnswer)
+            .MapPost("", AddAnswer)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<AnswerDomain>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces<FieldErrorResponse>(StatusCodes.Status404NotFound);
+
+        group
+            .MapPut("", UpdateAnswer)
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<AnswerDomain>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces<FieldErrorResponse>(StatusCodes.Status404NotFound);
+
+        group
+            .MapGet("/{userId:ulong}/{classId}/{testId:guid}", ReadAnswer)
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<AnswerDomain>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound);
 
         return group;
     }
@@ -48,6 +65,27 @@ public static class AnswerRoutes
             ctx,
             updateAnswerUseCase,
             mapRequest: () => update,
+            mapResponse: a => Results.Ok(a)
+        );
+
+    public static Task<IResult> ReadAnswer(
+        [FromRoute] ulong userId,
+        [FromRoute] string classId,
+        [FromRoute] Guid testId,
+        [FromServices] ReadAnswerUseCase readAnswerUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            readAnswerUseCase,
+            mapRequest: () =>
+                new AnswerIdDTO
+                {
+                    UserId = userId,
+                    ClassId = classId,
+                    TestId = testId,
+                },
             mapResponse: a => Results.Ok(a)
         );
 }

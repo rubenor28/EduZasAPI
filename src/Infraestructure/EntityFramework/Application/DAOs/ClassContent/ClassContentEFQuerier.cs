@@ -77,6 +77,7 @@ public sealed class ClassContentEFQuerier(EduZasDotnetContext ctx, int maxPageSi
                 Id = tpc.Test.TestId,
                 Title = tpc.Test.Title,
                 Type = ContentType.TEST,
+                Hidden = null,
                 PublishDate = tpc.CreatedAt,
             });
 

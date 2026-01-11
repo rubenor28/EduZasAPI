@@ -66,5 +66,6 @@ app.MapDatabaseRoutes();
 app.MapNotificationRoutes();
 app.MapResourceRoutes();
 app.MapTestRoutes();
+app.MapAnswerRoutes();
 
 app.Run();

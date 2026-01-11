@@ -9,7 +9,8 @@ using FluentValidationProj.Application.Services.Common;
 namespace FluentValidationProj.Application.Services.Answers;
 
 public sealed class AnswerUpdateStudentFluentValidator
-    : FluentValidator<(AnswerUpdateStudentDTO, TestDomain)>, IAnswerUpdateStudentValidator
+    : FluentValidator<(AnswerUpdateStudentDTO, TestDomain)>,
+        IAnswerUpdateStudentValidator
 {
     private readonly IOpenQuestionAnswerValidator _openQAValidator;
     private readonly IConceptRelationQuestionAnswerValidator _conceptRelationQAValidator;
@@ -31,7 +32,15 @@ public sealed class AnswerUpdateStudentFluentValidator
         _multipleSelectionQAValidator = multipleSelectionQuestionAnswerValidator;
         _orderingQuestionQAValidator = orderingQuestionAnswerValidator;
 
-        RuleFor(tuple => tuple.Item1.Content).NotEmpty();
+        RuleFor(tuple => tuple.Item1.Content)
+            .Custom(
+                (content, ctx) =>
+                {
+                    if (content.Count == 0)
+                        ctx.AddFailure(new ValidationFailure("content", "Campo requerido"));
+                }
+            );
+
         RuleForEach(tuple => tuple.Item1.Content)
             .Custom(
                 (answerKvp, context) =>
@@ -60,7 +69,8 @@ public sealed class AnswerUpdateStudentFluentValidator
 
                         (OpenQuestionAnswer a, OpenQuestion q) => _openQAValidator.IsValid((a, q)),
 
-                        (OrderingQuestionAnswer a, OrderingQuestion q) => _orderingQuestionQAValidator.IsValid((a, q)),
+                        (OrderingQuestionAnswer a, OrderingQuestion q) =>
+                            _orderingQuestionQAValidator.IsValid((a, q)),
 
                         _ => null,
                     };

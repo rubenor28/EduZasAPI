@@ -1,10 +1,8 @@
-using System.ComponentModel;
 using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.Answers;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
-using Application.Services.Validators;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
@@ -13,7 +11,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.Answers;
 
 using AnswerReader = IReaderAsync<AnswerIdDTO, AnswerDomain>;
-using AnswerValidator = IBusinessValidationService<AnswerUpdateStudentDTO, TestDomain>;
+using AnswerValidator = IAnswerUpdateStudentValidator;
 using ClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using StudentAnswerUpdater = IUpdaterAsync<AnswerDomain, AnswerUpdateStudentDTO>;
 using TestReader = IReaderAsync<Guid, TestDomain>;
@@ -58,7 +56,7 @@ public sealed class UpdateStudentAnswerUseCase(
                 $"El test con ID {value.Data.TestId} deberia existir en este punto"
             );
 
-        var validation = _answerValidator.IsValid(value.Data, test);
+        var validation = _answerValidator.IsValid((value.Data, test));
         if (validation.IsErr)
             return UseCaseErrors.Input(validation.UnwrapErr());
 
@@ -66,8 +64,6 @@ public sealed class UpdateStudentAnswerUseCase(
     }
 
     private async Task<bool> IsCommonUserAuthorized(UserActionDTO<AnswerUpdateStudentDTO> value)
-      => false;
-      /*
     {
         if (value.Data.UserId != value.Executor.Id)
             return false;
@@ -89,11 +85,10 @@ public sealed class UpdateStudentAnswerUseCase(
                 $"El la relacion clase - evaluacion con ID de clase {value.Data.ClassId} y ID de evaluación {value.Data.TestId} deberia existir en este punto"
             );
 
-        // Fecha en la que
-        var assignedDate = classTest.CreatedAt;
+        var startTime = classTest.CreatedAt;
+        var timeLimit = TimeSpan.FromMinutes(test.TimeLimitMinutes.Value);
+        var deadline = startTime.Add(timeLimit);
 
-        var testTimeLimit = TimeSpan.FromMinutes((double)test.TimeLimitMinutes);
-        var answerTimeSpan = new TimeSpan();
+        return DateTime.UtcNow <= deadline;
     }
-    */
 }
