@@ -51,6 +51,7 @@ public static class ServiceCollectionExtensions
         {
             options.SerializerOptions.Converters.Add(new IQuestionJsonConverter());
             options.SerializerOptions.Converters.Add(new IPublicQuestionJsonConverter());
+            options.SerializerOptions.Converters.Add(new IQuestionAnswerJsonConverter());
             options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
         return services;

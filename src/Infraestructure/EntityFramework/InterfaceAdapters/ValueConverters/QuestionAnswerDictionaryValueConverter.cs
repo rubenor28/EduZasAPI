@@ -1,24 +1,24 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Domain.Entities.QuestionAnswers;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EntityFramework.InterfaceAdapters.ValueConverters;
 
-public class QuestionAnswerDictionaryValueConverter
-    : ValueConverter<IDictionary<Guid, IQuestionAnswer>, string>
+public class QuestionAnswerDictionaryValueConverter(ConverterMappingHints? mappingHints = null)
+    : ValueConverter<IDictionary<Guid, IQuestionAnswer>, string>(
+        v => JsonSerializer.Serialize(v, GetSerializerOptions()),
+        v =>
+            JsonSerializer.Deserialize<IDictionary<Guid, IQuestionAnswer>>(
+                v,
+                GetSerializerOptions()
+            )!,
+        mappingHints
+    )
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        ReferenceHandler = ReferenceHandler.Preserve,
-        Converters = { new IQuestionAnswerJsonConverter() },
-    };
-
-    public QuestionAnswerDictionaryValueConverter()
-        : base(
-            v => JsonSerializer.Serialize(v, _jsonOptions),
-            v =>
-                JsonSerializer.Deserialize<IDictionary<Guid, IQuestionAnswer>>(v, _jsonOptions)
-                ?? new Dictionary<Guid, IQuestionAnswer>()
-        ) { }
+    public static JsonSerializerOptions GetSerializerOptions() =>
+        new()
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new IQuestionAnswerJsonConverter() },
+        };
 }
