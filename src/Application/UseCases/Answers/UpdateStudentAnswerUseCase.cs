@@ -85,7 +85,7 @@ public sealed class UpdateStudentAnswerUseCase(
                 $"El la relacion clase - evaluacion con ID de clase {value.Data.ClassId} y ID de evaluación {value.Data.TestId} deberia existir en este punto"
             );
 
-        var startTime = classTest.CreatedAt;
+        var startTime = classTest.CreatedAt.ToUniversalTime();
         var timeLimit = TimeSpan.FromMinutes(test.TimeLimitMinutes.Value);
         var deadline = startTime.Add(timeLimit);
 

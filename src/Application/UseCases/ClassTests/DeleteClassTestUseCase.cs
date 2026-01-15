@@ -1,5 +1,6 @@
 using Application.DAOs;
 using Application.DTOs;
+using Application.DTOs.Answers;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
 using Application.Services.Validators;
@@ -17,10 +18,14 @@ public sealed class DeleteClassTestUseCase(
     IDeleterAsync<ClassTestIdDTO, ClassTestDomain> deleter,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> reader,
     IReaderAsync<Guid, TestDomain> testReader,
+    IQuerierAsync<AnswerDomain, AnswerCriteriaDTO> answerQuerier,
+    IDeleterAsync<AnswerIdDTO, AnswerDomain> answerDeleter,
     IBusinessValidationService<ClassTestIdDTO>? validator = null
 ) : DeleteUseCase<ClassTestIdDTO, ClassTestDomain>(deleter, reader, validator)
 {
     private readonly IReaderAsync<Guid, TestDomain> _testReader = testReader;
+    private readonly IQuerierAsync<AnswerDomain, AnswerCriteriaDTO> _answerQuerier = answerQuerier;
+    private readonly IDeleterAsync<AnswerIdDTO, AnswerDomain> _answerDeleter = answerDeleter;
 
     private async Task<bool> IsAuthorizedProfessor(
         ClassTestDomain testClassRelation,
@@ -54,12 +59,22 @@ public sealed class DeleteClassTestUseCase(
     }
 
     /// <inheritdoc/>
-    protected override Task ExtraTaskAsync(
-        UserActionDTO<ClassTestIdDTO> newEntity,
-        ClassTestDomain createdEntity
+    protected override async Task ExtraTaskAsync(
+        UserActionDTO<ClassTestIdDTO> dto,
+        ClassTestDomain deleted
     )
     {
-        // TODO: Eliminar respuestas
-        return Task.FromResult(Unit.Value);
+        var answers = (
+            await _answerQuerier.GetByAsync(
+                new() { ClassId = dto.Data.ClassId, TestId = dto.Data.TestId }
+            )
+        ).Results.Select(a => new AnswerIdDTO
+        {
+            ClassId = a.ClassId,
+            TestId = a.TestId,
+            UserId = a.UserId,
+        });
+
+        await _answerDeleter.BulkDelete(answers);
     }
 }

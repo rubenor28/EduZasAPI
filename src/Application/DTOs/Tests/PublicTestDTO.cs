@@ -10,6 +10,11 @@ public sealed record PublicTestDTO
     public required Guid Id { get; set; }
 
     /// <summary>
+    /// Id de la clase asignada.
+    /// </summary>
+    public required string ClassId { get; set; }
+
+    /// <summary>
     /// Obtiene o establece si el examen está activo y disponible para ser asignado.
     /// </summary>
     public required bool Active { get; set; }
@@ -33,10 +38,10 @@ public sealed record PublicTestDTO
     public required IEnumerable<IPublicQuestion> Content { get; set; }
 
     /// <summary>
-    /// Obtiene o establece el límite de tiempo para completar el examen, en minutos.
+    /// Obtiene o establece la fecha y hora límite para entregar la evaluación.
     /// Un valor nulo indica que no hay límite de tiempo.
     /// </summary>
-    public uint? TimeLimitMinutes { get; set; }
+    public DateTime? Deadline { get; set; }
 
     /// <summary>
     /// Obtiene o establece el identificador del profesor que creó el examen.
