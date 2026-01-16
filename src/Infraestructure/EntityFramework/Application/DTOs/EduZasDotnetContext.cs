@@ -103,6 +103,15 @@ public partial class EduZasDotnetContext : DbContext
         }
     }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // REGLA GLOBAL: Todo DateTimeOffset se convertirá a DateTime (UTC) al ir a la DB
+        configurationBuilder
+            .Properties<DateTimeOffset>()
+            .HaveConversion<DateTimeOffsetToDateTimeConverter>()
+            .HavePrecision(6); // Importante para no perder microsegundos en MariaDB
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AgendaContact>(agendaContactBuilder =>
@@ -123,13 +132,11 @@ public partial class EduZasDotnetContext : DbContext
                 agendaContactBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 agendaContactBuilder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
             }
             else
@@ -173,12 +180,12 @@ public partial class EduZasDotnetContext : DbContext
                 .Property(e => e.Content)
                 .HasConversion(new QuestionAnswerDictionaryValueConverter())
                 .HasColumnName("content");
-            
+
             var metadataProperty = answerBuilder
                 .Property(e => e.Metadata)
                 .HasConversion(new AnswerMetadataJsonConverter())
                 .HasColumnName("metadata");
-            
+
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 contentProperty.HasColumnType("json");
@@ -193,13 +200,11 @@ public partial class EduZasDotnetContext : DbContext
                 answerBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 answerBuilder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
             }
             else
@@ -253,13 +258,11 @@ public partial class EduZasDotnetContext : DbContext
                 classBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 classBuilder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
             }
             else
@@ -301,7 +304,6 @@ public partial class EduZasDotnetContext : DbContext
                 classProfessorBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
@@ -349,7 +351,6 @@ public partial class EduZasDotnetContext : DbContext
                 classStudentBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
@@ -397,7 +398,6 @@ public partial class EduZasDotnetContext : DbContext
                 notificationBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
@@ -442,13 +442,11 @@ public partial class EduZasDotnetContext : DbContext
                 notificationPerUserBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 notificationPerUserBuilder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
             }
             else
@@ -522,13 +520,11 @@ public partial class EduZasDotnetContext : DbContext
                 resourceBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 resourceBuilder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
             }
             else
@@ -587,7 +583,6 @@ public partial class EduZasDotnetContext : DbContext
                 classResourceBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
@@ -633,7 +628,6 @@ public partial class EduZasDotnetContext : DbContext
                 tagBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
@@ -676,7 +670,6 @@ public partial class EduZasDotnetContext : DbContext
                 contactTagBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
@@ -750,13 +743,11 @@ public partial class EduZasDotnetContext : DbContext
                 testBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 testBuilder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
             }
             else
@@ -804,7 +795,6 @@ public partial class EduZasDotnetContext : DbContext
                 testPerClassBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
             }
             else
@@ -862,13 +852,11 @@ public partial class EduZasDotnetContext : DbContext
                 userBuilder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 userBuilder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
                 userBuilder
                     .Property(e => e.Role)
@@ -925,13 +913,11 @@ public partial class EduZasDotnetContext : DbContext
                 builder
                     .Property(e => e.CreatedAt)
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
                 builder
                     .Property(e => e.ModifiedAt)
                     .ValueGeneratedOnAddOrUpdate()
                     .HasDefaultValueSql("current_timestamp()")
-                    .HasColumnType("datetime")
                     .HasColumnName("modified_at");
             }
             else

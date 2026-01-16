@@ -1,11 +1,34 @@
 using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.UseCases.Tests;
+using Domain.Entities;
 using Domain.Entities.Questions;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
+using Application.DAOs;
+using Application.Services.Validators;
 
 namespace Tests.Application.UseCases.Tests;
+
+class MockTestUpdateValidator : IBusinessValidationService<TestUpdateDTO>
+{
+    public Result<Unit, IEnumerable<FieldErrorDTO>> IsValid(TestUpdateDTO data)
+    {
+        List<FieldErrorDTO> errors = [];
+
+        if (data.Content is null)
+            errors.Add(new() { Field = "content", Message = "Campo obligatorio" });
+
+        if (string.IsNullOrEmpty(data.Title.Trim()))
+            errors.Add(new() { Field = "title", Message = "Campo obligatorio" });
+
+        if (errors.Count > 0)
+            return errors;
+
+        return Unit.Value;
+    }
+}
 
 public class UpdateTestUseCaseTest : BaseTest
 {
@@ -13,7 +36,12 @@ public class UpdateTestUseCaseTest : BaseTest
 
     public UpdateTestUseCaseTest()
     {
-        _useCase = _sp.GetRequiredService<UpdateTestUseCase>();
+        var testUpdater = _sp.GetRequiredService<IUpdaterAsync<TestDomain, TestUpdateDTO>>();
+        var testReader = _sp.GetRequiredService<IReaderAsync<Guid, TestDomain>>();
+        var answerQuerier = _sp.GetRequiredService<IQuerierAsync<AnswerDomain, AnswerCriteriaDTO>>();
+        var testValidator = new MockTestUpdateValidator();
+
+        _useCase = new UpdateTestUseCase(testUpdater, testReader, testValidator, answerQuerier);
     }
 
     [Fact]
@@ -172,7 +200,11 @@ public class UpdateTestUseCaseTest : BaseTest
         };
 
         var result = await _useCase.ExecuteAsync(
-            new() { Data = updateDto, Executor = AsExecutor(professor2) }
+            new()
+            {
+                Data = updateDto,
+                Executor = AsExecutor(professor2),
+            }
         );
 
         Assert.True(result.IsErr);
@@ -196,7 +228,11 @@ public class UpdateTestUseCaseTest : BaseTest
         };
 
         var result = await _useCase.ExecuteAsync(
-            new() { Data = updateDto, Executor = AsExecutor(professor) }
+            new()
+            {
+                Data = updateDto,
+                Executor = AsExecutor(professor),
+            }
         );
 
         Assert.True(result.IsErr);
@@ -205,3 +241,4 @@ public class UpdateTestUseCaseTest : BaseTest
         Assert.Contains(((InputError)err).Errors, e => e.Field == "title");
     }
 }
+
