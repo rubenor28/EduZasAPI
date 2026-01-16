@@ -11,9 +11,9 @@ public partial class NotificationPerUser
 
     public bool Readed { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-    public DateTime ModifiedAt { get; set; }
+    public DateTimeOffset ModifiedAt { get; set; }
 
     public virtual Notification Notification { get; set; } = null!;
 

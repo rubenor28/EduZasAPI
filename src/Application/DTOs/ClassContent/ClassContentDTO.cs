@@ -12,5 +12,5 @@ public sealed class ClassContentDTO
     public required string Title { get; set; }
     public required ContentType Type { get; set; }
     public bool? Hidden { get; set; } = null;
-    public required DateTime PublishDate { get; set; }
+    public required DateTimeOffset PublishDate { get; set; }
 }

@@ -23,5 +23,5 @@ public sealed class ClassTestDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la asignación.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 }

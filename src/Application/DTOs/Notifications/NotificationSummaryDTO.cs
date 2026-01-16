@@ -5,5 +5,5 @@ public sealed record NotificationSummaryDTO(
     bool Readed,
     string Title,
     string ClassId,
-    DateTime PublishDate
+    DateTimeOffset PublishDate
 );

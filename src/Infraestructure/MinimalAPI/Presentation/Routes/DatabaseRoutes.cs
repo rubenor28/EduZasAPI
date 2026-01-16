@@ -75,7 +75,7 @@ public static class DatabaseRoutes
             mapRequest: () => Unit.Value,
             mapResponse: (stream) =>
             {
-                var fileName = $"backup-{DateTime.UtcNow:yyyyMMddHHmmss}.sql";
+                var fileName = $"backup-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}.sql";
                 return Results.File(stream, "application/octet-stream", fileName);
             }
         );

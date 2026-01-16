@@ -16,15 +16,23 @@ namespace Application.UseCases.Tests;
 public sealed class UpdateTestUseCase(
     IUpdaterAsync<TestDomain, TestUpdateDTO> updater,
     IReaderAsync<Guid, TestDomain> reader,
-    IBusinessValidationService<TestUpdateDTO> validator
+    IBusinessValidationService<TestUpdateDTO> validator,
+    IQuerierAsync<AnswerDomain, AnswerCriteriaDTO> answerQuerier
 ) : UpdateUseCase<Guid, TestUpdateDTO, TestDomain>(updater, reader, validator)
 {
+    readonly IQuerierAsync<AnswerDomain, AnswerCriteriaDTO> _answerQuerier = answerQuerier;
+
     /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<TestUpdateDTO> value,
         TestDomain record
     )
     {
+        var hasAnswers = await _answerQuerier.AnyAsync(new() { TestId = value.Data.Id });
+
+        if (hasAnswers)
+            return UseCaseErrors.Conflict("No se puede modificar una evaluación con respuestas");
+
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,

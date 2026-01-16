@@ -53,10 +53,10 @@ public sealed record TestDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación del examen.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de la última modificación del examen.
     /// </summary>
-    public required DateTime ModifiedAt { get; set; }
+    public required DateTimeOffset ModifiedAt { get; set; }
 }

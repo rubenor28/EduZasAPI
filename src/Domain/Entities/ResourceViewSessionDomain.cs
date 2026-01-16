@@ -32,12 +32,12 @@ public sealed record ResourceViewSession
     /// <summary>
     /// Obtiene o establece la fecha y hora (UTC) de inicio de la visualización.
     /// </summary>
-    public required DateTime StartTimeUtc { get; set; }
+    public required DateTimeOffset StartTimeUtc { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora (UTC) de finalización de la visualización. Es nulo si la sesión sigue activa.
     /// </summary>
-    public required DateTime? EndTimeUtc { get; set; }
+    public required DateTimeOffset? EndTimeUtc { get; set; }
 
     /// <summary>
     /// Obtiene o establece la duración total de la sesión en segundos. Es nulo si la sesión no ha finalizado.
@@ -47,10 +47,10 @@ public sealed record ResourceViewSession
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación del registro de la sesión.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de la última modificación del registro.
     /// </summary>
-    public required DateTime ModifiedAt { get; set; }
+    public required DateTimeOffset ModifiedAt { get; set; }
 }

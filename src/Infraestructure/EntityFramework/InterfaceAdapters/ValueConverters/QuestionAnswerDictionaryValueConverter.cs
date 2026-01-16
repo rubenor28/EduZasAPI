@@ -6,19 +6,16 @@ namespace EntityFramework.InterfaceAdapters.ValueConverters;
 
 public class QuestionAnswerDictionaryValueConverter(ConverterMappingHints? mappingHints = null)
     : ValueConverter<IDictionary<Guid, IQuestionAnswer>, string>(
-        v => JsonSerializer.Serialize(v, GetSerializerOptions()),
+        v => JsonSerializer.Serialize(v, _jsonOptions),
         v =>
-            JsonSerializer.Deserialize<IDictionary<Guid, IQuestionAnswer>>(
-                v,
-                GetSerializerOptions()
-            )!,
+            JsonSerializer.Deserialize<IDictionary<Guid, IQuestionAnswer>>(v, _jsonOptions)
+            ?? new Dictionary<Guid, IQuestionAnswer>(),
         mappingHints
     )
 {
-    public static JsonSerializerOptions GetSerializerOptions() =>
-        new()
-        {
-            PropertyNameCaseInsensitive = true,
-            Converters = { new IQuestionAnswerJsonConverter() },
-        };
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new IQuestionAnswerJsonConverter() },
+    };
 }

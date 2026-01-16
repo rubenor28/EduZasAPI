@@ -21,5 +21,5 @@ public sealed record TagDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la etiqueta.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 }

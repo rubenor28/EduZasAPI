@@ -27,5 +27,5 @@ public sealed record ClassResourceDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora en que se realizó la asignación.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 }

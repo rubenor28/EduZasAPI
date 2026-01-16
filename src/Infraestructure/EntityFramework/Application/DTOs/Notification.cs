@@ -13,7 +13,7 @@ public partial class Notification
 
     public string ClassId { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     public virtual Class Class { get; set; } = null!;
 

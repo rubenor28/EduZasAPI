@@ -17,9 +17,9 @@ public partial class Class
 
     public string? Section { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-    public DateTime ModifiedAt { get; set; }
+    public DateTimeOffset ModifiedAt { get; set; }
 
     public virtual ICollection<ClassProfessor> ClassProfessors { get; set; } = new List<ClassProfessor>();
 

@@ -32,5 +32,5 @@ public sealed record NotificationDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la notificación.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 }

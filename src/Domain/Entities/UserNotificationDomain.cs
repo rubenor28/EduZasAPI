@@ -38,10 +38,10 @@ public sealed record UserNotificationDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación del registro.
     /// </summary>
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de la última modificación (ej. cuando se marca como leída).
     /// </summary>
-    public DateTime ModifiedAt { get; set; }
+    public DateTimeOffset ModifiedAt { get; set; }
 }

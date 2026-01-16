@@ -38,5 +38,5 @@ public sealed record ContactTagDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora en que se asignó la etiqueta.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 }

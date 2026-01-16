@@ -13,8 +13,8 @@ public partial class Answer
     public string ClassId { get; set; } = null!;
     public IDictionary<Guid, IQuestionAnswer> Content { get; set; } = null!;
     public AnswerMetadata Metadata { get; set; } = null!;
-    public DateTime CreatedAt { get; set; }
-    public DateTime ModifiedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ModifiedAt { get; set; }
 
     public virtual User User { get; set; } = null!;
     public virtual TestPerClass TestPerClass { get; set; } = null!;

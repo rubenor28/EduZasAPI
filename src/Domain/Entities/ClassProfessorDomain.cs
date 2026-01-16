@@ -27,5 +27,5 @@ public sealed record ClassProfessorDomain
     /// <summary>
     /// Obtiene la fecha y hora de creación de la relación.
     /// </summary>
-    public required DateTime CreatedAt { get; init; }
+    public required DateTimeOffset CreatedAt { get; init; }
 }

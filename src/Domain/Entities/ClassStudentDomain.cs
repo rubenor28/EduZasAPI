@@ -26,5 +26,5 @@ public sealed record ClassStudentDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de la inscripción.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 }

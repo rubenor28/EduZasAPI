@@ -23,9 +23,9 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
-    public DateTime ModifiedAt { get; set; }
+    public DateTimeOffset ModifiedAt { get; set; }
 
     public virtual ICollection<AgendaContact> AgendaContactAgendaOwners { get; set; } = new List<AgendaContact>();
 

@@ -42,10 +42,10 @@ public class ClassDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la clase.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de la última modificación de la clase.
     /// </summary>
-    public required DateTime ModifiedAt { get; set; }
+    public required DateTimeOffset ModifiedAt { get; set; }
 }

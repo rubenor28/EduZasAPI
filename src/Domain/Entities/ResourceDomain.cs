@@ -40,12 +40,12 @@ public sealed record ResourceDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación del recurso.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de la última modificación del recurso.
     /// </summary>
-    public required DateTime ModifiedAt { get; set; }
+    public required DateTimeOffset ModifiedAt { get; set; }
 }
 
 /// <summary>

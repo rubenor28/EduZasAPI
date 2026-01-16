@@ -41,7 +41,7 @@ public sealed record PublicTestDTO
     /// Obtiene o establece la fecha y hora límite para entregar la evaluación.
     /// Un valor nulo indica que no hay límite de tiempo.
     /// </summary>
-    public DateTime? Deadline { get; set; }
+    public DateTimeOffset? Deadline { get; set; }
 
     /// <summary>
     /// Obtiene o establece el identificador del profesor que creó el examen.

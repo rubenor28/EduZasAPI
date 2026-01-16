@@ -14,6 +14,6 @@ public class AnswerDomain
     public required string ClassId { get; set; }
     public required IDictionary<Guid, IQuestionAnswer> Content { get; set; }
     public required AnswerMetadata Metadata { get; set; }
-    public required DateTime CreatedAt { get; set; }
-    public required DateTime ModifiedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
+    public required DateTimeOffset ModifiedAt { get; set; }
 }

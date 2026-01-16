@@ -13,9 +13,9 @@ namespace Application.UseCases.Answers;
 using AnswerCreator = ICreatorAsync<AnswerDomain, AnswerIdDTO>;
 using ClassReader = IReaderAsync<string, ClassDomain>;
 using ClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
+using StudentReader = IReaderAsync<UserClassRelationId, ClassStudentDomain>;
 using TestReader = IReaderAsync<Guid, TestDomain>;
 using UserReader = IReaderAsync<ulong, UserDomain>;
-using StudentReader = IReaderAsync<UserClassRelationId, ClassStudentDomain>;
 
 public sealed class AddAnswerUseCase(
     AnswerCreator creator,
@@ -33,7 +33,7 @@ public sealed class AddAnswerUseCase(
 
     private readonly StudentReader _studentReader = studentReader;
 
-    private async Task ItemExists<I, E>(
+    private async Task<E?> ItemExists<I, E>(
         I id,
         string fieldName,
         List<FieldErrorDTO> errors,
@@ -44,6 +44,8 @@ public sealed class AddAnswerUseCase(
 
         if (search is null)
             errors.Add(new() { Field = fieldName, Message = "No encontrado" });
+
+        return search;
     }
 
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
@@ -60,7 +62,7 @@ public sealed class AddAnswerUseCase(
             return UseCaseErrors.Unauthorized();
 
         var errors = new List<FieldErrorDTO>();
-        await ItemExists(value.Data.TestId, "testId", errors, _testReader.GetAsync);
+        var test = await ItemExists(value.Data.TestId, "testId", errors, _testReader.GetAsync);
         await ItemExists(value.Data.ClassId, "classId", errors, _classReader.GetAsync);
         await ItemExists(value.Data.UserId, "userId", errors, _userReader.GetAsync);
 
@@ -74,13 +76,22 @@ public sealed class AddAnswerUseCase(
         if (classTest is null)
             return UseCaseErrors.Unauthorized();
 
-        var student = await _studentReader.GetAsync(new()
-        {
-            ClassId = value.Data.ClassId,
-            UserId = value.Data.UserId,
-        });
+        var student = await _studentReader.GetAsync(
+            new() { ClassId = value.Data.ClassId, UserId = value.Data.UserId }
+        );
 
-        if(student is null) return UseCaseErrors.Unauthorized();
+        if (student is null)
+            return UseCaseErrors.Unauthorized();
+
+        if (test!.TimeLimitMinutes is not null)
+        {
+            var startTime = classTest.CreatedAt.ToUniversalTime();
+            var timeLimit = TimeSpan.FromMinutes(test.TimeLimitMinutes.Value);
+            var deadline = startTime.Add(timeLimit);
+
+            if (DateTimeOffset.UtcNow > deadline)
+                return UseCaseErrors.Unauthorized();
+        }
 
         return Unit.Value;
     }

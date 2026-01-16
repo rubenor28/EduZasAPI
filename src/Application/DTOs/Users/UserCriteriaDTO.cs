@@ -91,7 +91,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la fecha de creación para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public DateTime? CreatedAt { get; init; } 
+    public DateTimeOffset? CreatedAt { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de modificación del usuario.
@@ -100,7 +100,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la fecha de modificación para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public DateTime? ModifiedAt { get; init; } 
+    public DateTimeOffset? ModifiedAt { get; init; } 
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para usuarios inscritos en una clase específica.

@@ -28,5 +28,5 @@ public sealed record TestSummary
     /// <summary>
     /// Fecha de la última modificación.
     /// </summary>
-    public required DateTime ModifiedAt { get; set; }
+    public required DateTimeOffset ModifiedAt { get; set; }
 }

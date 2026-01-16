@@ -11,7 +11,7 @@ public partial class ClassStudent
 
     public bool Hidden { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     public virtual Class Class { get; set; } = null!;
 

@@ -89,6 +89,6 @@ public sealed class UpdateStudentAnswerUseCase(
         var timeLimit = TimeSpan.FromMinutes(test.TimeLimitMinutes.Value);
         var deadline = startTime.Add(timeLimit);
 
-        return DateTime.UtcNow <= deadline;
+        return DateTimeOffset.UtcNow <= deadline;
     }
 }

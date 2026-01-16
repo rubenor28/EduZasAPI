@@ -10,8 +10,8 @@ public partial class AgendaContact
     public string? Notes { get; set; }
     public ulong AgendaOwnerId { get; set; }
     public ulong UserId { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime ModifiedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ModifiedAt { get; set; }
 
     public virtual User AgendaOwner { get; set; } = null!;
     public virtual User Contact { get; set; } = null!;

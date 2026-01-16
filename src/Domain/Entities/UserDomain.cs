@@ -39,12 +39,12 @@ public class UserDomain
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la cuenta de usuario.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de la última modificación de los datos del usuario.
     /// </summary>
-    public required DateTime ModifiedAt { get; set; }
+    public required DateTimeOffset ModifiedAt { get; set; }
 
     /// <summary>
     /// Obtiene o establece el estado de activación del usuario.
