@@ -1,15 +1,17 @@
 using System.Net;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.RateLimiting;
+using Application.Services;
 using InterfaceAdapters.Mappers.Tests;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Application.DTOs;
 using MinimalAPI.Application.DTOs.RateLimit;
 using MinimalAPI.Application.Services;
+using MinimalAPI.Application.Services;
 using MinimalAPI.Presentation.Routes;
+using Quartz;
 
 namespace MinimalAPI.Extensions;
 
@@ -35,11 +37,12 @@ public static class ServiceCollectionExtensions
             .AddAuthSettings(configuration)
             .AddRateLimit(configuration)
             .AddSwaggerServices()
-            .AddApiServices();
+            .AddApiServices()
+            .AddScheduledJobs(configuration);
 
         return services;
     }
-    
+
     /// <summary>
     /// Configura las opciones de serialización JSON para la aplicación.
     /// </summary>
@@ -180,6 +183,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddApiServices(this IServiceCollection services)
     {
         services.AddSingleton<RoutesUtils>();
+        services.AddScoped<ITaskScheduler, QuartzTaskScheduler>();
         return services;
     }
 
@@ -262,5 +266,35 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-}
 
+    private static IServiceCollection AddScheduledJobs(
+        this IServiceCollection services,
+        IConfiguration cfg
+    )
+    {
+        var connStr = cfg.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connStr))
+            throw new InvalidOperationException("DefaultConnection no puede ser nulo o vacío");
+
+        services.AddQuartz(q =>
+        {
+            q.UsePersistentStore(x =>
+            {
+                x.UseProperties = true;
+                x.UseSystemTextJsonSerializer();
+
+                x.UseMySql(mysql =>
+                {
+                    mysql.ConnectionString = connStr;
+                });
+            });
+        });
+
+        services.AddQuartzHostedService(options =>
+        {
+            options.WaitForJobsToComplete = true;
+        });
+
+        return services;
+    }
+}

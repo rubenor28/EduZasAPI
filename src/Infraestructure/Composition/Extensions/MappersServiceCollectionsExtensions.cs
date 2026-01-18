@@ -183,6 +183,7 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IEFProjector<Answer, AnswerDomain, AnswerCriteriaDTO>, AnswerEFProjector>();
         s.AddSingleton<IUpdateMapper<AnswerUpdateProfessorDTO, Answer>, AnswerProfessorUpdateEFMapper>();
         s.AddSingleton<IUpdateMapper<AnswerUpdateStudentDTO, Answer>, AnswerStudentUpdateEFMapper>();
+        s.AddSingleton<IUpdateMapper<AnswerUpdateDTO, Answer>, AnswerUpdateEFMapper>();
 
         return s;
     }

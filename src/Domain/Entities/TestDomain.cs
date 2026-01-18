@@ -59,4 +59,9 @@ public sealed record TestDomain
     /// Obtiene o establece la fecha y hora de la última modificación del examen.
     /// </summary>
     public required DateTimeOffset ModifiedAt { get; set; }
+
+    /// <summary>
+    /// Obtiene si el test tiene preguntas que requieren intervencion manual para calificar.
+    /// </summary>
+    public bool RequiresManualGrade => Content.Values.Any(v => v.RequiresManualGrade);
 }

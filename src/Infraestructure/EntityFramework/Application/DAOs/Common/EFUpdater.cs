@@ -23,6 +23,28 @@ public abstract class EFUpdater<DomainEntity, UpdateEntity, EFEntity>(
     protected readonly IMapper<EFEntity, DomainEntity> _domainMapper = domainMapper;
     protected readonly IUpdateMapper<UpdateEntity, EFEntity> _updateMapper = updateMapper;
 
+    public async Task<IEnumerable<DomainEntity>> BulkUpdateAsync(IEnumerable<UpdateEntity> updates)
+    {
+        IEnumerable<EFEntity> entities = updates
+            .Select(updateEntity =>
+            {
+                var task = GetTrackedByDTO(updateEntity);
+                task.Wait();
+
+                var entity = task.Result;
+
+                if (entity is not null)
+                    _updateMapper.Map(updateEntity, entity);
+
+                return task.Result;
+            })
+            .OfType<EFEntity>();
+
+        _dbSet.UpdateRange(entities);
+        await _ctx.SaveChangesAsync();
+        return entities.Select(_domainMapper.Map);
+    }
+
     /// <inheritdoc/>
     public async Task<DomainEntity> UpdateAsync(UpdateEntity updateData)
     {

@@ -93,7 +93,7 @@ public sealed class AddContactUseCase(
         ContactDomain createdEntity
     )
     {
-        await newEntity.Data.Tags.IfSome(
+        await newEntity.Data.Tags.IfSomeAsync(
             async (tags) =>
             {
                 if (!tags.Any())

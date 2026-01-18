@@ -19,5 +19,14 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
+  },
+
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore.Routing": "None",
+      "Microsoft.AspNetCore": "Warning",
+      "System": "Warning"
+    }
   }
 }

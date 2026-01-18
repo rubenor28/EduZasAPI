@@ -44,7 +44,7 @@ public sealed class UpdateStudentAnswerUseCase(
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            _ => await IsCommonUserAuthorized(value),
+            _ => await IsCommonUserAuthorized(value, original),
         };
 
         if (!authorized)
@@ -63,8 +63,14 @@ public sealed class UpdateStudentAnswerUseCase(
         return Unit.Value;
     }
 
-    private async Task<bool> IsCommonUserAuthorized(UserActionDTO<AnswerUpdateStudentDTO> value)
+    private async Task<bool> IsCommonUserAuthorized(
+        UserActionDTO<AnswerUpdateStudentDTO> value,
+        AnswerDomain original
+    )
     {
+        if (original.TryFinished)
+            return false;
+
         if (value.Data.UserId != value.Executor.Id)
             return false;
 

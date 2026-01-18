@@ -2,6 +2,7 @@ using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
+using Application.Services;
 using Application.Services.Validators;
 using Application.UseCases.Common;
 using Domain.Entities;
@@ -20,6 +21,7 @@ public sealed class AddClassTestUseCase(
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> classTestReader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader,
+    ITaskScheduler taskScheduler,
     IBusinessValidationService<ClassTestDTO>? validator = null
 ) : AddUseCase<ClassTestDTO, ClassTestDomain>(creator, validator)
 {
@@ -27,8 +29,12 @@ public sealed class AddClassTestUseCase(
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
     private readonly IReaderAsync<ClassTestIdDTO, ClassTestDomain> _classTestReader =
         classTestReader;
+    private readonly ITaskScheduler _taskScheduler = taskScheduler;
+
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
+
+    private TestDomain _test = null!;
 
     /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
@@ -41,9 +47,9 @@ public sealed class AddClassTestUseCase(
             errors.Add(new() { Field = "classId", Message = "No se encontró la clase" })
         );
 
-        var test = await _testReader.GetAsync(value.Data.TestId);
+        _test = (await _testReader.GetAsync(value.Data.TestId))!;
 
-        test.IfNull(() =>
+        _test.IfNull(() =>
             errors.Add(new() { Field = "testId", Message = "No se encontró el test" })
         );
 
@@ -52,11 +58,11 @@ public sealed class AddClassTestUseCase(
 
         var authorized = value.Executor.Role switch
         {
-            UserType.ADMIN => await TestOwnerIsClassProfessor(test!.ProfessorId, value.Data.ClassId),
+            UserType.ADMIN => await TestOwnerIsClassProfessor(_test!.ProfessorId, value.Data.ClassId),
             UserType.PROFESSOR => await IsProfessorAuthorized(
                 value.Executor.Id,
                 value.Data.ClassId,
-                test!
+                _test
             ),
             UserType.STUDENT => false,
             _ => throw new NotImplementedException(),
@@ -95,5 +101,20 @@ public sealed class AddClassTestUseCase(
         );
 
         return professorSearch is not null && test.ProfessorId == professorId;
+    }
+
+    protected override async Task ExtraTaskAsync(UserActionDTO<ClassTestDTO> dto, ClassTestDomain created)
+    {
+      if(_test.TimeLimitMinutes is null) return;
+
+            var startTime = created.CreatedAt;
+            var timeLimit = TimeSpan.FromMinutes(_test.TimeLimitMinutes.Value);
+            var deadline = startTime.Add(timeLimit);
+
+            await _taskScheduler.ScheduleMarkAnswersAsFinished(
+                dto.Data.ClassId,
+                dto.Data.TestId,
+                deadline
+            );
     }
 }

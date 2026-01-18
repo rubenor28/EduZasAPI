@@ -250,6 +250,7 @@ internal static class RepositoryServiceCollectionExtensions
         s.AddScoped<ICreatorAsync<AnswerDomain, AnswerIdDTO>, AnswerEFCreator>();
         s.AddScoped<IReaderAsync<AnswerIdDTO, AnswerDomain>, AnswerEFReader>();
         s.AddScoped<IDeleterAsync<AnswerIdDTO, AnswerDomain>, AnswerEFDeleter>();
+        s.AddScoped<IUpdaterAsync<AnswerDomain, AnswerUpdateDTO>, AnswerEFUpdater>();
         s.AddScoped<IUpdaterAsync<AnswerDomain, AnswerUpdateStudentDTO>, AnswerStudentEFUpdater>();
         s.AddScoped<IUpdaterAsync<AnswerDomain, AnswerUpdateProfessorDTO>, AnswerProfessorEFUpdater>();
         s.AddScoped<IQuerierAsync<AnswerDomain, AnswerCriteriaDTO>>(

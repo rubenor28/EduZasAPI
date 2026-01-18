@@ -14,6 +14,8 @@ public class AnswerEFProjector : IEFProjector<Answer, AnswerDomain, AnswerCriter
                 UserId = answer.UserId,
                 ClassId = answer.ClassId,
                 TestId = answer.TestId,
+                Graded = answer.Graded,
+                TryFinished = answer.TryFinished,
                 Metadata = answer.Metadata,
                 Content = answer.Content,
                 ModifiedAt = answer.ModifiedAt,

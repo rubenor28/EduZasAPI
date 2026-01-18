@@ -68,4 +68,27 @@ app.MapResourceRoutes();
 app.MapTestRoutes();
 app.MapAnswerRoutes();
 
+app.MapGet("/quartz-status", async (Quartz.ISchedulerFactory schedulerFactory) =>
+{
+    try
+    {
+        var scheduler = await schedulerFactory.GetScheduler();
+        var metadata = await scheduler.GetMetaData();
+        return Results.Ok(new
+        {
+            SchedulerName = metadata.SchedulerName,
+            SchedulerInstanceId = metadata.SchedulerInstanceId,
+            SchedulerType = metadata.SchedulerType.FullName,
+            IsRunning = metadata.Started,
+            InStandbyMode = metadata.InStandbyMode,
+            IsShutdown = metadata.Shutdown,
+            JobsExecuted = metadata.NumberOfJobsExecuted,
+        });
+    }
+    catch (Exception e)
+    {
+        return Results.Problem(e.ToString());
+    }
+});
+
 app.Run();

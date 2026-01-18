@@ -6,4 +6,5 @@ public record MultipleSelectionQuestion : IQuestion
     public string? ImageUrl { get; set; }
     public required IDictionary<Guid, string> Options { get; set; }
     public required ISet<Guid> CorrectOptions { get; set; }
+    public bool RequiresManualGrade => false;
 }

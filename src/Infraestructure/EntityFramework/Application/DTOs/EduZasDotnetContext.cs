@@ -191,9 +191,23 @@ public partial class EduZasDotnetContext : DbContext
                 contentProperty.HasColumnType("json");
                 metadataProperty.HasColumnType("json");
             }
+
             answerBuilder.Property(e => e.UserId).HasColumnName("user_id");
             answerBuilder.Property(e => e.TestId).HasColumnName("test_id");
             answerBuilder.Property(e => e.ClassId).HasColumnName("class_id");
+
+
+            answerBuilder
+                .Property(e => e.TryFinished)
+                .IsRequired()
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("try_finished");
+
+            answerBuilder
+                .Property(e => e.Graded)
+                .IsRequired()
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("graded");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
@@ -231,6 +245,7 @@ public partial class EduZasDotnetContext : DbContext
                 .WithMany(e => e.Answers)
                 .HasForeignKey(e => new { e.TestId, e.ClassId })
                 .OnDelete(DeleteBehavior.Cascade);
+
         });
 
         modelBuilder.Entity<Class>(classBuilder =>

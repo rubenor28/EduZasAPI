@@ -12,6 +12,8 @@ public class AnswerMapper : IMapper<Answer, AnswerDomain>
             ClassId = input.ClassId,
             UserId = input.UserId,
             TestId = input.TestId,
+            TryFinished = input.TryFinished,
+            Graded = input.Graded,
             Content = input.Content,
             Metadata = input.Metadata,
             CreatedAt = input.CreatedAt,

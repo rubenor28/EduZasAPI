@@ -33,6 +33,8 @@ public sealed class AddAnswerUseCase(
 
     private readonly StudentReader _studentReader = studentReader;
 
+    private DateTimeOffset _deadline;
+
     private async Task<E?> ItemExists<I, E>(
         I id,
         string fieldName,
@@ -87,9 +89,9 @@ public sealed class AddAnswerUseCase(
         {
             var startTime = classTest.CreatedAt.ToUniversalTime();
             var timeLimit = TimeSpan.FromMinutes(test.TimeLimitMinutes.Value);
-            var deadline = startTime.Add(timeLimit);
+            _deadline = startTime.Add(timeLimit);
 
-            if (DateTimeOffset.UtcNow > deadline)
+            if (DateTimeOffset.UtcNow > _deadline)
                 return UseCaseErrors.Unauthorized();
         }
 

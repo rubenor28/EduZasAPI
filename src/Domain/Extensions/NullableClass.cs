@@ -11,28 +11,13 @@ public static class NullableClass
     /// <typeparam name="T">El tipo del objeto (clase).</typeparam>
     /// <param name="value">El objeto que puede ser nulo.</param>
     /// <param name="action">La acción a ejecutar con el valor no nulo.</param>
-    public static void IfSome<T>(this T? value, Action<T> action)
+    public static T? IfSome<T>(this T? value, Action<T> action)
         where T : class
     {
-        if (value is null)
-            return;
+        if (value is not null)
+            action(value);
 
-        action(value);
-    }
-
-    /// <summary>
-    /// Ejecuta una acción asíncrona si el valor no es nulo.
-    /// </summary>
-    /// <typeparam name="T">El tipo del objeto (clase).</typeparam>
-    /// <param name="value">El objeto que puede ser nulo.</param>
-    /// <param name="action">La función asíncrona a ejecutar con el valor no nulo.</param>
-    public static Task IfSome<T>(this T? value, Func<T, Task> action)
-        where T : class
-    {
-        if (value is null)
-            return Task.CompletedTask;
-
-        return action(value);
+        return value;
     }
 
     /// <summary>
@@ -41,28 +26,31 @@ public static class NullableClass
     /// <typeparam name="T">El tipo del objeto (clase).</typeparam>
     /// <param name="value">El objeto que puede ser nulo.</param>
     /// <param name="action">La acción a ejecutar.</param>
-    public static void IfNull<T>(this T? value, Action action)
+    public static T? IfNull<T>(this T? value, Action action)
         where T : class
     {
-        if (value is not null)
-            return;
+        if (value is null)
+            action();
 
-        action();
+        return value;
     }
 
-    /// <summary>
-    /// Ejecuta una acción asíncrona si el valor es nulo.
-    /// </summary>
-    /// <typeparam name="T">El tipo del objeto (clase).</typeparam>
-    /// <param name="value">El objeto que puede ser nulo.</param>
-    /// <param name="action">La función asíncrona a ejecutar.</param>
-    public static Task IfNull<T>(this T? value, Func<Task> action)
+    public static async Task<T?> IfSomeAsync<T>(this T? value, Func<T, Task> action)
         where T : class
     {
         if (value is not null)
-            return Task.CompletedTask;
+            await action(value);
 
-        return action();
+        return value;
+    }
+
+    public static async Task<T?> IfNullAsync<T>(this T? value, Func<Task> action)
+        where T : class
+    {
+        if (value is null)
+            await action();
+
+        return value;
     }
 
     /// <summary>
@@ -101,44 +89,6 @@ public static class NullableClass
     /// <param name="nullAction">La función para un valor nulo.</param>
     /// <returns>El resultado de la función ejecutada.</returns>
     public static U Match<T, U>(this T? value, Func<T, U> someAction, Func<U> nullAction)
-        where T : class
-    {
-        if (value is not null)
-            return someAction(value);
-
-        return nullAction();
-    }
-
-    /// <summary>
-    /// Ejecuta una de dos acciones asíncronas dependiendo de si el valor es nulo o no.
-    /// </summary>
-    /// <typeparam name="T">El tipo del objeto (clase).</typeparam>
-    /// <param name="value">El objeto que puede ser nulo.</param>
-    /// <param name="someAction">La función asíncrona para un valor no nulo.</param>
-    /// <param name="nullAction">La función asíncrona para un valor nulo.</param>
-    public static Task Match<T>(this T? value, Func<T, Task> someAction, Func<Task> nullAction)
-        where T : class
-    {
-        if (value is not null)
-            return someAction(value);
-
-        return nullAction();
-    }
-
-    /// <summary>
-    /// Proyecta asíncronamente el valor a un nuevo tipo, ejecutando una de dos funciones según si es nulo.
-    /// </summary>
-    /// <typeparam name="T">El tipo del objeto original.</typeparam>
-    /// <typeparam name="U">El tipo del valor resultante.</typeparam>
-    /// <param name="value">El objeto que puede ser nulo.</param>
-    /// <param name="someAction">La función asíncrona para un valor no nulo.</param>
-    /// <param name="nullAction">La función asíncrona para un valor nulo.</param>
-    /// <returns>Una tarea con el resultado de la función ejecutada.</returns>
-    public static Task<U> Match<T, U>(
-        this T? value,
-        Func<T, Task<U>> someAction,
-        Func<Task<U>> nullAction
-    )
         where T : class
     {
         if (value is not null)

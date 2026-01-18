@@ -11,29 +11,13 @@ public static class NullableStruct
     /// <typeparam name="T">El tipo del struct.</typeparam>
     /// <param name="value">El valor `Nullable<T>`.</param>
     /// <param name="action">La acción a ejecutar con el valor.</param>
-    public static void IfSome<T>(this T? value, Action<T> action)
+    public static T? IfSome<T>(this T? value, Action<T> action)
         where T : struct
     {
         if (value.HasValue)
-        {
             action(value.Value);
-        }
-    }
 
-    /// <summary>
-    /// Ejecuta una acción asíncrona si el `Nullable<T>` tiene un valor.
-    /// </summary>
-    /// <typeparam name="T">El tipo del struct.</typeparam>
-    /// <param name="value">El valor `Nullable<T>`.</param>
-    /// <param name="action">La función asíncrona a ejecutar con el valor.</param>
-    public static Task IfSome<T>(this T? value, Func<T, Task> action)
-        where T : struct
-    {
-        if (value.HasValue)
-        {
-            return action(value.Value);
-        }
-        return Task.CompletedTask;
+        return value;
     }
 
     /// <summary>
@@ -42,29 +26,31 @@ public static class NullableStruct
     /// <typeparam name="T">El tipo del struct.</typeparam>
     /// <param name="value">El valor `Nullable<T>`.</param>
     /// <param name="action">La acción a ejecutar.</param>
-    public static void IfNull<T>(this T? value, Action action)
+    public static T? IfNull<T>(this T? value, Action action)
         where T : struct
     {
         if (!value.HasValue)
-        {
             action();
-        }
+
+        return value;
     }
 
-    /// <summary>
-    /// Ejecuta una acción asíncrona si el `Nullable<T>` es nulo.
-    /// </summary>
-    /// <typeparam name="T">El tipo del struct.</typeparam>
-    /// <param name="value">El valor `Nullable<T>`.</param>
-    /// <param name="action">La función asíncrona a ejecutar.</param>
-    public static Task IfNull<T>(this T? value, Func<Task> action)
+    public static async Task<T?> IfSomeAsync<T>(this T? value, Func<T, Task> action)
+        where T : struct
+    {
+        if (value.HasValue)
+            await action(value.Value);
+
+        return value;
+    }
+
+    public static async Task<T?> IfNullAsync<T>(this T? value, Func<Task> action)
         where T : struct
     {
         if (!value.HasValue)
-        {
-            return action();
-        }
-        return Task.CompletedTask;
+            await action();
+
+        return value;
     }
 
     /// <summary>
@@ -103,44 +89,6 @@ public static class NullableStruct
     /// <param name="nullAction">La función para un valor nulo.</param>
     /// <returns>El resultado de la función ejecutada.</returns>
     public static U Match<T, U>(this T? value, Func<T, U> someAction, Func<U> nullAction)
-        where T : struct
-    {
-        if (value.HasValue)
-            return someAction(value.Value);
-
-        return nullAction();
-    }
-
-    /// <summary>
-    /// Ejecuta una de dos acciones asíncronas dependiendo de si el `Nullable<T>` tiene valor o no.
-    /// </summary>
-    /// <typeparam name="T">El tipo del struct.</typeparam>
-    /// <param name="value">El valor `Nullable<T>`.</param>
-    /// <param name="someAction">La función asíncrona para un valor existente.</param>
-    /// <param name="nullAction">La función asíncrona para un valor nulo.</param>
-    public static Task Match<T>(this T? value, Func<T, Task> someAction, Func<Task> nullAction)
-        where T : struct
-    {
-        if (value.HasValue)
-            return someAction(value.Value);
-
-        return nullAction();
-    }
-
-    /// <summary>
-    /// Proyecta asíncronamente el `Nullable<T>` a un nuevo tipo, ejecutando una de dos funciones.
-    /// </summary>
-    /// <typeparam name="T">El tipo del struct original.</typeparam>
-    /// <typeparam name="U">El tipo del valor resultante.</typeparam>
-    /// <param name="value">El valor `Nullable<T>`.</param>
-    /// <param name="someAction">La función asíncrona para un valor existente.</param>
-    /// <param name="nullAction">La función asíncrona para un valor nulo.</param>
-    /// <returns>Una tarea con el resultado de la función ejecutada.</returns>
-    public static Task<U> Match<T, U>(
-        this T? value,
-        Func<T, Task<U>> someAction,
-        Func<Task<U>> nullAction
-    )
         where T : struct
     {
         if (value.HasValue)

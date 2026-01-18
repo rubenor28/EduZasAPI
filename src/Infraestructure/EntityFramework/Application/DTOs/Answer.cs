@@ -12,6 +12,8 @@ public partial class Answer
     public Guid TestId { get; set; }
     public string ClassId { get; set; } = null!;
     public IDictionary<Guid, IQuestionAnswer> Content { get; set; } = null!;
+    public bool TryFinished { get; set; }
+    public bool Graded { get; set; }
     public AnswerMetadata Metadata { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset ModifiedAt { get; set; }
