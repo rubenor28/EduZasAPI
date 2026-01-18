@@ -15,6 +15,7 @@
 !/run.bat
 !/run-dev.bat
 !/TODO.md
+!/schema.sql
 
 !/EduZasAPI.sln
 !/Directory.Build.props
