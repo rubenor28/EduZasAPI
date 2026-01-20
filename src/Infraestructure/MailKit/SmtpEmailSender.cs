@@ -1,5 +1,4 @@
 using Application.Configuration;
-using Application.DTOs;
 using Application.Services;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -25,7 +24,83 @@ public class SmtpEmailSender(IOptions<SmtpSettings> smtpSettings) : IEmailSender
     /// <returns>Tarea asíncrona.</returns>
     public async Task SendAsync(EmailMessage message, CancellationToken cancellationToken = default)
     {
+        using var client = new SmtpClient();
+
+        await ConnectAndAuthenticateAsync(client, cancellationToken);
+
+        var mimeMessage = CreateMimeMessage(message);
+        await client.SendAsync(mimeMessage, cancellationToken);
+
+        await client.DisconnectAsync(true, cancellationToken);
+    }
+
+    public async Task SendBulkAsync(
+        IEnumerable<EmailMessage> messages,
+        CancellationToken cancellationToken = default
+    )
+    {
+        using var client = new SmtpClient();
+
+        try
+        {
+            await ConnectAndAuthenticateAsync(client, cancellationToken);
+
+            foreach (var message in messages)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
+                try
+                {
+                    var mimeMessage = CreateMimeMessage(message);
+                    await client.SendAsync(mimeMessage, cancellationToken);
+                }
+                catch
+                {
+                    Console.WriteLine(
+                        $"[IEmailSender] Error al enviar correo indivual a: {message.To} "
+                    );
+                }
+            }
+        }
+        finally
+        {
+            if (client.IsConnected)
+            {
+                await client.DisconnectAsync(true, cancellationToken);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Centraliza la conexión y autenticación para evitar duplicidad.
+    /// </summary>
+    private async Task ConnectAndAuthenticateAsync(
+        ISmtpClient client,
+        CancellationToken cancellationToken
+    )
+    {
+        await client.ConnectAsync(
+            _smtpSettings.Server,
+            _smtpSettings.Port,
+            SecureSocketOptions.StartTls,
+            cancellationToken
+        );
+
+        await client.AuthenticateAsync(
+            _smtpSettings.Username,
+            _smtpSettings.Password,
+            cancellationToken
+        );
+    }
+
+    /// <summary>
+    /// Mapea nuestro DTO EmailMessage al MimeMessage de MailKit.
+    /// </summary>
+    private MimeMessage CreateMimeMessage(EmailMessage message)
+    {
         var mimeMessage = new MimeMessage();
+
         mimeMessage.From.Add(
             new MailboxAddress(_smtpSettings.SenderName, _smtpSettings.SenderEmail)
         );
@@ -35,14 +110,18 @@ public class SmtpEmailSender(IOptions<SmtpSettings> smtpSettings) : IEmailSender
         );
 
         if (message.Cc?.Any() == true)
+        {
             mimeMessage.Cc.AddRange(
                 message.Cc.Select(email => new MailboxAddress(string.Empty, email))
             );
+        }
 
         if (message.Bcc?.Any() == true)
+        {
             mimeMessage.Bcc.AddRange(
                 message.Bcc.Select(email => new MailboxAddress(string.Empty, email))
             );
+        }
 
         mimeMessage.Subject = message.Subject;
         mimeMessage.Body = new TextPart(message.IsBodyHtml ? TextFormat.Html : TextFormat.Plain)
@@ -50,28 +129,6 @@ public class SmtpEmailSender(IOptions<SmtpSettings> smtpSettings) : IEmailSender
             Text = message.Body,
         };
 
-        using var client = new SmtpClient();
-
-        // Conectar al servidor SMTP. Usar STARTTLS que es el estándar de seguridad moderno.
-        await client.ConnectAsync(
-            _smtpSettings.Server,
-            _smtpSettings.Port,
-            SecureSocketOptions.StartTls,
-            cancellationToken
-        );
-
-        // Autenticarse con las credenciales proporcionadas.
-        await client.AuthenticateAsync(
-            _smtpSettings.Username,
-            _smtpSettings.Password,
-            cancellationToken
-        );
-
-        // Enviar el mensaje.
-        await client.SendAsync(mimeMessage, cancellationToken);
-
-        // Desconectarse del servidor.
-        await client.DisconnectAsync(true, cancellationToken);
+        return mimeMessage;
     }
 }
-

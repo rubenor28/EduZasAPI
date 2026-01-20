@@ -71,7 +71,6 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddScoped<QueryClassProfessorSummaryUseCase>();
 
         // Notifications
-        s.AddScoped<AddNotificationUseCase>();
         s.AddScoped<SearchNotificationUseCase>();
         s.AddScoped<QueryNotificationSummaryUseCase>();
         s.AddScoped<HasUnreadNotificationUseCase>();

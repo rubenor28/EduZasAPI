@@ -2,6 +2,7 @@ using Application.DAOs;
 using Application.DTOs;
 using Application.DTOs.ClassTests;
 using Application.DTOs.Common;
+using Application.DTOs.Users;
 using Application.Services;
 using Application.Services.Validators;
 using Application.UseCases.Common;
@@ -9,6 +10,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.Extensions;
 using Domain.ValueObjects;
+using Microsoft.Extensions.Configuration;
 
 namespace Application.UseCases.ClassTests;
 
@@ -21,7 +23,10 @@ public sealed class AddClassTestUseCase(
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> classTestReader,
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> professorReader,
-    ITaskScheduler taskScheduler,
+    IReaderAsync<ulong, UserDomain> userReader,
+    IQuerierAsync<UserDomain, UserCriteriaDTO> userQuierier,
+    ITaskScheduler scheduler,
+    IConfiguration cfg,
     IBusinessValidationService<ClassTestDTO>? validator = null
 ) : AddUseCase<ClassTestDTO, ClassTestDomain>(creator, validator)
 {
@@ -29,10 +34,14 @@ public sealed class AddClassTestUseCase(
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
     private readonly IReaderAsync<ClassTestIdDTO, ClassTestDomain> _classTestReader =
         classTestReader;
-    private readonly ITaskScheduler _taskScheduler = taskScheduler;
 
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
+
+    private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuierier = userQuierier;
+    private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
+    private readonly ITaskScheduler _scheduler = scheduler;
+    private readonly IConfiguration _cfg = cfg;
 
     private TestDomain _test = null!;
 
@@ -58,7 +67,10 @@ public sealed class AddClassTestUseCase(
 
         var authorized = value.Executor.Role switch
         {
-            UserType.ADMIN => await TestOwnerIsClassProfessor(_test!.ProfessorId, value.Data.ClassId),
+            UserType.ADMIN => await TestOwnerIsClassProfessor(
+                _test!.ProfessorId,
+                value.Data.ClassId
+            ),
             UserType.PROFESSOR => await IsProfessorAuthorized(
                 value.Executor.Id,
                 value.Data.ClassId,
@@ -103,18 +115,96 @@ public sealed class AddClassTestUseCase(
         return professorSearch is not null && test.ProfessorId == professorId;
     }
 
-    protected override async Task ExtraTaskAsync(UserActionDTO<ClassTestDTO> dto, ClassTestDomain created)
+    protected override async Task ExtraTaskAsync(
+        UserActionDTO<ClassTestDTO> dto,
+        ClassTestDomain created
+    )
     {
-      if(_test.TimeLimitMinutes is null) return;
+        List<Task> actionsToDo = [];
 
+        // NOTIFICACIONES EN SISTEMA
+        var user = await _userReader.GetAsync(dto.Executor.Id);
+        var @class = await _classReader.GetAsync(dto.Data.ClassId);
+
+        string professorName = $"{user!.FirstName} {user.FatherLastname}";
+        string subject = $"Nueva evaluación disponible en {@class!.ClassName}";
+        string title = $"{professorName} ha agregado una nueva evaluación en {@class.ClassName}";
+
+        var users = new List<UserDomain>();
+        var page = 1;
+        PaginatedQuery<UserDomain, UserCriteriaDTO> usersSearch;
+
+        do
+        {
+            usersSearch = await _userQuierier.GetByAsync(
+                new() { EnrolledInClass = @class.Id, Page = page }
+            );
+            users.AddRange(usersSearch.Results);
+            page++;
+        } while (usersSearch.TotalPages >= page);
+
+        var userIds = users.Select(u => u.Id).ToList();
+
+        var notificationTask = _scheduler.CreateNotification(
+            new() { ClassId = @class.Id, Title = title },
+            userIds
+        );
+
+        actionsToDo.Add(notificationTask);
+
+        // NOTIFICACIONES POR EMAIL
+        var emailMessages = new List<EmailMessage>();
+
+        var frontendUrl = _cfg.GetValue<string>("ServerOptions:FrontEndUrl");
+        if (frontendUrl is not null)
+        {
+            var htmlBody = EmailTemplates.GetGenericTemplate(
+                title: "Nueva Evaluación Disponible",
+                mainMessage: "Se ha publicado una evaluación.",
+                detailLabel: "Clase",
+                detailValue: @class.ClassName,
+                actionText: "Ver Evaluación",
+                actionUrl: $"{frontendUrl.TrimEnd('/')}/student/classes/test/{@class.Id}/{dto.Data.TestId}"
+            );
+
+            foreach (var u in users)
+            {
+                emailMessages.Add(
+                    new EmailMessage
+                    {
+                        To = [u.Email],
+                        Subject = subject,
+                        Body = htmlBody,
+                        IsBodyHtml = true,
+                    }
+                );
+            }
+
+            var emailTask = _scheduler.BulkSendEmail(emailMessages);
+            actionsToDo.Add(emailTask);
+        }
+        else
+            Console.WriteLine(
+                "[AddClassTestUseCase] No se configuró FrontEndUrl en la configuración, no se enviarán los emails"
+            );
+
+        // CIERRE DE INTENTOS SI SE TERMINA EL TIEMPO
+        if (_test.TimeLimitMinutes is not null)
+        {
             var startTime = created.CreatedAt;
             var timeLimit = TimeSpan.FromMinutes(_test.TimeLimitMinutes.Value);
             var deadline = startTime.Add(timeLimit);
 
-            await _taskScheduler.ScheduleMarkAnswersAsFinished(
+            var markTriesAsFinishedTask = _scheduler.ScheduleMarkAnswersAsFinished(
                 dto.Data.ClassId,
                 dto.Data.TestId,
                 deadline
             );
+
+            actionsToDo.Add(markTriesAsFinishedTask);
+        }
+
+        // Encolar todas las tareas
+        await Task.WhenAll(actionsToDo);
     }
 }
