@@ -39,6 +39,14 @@ public static class AnswerRoutes
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound);
 
+        group
+            .MapPut("/{userId:ulong}/{classId}/{testId:guid}/try", EndTry)
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces(StatusCodes.Status404NotFound);
+
         return group;
     }
 
@@ -87,5 +95,26 @@ public static class AnswerRoutes
                     TestId = testId,
                 },
             mapResponse: a => Results.Ok(a)
+        );
+
+    public static Task<IResult> EndTry(
+        [FromRoute] ulong userId,
+        [FromRoute] string classId,
+        [FromRoute] Guid testId,
+        [FromServices] FinishTryUseCase finishTryUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            finishTryUseCase,
+            mapRequest: () =>
+                new AnswerIdDTO
+                {
+                    UserId = userId,
+                    ClassId = classId,
+                    TestId = testId,
+                },
+            mapResponse: _ => Results.NoContent()
         );
 }

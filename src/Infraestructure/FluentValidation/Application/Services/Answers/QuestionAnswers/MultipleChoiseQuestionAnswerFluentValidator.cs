@@ -2,6 +2,7 @@ using Application.Services.Validators;
 using Domain.Entities.QuestionAnswers;
 using Domain.Entities.Questions;
 using FluentValidation;
+using FluentValidation.Results;
 using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Answers.QuestionAnswers;
@@ -13,9 +14,20 @@ public class MultipleChoiseQuestionAnswerFluentValidator
     public MultipleChoiseQuestionAnswerFluentValidator()
     {
         RuleFor(tuple => tuple.Item1.SelectedOption)
-            .NotNull()
-            .WithMessage("Campo requerido")
-            .Must((tuple, option) => tuple.Item2.Options.ContainsKey(option))
-            .WithMessage("No es una respuesta de la lista de opciones");
+            .Custom(
+                (option, ctx) =>
+                {
+                    if (!option.HasValue)
+                        return;
+
+                    if (ctx.InstanceToValidate.Item2.Options.ContainsKey(option.Value))
+                        return;
+
+                    var field = "SelectedOption";
+                    var message = "La opción seleccionada no corresponde a las opciones dispnibles";
+
+                    ctx.AddFailure(new ValidationFailure(field, message));
+                }
+            );
     }
 }

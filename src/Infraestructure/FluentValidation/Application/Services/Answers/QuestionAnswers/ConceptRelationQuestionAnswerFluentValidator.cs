@@ -15,40 +15,42 @@ public class ConceptRelationQuestionAnswerFluentValidator
     {
         RuleFor(answer => answer.Item1.AnsweredPairs)
             .Custom(
-                (pairsSet, ctx) =>
+                (answeredPairsSet, ctx) =>
                 {
-                    if (pairsSet is null)
-                        return;
+                    var questionColumA = new HashSet<string>(
+                        ctx.InstanceToValidate.Item2.Concepts.Count
+                    );
+                    var questionColumB = new HashSet<string>(
+                        ctx.InstanceToValidate.Item2.Concepts.Count
+                    );
 
-                    var pairs = pairsSet.ToList();
-                    var (_, question) = ctx.InstanceToValidate;
-                    var columnASet = new HashSet<string>(pairsSet.Count);
-                    var columnBSet = new HashSet<string>(pairsSet.Count);
-
-                    foreach (var (conceptA, conceptB) in pairsSet)
+                    foreach (var pair in ctx.InstanceToValidate.Item2.Concepts)
                     {
-                        columnASet.Add(conceptA);
-                        columnBSet.Add(conceptB);
+                        questionColumA.Add(pair.ConceptA);
+                        questionColumB.Add(pair.ConceptB);
                     }
 
-                    for (var i = 0; i < pairs.Count; i++)
+                    var idx = 0;
+                    foreach (var pair in answeredPairsSet)
                     {
-                        var answeredPair = pairs[i];
-                        if (!columnASet.Contains(answeredPair.ConceptA))
+                        var existsConceptA = questionColumA.Contains(pair.ConceptA);
+                        var existsConceptB = questionColumB.Contains(pair.ConceptB);
+
+                        if (!existsConceptA)
                         {
-                            var fieldName = $"{ctx.PropertyPath}[{i}].ConceptA";
-                            var message =
-                                $"El concepto '{answeredPair.ConceptA}' no es una opción de la primera columna.";
-                            ctx.AddFailure(new ValidationFailure(fieldName, message));
+                            var field = $"answeredPairs[{idx}].conceptA";
+                            var error = $"{pair.ConceptA} no es un valor válido";
+                            ctx.AddFailure(new ValidationFailure(field, error));
                         }
 
-                        if (!columnBSet.Contains(answeredPair.ConceptB))
+                        if (!existsConceptB)
                         {
-                            var fieldName = $"{ctx.PropertyPath}[{i}].ConceptB";
-                            var message =
-                                $"El concepto '{answeredPair.ConceptB}' no es una opción de la segunda columna.";
-                            ctx.AddFailure(new ValidationFailure(fieldName, message));
+                            var field = $"answeredPairs[{idx}].conceptB";
+                            var error = $"{pair.ConceptB} no es un valor válido";
+                            ctx.AddFailure(new ValidationFailure(field, error));
                         }
+
+                        idx += 1;
                     }
                 }
             );

@@ -14,8 +14,6 @@ public class MultipleSelectionQuestionAnswerFluentValidator
     public MultipleSelectionQuestionAnswerFluentValidator()
     {
         RuleFor(tuple => tuple.Item1.SelectedOptions)
-            .NotNull()
-            .WithMessage("Campo requerido")
             .Custom(
                 (optionsSet, ctx) =>
                 {
@@ -27,8 +25,8 @@ public class MultipleSelectionQuestionAnswerFluentValidator
                         var option = options[i];
                         if (!question.Options.ContainsKey(option))
                         {
-                            var fieldName = $"{ctx.PropertyPath}[{i}]";
-                            var message = $"La opcion {option} no es una opción válida";
+                            var fieldName = $"SelectedOptions[{i}]";
+                            var message = $"La opcion '{option}' no es una opción válida";
                             ctx.AddFailure(new ValidationFailure(fieldName, message));
                         }
                     }

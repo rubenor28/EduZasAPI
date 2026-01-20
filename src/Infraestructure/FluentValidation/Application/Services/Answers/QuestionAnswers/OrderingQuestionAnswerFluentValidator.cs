@@ -14,12 +14,6 @@ public sealed class OrderingQuestionAnswerFluentValidator
     public OrderingQuestionAnswerFluentValidator()
     {
         RuleFor(tuple => tuple.Item1.Sequence)
-            .NotNull()
-            .WithMessage("Campo requerido")
-            .NotEmpty()
-            .WithMessage("Campo requerido")
-            .Must((tuple, sequence) => tuple.Item2.Sequence.Count == sequence.Count)
-            .WithMessage("El número de opciones en la secuencia no corresponde a la del test")
             .Custom(
                 (answerSequence, ctx) =>
                 {

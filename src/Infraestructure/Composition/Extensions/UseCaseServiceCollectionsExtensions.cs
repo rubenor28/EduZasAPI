@@ -129,6 +129,7 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddScoped<AddAnswerUseCase>();
         s.AddScoped<ReadAnswerUseCase>();
         s.AddScoped<UpdateStudentAnswerUseCase>();
+        s.AddScoped<FinishTryUseCase>();
 
         return s;
     }

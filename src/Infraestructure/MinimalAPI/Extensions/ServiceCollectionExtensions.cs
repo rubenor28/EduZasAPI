@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Application.DTOs;
 using MinimalAPI.Application.DTOs.RateLimit;
 using MinimalAPI.Application.Services;
-using MinimalAPI.Application.Services;
 using MinimalAPI.Presentation.Routes;
 using Quartz;
 
