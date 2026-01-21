@@ -4,16 +4,16 @@ API para gestión del sistema educativo EduZas
 
 ## Prerequisitos
 
-### Opción 1: Dev Container (Recomendado para desarrollo)
+### Opción 1: Dev Container
 
 - **Visual Studio Code** con la extensión **Dev Containers**
 - **Docker** instalado en tu sistema
 
 ### Opción 2: Manual
 
-- **MariaDB** ≥ 12.0.2
-- **.NET 9.0 SDK**
-- **ASP.NET Core 9.0**
+- **MariaDB LTS**
+- **.NET 10.0 SDK**
+- **ASP.NET Core 10.0**
 
 ## Estructura del proyecto (Clean Architecture)
 
@@ -48,7 +48,7 @@ El proyecto sigue los principios de Clean Architecture organizándose en las sig
    - O haz clic en el botón "Reopen in Container" cuando aparezca en la esquina inferior derecha
 
 2. **El contenedor de desarrollo incluye:**
-   - .NET 9.0 SDK preinstalado
+   - .NET 10.0 SDK preinstalado
    - Todas las dependencias del proyecto configuradas
    - Extensiones útiles de VS Code para desarrollo .NET
    - Entorno de desarrollo consistente para todo el equipo
@@ -61,11 +61,9 @@ El proyecto sigue los principios de Clean Architecture organizándose en las sig
 git clone https://github.com/tu-usuario/EduZasAPI.git
 ```
 
-2. Instalar .NET 9.0 SDK desde [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/9.0)
+2. Instalar .NET 10.0 SDK desde [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/10.0)
 
-3. Configurar la base de datos. Dentro de `EduZasAPI.Infraestructure.MinimalAPI` existen ejemplos tanto
-   para producción como desarrollo, y algunos test también requiren las variables de entorno definidas
-   en el `.env.example` en un archivo `.env`
+3. Configurar la base de datos y variables de entorno tomando como base el `.env.example`
 
 ## Despliegue
 
@@ -79,22 +77,6 @@ git clone https://github.com/tu-usuario/EduZasAPI.git
 dotnet run --project src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.MinimalAPI/EduZasAPI.Infraestructure.MinimalAPI.csproj
 ```
 
-### Comandos de desarrollo
-
-```bash
-# Ejecutar tests
-dotnet test
-
-# Restaurar dependencias
-dotnet restore
-
-# Compilar proyecto
-dotnet build
-
-# Ejecutar con hot reload (desarrollo)
-dotnet watch run --project src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.MinimalAPI/EduZasAPI.Infraestructure.MinimalAPI.csproj
-```
-
 ### Documentación de la API
 
 Una vez ejecutada la aplicación, la documentación Swagger estará disponible en:
@@ -105,5 +87,4 @@ Accesible desde cualquier navegador web.
 
 ### Configuración de dependencias
 
-La inyección de dependencias está configurada en:
-`src/EduZasAPI.Infraestructure/EduZasAPI.Infraestructure.MinimalAPI/Extensions/`
+La inyección de dependencias está configurada en: `./src/Infraestructure/Composition`
