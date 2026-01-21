@@ -1,5 +1,5 @@
 {
-  "name": "EduZas API .NET 9.0",
+  "name": "EduZas API .NET 10.0",
   "dockerComposeFile": "docker-compose.yml",
   "service": "dev",
   "workspaceFolder": "/workspace",
