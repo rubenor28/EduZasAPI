@@ -1,0 +1,29 @@
+meta {
+  name: Search classes
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:5018/classes/all
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "page": 1,
+    "pageSize": 1,
+    "active": null,
+    "className": null,
+    "subject": null,
+    "section": null,
+    "withProfessor": null,
+    "withStudent": null
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,35 @@
+meta {
+  name: create test
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5018/test
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "string",
+    "color": "string",
+    "content": {
+      "50a622d3-c5e7-4644-ada8-7cc1d7b29f00": {
+        "type": "open",
+        "Title": "Nueva pregunta",
+        "ImageUrl": null
+      },
+      "019bd3f3-8035-7f9b-acf9-d5f6cb16ada5": {
+        
+      }
+    },
+    "timeLimitMinutes": null,
+    "professorId": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

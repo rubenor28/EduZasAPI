@@ -146,6 +146,7 @@ CREATE TABLE tests (
 CREATE TABLE tests_per_class (
     test_id BINARY(16) NOT NULL,
     class_id CHAR(20) NOT NULL,
+    allow_modify_answers TINYINT(1) NOT NULL DEFAULT 1;
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (test_id, class_id),
     KEY idx_tests_per_class_class (class_id),
@@ -161,8 +162,10 @@ CREATE TABLE answer (
     test_id BINARY(16) NOT NULL,
     class_id CHAR(20) NOT NULL,
     user_id BIGINT UNSIGNED NOT NULL,
-    content JSON,
-    metadata JSON,
+    graded TINYINT(1) NOT NULL DEFAULT 0,
+    try_finished TINYINT(1) NOT NULL DEFAULT 0,
+    content JSON NOT NULL,
+    metadata JSON NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (test_id, class_id, user_id),

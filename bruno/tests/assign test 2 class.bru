@@ -1,0 +1,23 @@
+meta {
+  name: assign test 2 class
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:5018/tests/classes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "testId": "019bd3f3-8035-7f9b-acf9-d5f6cb16ada5",
+    "classId": "VUHv3gejkun3FgJ"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,27 @@
+meta {
+  name: update class
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:5018/classes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "VUHv3gejkun3FgJ",
+    "active": true,
+    "className": "Clase test preguntas",
+    "subject": "string",
+    "section": "string",
+    "color": "string"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

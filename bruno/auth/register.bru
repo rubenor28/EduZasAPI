@@ -1,0 +1,26 @@
+meta {
+  name: register
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:5018/auth/sign-in
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "string",
+    "fatherLastname": "string",
+    "email": "admin@test.com",
+    "password": "Contraseña1",
+    "role": 0
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

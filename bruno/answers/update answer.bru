@@ -1,0 +1,67 @@
+meta {
+  name: update answer
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:5018/answers
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "userId": 2,
+    "testId": "019bd3f3-8035-7f9b-acf9-d5f6cb16ada5",
+    "classId": "VUHv3gejkun3FgJ",
+    "content": {
+      "50a622d3-c5e7-4644-ada8-7cc1d7b29f00": {
+        "type": "open",
+        "text": ""
+      },
+      "693e6bb6-8a2b-4bc0-953d-d0f0f4a45faf": {
+        "type": "multiple-choise",
+        "selectedOption": "1d5de8a5-89b8-4b1c-a220-2ef641170000"
+      },
+      "56e1dde0-35b8-4492-bebb-845faf1bcdf8": {
+        "type": "multiple-selection",
+        "selectedOptions": [
+          "a4a1bb4a-0d96-4751-b182-722515dae000",
+          "af8bd12c-3fc5-4dae-9aa0-53abecbcc000",
+          "b39cddc3-55f0-485e-b42e-27d62f562000"
+        ]
+      },
+      "8b42720c-c80a-4097-b3c9-2813a92fcafe": {
+        "type": "ordering",
+        "sequence": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      "60be6af2-2019-44cd-8c08-3536aa7995c4": {
+        "type": "concept-relation",
+        "answeredPairs": [
+          {
+            "conceptA": "z",
+            "conceptB": "A"
+          },
+          {
+            "conceptA": "B",
+            "conceptB": "z"
+          },
+          {
+            "conceptA": "z",
+            "conceptB": "z"
+          }
+        ]
+      }
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

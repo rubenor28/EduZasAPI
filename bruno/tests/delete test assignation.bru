@@ -1,0 +1,21 @@
+meta {
+  name: delete test assignation
+  type: http
+  seq: 6
+}
+
+delete {
+  url: http://localhost:5018/tests/:testId/:classId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  testId: 019bd3f3-8035-7f9b-acf9-d5f6cb16ada5
+  classId: VUHv3gejkun3FgJ
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

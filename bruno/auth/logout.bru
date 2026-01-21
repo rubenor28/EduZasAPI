@@ -1,0 +1,26 @@
+meta {
+  name: logout
+  type: http
+  seq: 3
+}
+
+delete {
+  url: http://localhost:5018/auth/logout
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "string",
+    "fatherLastname": "string",
+    "email": "admin@test.com",
+    "password": "Contraseña1",
+    "role": 0
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
