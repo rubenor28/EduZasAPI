@@ -4,32 +4,19 @@ namespace Domain.ValueObjects.Grades;
 
 public record ConceptRelationGrade : Grade
 {
+    public override uint TotalPoints => (uint)Pairs.Count;
     public required string Title { get; init; }
     public required IList<ConceptPair> Pairs { get; init; }
     public required IList<ConceptPair> AnsweredPairs { get; init; }
 
-    public override uint CalculateAsserts
+    public override uint Asserts()
     {
-        get
-        {
-            if (ManualGrade == true)
-                return (uint)Pairs.Count;
+        if (ManualGrade == true)
+            return (uint)Pairs.Count;
 
-            if (Pairs.Count != AnsweredPairs.Count)
-                throw new InvalidOperationException("Los tamaños de las listas no coinciden");
+        if (Pairs.Count != AnsweredPairs.Count)
+            throw new InvalidOperationException("The sizes of the lists do not match");
 
-            var points = 0u;
-            for (var i = 0; i < Pairs.Count; i++)
-            {
-                if (Pairs[i] == AnsweredPairs[i])
-                    break;
-
-                points += 1;
-            }
-
-            return points;
-        }
+        return (uint)AnsweredPairs.Intersect(Pairs).Count();
     }
-
-    public override uint TotalPoints => (uint)Pairs.Count;
 }
