@@ -67,6 +67,7 @@ app.MapNotificationRoutes();
 app.MapResourceRoutes();
 app.MapTestRoutes();
 app.MapAnswerRoutes();
+app.MapReportRoutes();
 
 app.MapGet("/quartz-status", async (Quartz.ISchedulerFactory schedulerFactory) =>
 {

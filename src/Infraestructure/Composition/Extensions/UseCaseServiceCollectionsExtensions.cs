@@ -1,3 +1,4 @@
+using Application.Services.Graders;
 using Application.UseCases.Answers;
 using Application.UseCases.Auth;
 using Application.UseCases.ClassContent;
@@ -129,6 +130,9 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddScoped<ReadAnswerUseCase>();
         s.AddScoped<UpdateStudentAnswerUseCase>();
         s.AddScoped<FinishTryUseCase>();
+
+        // Reports
+        s.AddScoped<AnswerGradeUseCase>();
 
         return s;
     }

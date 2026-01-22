@@ -1,0 +1,22 @@
+meta {
+  name: Exam grade
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:5018/reports/answer/:userId/:classId/:testId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  userId: 17
+  classId: FKyWrFcmxfzI1Xh
+  testId: 019be6f7-50c3-733c-84c1-faaefd4717ff
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

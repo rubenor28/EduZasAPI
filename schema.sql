@@ -146,7 +146,7 @@ CREATE TABLE tests (
 CREATE TABLE tests_per_class (
     test_id BINARY(16) NOT NULL,
     class_id CHAR(20) NOT NULL,
-    allow_modify_answers TINYINT(1) NOT NULL DEFAULT 1;
+    allow_modify_answers TINYINT(1) NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (test_id, class_id),
     KEY idx_tests_per_class_class (class_id),
