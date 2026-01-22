@@ -1,8 +1,6 @@
 using Application.DAOs;
-using Application.DTOs;
 using Application.DTOs.Answers;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
@@ -75,7 +73,7 @@ public sealed class AddAnswerUseCase(
             new() { TestId = value.Data.TestId, ClassId = value.Data.ClassId }
         );
 
-        if (classTest is null)
+        if (classTest is null || !classTest.AllowModifyAnswers)
             return UseCaseErrors.Unauthorized();
 
         var student = await _studentReader.GetAsync(

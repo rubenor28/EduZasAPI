@@ -1,11 +1,10 @@
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.DTOs.ContactTags;
 using Application.UseCases.ContactTags;
 using Domain.Enums;
 using EntityFramework.Application.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 namespace Tests.Application.UseCases.ContactTags;
 

@@ -1,3 +1,5 @@
+namespace Domain.ValueObjects;
+
 /// <summary>
 /// Representa un mensaje de correo electrónico.
 /// </summary>

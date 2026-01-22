@@ -17,6 +17,15 @@ public sealed class OrderingQuestionAnswerFluentValidator
             .Custom(
                 (answerSequence, ctx) =>
                 {
+                    if (ctx.InstanceToValidate.Item2.Sequence.Count != answerSequence.Count)
+                    {
+                        var field = $"Sequence";
+                        var message =
+                            "El número de elementos no corresponde al esperado en la pregunta";
+
+                        ctx.AddFailure(new ValidationFailure(field, message));
+                    }
+
                     var sequence = ctx.InstanceToValidate.Item2.Sequence.ToHashSet();
                     for (var i = 0; i < answerSequence.Count; i++)
                     {

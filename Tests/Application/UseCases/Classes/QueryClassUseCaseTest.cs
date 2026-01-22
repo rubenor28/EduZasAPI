@@ -1,8 +1,8 @@
 using Application.DTOs.Classes;
-using Application.DTOs.Common;
 using Application.UseCases.Classes;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.Classes;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
@@ -10,7 +10,7 @@ using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationTest.Classes;
+namespace Tests.Application.UseCases.Classes;
 
 public class QueryClassUseCaseTest : IDisposable
 {

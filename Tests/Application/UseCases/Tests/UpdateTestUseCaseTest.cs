@@ -1,13 +1,13 @@
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.DTOs.Tests;
 using Application.UseCases.Tests;
 using Domain.Entities;
 using Domain.Entities.Questions;
 using Domain.Enums;
-using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 using Application.DAOs;
 using Application.Services.Validators;
+using Application.DTOs.Answers;
 
 namespace Tests.Application.UseCases.Tests;
 

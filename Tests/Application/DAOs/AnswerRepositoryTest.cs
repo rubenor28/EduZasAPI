@@ -308,7 +308,7 @@ public class AnswerRepositoryTest : BaseTest
             TestId = test.Id,
             Metadata = new AnswerMetadata
             {
-                ManualMarkAsCorrect = new HashSet<Guid> { questionId },
+                ManualGrade = new Dictionary<Guid, bool> { { questionId, true } },
             },
         };
 
@@ -317,10 +317,10 @@ public class AnswerRepositoryTest : BaseTest
         // Assert
         Assert.NotNull(updated);
         Assert.NotNull(updated.Metadata);
-        Assert.Single(updated.Metadata.ManualMarkAsCorrect);
-        Assert.Contains(questionId, updated.Metadata.ManualMarkAsCorrect);
+        Assert.Single(updated.Metadata.ManualGrade);
+        Assert.Contains(questionId, updated.Metadata.ManualGrade);
     }
-    
+
     [Fact]
     public async Task GetByAsync_WithCriteria_ReturnsMatchingAnswer()
     {
@@ -332,14 +332,28 @@ public class AnswerRepositoryTest : BaseTest
         var student1 = await SeedUser(UserType.STUDENT);
         var student2 = await SeedUser(UserType.STUDENT);
 
-        await _creator.AddAsync(new AnswerIdDTO { ClassId = cls.Id, TestId = test.Id, UserId = student1.Id });
-        await _creator.AddAsync(new AnswerIdDTO { ClassId = cls.Id, TestId = test.Id, UserId = student2.Id });
+        await _creator.AddAsync(
+            new AnswerIdDTO
+            {
+                ClassId = cls.Id,
+                TestId = test.Id,
+                UserId = student1.Id,
+            }
+        );
+        await _creator.AddAsync(
+            new AnswerIdDTO
+            {
+                ClassId = cls.Id,
+                TestId = test.Id,
+                UserId = student2.Id,
+            }
+        );
 
         var criteria = new AnswerCriteriaDTO
         {
             UserId = student1.Id,
             ClassId = cls.Id,
-            TestId = test.Id
+            TestId = test.Id,
         };
 
         // Act
@@ -366,13 +380,24 @@ public class AnswerRepositoryTest : BaseTest
         await SeedClassTest(classId: cls.Id, testId: test2.Id);
         var student = await SeedUser(UserType.STUDENT);
 
-        await _creator.AddAsync(new AnswerIdDTO { ClassId = cls.Id, TestId = test1.Id, UserId = student.Id });
-        await _creator.AddAsync(new AnswerIdDTO { ClassId = cls.Id, TestId = test2.Id, UserId = student.Id });
+        await _creator.AddAsync(
+            new AnswerIdDTO
+            {
+                ClassId = cls.Id,
+                TestId = test1.Id,
+                UserId = student.Id,
+            }
+        );
+        await _creator.AddAsync(
+            new AnswerIdDTO
+            {
+                ClassId = cls.Id,
+                TestId = test2.Id,
+                UserId = student.Id,
+            }
+        );
 
-        var criteria = new AnswerCriteriaDTO
-        {
-            TestOwnerId = professor1.Id,
-        };
+        var criteria = new AnswerCriteriaDTO { TestOwnerId = professor1.Id };
 
         // Act
         var result = await _querier.GetByAsync(criteria);

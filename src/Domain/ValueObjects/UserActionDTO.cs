@@ -1,6 +1,4 @@
-using Application.DTOs.Common;
-
-namespace Application.DTOs;
+namespace Domain.ValueObjects;
 
 /// <summary>
 /// Envuelve una acción realizada por un usuario.

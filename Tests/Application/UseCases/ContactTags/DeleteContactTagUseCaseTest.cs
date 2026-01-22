@@ -1,4 +1,4 @@
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.UseCases.ContactTags;
 using Domain.Entities;
 using Domain.Enums;

@@ -9,6 +9,7 @@
 !/.devcontainer/
 !/.devcontainer/**
 !/bruno/
+!/bruno/**
 
 # Archivos
 !/run.sh

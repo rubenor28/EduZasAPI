@@ -1,6 +1,6 @@
-using Application.DTOs.Common;
 using Application.UseCases.Auth;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.Auth;
@@ -70,3 +70,4 @@ public class ReadUserUseCaseTest : BaseTest
         Assert.Contains(error.Errors, e => e.Field == "id" && e.Message == "Id debe ser mayor a 0");
     }
 }
+

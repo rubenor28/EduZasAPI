@@ -21,6 +21,11 @@ public sealed class ClassTestDomain
     public required string ClassId { get; set; }
 
     /// <summary>
+    /// Flag que determina si una evaluación admite nuevas respuestas o modificar las existentes
+    /// </summary>
+    public required bool AllowModifyAnswers { get; set; }
+
+    /// <summary>
     /// Obtiene o establece la fecha y hora de creación de la asignación.
     /// </summary>
     public required DateTimeOffset CreatedAt { get; set; }

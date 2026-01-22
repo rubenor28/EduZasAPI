@@ -4,7 +4,6 @@ using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassResources;
 using Application.DTOs.ClassStudents;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
@@ -159,8 +158,9 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>, ClassTestAssociationProjector>();
         
         // Class Tests
-        s.AddSingleton<IMapper<ClassTestDTO, TestPerClass>, NewClassTestEFMapper>();
+        s.AddSingleton<IMapper<ClassTestIdDTO, TestPerClass>, NewClassTestEFMapper>();
         s.AddSingleton<IMapper<TestPerClass, ClassTestDomain>, ClassTestMapper>();
+        s.AddSingleton<IUpdateMapper<ClassTestUpdateDTO, TestPerClass>, ClassTestUpdateMapper>();
 
         // Resource
         // EF

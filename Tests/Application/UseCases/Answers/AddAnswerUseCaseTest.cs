@@ -1,7 +1,7 @@
 using Application.DTOs.Answers;
-using Application.DTOs.Common;
 using Application.UseCases.Answers;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.UseCases.Answers;

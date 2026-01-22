@@ -1,11 +1,9 @@
 using Application.DAOs;
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.DTOs.UserNotifications;
 using Application.UseCases.UserNotifications;
 using Domain.Entities;
-using Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 namespace Tests.Application.UseCases.Notifications;
 

@@ -1,7 +1,5 @@
 using Application.DAOs;
-using Application.DTOs;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.Services;
 using Application.Services.Validators;
@@ -18,7 +16,7 @@ namespace Application.UseCases.ClassTests;
 /// Caso de uso para asociar una evaluación a una clase.
 /// </summary>
 public sealed class AddClassTestUseCase(
-    ICreatorAsync<ClassTestDomain, ClassTestDTO> creator,
+    ICreatorAsync<ClassTestDomain, ClassTestIdDTO> creator,
     IReaderAsync<Guid, TestDomain> testReader,
     IReaderAsync<string, ClassDomain> classReader,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> classTestReader,
@@ -27,8 +25,8 @@ public sealed class AddClassTestUseCase(
     IQuerierAsync<UserDomain, UserCriteriaDTO> userQuierier,
     ITaskScheduler scheduler,
     IConfiguration cfg,
-    IBusinessValidationService<ClassTestDTO>? validator = null
-) : AddUseCase<ClassTestDTO, ClassTestDomain>(creator, validator)
+    IBusinessValidationService<ClassTestIdDTO>? validator = null
+) : AddUseCase<ClassTestIdDTO, ClassTestDomain>(creator, validator)
 {
     private readonly IReaderAsync<Guid, TestDomain> _testReader = testReader;
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
@@ -47,7 +45,7 @@ public sealed class AddClassTestUseCase(
 
     /// <inheritdoc/>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
-        UserActionDTO<ClassTestDTO> value
+        UserActionDTO<ClassTestIdDTO> value
     )
     {
         List<FieldErrorDTO> errors = [];
@@ -116,7 +114,7 @@ public sealed class AddClassTestUseCase(
     }
 
     protected override async Task ExtraTaskAsync(
-        UserActionDTO<ClassTestDTO> dto,
+        UserActionDTO<ClassTestIdDTO> dto,
         ClassTestDomain created
     )
     {

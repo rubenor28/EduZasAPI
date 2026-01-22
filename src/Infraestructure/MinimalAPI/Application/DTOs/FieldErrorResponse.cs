@@ -1,4 +1,4 @@
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 
 namespace MinimalAPI.Application.DTOs;
 

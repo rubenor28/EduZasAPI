@@ -2,7 +2,7 @@ using Application.DAOs;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
@@ -29,7 +29,7 @@ public abstract class BaseTest : IDisposable
     protected readonly ICreatorAsync<ClassProfessorDomain, NewClassProfessorDTO> _classProfessorCreator;
     protected readonly ICreatorAsync<ClassStudentDomain, UserClassRelationId> _classStudentCreator;
     protected readonly ICreatorAsync<TestDomain, NewTestDTO> _testCreator;
-    protected readonly ICreatorAsync<ClassTestDomain, ClassTestDTO> _classTestCreator;
+    protected readonly ICreatorAsync<ClassTestDomain, ClassTestIdDTO> _classTestCreator;
     protected readonly ICreatorAsync<ContactDomain, NewContactDTO> _contactCreator;
     protected readonly ICreatorAsync<TagDomain, NewTagDTO> _tagCreator;
     protected readonly ICreatorAsync<ContactTagDomain, NewContactTagDTO> _contactTagCreator;
@@ -45,7 +45,7 @@ public abstract class BaseTest : IDisposable
         _classProfessorCreator = _sp.GetRequiredService<ICreatorAsync<ClassProfessorDomain, NewClassProfessorDTO>>();
         _classStudentCreator = _sp.GetRequiredService<ICreatorAsync<ClassStudentDomain, UserClassRelationId>>();
         _testCreator = _sp.GetRequiredService<ICreatorAsync<TestDomain, NewTestDTO>>();
-        _classTestCreator = _sp.GetRequiredService<ICreatorAsync<ClassTestDomain, ClassTestDTO>>();
+        _classTestCreator = _sp.GetRequiredService<ICreatorAsync<ClassTestDomain, ClassTestIdDTO>>();
         _contactCreator = _sp.GetRequiredService<ICreatorAsync<ContactDomain, NewContactDTO>>();
         _tagCreator = _sp.GetRequiredService<ICreatorAsync<TagDomain, NewTagDTO>>();
         _contactTagCreator = _sp.GetRequiredService<ICreatorAsync<ContactTagDomain, NewContactTagDTO>>();

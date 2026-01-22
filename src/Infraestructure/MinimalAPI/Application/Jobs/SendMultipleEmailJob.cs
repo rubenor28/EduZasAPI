@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Application.Services;
+using Domain.ValueObjects;
 using Quartz;
 
 namespace MinimalAPI.Application.Jobs;

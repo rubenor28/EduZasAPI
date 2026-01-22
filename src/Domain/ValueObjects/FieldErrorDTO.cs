@@ -1,4 +1,4 @@
-namespace Application.DTOs.Common;
+namespace Domain.ValueObjects;
 
 /// <summary>
 /// Representa un error de validación asociado a un campo específico en una operación.

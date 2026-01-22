@@ -1,8 +1,6 @@
 using Application.DAOs;
-using Application.DTOs;
 using Application.DTOs.Answers;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
@@ -41,10 +39,13 @@ public sealed class UpdateStudentAnswerUseCase(
         AnswerDomain original
     )
     {
+        if (original.TryFinished)
+            return UseCaseErrors.Conflict("La respuesta no puede modificarse");
+
         var authorized = value.Executor.Role switch
         {
             UserType.ADMIN => true,
-            _ => await IsCommonUserAuthorized(value, original),
+            _ => await IsCommonUserAuthorized(value),
         };
 
         if (!authorized)
@@ -63,15 +64,17 @@ public sealed class UpdateStudentAnswerUseCase(
         return Unit.Value;
     }
 
-    private async Task<bool> IsCommonUserAuthorized(
-        UserActionDTO<AnswerUpdateStudentDTO> value,
-        AnswerDomain original
-    )
+    private async Task<bool> IsCommonUserAuthorized(UserActionDTO<AnswerUpdateStudentDTO> value)
     {
-        if (original.TryFinished)
-            return false;
+        var classTest =
+            await _classTestReader.GetAsync(
+                new() { ClassId = value.Data.ClassId, TestId = value.Data.TestId }
+            )
+            ?? throw new InvalidDataException(
+                $"El la relacion clase - evaluacion con ID de clase {value.Data.ClassId} y ID de evaluación {value.Data.TestId} deberia existir en este punto"
+            );
 
-        if (value.Data.UserId != value.Executor.Id)
+        if (value.Data.UserId != value.Executor.Id || !classTest.AllowModifyAnswers)
             return false;
 
         var test =
@@ -82,14 +85,6 @@ public sealed class UpdateStudentAnswerUseCase(
 
         if (test.TimeLimitMinutes is null)
             return true;
-
-        var classTest =
-            await _classTestReader.GetAsync(
-                new() { ClassId = value.Data.ClassId, TestId = value.Data.TestId }
-            )
-            ?? throw new InvalidDataException(
-                $"El la relacion clase - evaluacion con ID de clase {value.Data.ClassId} y ID de evaluación {value.Data.TestId} deberia existir en este punto"
-            );
 
         var startTime = classTest.CreatedAt.ToUniversalTime();
         var timeLimit = TimeSpan.FromMinutes(test.TimeLimitMinutes.Value);

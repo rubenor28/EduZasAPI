@@ -1,9 +1,9 @@
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.UseCases.ClassTests;
 using Application.UseCases.Tests;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs;
 using MinimalAPI.Presentation.Filters;
@@ -279,7 +279,7 @@ public static class TestRoutes
         );
 
     public static Task<IResult> AddClassTest(
-        [FromBody] ClassTestDTO newClassTest,
+        [FromBody] ClassTestIdDTO newClassTest,
         [FromServices] AddClassTestUseCase addClassTestUseCase,
         [FromServices] RoutesUtils utils,
         HttpContext ctx

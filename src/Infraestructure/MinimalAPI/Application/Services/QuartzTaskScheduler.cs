@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Application.DTOs.Notifications;
 using Application.Services;
+using Domain.ValueObjects;
 using MinimalAPI.Application.Jobs;
 using Quartz;
 

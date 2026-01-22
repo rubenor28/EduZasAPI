@@ -1,9 +1,9 @@
-using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Application.UseCases.Users;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.Auth;
@@ -97,3 +97,4 @@ public class LoginUseCaseTest : BaseTest
         Assert.Contains(((InputError)err).Errors, e => e.Field == "email");
     }
 }
+

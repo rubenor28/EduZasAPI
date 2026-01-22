@@ -1,6 +1,5 @@
 using Application.DAOs;
 using Application.DTOs.Answers;
-using Application.DTOs.Common;
 using Application.Services.Validators;
 using Application.UseCases.Common;
 using Domain.Entities;
@@ -15,7 +14,7 @@ public class ReadAnswerUseCase(
 ) : ReadUseCase<AnswerIdDTO, AnswerDomain>(reader, validator)
 {
     protected override Result<Unit, UseCaseError> ExtraValidation(
-        DTOs.UserActionDTO<AnswerIdDTO> value
+        UserActionDTO<AnswerIdDTO> value
     )
     {
         var authorized = value.Executor.Role switch

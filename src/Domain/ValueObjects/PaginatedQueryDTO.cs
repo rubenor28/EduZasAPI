@@ -1,4 +1,4 @@
-namespace Application.DTOs.Common;
+namespace Domain.ValueObjects;
 
 /// <summary>
 /// Representa el resultado de una consulta paginada con criterios específicos.

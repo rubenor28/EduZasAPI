@@ -1,5 +1,4 @@
 using Application.DAOs;
-using Application.DTOs.Common;
 using Application.DTOs.UserNotifications;
 using Application.Services.Validators;
 using Application.UseCases.Common;
@@ -29,7 +28,7 @@ public sealed class UpdateUserNotificationUseCase(
 
     /// <inheritdoc/>
     protected override Result<Unit, UseCaseError> ExtraValidation(
-        DTOs.UserActionDTO<UserNotificationUpdateDTO> value,
+        UserActionDTO<UserNotificationUpdateDTO> value,
         UserNotificationDomain original
     )
     {

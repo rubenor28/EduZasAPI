@@ -1,4 +1,4 @@
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.DTOs.Notifications;
 using Application.DTOs.UserNotifications;
 using Application.UseCases.Notifications;

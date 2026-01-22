@@ -1,8 +1,8 @@
 ﻿using Application.DAOs;
-using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.DAOs;

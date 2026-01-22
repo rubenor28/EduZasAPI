@@ -1,5 +1,5 @@
 using Application.DAOs;
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Common;
 using Microsoft.EntityFrameworkCore;

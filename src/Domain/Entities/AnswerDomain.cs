@@ -4,7 +4,7 @@ namespace Domain.Entities;
 
 public record AnswerMetadata
 {
-    public ISet<Guid> ManualMarkAsCorrect { get; init; } = new HashSet<Guid>();
+    public IDictionary<Guid, bool> ManualGrade { get; init; } = new Dictionary<Guid, bool>();
 }
 
 public class AnswerDomain

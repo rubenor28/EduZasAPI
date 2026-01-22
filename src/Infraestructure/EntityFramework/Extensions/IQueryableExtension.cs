@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using Application.DTOs.Common;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFramework.Extensions;

@@ -12,6 +12,6 @@ namespace EntityFramework.Application.DAOs.ClassTests;
 public sealed class ClassTestEFCreator(
     EduZasDotnetContext ctx,
     IMapper<TestPerClass, ClassTestDomain> domainMapper,
-    IMapper<ClassTestDTO, TestPerClass> newEntityMapper
-) : EFCreator<ClassTestDomain, ClassTestDTO, TestPerClass>(ctx, domainMapper, newEntityMapper);
+    IMapper<ClassTestIdDTO, TestPerClass> newEntityMapper
+) : EFCreator<ClassTestDomain, ClassTestIdDTO, TestPerClass>(ctx, domainMapper, newEntityMapper);
 

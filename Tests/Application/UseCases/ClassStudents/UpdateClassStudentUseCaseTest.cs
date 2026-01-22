@@ -1,8 +1,8 @@
 using Application.DTOs.ClassStudents;
-using Application.DTOs.Common;
 using Application.UseCases.ClassStudents;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.ClassStudents;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
@@ -11,7 +11,7 @@ using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationTest.ClassStudents;
+namespace Tests.Application.UseCases.ClassStudents;
 
 public class UpdateClassStudentUseCaseTest : IDisposable
 {

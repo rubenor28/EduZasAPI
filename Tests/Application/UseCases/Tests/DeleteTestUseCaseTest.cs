@@ -1,9 +1,7 @@
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.UseCases.Tests;
 using Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace Tests.Application.UseCases.Tests;
 

@@ -1,7 +1,7 @@
-using Application.DTOs.Common;
 using Application.UseCases.ClassProfessors;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using EntityFramework.Application.DAOs.ClassProfessors;
 using EntityFramework.Application.DTOs;
 using EntityFramework.InterfaceAdapters.Mappers.Classes;
@@ -10,7 +10,7 @@ using EntityFramework.InterfaceAdapters.Mappers.Users;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApplicationTest.ClassProfessors;
+namespace Tests.Application.UseCases.ClassProfessors;
 
 public class DeleteClassProfessorUseCaseTest : IDisposable
 {

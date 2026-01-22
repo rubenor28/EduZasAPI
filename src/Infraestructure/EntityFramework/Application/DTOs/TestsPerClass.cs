@@ -9,6 +9,8 @@ public partial class TestPerClass
 
     public string ClassId { get; set; } = null!;
 
+    public required bool AllowModifyAnswers { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; }
 
     public virtual Class Class { get; set; } = null!;

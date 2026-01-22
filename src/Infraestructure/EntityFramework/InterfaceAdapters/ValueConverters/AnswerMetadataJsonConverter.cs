@@ -14,8 +14,6 @@ public class AnswerMetadataJsonConverter : ValueConverter<AnswerMetadata, string
     public AnswerMetadataJsonConverter()
         : base(
             v => JsonSerializer.Serialize(v, _jsonOptions),
-            v =>
-                JsonSerializer.Deserialize<AnswerMetadata>(v, _jsonOptions)
-                ?? new AnswerMetadata { ManualMarkAsCorrect = new HashSet<Guid>() }
+            v => JsonSerializer.Deserialize<AnswerMetadata>(v, _jsonOptions) ?? new AnswerMetadata()
         ) { }
 }

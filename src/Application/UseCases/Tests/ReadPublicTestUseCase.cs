@@ -1,7 +1,5 @@
 using Application.DAOs;
-using Application.DTOs;
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.DTOs.Tests;
 using Application.UseCases.Common;
 using Domain.Entities;

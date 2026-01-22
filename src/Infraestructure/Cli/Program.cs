@@ -1,9 +1,9 @@
 using Application.DAOs;
-using Application.DTOs.Common;
 using Application.UseCases.Users;
 using Composition;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using DotNetEnv;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,6 @@
 using Domain.Enums;
 
-namespace Application.DTOs.Common;
+namespace Domain.ValueObjects;
 
 /// <summary>
 /// Representa una consulta de texto con un tipo específico de búsqueda a aplicar.

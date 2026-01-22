@@ -1,6 +1,4 @@
 using Application.DAOs;
-using Application.DTOs;
-using Application.DTOs.Common;
 using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Tags;

@@ -1,9 +1,9 @@
 using Application.DTOs.ClassResources;
-using Application.DTOs.Common;
 using Application.DTOs.Resources;
 using Application.UseCases.ClassResource;
 using Application.UseCases.Resources;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Application.DTOs;
 using MinimalAPI.Presentation.Filters;

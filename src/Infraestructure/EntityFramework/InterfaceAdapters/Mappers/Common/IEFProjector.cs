@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 
 namespace EntityFramework.InterfaceAdapters.Mappers.Common;
 

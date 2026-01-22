@@ -1,7 +1,7 @@
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.UseCases.ClassTests;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.UseCases.ClassTests;
@@ -23,7 +23,7 @@ public class AddClassTestUseCaseTest : BaseTest
         var cls = await SeedClass(ownerId: professor.Id);
         var test = await SeedTest(professor.Id);
 
-        var dto = new ClassTestDTO { ClassId = cls.Id, TestId = test.Id };
+        var dto = new ClassTestIdDTO { ClassId = cls.Id, TestId = test.Id };
 
         var result = await _useCase.ExecuteAsync(
             new() { Data = dto, Executor = AsExecutor(admin) }
@@ -42,7 +42,7 @@ public class AddClassTestUseCaseTest : BaseTest
         var test = await SeedTest(professorId: professor.Id);
         // Note: Professor is NOT seeded into the class
 
-        var dto = new ClassTestDTO { ClassId = cls.Id, TestId = test.Id };
+        var dto = new ClassTestIdDTO { ClassId = cls.Id, TestId = test.Id };
 
         var result = await _useCase.ExecuteAsync(
             new() { Data = dto, Executor = AsExecutor(admin) }
@@ -59,7 +59,7 @@ public class AddClassTestUseCaseTest : BaseTest
         var cls = await SeedClass(ownerId: professor.Id);
         var test = await SeedTest(professor.Id);
 
-        var dto = new ClassTestDTO { ClassId = cls.Id, TestId = test.Id };
+        var dto = new ClassTestIdDTO { ClassId = cls.Id, TestId = test.Id };
 
         var result = await _useCase.ExecuteAsync(
             new() { Data = dto, Executor = AsExecutor(professor) }
@@ -73,7 +73,7 @@ public class AddClassTestUseCaseTest : BaseTest
     {
         var professor = await SeedUser(UserType.PROFESSOR);
         var test = await SeedTest(professor.Id);
-        var dto = new ClassTestDTO { ClassId = "non-existent", TestId = test.Id };
+        var dto = new ClassTestIdDTO { ClassId = "non-existent", TestId = test.Id };
 
         var result = await _useCase.ExecuteAsync(
             new() { Data = dto, Executor = AsExecutor(professor) }
@@ -91,7 +91,7 @@ public class AddClassTestUseCaseTest : BaseTest
         var cls = await SeedClass(professor.Id);
         var test = await SeedTest(professor.Id);
 
-        var dto = new ClassTestDTO { ClassId = cls.Id, TestId = test.Id };
+        var dto = new ClassTestIdDTO { ClassId = cls.Id, TestId = test.Id };
         await _useCase.ExecuteAsync(new() { Data = dto, Executor = AsExecutor(admin) }); // First time
 
         var result = await _useCase.ExecuteAsync(

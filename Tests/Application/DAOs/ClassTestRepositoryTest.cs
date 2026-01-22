@@ -8,13 +8,13 @@ namespace Tests.Application.DAOs;
 
 public class ClassTestRepositoryTest : BaseTest
 {
-    private readonly ICreatorAsync<ClassTestDomain, ClassTestDTO> _creator;
+    private readonly ICreatorAsync<ClassTestDomain, ClassTestIdDTO> _creator;
     private readonly IDeleterAsync<ClassTestIdDTO, ClassTestDomain> _deleter;
     private readonly IReaderAsync<ClassTestIdDTO, ClassTestDomain> _reader;
 
     public ClassTestRepositoryTest()
     {
-        _creator = _sp.GetRequiredService<ICreatorAsync<ClassTestDomain, ClassTestDTO>>();
+        _creator = _sp.GetRequiredService<ICreatorAsync<ClassTestDomain, ClassTestIdDTO>>();
         _deleter = _sp.GetRequiredService<IDeleterAsync<ClassTestIdDTO, ClassTestDomain>>();
         _reader = _sp.GetRequiredService<IReaderAsync<ClassTestIdDTO, ClassTestDomain>>();
     }
@@ -27,7 +27,7 @@ public class ClassTestRepositoryTest : BaseTest
         var createdClass = await SeedClass(professor.Id);
         var createdTest = await SeedTest(professor.Id);
 
-        var newClassTest = new ClassTestDTO
+        var newClassTest = new ClassTestIdDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,
@@ -50,7 +50,7 @@ public class ClassTestRepositoryTest : BaseTest
         var createdClass = await SeedClass(professor.Id);
         var createdTest = await SeedTest(professor.Id);
 
-        var newClassTestDto = new ClassTestDTO
+        var newClassTestDto = new ClassTestIdDTO
         {
             ClassId = createdClass.Id,
             TestId = createdTest.Id,

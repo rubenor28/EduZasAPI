@@ -1,4 +1,4 @@
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.DTOs.Users;
 using Application.UseCases.Auth;
 using Application.UseCases.Users;

@@ -1,7 +1,7 @@
-using Application.DTOs.Common;
 using Application.DTOs.Users;
 using Application.UseCases.Users;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 using Tests;
 

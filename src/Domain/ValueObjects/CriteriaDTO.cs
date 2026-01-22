@@ -1,4 +1,4 @@
-namespace Application.DTOs.Common;
+namespace Domain.ValueObjects;
 
 /// <summary>
 /// Define la interfaz para los criterios de consulta y paginación.

@@ -1,7 +1,5 @@
 using Application.DAOs;
-using Application.DTOs;
 using Application.DTOs.ClassContent;
-using Application.DTOs.Common;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;

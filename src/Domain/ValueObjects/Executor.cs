@@ -1,6 +1,6 @@
 using Domain.Enums;
 
-namespace Application.DTOs.Common;
+namespace Domain.ValueObjects;
 
 /// <summary>
 /// Representa al usuario que ejecuta una acción en un caso de uso.

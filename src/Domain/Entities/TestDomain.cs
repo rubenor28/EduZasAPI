@@ -63,5 +63,6 @@ public sealed record TestDomain
     /// <summary>
     /// Obtiene si el test tiene preguntas que requieren intervencion manual para calificar.
     /// </summary>
-    public bool RequiresManualGrade => Content.Values.Any(v => v.RequiresManualGrade);
+    public IEnumerable<Guid> RequiresManualGrade =>
+        Content.Where((pair) => pair.Value.RequiresManualGrade).Select(pair => pair.Key);
 }

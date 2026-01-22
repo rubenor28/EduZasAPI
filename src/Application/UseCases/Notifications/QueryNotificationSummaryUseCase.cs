@@ -1,6 +1,4 @@
 using Application.DAOs;
-using Application.DTOs;
-using Application.DTOs.Common;
 using Application.DTOs.Notifications;
 using Application.UseCases.Common;
 using Domain.Enums;

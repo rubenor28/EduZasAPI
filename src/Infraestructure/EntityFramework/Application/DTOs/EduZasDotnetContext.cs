@@ -799,6 +799,7 @@ public partial class EduZasDotnetContext : DbContext
             testPerClassBuilder.ToTable("tests_per_class");
             testPerClassBuilder.HasIndex(e => e.ClassId, "idx_tests_per_class_class_id");
             testPerClassBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
+            testPerClassBuilder.Property(e => e.AllowModifyAnswers).HasColumnName("allow_modify_answers");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {

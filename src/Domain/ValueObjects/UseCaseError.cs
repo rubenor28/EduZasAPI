@@ -1,4 +1,4 @@
-namespace Application.DTOs.Common;
+namespace Domain.ValueObjects;
 
 /// <summary>
 /// Representa el tipo base abstracto para un error de un caso de uso.

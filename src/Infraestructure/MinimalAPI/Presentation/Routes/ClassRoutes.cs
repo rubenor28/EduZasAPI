@@ -2,7 +2,7 @@ using Application.DTOs.ClassContent;
 using Application.DTOs.Classes;
 using Application.DTOs.ClassProfessors;
 using Application.DTOs.ClassStudents;
-using Application.DTOs.Common;
+using Domain.ValueObjects;
 using Application.DTOs.Users;
 using Application.UseCases.ClassContent;
 using Application.UseCases.Classes;

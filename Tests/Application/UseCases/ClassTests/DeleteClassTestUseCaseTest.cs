@@ -1,7 +1,7 @@
 using Application.DTOs.ClassTests;
-using Application.DTOs.Common;
 using Application.UseCases.ClassTests;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.Application.UseCases.ClassTests;
