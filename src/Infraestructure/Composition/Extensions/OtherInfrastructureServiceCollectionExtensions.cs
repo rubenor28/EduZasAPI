@@ -20,9 +20,10 @@ internal static class OtherInfrastructureServiceCollectionExtensions
 
         return services;
     }
-    
+
     internal static IServiceCollection AddOtherInfrastructureServices(
-        this IServiceCollection services
+        this IServiceCollection services,
+        IConfiguration cfg
     )
     {
         services.AddScoped<IHashService, BCryptHasher>();
@@ -32,6 +33,15 @@ internal static class OtherInfrastructureServiceCollectionExtensions
                 15
             )
         );
+
+        var gradeSettings = cfg.GetSection("GradeSettings").Get<GradeSettings>();
+
+        ArgumentNullException.ThrowIfNull(
+            gradeSettings,
+            "GradeSettings must be defined on appsettings.json"
+        );
+
+        services.AddSingleton(gradeSettings);
 
         services.AddScoped<AnswerGrader>();
 

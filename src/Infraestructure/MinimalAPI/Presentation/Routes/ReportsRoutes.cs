@@ -1,4 +1,5 @@
 using Application.DTOs.Answers;
+using Application.DTOs.ClassTests;
 using Application.UseCases.Reports;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Presentation.Filters;
@@ -12,6 +13,12 @@ public static class ReportsRoutes
 
         group
             .MapGet("/answer/{userId:ulong}/{classId}/{testId:guid}", GetAnswerReport)
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>();
+
+        group
+            .MapGet("/test/{classId}/{testId:guid}", GetTestReport)
+            .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
         return group;
@@ -36,5 +43,19 @@ public static class ReportsRoutes
                     UserId = userId,
                 },
             (grade) => Results.Ok(grade)
+        );
+
+    private static Task<IResult> GetTestReport(
+        [FromRoute] string classId,
+        [FromRoute] Guid testId,
+        [FromServices] ClassTestAnswersGradeUseCase classTestAnswersGradeUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            classTestAnswersGradeUseCase,
+            () => new ClassTestIdDTO { ClassId = classId, TestId = testId },
+            (report) => Results.Ok(report)
         );
 }

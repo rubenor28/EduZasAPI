@@ -1,0 +1,21 @@
+meta {
+  name: Class test grade
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:5018/reports/test/:classId/:testId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  classId: FKyWrFcmxfzI1Xh
+  testId: 019be6f7-50c3-733c-84c1-faaefd4717ff
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

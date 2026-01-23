@@ -133,6 +133,7 @@ internal static class UseCaseServiceCollectionExtensions
 
         // Reports
         s.AddScoped<AnswerGradeUseCase>();
+        s.AddScoped<ClassTestAnswersGradeUseCase>();
 
         return s;
     }

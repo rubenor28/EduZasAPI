@@ -19,7 +19,7 @@ public class AnswerGrader
         );
 
         if (missingManualGrades)
-            return "Esta respuesta requiere calificación manual";
+            return "Calificacion manual requerida";
 
         var grades = test
             .Content.AsParallel()
@@ -86,7 +86,7 @@ public class AnswerGrader
                 ManualGrade = manualGrade,
             },
             _ => throw new InvalidOperationException(
-                $"Cannot grade question of type {question.GetType().Name} with answer of type {answer.GetType().Name}"
+                $"No es posible calificar pregunta de tipo {question.GetType().Name} con tipo de respuesta {answer.GetType().Name}"
             ),
         };
     }

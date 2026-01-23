@@ -19,7 +19,7 @@ public static class DependencyInjection
             .AddValidators()
             .AddMapperServices()
             .AddUseCases()
-            .AddOtherInfrastructureServices();
+            .AddOtherInfrastructureServices(configuration);
             // Nota: Los servicios específicos de la API (Auth, Swagger, CORS) y de producción (DB, Email) no se registran aquí.
 
         return services;
