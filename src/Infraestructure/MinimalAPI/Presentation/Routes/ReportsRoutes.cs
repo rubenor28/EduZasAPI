@@ -1,5 +1,5 @@
 using Application.DTOs.Answers;
-using Application.Services.Graders;
+using Application.UseCases.Reports;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Presentation.Filters;
 using MinimalAPI.Presentation.Routes;

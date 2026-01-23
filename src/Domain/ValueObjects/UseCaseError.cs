@@ -42,6 +42,8 @@ public class UseCaseErrors
     /// <param name="msg">Mensaje descriptivo del conflicto.</param>
     /// <returns>Una instancia de error de tipo <see cref="Conflict"/>.</returns>
     public static Conflict Conflict(string msg) => new(msg);
+
+    public static Conflict<T> Conflict<T>(string msg, T detail) => new(msg, detail);
 }
 
 /// <summary>
@@ -65,3 +67,10 @@ public sealed record NotFoundError() : UseCaseError;
 /// </summary>
 /// <param name="Message">Mensaje descriptivo del conflicto.</param>
 public sealed record Conflict(string Message) : UseCaseError;
+
+/// <summary>
+/// Representa un error de conflicto de estado (ej. duplicados, violación de reglas de negocio) con
+/// información de detalle extra.
+/// </summary>
+/// <param name="Message">Mensaje descriptivo del conflicto.</param>
+public sealed record Conflict<T>(string Message, T Detail) : UseCaseError;

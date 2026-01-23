@@ -1,76 +1,29 @@
-using Application.DAOs;
-using Application.DTOs.Answers;
-using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Entities.QuestionAnswers;
 using Domain.Entities.Questions;
-using Domain.Enums;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Grades;
 
 namespace Application.Services.Graders;
 
-using IAnswerReader = IReaderAsync<AnswerIdDTO, AnswerDomain>;
-using IProfessorReader = IReaderAsync<UserClassRelationId, ClassProfessorDomain>;
-using ITestReader = IReaderAsync<Guid, TestDomain>;
-
-public class AnswerGradeUseCase(
-    IAnswerReader answerReader,
-    ITestReader testReader,
-    IProfessorReader professorReader
-) : IUseCaseAsync<AnswerIdDTO, TestGrade>
+public class AnswerGrader
 {
-    private readonly ITestReader _testReader = testReader;
-    private readonly IAnswerReader _answerReader = answerReader;
-    private readonly IProfessorReader _professorReader = professorReader;
-
-    public async Task<Result<TestGrade, UseCaseError>> ExecuteAsync(
-        UserActionDTO<AnswerIdDTO> request
+    public Result<AnswerGrade, string> Grade(
+        AnswerDomain answer,
+        TestDomain test,
+        CancellationToken ct = default
     )
-    {
-        var answer = await _answerReader.GetAsync(request.Data);
-        if (answer is null)
-            return UseCaseErrors.NotFound();
-
-        var authorized = request.Executor.Role switch
-        {
-            UserType.ADMIN => true,
-            UserType.PROFESSOR => await IsProfessorAuthorized(request),
-            UserType => request.Data.UserId == request.Executor.Id,
-        };
-
-        if (!authorized)
-            return UseCaseErrors.Unauthorized();
-
-        var test =
-            await _testReader.GetAsync(answer.TestId)
-            ?? throw new InvalidOperationException(
-                $"El test con ID: {answer.TestId} debería existir en este punto"
-            );
-
-        return await Task.Run(() => Grade(answer, test));
-    }
-
-    private async Task<bool> IsProfessorAuthorized(UserActionDTO<AnswerIdDTO> request)
-    {
-        var classProfessor = await _professorReader.GetAsync(
-            new() { ClassId = request.Data.ClassId, UserId = request.Executor.Id }
-        );
-
-        return classProfessor is not null;
-    }
-
-    public Result<TestGrade, UseCaseError> Grade(AnswerDomain answer, TestDomain test)
     {
         var missingManualGrades = test.RequiresManualGrade.Any(id =>
             !answer.Metadata.ManualGrade.ContainsKey(id)
         );
 
         if (missingManualGrades)
-            return UseCaseErrors.Conflict("Esta respuesta requiere calificación manual");
+            return "Esta respuesta requiere calificación manual";
 
         var grades = test
             .Content.AsParallel()
+            .WithCancellation(ct)
             .Select(kvp =>
             {
                 var (id, question) = kvp;
@@ -83,15 +36,16 @@ public class AnswerGradeUseCase(
         var totalPoints = (uint)grades.Sum(g => g.TotalPoints);
         var earnedPoints = (uint)grades.Sum(g => g.Points);
 
-        return new TestGrade
+        return new AnswerGrade
         {
+            StudentId = answer.UserId,
             Points = earnedPoints,
             TotalPoints = totalPoints,
             GradeDetails = grades,
         };
     }
 
-    private static Grade CreateGrade(IQuestion question, IQuestionAnswer answer, bool? manualGrade)
+    private Grade CreateGrade(IQuestion question, IQuestionAnswer answer, bool? manualGrade)
     {
         return (question, answer) switch
         {
@@ -135,5 +89,31 @@ public class AnswerGradeUseCase(
                 $"Cannot grade question of type {question.GetType().Name} with answer of type {answer.GetType().Name}"
             ),
         };
+    }
+
+    public async Task<IEnumerable<Result<AnswerGrade, IndividualGradeError>>> GradeManyAsync(
+        IEnumerable<AnswerDomain> answers,
+        TestDomain test,
+        CancellationToken ct = default
+    )
+    {
+        return await Task.Run(
+            () =>
+            {
+                return answers
+                    .AsParallel()
+                    .WithCancellation(ct)
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .Select<AnswerDomain, Result<AnswerGrade, IndividualGradeError>>(answer =>
+                    {
+                        var result = Grade(answer, test, ct);
+                        return result.IsErr
+                            ? new IndividualGradeError(answer.UserId, result.UnwrapErr())
+                            : result.Unwrap();
+                    })
+                    .ToList();
+            },
+            ct
+        );
     }
 }

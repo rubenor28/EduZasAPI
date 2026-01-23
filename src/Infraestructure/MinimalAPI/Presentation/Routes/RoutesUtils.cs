@@ -33,8 +33,21 @@ public class RoutesUtils
             UnauthorizedError => Results.Forbid(),
             NotFoundError => Results.NotFound(),
             Conflict c => Results.Conflict(new MessageResponse { Message = c.Message }),
+            // Maneja Conflict<T> para cualquier T y extrae el mensaje
+            // Usamos "property pattern" para sacar el Message sin importar el T
+            { }
+                when err.GetType().IsGenericType
+                    && err.GetType().GetGenericTypeDefinition() == typeof(Conflict<>) =>
+                HandleGenericConflict(err),
             _ => throw new NotImplementedException(),
         };
+
+    private static IResult HandleGenericConflict(UseCaseError err)
+    {
+        // Usamos 'dynamic' o reflexión para acceder a las propiedades sin conocer T
+        dynamic conflict = err;
+        return Results.Conflict(new { conflict.Message, conflict.Detail });
+    }
 
     /// <summary>
     /// Ejecuta de forma segura una acción de ruta sincrónica, capturando cualquier excepción inesperada.
