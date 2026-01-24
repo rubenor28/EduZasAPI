@@ -65,4 +65,8 @@ public class UserDomain
     /// Obtiene o establece el apellido materno del usuario (opcional).
     /// </summary>
     public string? MotherLastname { get; set; }
+
+public string FullName => string.Join(" ", 
+    new[] { FatherLastname, MotherLastname, FirstName, MidName }
+    .Where(s => !string.IsNullOrWhiteSpace(s)));
 }

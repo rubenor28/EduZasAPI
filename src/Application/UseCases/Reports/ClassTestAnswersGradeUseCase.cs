@@ -49,10 +49,10 @@ public class ClassTestAnswersGradeUseCase(
             PassThreshold = settings.PassThreshold,
             AveragePercentage = 0,
             MedianPercentage = 0,
-            PassRate = 0,
+            PassPercentage = 0,
             StandardDeviation = 0,
-            MaxPoints = 0,
-            MinPoints = 0,
+            MaxScore = 0,
+            MinScore = 0,
             Results = [],
         };
 
@@ -101,19 +101,26 @@ public class ClassTestAnswersGradeUseCase(
         if (successGrades.Count == 0)
             return EmptyReport(cls, professor, classTest);
 
-        var percentages = successGrades
-            .Select(g => g.TotalPoints > 0 ? (double)g.Points / g.TotalPoints : 0.0)
-            .OrderBy(p => p)
-            .ToList();
+        var query = successGrades.Count switch
+        {
+            >= 1000 => successGrades
+                .AsEnumerable()
+                .AsParallel()
+                .WithDegreeOfParallelism(Environment.ProcessorCount),
+            < 1000 => successGrades.AsEnumerable(),
+        };
 
-        var studentResults = successGrades
+        var studentResults = query
             .Select(g => new StudentResult
             {
-                Grade = g.TotalPoints > 0 ? Math.Round((double)g.Points / g.TotalPoints * 100, 2) : 0.0,
+                Grade =
+                    g.TotalPoints > 0 ? Math.Round((double)g.Points / g.TotalPoints * 100, 2) : 0.0,
                 StudentId = g.StudentId,
             })
             .OrderBy(g => g.Grade)
             .ToList();
+
+        var percentages = studentResults.Select(g => g.Grade / 100).ToList();
 
         var averagePercentage = percentages.Average();
 
@@ -125,11 +132,26 @@ public class ClassTestAnswersGradeUseCase(
         else
             medianPercentage = percentages[mid];
 
-        var passCount = percentages.Count(p => p >= settings.PassThreshold);
+        var passCount = percentages.Count(p => p >= settings.PassThresholdPercentage);
         var passRate = (double)passCount / successGrades.Count;
 
         var sumOfSquares = percentages.Sum(p => Math.Pow(p - averagePercentage, 2));
         var standardDeviation = Math.Sqrt(sumOfSquares / percentages.Count);
+
+        var maxPoints = long.MinValue;
+        var minPoints = long.MaxValue;
+        uint? total = null;
+
+        foreach (var g in successGrades)
+        {
+            total ??= g.TotalPoints;
+
+            if (g.Points > maxPoints)
+                maxPoints = g.Points;
+
+            if (g.Points < minPoints)
+                minPoints = g.Points;
+        }
 
         return new ClassTestReport
         {
@@ -141,10 +163,10 @@ public class ClassTestAnswersGradeUseCase(
             PassThreshold = settings.PassThreshold,
             AveragePercentage = Math.Round(averagePercentage * 100, 2),
             MedianPercentage = Math.Round(medianPercentage * 100, 2),
-            PassRate = Math.Round(passRate * 100, 2),
+            PassPercentage = Math.Round(passRate * 100, 2),
             StandardDeviation = Math.Round(standardDeviation * 100, 3),
-            MaxPoints = successGrades.Max(g => g.Points),
-            MinPoints = successGrades.Min(g => g.Points),
+            MaxScore = Math.Round((double)maxPoints / total!.Value * 100, 2),
+            MinScore = Math.Round((double)minPoints / total!.Value * 100, 2),
             Results = studentResults,
         };
     }

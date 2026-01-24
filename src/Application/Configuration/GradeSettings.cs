@@ -1,6 +1,7 @@
 namespace Application.Configuration;
 
-public class GradeSettings
+public record GradeSettings
 {
-    public double PassThreshold { get; init; }
+    public double PassThresholdPercentage { get; init; }
+    public double PassThreshold => PassThresholdPercentage * 100;
 }

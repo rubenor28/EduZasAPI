@@ -15,10 +15,10 @@ public record ClassTestReport
 
     public required double AveragePercentage { get; init; }
     public required double MedianPercentage { get; init; }
-    public required double PassRate { get; init; }
+    public required double PassPercentage { get; init; }
     public required double StandardDeviation { get; init; }
-    public required uint MaxPoints { get; init; }
-    public required uint MinPoints { get; init; }
+    public required double MaxScore { get; init; }
+    public required double MinScore { get; init; }
     public required int TotalStudents { get; init; }
 
     public required IEnumerable<StudentResult> Results { get; init; }

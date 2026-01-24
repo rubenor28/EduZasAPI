@@ -8,10 +8,9 @@ namespace Application.Services.Graders;
 
 public class AnswerGrader
 {
-    public Result<AnswerGrade, string> Grade(
+    private Result<List<Grade>, string> CalculateGradesInternal(
         AnswerDomain answer,
-        TestDomain test,
-        CancellationToken ct = default
+        TestDomain test
     )
     {
         var missingManualGrades = test.RequiresManualGrade.Any(id =>
@@ -22,9 +21,7 @@ public class AnswerGrader
             return "Calificacion manual requerida";
 
         var grades = test
-            .Content.AsParallel()
-            .WithCancellation(ct)
-            .Select(kvp =>
+            .Content.Select(kvp =>
             {
                 var (id, question) = kvp;
                 var questionAnswer = answer.Content[id];
@@ -33,17 +30,85 @@ public class AnswerGrader
             })
             .ToList();
 
-        var totalPoints = (uint)grades.Sum(g => g.TotalPoints);
-        var earnedPoints = (uint)grades.Sum(g => g.Points);
+        return grades;
+    }
+
+    public Result<AnswerGrade, string> Grade(AnswerDomain answer, TestDomain test)
+    {
+        var result = CalculateGradesInternal(answer, test);
+        if (result.IsErr)
+            return result.UnwrapErr();
+
+        var grades = result.Unwrap();
 
         return new AnswerGrade
         {
             StudentId = answer.UserId,
-            Points = earnedPoints,
-            TotalPoints = totalPoints,
+            Points = (uint)grades.Sum(g => g.Points),
+            TotalPoints = (uint)grades.Sum(g => g.TotalPoints),
             GradeDetails = grades,
         };
     }
+
+    public Result<SimpleGrade, string> SimpleGrade(AnswerDomain answer, TestDomain test)
+    {
+        var result = CalculateGradesInternal(answer, test);
+        if (result.IsErr)
+            return result.UnwrapErr();
+
+        var grades = result.Unwrap();
+
+        return new SimpleGrade
+        {
+            Points = (uint)grades.Sum(g => g.Points),
+            TotalPoints = (uint)grades.Sum(g => g.TotalPoints),
+        };
+    }
+
+    private async Task<
+        IEnumerable<Result<TResult, IndividualGradeError>>
+    > ExecuteBatchAsync<TResult>(
+        IEnumerable<AnswerDomain> answers,
+        Func<AnswerDomain, CancellationToken, Result<TResult, string>> graderFunc,
+        CancellationToken ct
+    )
+    {
+        var answersList = answers as IList<AnswerDomain> ?? [.. answers];
+
+        var query =
+            answersList.Count >= 1000
+                ? answersList
+                    .AsParallel()
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .WithCancellation(ct)
+                : answersList.AsEnumerable();
+
+        return await Task.Run(
+            () =>
+                query
+                    .Select<AnswerDomain, Result<TResult, IndividualGradeError>>(answer =>
+                    {
+                        var result = graderFunc(answer, ct);
+                        return result.IsErr
+                            ? new IndividualGradeError(answer.UserId, result.UnwrapErr())
+                            : result.Unwrap();
+                    })
+                    .ToList(),
+            ct
+        );
+    }
+
+    public Task<IEnumerable<Result<AnswerGrade, IndividualGradeError>>> GradeManyAsync(
+        IEnumerable<AnswerDomain> answers,
+        TestDomain test,
+        CancellationToken ct = default
+    ) => ExecuteBatchAsync(answers, (ans, token) => Grade(ans, test), ct);
+
+    public Task<IEnumerable<Result<SimpleGrade, IndividualGradeError>>> SimpleGradeManyAsync(
+        IEnumerable<AnswerDomain> answers,
+        TestDomain test,
+        CancellationToken ct = default
+    ) => ExecuteBatchAsync(answers, (ans, token) => SimpleGrade(ans, test), ct);
 
     private Grade CreateGrade(IQuestion question, IQuestionAnswer answer, bool? manualGrade)
     {
@@ -89,31 +154,5 @@ public class AnswerGrader
                 $"No es posible calificar pregunta de tipo {question.GetType().Name} con tipo de respuesta {answer.GetType().Name}"
             ),
         };
-    }
-
-    public async Task<IEnumerable<Result<AnswerGrade, IndividualGradeError>>> GradeManyAsync(
-        IEnumerable<AnswerDomain> answers,
-        TestDomain test,
-        CancellationToken ct = default
-    )
-    {
-        return await Task.Run(
-            () =>
-            {
-                return answers
-                    .AsParallel()
-                    .WithCancellation(ct)
-                    .WithDegreeOfParallelism(Environment.ProcessorCount)
-                    .Select<AnswerDomain, Result<AnswerGrade, IndividualGradeError>>(answer =>
-                    {
-                        var result = Grade(answer, test, ct);
-                        return result.IsErr
-                            ? new IndividualGradeError(answer.UserId, result.UnwrapErr())
-                            : result.Unwrap();
-                    })
-                    .ToList();
-            },
-            ct
-        );
     }
 }
