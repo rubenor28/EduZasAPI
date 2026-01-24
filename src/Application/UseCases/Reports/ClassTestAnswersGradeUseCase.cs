@@ -85,21 +85,36 @@ public class ClassTestAnswersGradeUseCase(
                 $"Usuario con ID {test.ProfessorId} debería existir en este punto"
             );
 
-        var answersSearch = await _answerQuerier.GetByAsync(
-            new() { TestId = classTest.TestId, ClassId = classTest.ClassId }
-        );
+        var allAnswers = new List<AnswerDomain>();
+        var criteria = new AnswerCriteriaDTO
+        {
+            TestId = classTest.TestId,
+            ClassId = classTest.ClassId,
+            Page = 1,
+        };
 
-        if (answersSearch.Results.Count() == 0)
+        while (true)
+        {
+            var answersSearch = await _answerQuerier.GetByAsync(criteria);
+            allAnswers.AddRange(answersSearch.Results);
+
+            if (criteria.PageSize >= answersSearch.TotalPages)
+                break;
+
+            criteria.Page += 1;
+        }
+
+        if (allAnswers.Count == 0)
             return EmptyReport(cls, professor, classTest);
 
-        var results = await _answerGrader.GradeManyAsync(answersSearch.Results, test);
+        var results = await _answerGrader.GradeManyAsync(allAnswers, test);
 
         var splitted = results.ToLookup(r => r.IsOk);
         var successGrades = splitted[true].Select(r => r.Unwrap()).ToList();
         var errors = splitted[false].Select(r => r.UnwrapErr()).ToList();
 
         if (successGrades.Count == 0)
-            return EmptyReport(cls, professor, classTest);
+            return EmptyReport(cls, professor, classTest, errors);
 
         var query = successGrades.Count switch
         {

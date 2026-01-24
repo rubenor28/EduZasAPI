@@ -60,6 +60,7 @@ public class AnswerGrader
 
         return new SimpleGrade
         {
+            StudentId = answer.UserId,
             Points = (uint)grades.Sum(g => g.Points),
             TotalPoints = (uint)grades.Sum(g => g.TotalPoints),
         };
