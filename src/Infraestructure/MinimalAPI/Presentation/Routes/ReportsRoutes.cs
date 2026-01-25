@@ -1,6 +1,7 @@
 using Application.DTOs.Answers;
 using Application.DTOs.ClassTests;
 using Application.UseCases.Reports;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Presentation.Filters;
 using MinimalAPI.Presentation.Routes;
@@ -26,6 +27,11 @@ public static class ReportsRoutes
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
+        group
+            .MapGet("/test/{classId}/spreadsheet", GetClassReportSpreadSheet)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
         return group;
     }
 
@@ -40,14 +46,14 @@ public static class ReportsRoutes
         utils.HandleUseCaseAsync(
             ctx,
             testGradeUseCase,
-            () =>
+            mapRequest: () =>
                 new AnswerIdDTO
                 {
                     ClassId = classId,
                     TestId = testId,
                     UserId = userId,
                 },
-            (grade) => Results.Ok(grade)
+            mapResponse: (grade) => Results.Ok(grade)
         );
 
     private static Task<IResult> GetTestReport(
@@ -60,8 +66,8 @@ public static class ReportsRoutes
         utils.HandleUseCaseAsync(
             ctx,
             classTestAnswersGradeUseCase,
-            () => new ClassTestIdDTO { ClassId = classId, TestId = testId },
-            (report) => Results.Ok(report)
+            mapRequest: () => new ClassTestIdDTO { ClassId = classId, TestId = testId },
+            mapResponse: (report) => Results.Ok(report)
         );
 
     private static Task<IResult> GetClassReport(
@@ -73,7 +79,70 @@ public static class ReportsRoutes
         utils.HandleUseCaseAsync(
             ctx,
             globalClassGradeUseCase,
-            () => classId,
-            report => Results.Ok(report)
+            mapRequest: () => classId,
+            mapResponse: report => Results.Ok(report)
         );
+
+    private static async Task<IResult> GetClassReportSpreadSheet(
+        [FromRoute] string classId,
+        [FromServices] GlobalClassGradeUseCase globalClassGradeUseCase,
+        [FromServices] RoutesUtils utils,
+        [FromServices] XLWorkbook workbook,
+        HttpContext ctx
+    )
+    {
+        var executor = utils.GetExecutorFromContext(ctx);
+        var result = await globalClassGradeUseCase.ExecuteAsync(
+            new() { Data = classId, Executor = executor }
+        );
+
+        if (result.IsErr)
+            return RoutesUtils.MapError(result.UnwrapErr());
+
+        var report = result.Unwrap();
+        var worksheet = workbook.Worksheets.Add("Grades");
+
+        // Headers
+        var headers = new List<string> { "Correo", "Estudiante" };
+        var testIds = report.TestTitles.Keys.ToList();
+        headers.AddRange(testIds.Select(id => report.TestTitles[id]));
+
+        for (int i = 0; i < headers.Count; i++)
+        {
+            worksheet.Cell(1, i + 1).Value = headers[i];
+        }
+
+        // Data
+        var currentRow = 2;
+        foreach (var studentScore in report.StudentScores)
+        {
+            worksheet.Cell(currentRow, 1).Value = studentScore.Email;
+            worksheet.Cell(currentRow, 2).Value = studentScore.StudentName;
+            for (int i = 0; i < testIds.Count; i++)
+            {
+                var testId = testIds[i];
+                if (studentScore.Scores.TryGetValue(testId, out var score) && score.HasValue)
+                {
+                    worksheet.Cell(currentRow, i + 3).Value = score.Value;
+                }
+                else
+                {
+                    worksheet.Cell(currentRow, i + 3).Value = "N/A";
+                }
+            }
+            currentRow++;
+        }
+
+        worksheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+
+        return Results.File(
+            stream.ToArray(),
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"{report.ClassName}-grades.xlsx"
+        );
+    }
 }

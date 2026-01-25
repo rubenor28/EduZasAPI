@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Application.Services;
+using ClosedXML.Excel;
 using InterfaceAdapters.Mappers.Tests;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -37,7 +38,8 @@ public static class ServiceCollectionExtensions
             .AddRateLimit(configuration)
             .AddSwaggerServices()
             .AddApiServices()
-            .AddScheduledJobs(configuration);
+            .AddScheduledJobs(configuration)
+            .AddSpreadsheet();
 
         return services;
     }
@@ -295,5 +297,12 @@ public static class ServiceCollectionExtensions
         });
 
         return services;
+    }
+
+    private static IServiceCollection AddSpreadsheet(this IServiceCollection s)
+    {
+        s.AddTransient<XLWorkbook>();
+
+        return s;
     }
 }
