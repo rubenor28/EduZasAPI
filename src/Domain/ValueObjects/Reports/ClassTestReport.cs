@@ -9,6 +9,7 @@ public record StudentResult
 public record ClassTestReport
 {
     public required string ClassName { get; init; }
+    public required string TestTitle { get; init; }
     public required string ProfessorName { get; init; }
     public required double PassThreshold { get; init; }
     public required DateTimeOffset TestDate { get; init; }

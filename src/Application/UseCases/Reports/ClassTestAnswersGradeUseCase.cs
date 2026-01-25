@@ -35,6 +35,7 @@ public class ClassTestAnswersGradeUseCase(
 
     private ClassTestReport EmptyReport(
         ClassDomain cls,
+        TestDomain test,
         UserDomain professor,
         ClassTestDomain classTest,
         List<IndividualGradeError>? errors = null
@@ -42,6 +43,7 @@ public class ClassTestAnswersGradeUseCase(
         new()
         {
             ClassName = cls.ClassName,
+            TestTitle = test.Title,
             ProfessorName = $"{professor.FirstName} {professor.FatherLastname}",
             TestDate = classTest.CreatedAt,
             Errors = errors ?? [],
@@ -105,7 +107,7 @@ public class ClassTestAnswersGradeUseCase(
         }
 
         if (allAnswers.Count == 0)
-            return EmptyReport(cls, professor, classTest);
+            return EmptyReport(cls, test, professor, classTest);
 
         var results = await _answerGrader.GradeManyAsync(allAnswers, test);
 
@@ -114,7 +116,7 @@ public class ClassTestAnswersGradeUseCase(
         var errors = splitted[false].Select(r => r.UnwrapErr()).ToList();
 
         if (successGrades.Count == 0)
-            return EmptyReport(cls, professor, classTest, errors);
+            return EmptyReport(cls, test, professor, classTest, errors);
 
         var query = successGrades.Count switch
         {
@@ -170,6 +172,7 @@ public class ClassTestAnswersGradeUseCase(
 
         return new ClassTestReport
         {
+            TestTitle = test.Title,
             ClassName = cls.ClassName,
             ProfessorName = $"{professor.FirstName} {professor.FatherLastname}",
             TestDate = classTest.CreatedAt,

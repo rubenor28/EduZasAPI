@@ -20,7 +20,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// <value>
     /// Valor booleano para filtrar por estado activo/inactivo.
     /// </value>
-    public bool? Active { get; init; } 
+    public bool? Active { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el tipo o rol del usuario.
@@ -28,7 +28,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// <value>
     /// Rol del usuario para filtrar.
     /// </value>
-    public UserType? Role { get; init; } 
+    public UserType? Role { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el primer nombre del usuario.
@@ -37,7 +37,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el primer nombre para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public StringQueryDTO? FirstName { get; init; } 
+    public StringQueryDTO? FirstName { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el segundo nombre del usuario.
@@ -46,7 +46,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el segundo nombre para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public StringQueryDTO? MidName { get; init; } 
+    public StringQueryDTO? MidName { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido paterno del usuario.
@@ -55,7 +55,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el apellido paterno para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public StringQueryDTO? FatherLastname { get; init; } 
+    public StringQueryDTO? FatherLastname { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el apellido materno del usuario.
@@ -64,7 +64,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el apellido materno para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public StringQueryDTO? MotherLastname { get; init; } 
+    public StringQueryDTO? MotherLastname { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para el email del usuario.
@@ -73,7 +73,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el email para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public StringQueryDTO? Email { get; init; } 
+    public StringQueryDTO? Email { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la contraseña del usuario.
@@ -82,7 +82,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la contraseña para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public StringQueryDTO? Password { get; init; } 
+    public StringQueryDTO? Password { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de creación del usuario.
@@ -91,7 +91,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la fecha de creación para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public DateTimeOffset? CreatedAt { get; init; } 
+    public DateTimeOffset? CreatedAt { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para la fecha de modificación del usuario.
@@ -100,7 +100,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene la fecha de modificación para filtrar,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public DateTimeOffset? ModifiedAt { get; init; } 
+    public DateTimeOffset? ModifiedAt { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para usuarios inscritos en una clase específica.
@@ -109,7 +109,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el ID de la clase para filtrar usuarios inscritos,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public string? EnrolledInClass { get; init; } 
+    public string? EnrolledInClass { get; init; }
 
     /// <summary>
     /// Obtiene o establece el filtro opcional para usuarios que enseñan en una clase específica.
@@ -118,5 +118,7 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// Optional que contiene el ID de la clase para filtrar usuarios que enseñan,
     /// o None si no se desea filtrar por este campo.
     /// </value>
-    public string? TeachingInClass { get; init; } 
+    public string? TeachingInClass { get; init; }
+
+    public IEnumerable<ulong>? Ids { get; init; }
 }

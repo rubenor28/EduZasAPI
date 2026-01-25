@@ -4,9 +4,9 @@ public record MultipleSelectionGrade : Grade
 {
     public override uint TotalPoints => (uint)Options.Count;
     public required string Title { get; init; }
-    public required IDictionary<Guid, string> Options;
-    public required ISet<Guid> CorrectOptions;
-    public required ISet<Guid> AnsweredOptions;
+    public required IDictionary<Guid, string> Options { get; init; }
+    public required ISet<Guid> CorrectOptions { get; init; }
+    public required ISet<Guid> AnsweredOptions { get; init; }
 
-    public override uint Asserts() => (uint)Options.Count(opt => CorrectOptions.Contains(opt.Key));
+    public override uint Asserts() => AnsweredOptions.SetEquals(CorrectOptions) ? TotalPoints : 0;
 }

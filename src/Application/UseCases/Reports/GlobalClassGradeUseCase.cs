@@ -1,6 +1,7 @@
 using Application.DAOs;
 using Application.DTOs.Answers;
 using Application.DTOs.Tests;
+using Application.DTOs.Users;
 using Application.Services.Graders;
 using Application.UseCases.Common;
 using Domain.Entities;
@@ -14,7 +15,7 @@ using IAnswerQuerier = IQuerierAsync<AnswerDomain, AnswerCriteriaDTO>;
 using IClassReader = IReaderAsync<string, ClassDomain>;
 using IProfessorReader = IReaderAsync<UserClassRelationId, ClassProfessorDomain>;
 using ITestQuerier = IQuerierAsync<TestDomain, TestCriteriaDTO>;
-using IUserReader = IReaderAsync<ulong, UserDomain>;
+using IUserQuerier = IQuerierAsync<UserDomain, UserCriteriaDTO>;
 
 public record SimpleStudentGrade
 {
@@ -43,12 +44,12 @@ public class GlobalClassGradeUseCase(
     AnswerGrader answerGrader,
     IClassReader classReader,
     ITestQuerier testQuerier,
-    IUserReader userReader
+    IUserQuerier userQuerier
 ) : IUseCaseAsync<string, GlobalClassGradeReport>
 {
-    private readonly IUserReader _userReader = userReader;
     private readonly IClassReader _classReader = classReader;
     private readonly ITestQuerier _testQuerier = testQuerier;
+    private readonly IUserQuerier _userQuerier = userQuerier;
     private readonly AnswerGrader _answerGrader = answerGrader;
     private readonly IAnswerQuerier _answerQuerier = answerQuerier;
     private readonly IProfessorReader _professorReader = professorReader;
@@ -73,45 +74,44 @@ public class GlobalClassGradeUseCase(
         if (!authorized)
             return UseCaseErrors.Unauthorized();
 
-        var allTests = new List<TestDomain>();
-        var allAnswers = new Dictionary<Guid, List<AnswerDomain>>();
+        var allTests = await GetAllPaginatedResults(
+            _testQuerier,
+            new TestCriteriaDTO { AssignedInClass = cls.Id }
+        );
 
-        var testCriteria = new TestCriteriaDTO { AssignedInClass = cls.Id, Page = 1 };
-
-        while (true)
-        {
-            var testSearch = await _testQuerier.GetByAsync(testCriteria);
-            allTests.AddRange(testSearch.Results);
-
-            if (testSearch.Page >= testSearch.TotalPages)
-                break;
-
-            testCriteria.Page += 1;
-        }
+        var allGrades =
+            new Dictionary<TestDomain, (List<SimpleStudentGrade>, List<IndividualGradeError>)>();
 
         foreach (var test in allTests)
         {
-            var allTestAnswers = new List<AnswerDomain>();
-            var criteria = new AnswerCriteriaDTO
-            {
-                ClassId = cls.Id,
-                TestId = test.Id,
-                Page = 1,
-            };
+            var answers = await GetAllPaginatedResults(
+                _answerQuerier,
+                new AnswerCriteriaDTO { ClassId = cls.Id, TestId = test.Id }
+            );
 
-            while (true)
-            {
-                var answerSearch = await _answerQuerier.GetByAsync(criteria);
-                allTestAnswers.AddRange(answerSearch.Results);
+            var (studentGrades, studentGradesErrors) = await GetStudentsGrade(answers, test);
 
-                if (answerSearch.Page >= answerSearch.TotalPages)
-                    break;
-
-                criteria.Page += 1;
-            }
-
-            allAnswers.Add(test.Id, allTestAnswers);
+            allGrades.Add(test, (studentGrades, studentGradesErrors));
         }
+
+        var testGrades = allGrades.Select(pair =>
+        {
+            var (test, (grades, errors)) = pair;
+
+            return new TestGrades
+            {
+                Errors = errors,
+                TestTitle = test.Title,
+                StudentGrade = grades,
+            };
+        });
+
+        return new GlobalClassGradeReport()
+        {
+            ClassId = cls.Id,
+            ClassName = cls.ClassName,
+            TestsGrades = testGrades,
+        };
     }
 
     private async Task<bool> IsProfessorAuthorized(UserActionDTO<string> req)
@@ -123,7 +123,31 @@ public class GlobalClassGradeUseCase(
         return professor is not null;
     }
 
-    private async Task<TestGrades> GetStudentsGrade(
+    private static async Task<List<T>> GetAllPaginatedResults<T, TParam>(
+        IQuerierAsync<T, TParam> querier,
+        TParam criteria
+    )
+        where T : notnull
+        where TParam : CriteriaDTO
+    {
+        var allResults = new List<T>();
+        var currentCriteria = criteria with { Page = 1 };
+
+        while (true)
+        {
+            var searchResult = await querier.GetByAsync(currentCriteria);
+            allResults.AddRange(searchResult.Results);
+
+            if (searchResult.Page >= searchResult.TotalPages)
+                break;
+
+            currentCriteria = currentCriteria with { Page = currentCriteria.Page + 1 };
+        }
+
+        return allResults;
+    }
+
+    private async Task<(List<SimpleStudentGrade>, List<IndividualGradeError>)> GetStudentsGrade(
         IEnumerable<AnswerDomain> answers,
         TestDomain test
     )
@@ -134,23 +158,40 @@ public class GlobalClassGradeUseCase(
         var successGrades = grades[true].Select(r => r.Unwrap()).ToList();
         var errors = grades[false].Select(r => r.UnwrapErr()).ToList();
 
-        var formatTask = successGrades.Select(async (g) => {
-            var student  = await _userReader.GetAsync(g.StudentId)
-              ?? throw new InvalidOperationException($"Usuario con ID: {g.StudentId} debería existir en este punto");
-
-            return new SimpleStudentGrade {
-            Email = student.Email,
-            StudentName = student.FullName,
-            Score = Math.Round((double)g.Points / g.TotalPoints * 100, 2)
-            };
-            });
-
-        Task.WaitAll(formatTask);
-
-        return new() {
-          TestTitle = test.Title,
-          Errors = errors,
-          StudentGrade = formatTask
+        if (!successGrades.Any())
+        {
+            return (new List<SimpleStudentGrade>(), errors);
         }
+
+        var studentIds = successGrades.Select(g => g.StudentId).Distinct().ToList();
+
+        var users = await GetAllPaginatedResults(
+            _userQuerier,
+            new UserCriteriaDTO { Ids = studentIds }
+        );
+
+        var userDictionary = users.ToDictionary(u => u.Id);
+
+        var formattedGrades = new List<SimpleStudentGrade>();
+        foreach (var g in successGrades)
+        {
+            if (!userDictionary.TryGetValue(g.StudentId, out var student))
+            {
+                throw new InvalidOperationException(
+                    $"Usuario con ID: {g.StudentId} debería existir en este punto"
+                );
+            }
+
+            formattedGrades.Add(
+                new()
+                {
+                    Email = student.Email,
+                    StudentName = student.FullName,
+                    Score = Math.Round((double)g.Points / g.TotalPoints * 100, 2),
+                }
+            );
+        }
+
+        return (formattedGrades, errors);
     }
 }

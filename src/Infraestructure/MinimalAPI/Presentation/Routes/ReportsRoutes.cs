@@ -21,6 +21,11 @@ public static class ReportsRoutes
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
+        group
+            .MapGet("/test/{classId}", GetClassReport)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
         return group;
     }
 
@@ -57,5 +62,18 @@ public static class ReportsRoutes
             classTestAnswersGradeUseCase,
             () => new ClassTestIdDTO { ClassId = classId, TestId = testId },
             (report) => Results.Ok(report)
+        );
+
+    private static Task<IResult> GetClassReport(
+        [FromRoute] string classId,
+        [FromServices] GlobalClassGradeUseCase globalClassGradeUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            globalClassGradeUseCase,
+            () => classId,
+            report => Results.Ok(report)
         );
 }

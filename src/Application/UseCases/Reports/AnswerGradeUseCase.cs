@@ -11,6 +11,7 @@ using Domain.ValueObjects;
 namespace Application.UseCases.Reports;
 
 using IAnswerReader = IReaderAsync<AnswerIdDTO, AnswerDomain>;
+using IClassReader = IReaderAsync<string, ClassDomain>;
 using IClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using IProfessorReader = IReaderAsync<UserClassRelationId, ClassProfessorDomain>;
 using ITestReader = IReaderAsync<Guid, TestDomain>;
@@ -19,6 +20,7 @@ using IUserReader = IReaderAsync<ulong, UserDomain>;
 public record AnswerGradeDetail : AnswerGrade
 {
     public required Guid TestId { get; init; }
+    public required string ClassName { get; init; }
     public required string TestTitle { get; init; }
     public required string ProfessorName { get; init; }
     public required string StudentName { get; init; }
@@ -33,6 +35,7 @@ public class AnswerGradeUseCase(
     IProfessorReader professorReader,
     AnswerGrader answerGrader,
     IUserReader userReader,
+    IClassReader classReader,
     IClassTestReader classTestReader,
     GradeSettings settings
 ) : IUseCaseAsync<AnswerIdDTO, AnswerGradeDetail>
@@ -44,6 +47,7 @@ public class AnswerGradeUseCase(
     private readonly GradeSettings _settings = settings;
     private readonly IProfessorReader _professorReader = professorReader;
     private readonly IClassTestReader _classTestReader = classTestReader;
+    private readonly IClassReader _classReader = classReader;
 
     public async Task<Result<AnswerGradeDetail, UseCaseError>> ExecuteAsync(
         UserActionDTO<AnswerIdDTO> request
@@ -103,8 +107,15 @@ public class AnswerGradeUseCase(
             $"[AnswerGradeDetail] Score: {score} PassThreshold: {_settings.PassThreshold}"
         );
 
+        var cls =
+            await _classReader.GetAsync(classTest.ClassId)
+            ?? throw new InvalidOperationException(
+                $"La clase con ID: {classTest.ClassId} debería existir en este punto"
+            );
+
         return new AnswerGradeDetail
         {
+            ClassName = cls.ClassName,
             StudentId = student.Id,
             StudentName = student.FullName,
             Score = score,

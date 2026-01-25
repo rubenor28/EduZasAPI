@@ -39,7 +39,8 @@ public class UserEFQuerier(
             .WhereOptional(
                 c.TeachingInClass,
                 cId => u => u.ClassProfessors.Any(cpf => cpf.ClassId == cId)
-            );
+            )
+            .WhereOptional(c.Ids, ids => u => ids.Contains(u.UserId));
 
         if (_ctx.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
         {
