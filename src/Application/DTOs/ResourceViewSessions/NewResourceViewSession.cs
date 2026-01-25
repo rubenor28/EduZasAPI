@@ -10,4 +10,5 @@ public sealed record ResourceViewSession
     public required Guid ResourceId { get; init; }
     public required string ClassId { get; init; }
     public required DateTimeOffset StartTimeUtc { get; init; }
+    public required DateTimeOffset EndTimeUtc {get;init;}
 }

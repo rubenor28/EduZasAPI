@@ -13,7 +13,7 @@ public class AnswerGrader
         TestDomain test
     )
     {
-        var missingManualGrades = test.RequiresManualGrade.Any(id =>
+        var missingManualGrades = test.RequiredManualGrade.Any(id =>
             !answer.Metadata.ManualGrade.ContainsKey(id)
         );
 

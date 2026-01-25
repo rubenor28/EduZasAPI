@@ -33,6 +33,7 @@ public static class AnswerRoutes
 
         group
             .MapGet("/{userId:ulong}/{classId}/{testId:guid}", ReadAnswer)
+            .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces<AnswerDomain>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -41,11 +42,17 @@ public static class AnswerRoutes
 
         group
             .MapPut("/{userId:ulong}/{classId}/{testId:guid}/try", EndTry)
+            .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound);
+
+        group
+            .MapGet("/{userId:ulong}/{classId}/{testId:guid}/status", AnswerStatus)
+            .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>();
 
         return group;
     }
@@ -116,5 +123,26 @@ public static class AnswerRoutes
                     TestId = testId,
                 },
             mapResponse: _ => Results.NoContent()
+        );
+
+    public static Task<IResult> AnswerStatus(
+        [FromRoute] ulong userId,
+        [FromRoute] string classId,
+        [FromRoute] Guid testId,
+        [FromServices] GetAnswerStateUseCase getAnswerStateUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            getAnswerStateUseCase,
+            mapRequest: () =>
+                new AnswerIdDTO
+                {
+                    TestId = testId,
+                    ClassId = classId,
+                    UserId = userId,
+                },
+            mapResponse: status => Results.Ok(new { Status = status })
         );
 }

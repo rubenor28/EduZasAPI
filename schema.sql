@@ -214,7 +214,6 @@ CREATE TABLE resource_view_sessions (
     class_id CHAR(20),
     start_time_utc DATETIME,
     end_time_utc DATETIME,
-    duration_seconds INT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

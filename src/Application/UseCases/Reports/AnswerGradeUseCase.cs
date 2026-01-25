@@ -7,6 +7,7 @@ using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
+using Domain.ValueObjects.Grades;
 
 namespace Application.UseCases.Reports;
 
@@ -16,18 +17,6 @@ using IClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using IProfessorReader = IReaderAsync<UserClassRelationId, ClassProfessorDomain>;
 using ITestReader = IReaderAsync<Guid, TestDomain>;
 using IUserReader = IReaderAsync<ulong, UserDomain>;
-
-public record AnswerGradeDetail : AnswerGrade
-{
-    public required Guid TestId { get; init; }
-    public required string ClassName { get; init; }
-    public required string TestTitle { get; init; }
-    public required string ProfessorName { get; init; }
-    public required string StudentName { get; init; }
-    public required double Score { get; init; }
-    public required bool Approved { get; init; }
-    public required DateTimeOffset Date { get; init; }
-}
 
 public class AnswerGradeUseCase(
     IAnswerReader answerReader,
