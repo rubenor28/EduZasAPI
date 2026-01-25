@@ -14,9 +14,6 @@ public record ConceptRelationGrade : Grade
         if (ManualGrade == true)
             return (uint)Pairs.Count;
 
-        if (Pairs.Count != AnsweredPairs.Count)
-            throw new InvalidOperationException("The sizes of the lists do not match");
-
         return (uint)AnsweredPairs.Intersect(Pairs).Count();
     }
 }

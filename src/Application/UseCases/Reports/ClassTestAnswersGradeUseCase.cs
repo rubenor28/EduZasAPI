@@ -33,20 +33,23 @@ public class ClassTestAnswersGradeUseCase(
     private readonly IClassReader _classReader = classReader;
     private readonly IUserReader _userReader = userReader;
 
-    private ClassTestReport EmptyReport(
+    private async Task<ClassTestReport> EmptyReport(
         ClassDomain cls,
         TestDomain test,
         UserDomain professor,
         ClassTestDomain classTest,
         List<IndividualGradeError>? errors = null
-    ) =>
-        new()
+    )
+    {
+        errors ??= [];
+
+        return new()
         {
             ClassName = cls.ClassName,
             TestTitle = test.Title,
             ProfessorName = $"{professor.FirstName} {professor.FatherLastname}",
             TestDate = classTest.CreatedAt,
-            Errors = errors ?? [],
+            Errors = await FormatErrors(errors),
             TotalStudents = errors?.Count ?? 0,
             PassThreshold = settings.PassThreshold,
             AveragePercentage = 0,
@@ -57,6 +60,30 @@ public class ClassTestAnswersGradeUseCase(
             MinScore = 0,
             Results = [],
         };
+    }
+
+    private async Task<List<IndividualGradeErrorDetail>> FormatErrors(
+        List<IndividualGradeError> errors
+    )
+    {
+        var formattedErrors = new List<IndividualGradeErrorDetail>(errors.Count);
+        foreach (var error in errors)
+        {
+            var user = await _userReader.GetAsync(error.UserId);
+            NullException.ThrowIfNull(user);
+
+            formattedErrors.Add(
+                new()
+                {
+                    StudentId = user.Id,
+                    StudentName = user.FullName,
+                    Error = error.Error,
+                }
+            );
+        }
+
+        return formattedErrors;
+    }
 
     public async Task<Result<ClassTestReport, UseCaseError>> ExecuteAsync(
         UserActionDTO<ClassTestIdDTO> request
@@ -107,7 +134,7 @@ public class ClassTestAnswersGradeUseCase(
         }
 
         if (allAnswers.Count == 0)
-            return EmptyReport(cls, test, professor, classTest);
+            return await EmptyReport(cls, test, professor, classTest);
 
         var results = await _answerGrader.GradeManyAsync(allAnswers, test);
 
@@ -116,7 +143,7 @@ public class ClassTestAnswersGradeUseCase(
         var errors = splitted[false].Select(r => r.UnwrapErr()).ToList();
 
         if (successGrades.Count == 0)
-            return EmptyReport(cls, test, professor, classTest, errors);
+            return await EmptyReport(cls, test, professor, classTest, errors);
 
         var query = successGrades.Count switch
         {
@@ -170,13 +197,29 @@ public class ClassTestAnswersGradeUseCase(
                 minPoints = g.Points;
         }
 
+        var formattedResults = new List<StudentResultDetail>(studentResults.Count);
+        foreach (var r in studentResults)
+        {
+            var user = await _userReader.GetAsync(r.StudentId);
+            NullException.ThrowIfNull(user);
+
+            formattedResults.Add(
+                new()
+                {
+                    StudentId = r.StudentId,
+                    Grade = r.Grade,
+                    StudentName = user.FullName,
+                }
+            );
+        }
+
         return new ClassTestReport
         {
             TestTitle = test.Title,
             ClassName = cls.ClassName,
             ProfessorName = $"{professor.FirstName} {professor.FatherLastname}",
             TestDate = classTest.CreatedAt,
-            Errors = errors,
+            Errors = await FormatErrors(errors),
             TotalStudents = successGrades.Count,
             PassThreshold = settings.PassThreshold,
             AveragePercentage = Math.Round(averagePercentage * 100, 2),
@@ -185,7 +228,7 @@ public class ClassTestAnswersGradeUseCase(
             StandardDeviation = Math.Round(standardDeviation * 100, 3),
             MaxScore = Math.Round((double)maxPoints / total!.Value * 100, 2),
             MinScore = Math.Round((double)minPoints / total!.Value * 100, 2),
-            Results = studentResults,
+            Results = formattedResults,
         };
     }
 }

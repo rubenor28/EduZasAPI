@@ -6,6 +6,13 @@ public record StudentResult
     public required double Grade { get; init; }
 }
 
+public record StudentResultDetail
+{
+    public required ulong StudentId { get; init; }
+    public required string StudentName { get; init; }
+    public required double Grade { get; init; }
+}
+
 public record ClassTestReport
 {
     public required string ClassName { get; init; }
@@ -22,6 +29,6 @@ public record ClassTestReport
     public required double MinScore { get; init; }
     public required int TotalStudents { get; init; }
 
-    public required IEnumerable<StudentResult> Results { get; init; }
-    public required IEnumerable<IndividualGradeError> Errors { get; init; }
+    public required IEnumerable<StudentResultDetail> Results { get; init; }
+    public required IEnumerable<IndividualGradeErrorDetail> Errors { get; init; }
 }
