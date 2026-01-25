@@ -4,7 +4,7 @@ public record MultipleChoiseGrade : Grade
 {
     public override uint TotalPoints => 1;
     public required string Title { get; init; }
-    public required IDictionary<Guid, string> Options;
+    public required IDictionary<Guid, string> Options { get; init; }
     public required Guid CorrectOption { get; init; }
     public required Guid? SelectedOption { get; init; }
 
