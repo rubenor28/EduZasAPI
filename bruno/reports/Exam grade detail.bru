@@ -1,11 +1,11 @@
 meta {
-  name: Exam grade
+  name: Exam grade detail
   type: http
-  seq: 5
+  seq: 4
 }
 
 get {
-  url: http://localhost:5018/reports/answer/:userId/:classId/:testId
+  url: http://localhost:5018/reports/answer/:userId/:classId/:testId/detail
   body: none
   auth: inherit
 }

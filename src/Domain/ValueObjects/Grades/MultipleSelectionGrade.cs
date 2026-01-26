@@ -3,7 +3,6 @@ namespace Domain.ValueObjects.Grades;
 public record MultipleSelectionGrade : Grade
 {
     public override uint TotalPoints => (uint)Options.Count;
-    public required string Title { get; init; }
     public required IDictionary<Guid, string> Options { get; init; }
     public required ISet<Guid> CorrectOptions { get; init; }
     public required ISet<Guid> AnsweredOptions { get; init; }

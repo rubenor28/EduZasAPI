@@ -131,11 +131,13 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddScoped<UpdateStudentAnswerUseCase>();
         s.AddScoped<FinishTryUseCase>();
         s.AddScoped<GetAnswerStateUseCase>();
+        s.AddScoped<ProfessorUpdateAnswerUseCase>();
 
         // Reports
         s.AddScoped<AnswerGradeUseCase>();
         s.AddScoped<ClassTestAnswersGradeUseCase>();
         s.AddScoped<GlobalClassGradeUseCase>();
+        s.AddScoped<GetAnswerDetailUseCase>();
 
         return s;
     }

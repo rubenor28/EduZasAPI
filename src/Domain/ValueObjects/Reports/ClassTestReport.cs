@@ -6,11 +6,9 @@ public record StudentResult
     public required double Grade { get; init; }
 }
 
-public record StudentResultDetail
+public record StudentResultDetail : StudentResult
 {
-    public required ulong StudentId { get; init; }
     public required string StudentName { get; init; }
-    public required double Grade { get; init; }
 }
 
 public record ClassTestReport

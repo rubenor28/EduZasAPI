@@ -3,7 +3,6 @@ namespace Domain.ValueObjects.Grades;
 public record OrderingGrade : Grade
 {
     public override uint TotalPoints => (uint)Sequence.Count;
-    public required string Title { get; init; }
     public required List<string> Sequence { get; set; }
     public required List<string> AnsweredSequence { get; set; }
 

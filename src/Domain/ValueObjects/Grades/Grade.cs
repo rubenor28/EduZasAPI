@@ -11,8 +11,11 @@ namespace Domain.ValueObjects.Grades;
 [JsonDerivedType(typeof(OpenGrade), typeDiscriminator: QuestionTypes.Open)]
 public abstract record Grade
 {
+    public required string Title { get; init; }
+    public required Guid QuestionId { get; init; }
     public abstract uint TotalPoints { get; }
-    public bool? ManualGrade {get; init;} = null;
+    public bool? ManualGrade { get; init; } = null;
     public uint Points => ManualGrade == true ? TotalPoints : Asserts();
+
     public abstract uint Asserts();
 }

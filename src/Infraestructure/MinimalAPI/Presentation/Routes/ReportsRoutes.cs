@@ -18,6 +18,11 @@ public static class ReportsRoutes
             .AddEndpointFilter<ExecutorFilter>();
 
         group
+            .MapGet("/answer/{userId:ulong}/{classId}/{testId:guid}/detail", GetAnswerDetail)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
+        group
             .MapGet("/test/{classId}/{testId:guid}", GetTestReport)
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
@@ -46,6 +51,27 @@ public static class ReportsRoutes
         utils.HandleUseCaseAsync(
             ctx,
             testGradeUseCase,
+            mapRequest: () =>
+                new AnswerIdDTO
+                {
+                    ClassId = classId,
+                    TestId = testId,
+                    UserId = userId,
+                },
+            mapResponse: (grade) => Results.Ok(grade)
+        );
+
+    private static Task<IResult> GetAnswerDetail(
+        [FromRoute] ulong userId,
+        [FromRoute] string classId,
+        [FromRoute] Guid testId,
+        [FromServices] GetAnswerDetailUseCase getAnswerDetailUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            getAnswerDetailUseCase,
             mapRequest: () =>
                 new AnswerIdDTO
                 {

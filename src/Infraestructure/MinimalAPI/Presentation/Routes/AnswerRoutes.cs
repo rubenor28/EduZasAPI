@@ -32,6 +32,15 @@ public static class AnswerRoutes
             .Produces<FieldErrorResponse>(StatusCodes.Status404NotFound);
 
         group
+            .MapPut("/professor", ProfessorUpdateAnswer)
+            .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>()
+            .Produces<AnswerDomain>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
+            .Produces<FieldErrorResponse>(StatusCodes.Status404NotFound);
+
+        group
             .MapGet("/{userId:ulong}/{classId}/{testId:guid}", ReadAnswer)
             .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>()
@@ -79,6 +88,19 @@ public static class AnswerRoutes
         utils.HandleUseCaseAsync(
             ctx,
             updateAnswerUseCase,
+            mapRequest: () => update,
+            mapResponse: a => Results.Ok(a)
+        );
+
+    public static Task<IResult> ProfessorUpdateAnswer(
+        [FromBody] AnswerUpdateProfessorDTO update,
+        [FromServices] ProfessorUpdateAnswerUseCase professorUpdateAnswerUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            professorUpdateAnswerUseCase,
             mapRequest: () => update,
             mapResponse: a => Results.Ok(a)
         );

@@ -10,32 +10,40 @@ public class AnswerGrader
 {
     private Result<List<Grade>, string> CalculateGradesInternal(
         AnswerDomain answer,
-        TestDomain test
+        TestDomain test,
+        bool requireAllManualGrades
     )
     {
-        var missingManualGrades = test.RequiredManualGrade.Any(id =>
-            !answer.Metadata.ManualGrade.ContainsKey(id)
-        );
+        if (requireAllManualGrades)
+        {
+            var missingManualGrades = test.RequiredManualGrade.Any(id =>
+                !answer.Metadata.ManualGrade.ContainsKey(id)
+            );
 
-        if (missingManualGrades)
-            return "Calificacion manual requerida";
+            if (missingManualGrades)
+                return "Calificación manual requerida";
+        }
 
         var grades = test
             .Content.Select(kvp =>
             {
                 var (id, question) = kvp;
                 var questionAnswer = answer.Content[id];
-                answer.Metadata.ManualGrade.TryGetValue(id, out var manualGrade);
-                return CreateGrade(question, questionAnswer, manualGrade);
+                var manualGraded = answer.Metadata.ManualGrade.TryGetValue(id, out var manualGrade);
+                return CreateGrade(id, question, questionAnswer, manualGraded ? manualGrade : null);
             })
             .ToList();
 
         return grades;
     }
 
-    public Result<AnswerGrade, string> Grade(AnswerDomain answer, TestDomain test)
+    public Result<AnswerGrade, string> Grade(
+        AnswerDomain answer,
+        TestDomain test,
+        bool requireAllManualGrades = true
+    )
     {
-        var result = CalculateGradesInternal(answer, test);
+        var result = CalculateGradesInternal(answer, test, requireAllManualGrades);
         if (result.IsErr)
             return result.UnwrapErr();
 
@@ -50,9 +58,13 @@ public class AnswerGrader
         };
     }
 
-    public Result<SimpleGrade, string> SimpleGrade(AnswerDomain answer, TestDomain test)
+    public Result<SimpleGrade, string> SimpleGrade(
+        AnswerDomain answer,
+        TestDomain test,
+        bool requireAllManualGrades = true
+    )
     {
-        var result = CalculateGradesInternal(answer, test);
+        var result = CalculateGradesInternal(answer, test, requireAllManualGrades);
         if (result.IsErr)
             return result.UnwrapErr();
 
@@ -102,22 +114,30 @@ public class AnswerGrader
     public Task<IEnumerable<Result<AnswerGrade, IndividualGradeError>>> GradeManyAsync(
         IEnumerable<AnswerDomain> answers,
         TestDomain test,
+        bool requireAllManualGrades = true,
         CancellationToken ct = default
-    ) => ExecuteBatchAsync(answers, (ans, token) => Grade(ans, test), ct);
+    ) => ExecuteBatchAsync(answers, (ans, token) => Grade(ans, test, requireAllManualGrades), ct);
 
     public Task<IEnumerable<Result<SimpleGrade, IndividualGradeError>>> SimpleGradeManyAsync(
         IEnumerable<AnswerDomain> answers,
         TestDomain test,
+        bool requireAllManualGrades = true,
         CancellationToken ct = default
-    ) => ExecuteBatchAsync(answers, (ans, token) => SimpleGrade(ans, test), ct);
+    ) => ExecuteBatchAsync(answers, (ans, token) => SimpleGrade(ans, test, requireAllManualGrades), ct);
 
-    private Grade CreateGrade(IQuestion question, IQuestionAnswer answer, bool? manualGrade)
+    private Grade CreateGrade(
+        Guid id,
+        IQuestion question,
+        IQuestionAnswer answer,
+        bool? manualGrade
+    )
     {
         return (question, answer) switch
         {
             (ConceptRelationQuestion q, ConceptRelationQuestionAnswer qa) =>
                 new ConceptRelationGrade
                 {
+                    QuestionId = id,
                     Title = q.Title,
                     Pairs = [.. q.Concepts],
                     AnsweredPairs = [.. qa.AnsweredPairs],
@@ -125,6 +145,7 @@ public class AnswerGrader
                 },
             (MultipleChoiseQuestion q, MultipleChoiseQuestionAnswer qa) => new MultipleChoiseGrade
             {
+                QuestionId = id,
                 Title = q.Title,
                 Options = q.Options,
                 CorrectOption = q.CorrectOption,
@@ -134,18 +155,23 @@ public class AnswerGrader
             (MultipleSelectionQuestion q, MultipleSelectionQuestionAnswer qa) =>
                 new MultipleSelectionGrade
                 {
+                    QuestionId = id,
                     Title = q.Title,
                     Options = q.Options,
                     CorrectOptions = q.CorrectOptions,
                     AnsweredOptions = qa.SelectedOptions,
                     ManualGrade = manualGrade,
                 },
-            (OpenQuestion, OpenQuestionAnswer) => new OpenGrade
+            (OpenQuestion q, OpenQuestionAnswer qa) => new OpenGrade
             {
+                Title = q.Title,
+                QuestionId = id,
                 ManualGrade = manualGrade ?? false,
+                Text = qa.Text,
             },
             (OrderingQuestion q, OrderingQuestionAnswer qa) => new OrderingGrade
             {
+                QuestionId = id,
                 Title = q.Title,
                 Sequence = q.Sequence,
                 AnsweredSequence = qa.Sequence,
