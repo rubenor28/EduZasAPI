@@ -4,7 +4,10 @@ using Application.DTOs.ResourceViewSessions;
 using Application.UseCases.Reports;
 using Application.UseCases.ResourceViewSessions;
 using ClosedXML.Excel;
+using Domain.ValueObjects.Reports;
+using EntityFramework.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MinimalAPI.Presentation.Filters;
 using MinimalAPI.Presentation.Routes;
 
@@ -42,6 +45,11 @@ public static class ReportsRoutes
         group
             .MapPost("/resource/session", AddResourceViewSession)
             .RequireAuthorization("RequireAuthenticated")
+            .AddEndpointFilter<ExecutorFilter>();
+
+        group
+            .MapGet("/resource/session/{classId}/{resourceId:guid}", GetResourceViewReport)
+            .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>();
 
         return group;
@@ -191,4 +199,65 @@ public static class ReportsRoutes
             $"{report.ClassName}-grades.xlsx"
         );
     }
+
+    private static Task<IResult> GetResourceViewReport(
+        [FromRoute] string classId,
+        [FromRoute] Guid resourceId,
+        [FromServices] EduZasDotnetContext dbContext,
+        [FromServices] RoutesUtils utils
+    ) =>
+        utils.HandleResponseAsync(async () =>
+        {
+            var sessions = await dbContext
+                .ResourceViewSessions.Where(rvs =>
+                    rvs.ResourceId == resourceId && rvs.ClassId == classId
+                )
+                .Select(rvs => new
+                {
+                    rvs.UserId,
+                    rvs.User.FirstName,
+                    rvs.User.FatherLastname,
+                    rvs.Resource.Title,
+                    DurationMinutes = EF.Functions.DateDiffSecond(rvs.StartTimeUtc, rvs.EndTimeUtc) / 60.0,
+                    rvs.EndTimeUtc,
+                })
+                .ToListAsync();
+
+            if (!sessions.Any())
+                return Results.NoContent();
+
+            var summary = new ResourceMetrics(
+                TotalViews: sessions.Count,
+                UniqueStudentsCount: sessions.Select(s => s.UserId).Distinct().Count(),
+                AverageDurationMinutes: sessions.Average(s => s.DurationMinutes),
+                TotalTimeSpentMinutes: sessions.Sum(s => s.DurationMinutes)
+            );
+
+            var studentDetails = sessions
+                .GroupBy(s => new
+                {
+                    s.UserId,
+                    s.FirstName,
+                    s.FatherLastname,
+                })
+                .Select(g => new StudentActivityDetail(
+                    UserId: g.Key.UserId,
+                    FullName: $"{g.Key.FirstName} {g.Key.FatherLastname}",
+                    ViewCount: g.Count(),
+                    TotalMinutesSpent: g.Sum(s => s.DurationMinutes),
+                    LastViewed: g.Max(s => s.EndTimeUtc)
+                ))
+                .OrderByDescending(s => s.TotalMinutesSpent)
+                .ToList();
+
+            var report = new ResourceClassReportResponse(
+                ResourceId: resourceId,
+                ResourceTitle: sessions.First().Title,
+                ClassId: classId,
+                Summary: summary,
+                Students: studentDetails
+            );
+
+            return Results.Ok(report);
+        });
 }

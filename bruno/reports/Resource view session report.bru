@@ -1,0 +1,21 @@
+meta {
+  name: Resource view session report
+  type: http
+  seq: 7
+}
+
+get {
+  url: http://localhost:5018/reports/resource/session/:classId/:resourceId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  resourceId: 366b0c1b-4c48-46d5-86de-67072eb427db
+  classId: 3r2FtCloeA4hcNB
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
