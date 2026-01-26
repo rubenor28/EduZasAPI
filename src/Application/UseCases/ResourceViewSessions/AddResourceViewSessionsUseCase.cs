@@ -3,6 +3,7 @@ using Application.DTOs.ResourceViewSessions;
 using Application.Services.Validators;
 using Application.UseCases.Common;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Application.UseCases.ResourceViewSessions;
@@ -19,7 +20,7 @@ public class AddResourceViewSessionsUseCase(
         UserActionDTO<NewResourceViewSession> value
     )
     {
-        if (value.Data.UserId != value.Executor.Id)
+        if (value.Executor.Role != UserType.STUDENT || value.Data.UserId != value.Executor.Id)
             return UseCaseErrors.Unauthorized();
 
         return Unit.Value;
