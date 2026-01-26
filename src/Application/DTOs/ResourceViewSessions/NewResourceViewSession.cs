@@ -4,11 +4,30 @@ namespace Application.DTOs.ResourceViewSessions;
 /// DTO para crear una nueva sesión de visualización de recurso.
 /// Captura metadata de uso (tiempo, usuario, recurso) para reportes.
 /// </summary>
-public sealed record ResourceViewSession
+public sealed record NewResourceViewSession
 {
-    public required ulong UserId { get; init; }
-    public required Guid ResourceId { get; init; }
-    public required string ClassId { get; init; }
-    public required DateTimeOffset StartTimeUtc { get; init; }
-    public required DateTimeOffset EndTimeUtc {get;init;}
+    /// <summary>
+    /// Obtiene o establece el ID del usuario que visualiza el recurso.
+    /// </summary>
+    public required ulong UserId { get; set; }
+
+    /// <summary>
+    /// Obtiene o establece el ID del recurso que está siendo visualizado.
+    /// </summary>
+    public required Guid ResourceId { get; set; }
+
+    /// <summary>
+    /// Obtiene o establece el ID de la clase en el contexto de la cual se visualiza el recurso.
+    /// </summary>
+    public required string ClassId { get; set; }
+
+    /// <summary>
+    /// Obtiene o establece la fecha y hora (UTC) de inicio de la visualización.
+    /// </summary>
+    public required DateTimeOffset StartTimeUtc { get; set; }
+
+    /// <summary>
+    /// Obtiene o establece la fecha y hora (UTC) de finalización de la visualización. Es nulo si la sesión sigue activa.
+    /// </summary>
+    public required DateTimeOffset EndTimeUtc { get; set; }
 }

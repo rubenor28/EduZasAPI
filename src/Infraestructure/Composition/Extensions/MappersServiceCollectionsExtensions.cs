@@ -8,6 +8,7 @@ using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
 using Application.DTOs.Resources;
+using Application.DTOs.ResourceViewSessions;
 using Application.DTOs.Tags;
 using Application.DTOs.Tests;
 using Application.DTOs.UserNotifications;
@@ -184,6 +185,10 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IUpdateMapper<AnswerUpdateProfessorDTO, Answer>, AnswerProfessorUpdateEFMapper>();
         s.AddSingleton<IUpdateMapper<AnswerUpdateStudentDTO, Answer>, AnswerStudentUpdateEFMapper>();
         s.AddSingleton<IUpdateMapper<AnswerUpdateDTO, Answer>, AnswerUpdateEFMapper>();
+
+        // Resource view sessions
+        s.AddSingleton<IMapper<NewResourceViewSession, ResourceViewSession>, NewResourceViewSessionMapper>();
+        s.AddSingleton<IMapper<ResourceViewSession, ResourceViewSessionDomain>, ResourceViewSessionMapper>();
 
         return s;
     }

@@ -10,6 +10,7 @@ using Application.DTOs.Contacts;
 using Application.DTOs.ContactTags;
 using Application.DTOs.Notifications;
 using Application.DTOs.Resources;
+using Application.DTOs.ResourceViewSessions;
 using Application.DTOs.Tags;
 using Application.DTOs.Tests;
 using Application.DTOs.UserNotifications;
@@ -26,6 +27,7 @@ using EntityFramework.Application.DAOs.Contacts;
 using EntityFramework.Application.DAOs.ContactTags;
 using EntityFramework.Application.DAOs.Notifications;
 using EntityFramework.Application.DAOs.Resources;
+using EntityFramework.Application.DAOs.ResourceViewSessions;
 using EntityFramework.Application.DAOs.Tags;
 using EntityFramework.Application.DAOs.Tests;
 using EntityFramework.Application.DAOs.UserNotifications;
@@ -261,6 +263,9 @@ internal static class RepositoryServiceCollectionExtensions
                 pageSize
             )
         );
+
+        // Resource View sessions
+        s.AddScoped<ICreatorAsync<ResourceViewSessionDomain, NewResourceViewSession>, ResourceViewSessionEFCreator>();
 
         return s;
     }

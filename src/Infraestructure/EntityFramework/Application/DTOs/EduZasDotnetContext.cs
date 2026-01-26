@@ -913,7 +913,6 @@ public partial class EduZasDotnetContext : DbContext
                 .HasConversion<GuidToBigEndianBinaryConverter>();
             builder.Property(e => e.StartTimeUtc).HasColumnName("start_time_utc");
             builder.Property(e => e.EndTimeUtc).HasColumnName("end_time_utc");
-            builder.Property(e => e.DurationSeconds).HasColumnName("duration_seconds");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {

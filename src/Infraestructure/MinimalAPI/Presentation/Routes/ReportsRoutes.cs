@@ -1,6 +1,8 @@
 using Application.DTOs.Answers;
 using Application.DTOs.ClassTests;
+using Application.DTOs.ResourceViewSessions;
 using Application.UseCases.Reports;
+using Application.UseCases.ResourceViewSessions;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Presentation.Filters;
@@ -35,6 +37,11 @@ public static class ReportsRoutes
         group
             .MapGet("/test/{classId}/spreadsheet", GetClassReportSpreadSheet)
             .RequireAuthorization("ProfessorOrAdmin")
+            .AddEndpointFilter<ExecutorFilter>();
+
+        group
+            .MapPost("/resource/session", AddResourceViewSession)
+            .RequireAuthorization("RequireAuthenticated")
             .AddEndpointFilter<ExecutorFilter>();
 
         return group;
@@ -107,6 +114,19 @@ public static class ReportsRoutes
             globalClassGradeUseCase,
             mapRequest: () => classId,
             mapResponse: report => Results.Ok(report)
+        );
+
+    private static Task<IResult> AddResourceViewSession(
+        [FromBody] NewResourceViewSession request,
+        [FromServices] AddResourceViewSessionsUseCase addResourceViewSessionsUseCase,
+        [FromServices] RoutesUtils utils,
+        HttpContext ctx
+    ) =>
+        utils.HandleUseCaseAsync(
+            ctx,
+            addResourceViewSessionsUseCase,
+            mapRequest: () => request,
+            mapResponse: _ => Results.NoContent()
         );
 
     private static async Task<IResult> GetClassReportSpreadSheet(

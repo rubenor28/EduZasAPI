@@ -7,7 +7,7 @@ namespace Domain.Entities;
 /// Se utiliza para recopilar cuánto tiempo pasa un usuario viendo un recurso,
 /// con el fin de generar reportes y análisis de participación.
 /// </remarks>
-public sealed record ResourceViewSession
+public sealed record ResourceViewSessionDomain
 {
     /// <summary>
     /// Obtiene o establece el identificador único de la sesión de visualización.
@@ -38,11 +38,6 @@ public sealed record ResourceViewSession
     /// Obtiene o establece la fecha y hora (UTC) de finalización de la visualización. Es nulo si la sesión sigue activa.
     /// </summary>
     public required DateTimeOffset? EndTimeUtc { get; set; }
-
-    /// <summary>
-    /// Obtiene o establece la duración total de la sesión en segundos. Es nulo si la sesión no ha finalizado.
-    /// </summary>
-    public required int? DurationSeconds { get; set; }
 
     /// <summary>
     /// Obtiene o establece la fecha y hora de creación del registro de la sesión.

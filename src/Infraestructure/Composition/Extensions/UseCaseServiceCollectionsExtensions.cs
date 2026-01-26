@@ -12,6 +12,7 @@ using Application.UseCases.Database;
 using Application.UseCases.Notifications;
 using Application.UseCases.Reports;
 using Application.UseCases.Resources;
+using Application.UseCases.ResourceViewSessions;
 using Application.UseCases.Tags;
 using Application.UseCases.Tests;
 using Application.UseCases.UserNotifications;
@@ -138,6 +139,9 @@ internal static class UseCaseServiceCollectionExtensions
         s.AddScoped<ClassTestAnswersGradeUseCase>();
         s.AddScoped<GlobalClassGradeUseCase>();
         s.AddScoped<GetAnswerDetailUseCase>();
+
+        // Resource sessions
+        s.AddScoped<AddResourceViewSessionsUseCase>();
 
         return s;
     }

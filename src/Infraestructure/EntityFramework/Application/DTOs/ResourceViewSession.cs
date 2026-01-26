@@ -11,8 +11,7 @@ public partial class ResourceViewSession
     public Guid ResourceId { get; set; }
     public string ClassId { get; set; } = null!;
     public DateTimeOffset StartTimeUtc { get; set; }
-    public DateTimeOffset? EndTimeUtc { get; set; }
-    public int? DurationSeconds { get; set; }
+    public DateTimeOffset EndTimeUtc { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset ModifiedAt { get; set; }
 
