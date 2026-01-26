@@ -166,7 +166,7 @@ public class AnswerGrader
             {
                 Title = q.Title,
                 QuestionId = id,
-                ManualGrade = manualGrade ?? false,
+                ManualGrade = manualGrade,
                 Text = qa.Text,
             },
             (OrderingQuestion q, OrderingQuestionAnswer qa) => new OrderingGrade
