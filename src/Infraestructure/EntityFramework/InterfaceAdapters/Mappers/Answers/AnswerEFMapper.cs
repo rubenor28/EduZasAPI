@@ -13,7 +13,6 @@ public class AnswerMapper : IMapper<Answer, AnswerDomain>
             UserId = input.UserId,
             TestId = input.TestId,
             TryFinished = input.TryFinished,
-            Graded = input.Graded,
             Content = input.Content,
             Metadata = input.Metadata,
             CreatedAt = input.CreatedAt,

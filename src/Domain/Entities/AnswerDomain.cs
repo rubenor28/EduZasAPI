@@ -13,7 +13,6 @@ public class AnswerDomain
     public required Guid TestId { get; set; }
     public required string ClassId { get; set; }
     public required bool TryFinished { get; set; }
-    public required bool Graded { get; set; }
     public required IDictionary<Guid, IQuestionAnswer> Content { get; set; }
     public required AnswerMetadata Metadata { get; set; }
     public required DateTimeOffset CreatedAt { get; set; }

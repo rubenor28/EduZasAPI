@@ -162,7 +162,6 @@ CREATE TABLE answer (
     test_id BINARY(16) NOT NULL,
     class_id CHAR(20) NOT NULL,
     user_id BIGINT UNSIGNED NOT NULL,
-    graded TINYINT(1) NOT NULL DEFAULT 0,
     try_finished TINYINT(1) NOT NULL DEFAULT 0,
     content JSON NOT NULL DEFAULT '{}',
     metadata JSON NOT NULL DEFAULT '{"ManualGrade":{}}',
@@ -181,7 +180,7 @@ CREATE TABLE answer (
 CREATE TABLE notifications (
     notification_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     class_id CHAR(20),
-    title VARCHAR(100),
+    title VARCHAR(200),
     active TINYINT(1) NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (notification_id),

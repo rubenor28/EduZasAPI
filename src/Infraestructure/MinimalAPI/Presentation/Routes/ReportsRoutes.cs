@@ -216,9 +216,12 @@ public static class ReportsRoutes
                 {
                     rvs.UserId,
                     rvs.User.FirstName,
+                    rvs.User.MidName,
                     rvs.User.FatherLastname,
+                    rvs.User.MotherLastname,
                     rvs.Resource.Title,
-                    DurationMinutes = EF.Functions.DateDiffSecond(rvs.StartTimeUtc, rvs.EndTimeUtc) / 60.0,
+                    DurationMinutes = EF.Functions.DateDiffSecond(rvs.StartTimeUtc, rvs.EndTimeUtc)
+                        / 60.0,
                     rvs.EndTimeUtc,
                 })
                 .ToListAsync();
@@ -238,11 +241,22 @@ public static class ReportsRoutes
                 {
                     s.UserId,
                     s.FirstName,
+                    s.MidName,
                     s.FatherLastname,
+                    s.MotherLastname,
                 })
                 .Select(g => new StudentActivityDetail(
                     UserId: g.Key.UserId,
-                    FullName: $"{g.Key.FirstName} {g.Key.FatherLastname}",
+                    FullName: string.Join(
+                        " ",
+                        new[]
+                        {
+                            g.Key.FatherLastname,
+                            g.Key.MotherLastname,
+                            g.Key.FirstName,
+                            g.Key.MidName,
+                        }.Where(s => !string.IsNullOrWhiteSpace(s))
+                    ),
                     ViewCount: g.Count(),
                     TotalMinutesSpent: g.Sum(s => s.DurationMinutes),
                     LastViewed: g.Max(s => s.EndTimeUtc)

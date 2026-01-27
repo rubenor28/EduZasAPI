@@ -203,12 +203,6 @@ public partial class EduZasDotnetContext : DbContext
                 .HasDefaultValueSql("'0'")
                 .HasColumnName("try_finished");
 
-            answerBuilder
-                .Property(e => e.Graded)
-                .IsRequired()
-                .HasDefaultValueSql("'0'")
-                .HasColumnName("graded");
-
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 answerBuilder
