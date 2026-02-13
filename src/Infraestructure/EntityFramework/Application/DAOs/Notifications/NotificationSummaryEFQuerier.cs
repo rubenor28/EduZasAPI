@@ -28,5 +28,6 @@ public sealed class NotificationSummaryEFQuerier(
         _dbSet
             .AsNoTracking()
             .Where(un => un.UserId == criteria.UserId)
-            .WhereOptional(criteria.Readed, readed => un => un.Readed == readed);
+            .WhereOptional(criteria.Readed, readed => un => un.Readed == readed)
+            .OrderBy(un => un.CreatedAt);
 }

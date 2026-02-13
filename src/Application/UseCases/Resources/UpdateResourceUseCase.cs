@@ -12,7 +12,7 @@ namespace Application.UseCases.Resources;
 public sealed class UpdateResourceUseCase(
     IUpdaterAsync<ResourceDomain, ResourceUpdateDTO> updater,
     IReaderAsync<Guid, ResourceDomain> reader,
-    IBusinessValidationService<ResourceUpdateDTO>? validator = null
+    IBusinessValidationService<ResourceUpdateDTO> validator
 ) : UpdateUseCase<Guid, ResourceUpdateDTO, ResourceDomain>(updater, reader, validator)
 {
     /// <inheritdoc/>

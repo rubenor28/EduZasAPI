@@ -14,7 +14,7 @@ namespace Application.UseCases.Resources;
 public sealed class AddResourceUseCase(
     ICreatorAsync<ResourceDomain, NewResourceDTO> creator,
     IReaderAsync<ulong, UserDomain> userReader,
-    IBusinessValidationService<NewResourceDTO>? validator = null
+    IBusinessValidationService<NewResourceDTO> validator
 ) : AddUseCase<NewResourceDTO, ResourceDomain>(creator, validator)
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;

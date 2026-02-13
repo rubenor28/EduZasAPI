@@ -28,5 +28,6 @@ public class ResourceSummaryEFQuerier(
             .WhereOptional(
                 criteria.ClassId,
                 id => r => r.ClassResources.Any(rpc => rpc.ClassId == id)
-            );
+            )
+            .OrderByDescending(r => r.CreatedAt);
 }

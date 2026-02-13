@@ -28,5 +28,6 @@ public sealed class TestSummaryEFQuerier(
             .WhereOptional(
                 criteria.AssignedInClass,
                 c => test => test.TestsPerClasses.Any(tc => tc.ClassId == c)
-            );
+            )
+            .OrderByDescending(t => t.CreatedAt);
 }

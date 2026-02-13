@@ -1,5 +1,6 @@
 using Application.DTOs.Classes;
 using Application.DTOs.Contacts;
+using Application.DTOs.Resources;
 using Application.DTOs.Tests;
 using Application.DTOs.Users;
 using Application.Services.Validators;
@@ -10,6 +11,7 @@ using FluentValidationProj.Application.Services.Auth;
 using FluentValidationProj.Application.Services.Classes;
 using FluentValidationProj.Application.Services.Common;
 using FluentValidationProj.Application.Services.Contacts;
+using FluentValidationProj.Application.Services.Resources;
 using FluentValidationProj.Application.Services.Tests;
 using FluentValidationProj.Application.Services.Tests.Questions;
 using FluentValidationProj.Application.Services.Users;
@@ -47,6 +49,10 @@ internal static class ValidatorServiceCollectionExtensions
         // Contact validators
         services.AddSingleton<IBusinessValidationService<NewContactDTO>, NewContactFluentValidator>();
         services.AddSingleton<IBusinessValidationService<ContactUpdateDTO>, ContactUpdateFluentValidator>();
+
+        // Resources validators
+        services.AddSingleton<IBusinessValidationService<NewResourceDTO>, NewResourceFluentValidator>();
+        services.AddSingleton<IBusinessValidationService<ResourceUpdateDTO>, ResourceUpdateFluentValidator>();
 
         // Test validators
         services.AddSingleton<IBusinessValidationService<NewTestDTO>, NewTestFluentValidator>();
