@@ -28,9 +28,27 @@ public class AnswerGrader
             .Content.Select(kvp =>
             {
                 var (id, question) = kvp;
-                var questionAnswer = answer.Content[id];
-                var manualGraded = answer.Metadata.ManualGrade.TryGetValue(id, out var manualGrade);
-                return CreateGrade(id, question, questionAnswer, manualGraded ? manualGrade : null);
+                if (answer.Content.TryGetValue(id, out var questionAnswer))
+                {
+                    var manualGraded = answer.Metadata.ManualGrade.TryGetValue(
+                        id,
+                        out var manualGrade
+                    );
+
+                    return CreateGrade(
+                        id,
+                        question,
+                        questionAnswer,
+                        manualGraded ? manualGrade : null
+                    );
+                }
+
+                return new MissingAnswerGrade
+                {
+                    QuestionId = id,
+                    Title = question.Title,
+                    QuestionWeight = GetQuestionWeight(question),
+                };
             })
             .ToList();
 
@@ -124,6 +142,20 @@ public class AnswerGrader
         bool requireAllManualGrades = true,
         CancellationToken ct = default
     ) => ExecuteBatchAsync(answers, (ans, token) => SimpleGrade(ans, test, requireAllManualGrades), ct);
+
+    private uint GetQuestionWeight(IQuestion question) =>
+        question switch
+        {
+            ConceptRelationQuestion q => (uint)q.Concepts.Count,
+            MultipleChoiseQuestion => 1,
+            MultipleSelectionQuestion q => (uint)q.Options.Count,
+            OpenQuestion => 1,
+            OrderingQuestion q => (uint)q.Sequence.Count,
+            _
+                => throw new InvalidOperationException(
+                    $"No es posible calcular puntaje para pregunta de tipo {question.GetType().Name}"
+                )
+        };
 
     private Grade CreateGrade(
         Guid id,
