@@ -396,7 +396,7 @@ public partial class EduZasDotnetContext : DbContext
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("active");
             notificationBuilder.Property(e => e.ClassId).HasMaxLength(20).HasColumnName("class_id");
-            notificationBuilder.Property(e => e.Title).HasMaxLength(60).HasColumnName("title");
+            notificationBuilder.Property(e => e.Title).HasMaxLength(200).HasColumnName("title");
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
             {
