@@ -6,6 +6,11 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
 
+namespace Application.UseCases.Tests;
+
+/// <summary>
+/// Caso de uso para leer una evaluación pública, validando la autorización del usuario.
+/// </summary>
 public class ReadPublicTestUseCase(
     IReaderAsync<PublicTestIdDTO, PublicTestDTO> reader,
     IReaderAsync<ClassTestIdDTO, ClassTestDomain> classTestReader,

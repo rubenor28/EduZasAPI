@@ -2,8 +2,15 @@ using Domain.Entities.Questions;
 using FluentValidation;
 using FluentValidation.Results;
 
+
+/// <summary>
+/// Validador para preguntas de opción múltiple.
+/// </summary>
 public class MultipleChoiseQuestionFluentValidator : QuestionFluentValidator<MultipleChoiseQuestion>
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="MultipleChoiseQuestionFluentValidator"/>.
+    /// </summary>
     public MultipleChoiseQuestionFluentValidator()
     {
         RuleFor(q => q.Options)

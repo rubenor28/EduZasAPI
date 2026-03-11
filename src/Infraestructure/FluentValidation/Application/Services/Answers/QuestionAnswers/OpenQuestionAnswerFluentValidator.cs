@@ -7,10 +7,16 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Answers.QuestionAnswers;
 
+/// <summary>
+/// Validador para las respuestas a preguntas abiertas.
+/// </summary>
 public class OpenQuestionAnswerFluentValidator
     : FluentValidator<(OpenQuestionAnswer, OpenQuestion)>,
         IOpenQuestionAnswerValidator
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="OpenQuestionAnswerFluentValidator"/>.
+    /// </summary>
     public OpenQuestionAnswerFluentValidator()
     {
         RuleFor(answer => answer.Item1.Text)

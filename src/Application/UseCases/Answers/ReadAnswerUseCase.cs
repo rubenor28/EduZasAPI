@@ -8,6 +8,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Answers;
 
+/// <summary>
+/// Caso de uso para leer las respuestas de un estudiante en una evaluación.
+/// </summary>
 public class ReadAnswerUseCase(
     IReaderAsync<AnswerIdDTO, AnswerDomain> reader,
     IBusinessValidationService<AnswerIdDTO>? validator = null

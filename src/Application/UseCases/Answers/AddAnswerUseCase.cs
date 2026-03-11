@@ -15,6 +15,9 @@ using StudentReader = IReaderAsync<UserClassRelationId, ClassStudentDomain>;
 using TestReader = IReaderAsync<Guid, TestDomain>;
 using UserReader = IReaderAsync<ulong, UserDomain>;
 
+/// <summary>
+/// Caso de uso para añadir una nueva respuesta de un estudiante a una evaluación.
+/// </summary>
 public sealed class AddAnswerUseCase(
     AnswerCreator creator,
     TestReader testReader,

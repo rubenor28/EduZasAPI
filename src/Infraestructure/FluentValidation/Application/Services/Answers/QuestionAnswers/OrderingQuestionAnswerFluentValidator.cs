@@ -7,10 +7,16 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Answers.QuestionAnswers;
 
+/// <summary>
+/// Validador para las respuestas a preguntas de ordenamiento.
+/// </summary>
 public sealed class OrderingQuestionAnswerFluentValidator
     : FluentValidator<(OrderingQuestionAnswer, OrderingQuestion)>,
         IOrderingQuestionAnswerValidator
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="OrderingQuestionAnswerFluentValidator"/>.
+    /// </summary>
     public OrderingQuestionAnswerFluentValidator()
     {
         RuleFor(tuple => tuple.Item1.Sequence)

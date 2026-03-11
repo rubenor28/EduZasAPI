@@ -120,5 +120,11 @@ public sealed record UserCriteriaDTO : CriteriaDTO
     /// </value>
     public string? TeachingInClass { get; init; }
 
+    /// <summary>
+    /// Obtiene o establece una colección de IDs de usuario para filtrar.
+    /// </summary>
+    /// <value>
+    /// Una colección de identificadores únicos de usuarios.
+    /// </value>
     public IEnumerable<ulong>? Ids { get; init; }
 }

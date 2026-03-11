@@ -17,23 +17,59 @@ using IProfessorReader = IReaderAsync<UserClassRelationId, ClassProfessorDomain>
 using ITestQuerier = IQuerierAsync<TestDomain, TestCriteriaDTO>;
 using IUserQuerier = IQuerierAsync<UserDomain, UserCriteriaDTO>;
 
+/// <summary>
+/// Representa las puntuaciones de un estudiante en múltiples evaluaciones.
+/// </summary>
 public record StudentTestScores
 {
+    /// <summary>
+    /// ID del estudiante.
+    /// </summary>
     public required ulong StudentId { get; init; }
+    /// <summary>
+    /// Correo electrónico del estudiante.
+    /// </summary>
     public required string Email { get; init; }
+    /// <summary>
+    /// Nombre completo del estudiante.
+    /// </summary>
     public required string StudentName { get; init; }
+    /// <summary>
+    /// Diccionario donde la clave es el ID de la evaluación y el valor es la puntuación obtenida.
+    /// </summary>
     public required IDictionary<Guid, double?> Scores { get; init; }
 }
 
+/// <summary>
+/// Representa un reporte de calificaciones tabular para una clase, mostrando las puntuaciones de los estudiantes en diferentes evaluaciones.
+/// </summary>
 public record TabularClassGradeReport
 {
+    /// <summary>
+    /// ID de la clase.
+    /// </summary>
     public required string ClassId { get; init; }
+    /// <summary>
+    /// Nombre de la clase.
+    /// </summary>
     public required string ClassName { get; init; }
+    /// <summary>
+    /// Diccionario donde la clave es el ID de la evaluación y el valor es el título de la evaluación.
+    /// </summary>
     public required IDictionary<Guid, string> TestTitles { get; init; }
+    /// <summary>
+    /// Colección de puntuaciones de los estudiantes en las evaluaciones.
+    /// </summary>
     public required IEnumerable<StudentTestScores> StudentScores { get; init; }
+    /// <summary>
+    /// Colección de errores de calificación individuales, agrupados por ID de evaluación.
+    /// </summary>
     public required ILookup<Guid, IndividualGradeError> Errors { get; init; }
 }
 
+/// <summary>
+/// Caso de uso para generar un reporte de calificaciones global para una clase, incluyendo puntuaciones de todos los estudiantes en todas las evaluaciones.
+/// </summary>
 public class GlobalClassGradeUseCase(
     IProfessorReader professorReader,
     IAnswerQuerier answerQuerier,

@@ -2,8 +2,15 @@ using Domain.Entities.Questions;
 using FluentValidation;
 using FluentValidation.Results;
 
+
+/// <summary>
+/// Validador para preguntas de ordenamiento.
+/// </summary>
 public class OrderingQuestionFluentValidator : QuestionFluentValidator<OrderingQuestion>
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="OrderingQuestionFluentValidator"/>.
+    /// </summary>
     public OrderingQuestionFluentValidator()
     {
         RuleFor(q => q.Sequence)

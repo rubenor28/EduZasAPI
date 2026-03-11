@@ -11,6 +11,9 @@ namespace Application.UseCases.ResourceViewSessions;
 using IBusinessValidator = IBusinessValidationService<NewResourceViewSession>;
 using IResourceViewCreator = ICreatorAsync<ResourceViewSessionDomain, NewResourceViewSession>;
 
+/// <summary>
+/// Caso de uso para añadir nuevas sesiones de visualización de recursos.
+/// </summary>
 public class AddResourceViewSessionsUseCase(
     IResourceViewCreator creator,
     IBusinessValidator? validator = null

@@ -5,12 +5,23 @@ using Application.DTOs.UserNotifications;
 using Domain.Entities;
 using Quartz;
 
+
+/// <summary>
+/// Job de Quartz para crear notificaciones.
+/// </summary>
+/// <param name="logger">Logger.</param>
+/// <param name="notificationCreator">Creador de notificaciones.</param>
+/// <param name="userNotificationCreator">Creador de notificaciones de usuario.</param>
 public class CreateNotificationJob(
     ILogger<CreateNotificationJob> logger,
     ICreatorAsync<NotificationDomain, NewNotificationDTO> notificationCreator,
     IBulkCreatorAsync<UserNotificationDomain, NewUserNotificationDTO> userNotificationCreator
 ) : IJob
 {
+    /// <summary>
+    /// Ejecuta el job de creación de notificaciones.
+    /// </summary>
+    /// <param name="ctx">Contexto de ejecución del job.</param>
     public async Task Execute(IJobExecutionContext ctx)
     {
         var dataMap = ctx.MergedJobDataMap;

@@ -4,8 +4,16 @@ using Domain.Entities.Questions;
 
 namespace InterfaceAdapters.Mappers.Tests;
 
+
+/// <summary>
+/// Convertidor JSON personalizado para la interfaz <see cref="IQuestion"/>.
+/// Permite la serialización y deserialización polimórfica de los distintos tipos de preguntas.
+/// </summary>
 public class IQuestionJsonConverter : JsonConverter<IQuestion>
 {
+    /// <summary>
+    /// Lee y convierte el JSON a un tipo derivado de <see cref="IQuestion"/>.
+    /// </summary>
     public override IQuestion? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
@@ -62,6 +70,9 @@ public class IQuestionJsonConverter : JsonConverter<IQuestion>
         return question;
     }
 
+    /// <summary>
+    /// Escribe un objeto derivado de <see cref="IQuestion"/> como JSON.
+    /// </summary>
     public override void Write(
         Utf8JsonWriter writer,
         IQuestion value,

@@ -18,6 +18,9 @@ using IProfessorReader = IReaderAsync<UserClassRelationId, ClassProfessorDomain>
 using ITestReader = IReaderAsync<Guid, TestDomain>;
 using IUserReader = IReaderAsync<ulong, UserDomain>;
 
+/// <summary>
+/// Caso de uso para obtener los detalles de la calificación de una respuesta de examen.
+/// </summary>
 public class GetAnswerDetailUseCase(
     IAnswerReader answerReader,
     ITestReader testReader,

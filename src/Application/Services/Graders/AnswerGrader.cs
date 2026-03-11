@@ -4,8 +4,9 @@ using Domain.Entities.Questions;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Grades;
 
-namespace Application.Services.Graders;
-
+/// <summary>
+/// Proporciona métodos para calificar las respuestas de un examen.
+/// </summary>
 public class AnswerGrader
 {
     private Result<List<Grade>, string> CalculateGradesInternal(
@@ -55,6 +56,13 @@ public class AnswerGrader
         return grades;
     }
 
+    /// <summary>
+    /// Califica la respuesta de un examen y devuelve un informe detallado de la calificación.
+    /// </summary>
+    /// <param name="answer">La respuesta del estudiante al examen.</param>
+    /// <param name="test">El examen que se está calificando.</param>
+    /// <param name="requireAllManualGrades">Indica si se requiere que todas las preguntas de calificación manual estén calificadas.</param>
+    /// <returns>Un resultado que contiene el informe de calificación detallado o un mensaje de error.</returns>
     public Result<AnswerGrade, string> Grade(
         AnswerDomain answer,
         TestDomain test,
@@ -76,6 +84,13 @@ public class AnswerGrader
         };
     }
 
+    /// <summary>
+    /// Califica la respuesta de un examen y devuelve una calificación simple (puntos obtenidos y totales).
+    /// </summary>
+    /// <param name="answer">La respuesta del estudiante al examen.</param>
+    /// <param name="test">El examen que se está calificando.</param>
+    /// <param name="requireAllManualGrades">Indica si se requiere que todas las preguntas de calificación manual estén calificadas.</param>
+    /// <returns>Un resultado que contiene la calificación simple o un mensaje de error.</returns>
     public Result<SimpleGrade, string> SimpleGrade(
         AnswerDomain answer,
         TestDomain test,
@@ -129,6 +144,14 @@ public class AnswerGrader
         );
     }
 
+    /// <summary>
+    /// Califica de forma asíncrona una colección de respuestas de examen y devuelve un informe detallado para cada una.
+    /// </summary>
+    /// <param name="answers">La colección de respuestas de los estudiantes.</param>
+    /// <param name="test">El examen que se está calificando.</param>
+    /// <param name="requireAllManualGrades">Indica si se requiere que todas las preguntas de calificación manual estén calificadas.</param>
+    /// <param name="ct">El token de cancelación.</param>
+    /// <returns>Una tarea que representa la operación asíncrona, con una colección de resultados de calificación detallada.</returns>
     public Task<IEnumerable<Result<AnswerGrade, IndividualGradeError>>> GradeManyAsync(
         IEnumerable<AnswerDomain> answers,
         TestDomain test,
@@ -136,6 +159,14 @@ public class AnswerGrader
         CancellationToken ct = default
     ) => ExecuteBatchAsync(answers, (ans, token) => Grade(ans, test, requireAllManualGrades), ct);
 
+    /// <summary>
+    /// Califica de forma asíncrona una colección de respuestas de examen y devuelve una calificación simple para cada una.
+    /// </summary>
+    /// <param name="answers">La colección de respuestas de los estudiantes.</param>
+    /// <param name="test">El examen que se está calificando.</param>
+    /// <param name="requireAllManualGrades">Indica si se requiere que todas las preguntas de calificación manual estén calificadas.</param>
+    /// <param name="ct">El token de cancelación.</param>
+    /// <returns>Una tarea que representa la operación asíncrona, con una colección de resultados de calificación simple.</returns>
     public Task<IEnumerable<Result<SimpleGrade, IndividualGradeError>>> SimpleGradeManyAsync(
         IEnumerable<AnswerDomain> answers,
         TestDomain test,
@@ -215,3 +246,4 @@ public class AnswerGrader
         };
     }
 }
+

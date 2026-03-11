@@ -41,6 +41,7 @@ public sealed record NewUserDTO
     /// <summary>
     /// Obtiene o inicializa el tipo de usuario.
     /// </summary>
+    /// <value>Rol del usuario en el sistema. Campo obligatorio.</value>
     public required UserType Role { get; init; }
 
     /// <summary>

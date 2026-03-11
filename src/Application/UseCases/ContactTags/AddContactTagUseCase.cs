@@ -17,6 +17,9 @@ using TagCreator = ICreatorAsync<TagDomain, NewTagDTO>;
 using TagQuerier = IQuerierAsync<TagDomain, TagCriteriaDTO>;
 using UserReader = IReaderAsync<ulong, UserDomain>;
 
+/// <summary>
+/// Caso de uso para añadir una etiqueta a un contacto, creándola si no existe.
+/// </summary>
 public sealed class AddContactTagUseCase(
     ContactTagCreator contactTagCreator,
     TagQuerier tagQuerier,

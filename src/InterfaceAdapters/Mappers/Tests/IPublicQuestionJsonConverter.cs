@@ -3,8 +3,16 @@ using System.Text.Json.Serialization;
 using Domain.Entities.PublicQuestions;
 using Domain.Entities.Questions;
 
+
+/// <summary>
+/// Convertidor JSON personalizado para la interfaz <see cref="IPublicQuestion"/>.
+/// Permite la serialización y deserialización polimórfica de los distintos tipos de preguntas públicas.
+/// </summary>
 public class IPublicQuestionJsonConverter : JsonConverter<IPublicQuestion>
 {
+    /// <summary>
+    /// Lee y convierte el JSON a un tipo derivado de <see cref="IPublicQuestion"/>.
+    /// </summary>
     public override IPublicQuestion? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
@@ -61,6 +69,9 @@ public class IPublicQuestionJsonConverter : JsonConverter<IPublicQuestion>
         return question;
     }
 
+    /// <summary>
+    /// Escribe un objeto derivado de <see cref="IPublicQuestion"/> como JSON.
+    /// </summary>
     public override void Write(
         Utf8JsonWriter writer,
         IPublicQuestion value,

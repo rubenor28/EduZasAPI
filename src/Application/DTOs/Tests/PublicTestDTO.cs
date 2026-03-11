@@ -2,6 +2,9 @@ using Domain.Entities.PublicQuestions;
 
 namespace Application.DTOs.Tests;
 
+/// <summary>
+/// Representa la información pública de una evaluación (examen o prueba) para ser visualizada por usuarios.
+/// </summary>
 public sealed record PublicTestDTO
 {
     /// <summary>

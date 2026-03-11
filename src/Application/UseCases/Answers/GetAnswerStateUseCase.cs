@@ -11,13 +11,28 @@ using IAnswerReader = IReaderAsync<AnswerIdDTO, AnswerDomain>;
 using IClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using ITestReader = IReaderAsync<Guid, TestDomain>;
 
+/// <summary>
+/// Define los posibles estados de calificación de una respuesta.
+/// </summary>
 public static class AnswerGradeState
 {
+    /// <summary>
+    /// El intento aún no ha finalizado; el estudiante puede seguir respondiendo.
+    /// </summary>
     public static string Idle = "idle";
+    /// <summary>
+    /// El intento ha finalizado, pero requiere calificación manual por parte de un profesor.
+    /// </summary>
     public static string WaitingGrade = "waiting-grade";
+    /// <summary>
+    /// El intento ha sido finalizado y calificado.
+    /// </summary>
     public static string Graded = "graded";
 }
 
+/// <summary>
+/// Caso de uso para obtener el estado de la calificación de una respuesta.
+/// </summary>
 public class GetAnswerStateUseCase(
     IAnswerReader answerReader,
     IClassTestReader classTestReader,

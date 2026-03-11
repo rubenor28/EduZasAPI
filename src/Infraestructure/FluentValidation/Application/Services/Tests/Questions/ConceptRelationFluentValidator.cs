@@ -2,9 +2,16 @@ using Domain.Entities.Questions;
 using FluentValidation;
 using FluentValidation.Results;
 
+
+/// <summary>
+/// Validador para preguntas de relación de conceptos.
+/// </summary>
 public sealed class ConceptRelationFluentValidator
     : QuestionFluentValidator<ConceptRelationQuestion>
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="ConceptRelationFluentValidator"/>.
+    /// </summary>
     public ConceptRelationFluentValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;

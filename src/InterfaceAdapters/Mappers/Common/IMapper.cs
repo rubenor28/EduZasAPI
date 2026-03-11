@@ -90,7 +90,7 @@ public interface IMapper<T1, T2, T3, T4, T5, TOut>
     /// <param name="in2">El segundo objeto de origen.</param>
     /// <param name="in3">El tercer objeto de origen.</param>
     /// <param name="in4">El cuarto objeto de origen.</param>
-    /// <param name="in5">El cuarto objeto de origen.</param>
+    /// <param name="in5">El quinto objeto de origen.</param>
     /// <returns>El objeto mapeado de tipo <typeparamref name="TOut"/>.</returns>
     public TOut Map(T1 in1, T2 in2, T3 in3, T4 in4, T5 in5);
 }

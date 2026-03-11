@@ -8,6 +8,10 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Answers;
 
+
+/// <summary>
+/// Validador para la actualización de respuestas de estudiantes utilizando FluentValidation.
+/// </summary>
 public sealed class AnswerUpdateStudentFluentValidator
     : FluentValidator<(AnswerUpdateStudentDTO, TestDomain)>,
         IAnswerUpdateStudentValidator
@@ -18,6 +22,14 @@ public sealed class AnswerUpdateStudentFluentValidator
     private readonly IMultipleSelectionQuestionAnswerValidator _multipleSelectionQAValidator;
     private readonly IOrderingQuestionAnswerValidator _orderingQuestionQAValidator;
 
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="AnswerUpdateStudentFluentValidator"/>.
+    /// </summary>
+    /// <param name="openQuestionAnswerValidator">Validador para respuestas de preguntas abiertas.</param>
+    /// <param name="conceptRelationQuestionAnswerValidator">Validador para respuestas de preguntas de relación de conceptos.</param>
+    /// <param name="multipleChoiseQuestionAnswerValidator">Validador para respuestas de preguntas de opción múltiple.</param>
+    /// <param name="multipleSelectionQuestionAnswerValidator">Validador para respuestas de preguntas de selección múltiple.</param>
+    /// <param name="orderingQuestionAnswerValidator">Validador para respuestas de preguntas de ordenamiento.</param>
     public AnswerUpdateStudentFluentValidator(
         IOpenQuestionAnswerValidator openQuestionAnswerValidator,
         IConceptRelationQuestionAnswerValidator conceptRelationQuestionAnswerValidator,

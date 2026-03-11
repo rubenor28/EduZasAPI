@@ -6,6 +6,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.Notifications;
 
+/// <summary>
+/// Caso de uso para consultar un resumen paginado de notificaciones para un usuario específico.
+/// </summary>
 public sealed class QueryNotificationSummaryUseCase(
     IQuerierAsync<NotificationSummaryDTO, NotificationSummaryCriteriaDTO> querier
 )
@@ -32,6 +35,9 @@ public sealed class QueryNotificationSummaryUseCase(
     }
 }
 
+/// <summary>
+/// Caso de uso para verificar si un usuario tiene notificaciones sin leer.
+/// </summary>
 public sealed class HasUnreadNotificationUseCase(
     IQuerierAsync<NotificationSummaryDTO, NotificationSummaryCriteriaDTO> querier
 ) : IUseCaseAsync<ulong, bool>

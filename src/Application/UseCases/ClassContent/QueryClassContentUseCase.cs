@@ -7,10 +7,9 @@ using Domain.ValueObjects;
 
 namespace Application.UseCases.ClassContent;
 
-///<summary>
-/// Define una entidad encargada de buscar los recursos o evaluaciones asociadas a una
-/// clase
-///<summary/>
+/// <summary>
+/// Caso de uso para consultar el contenido de una clase (recursos y evaluaciones).
+/// </summary>
 public sealed class QueryClassContentUseCase(
     IQuerierAsync<ClassContentDTO, ClassContentCriteriaDTO> querier,
     IReaderAsync<UserClassRelationId, ClassStudentDomain> studentReader,
@@ -23,7 +22,7 @@ public sealed class QueryClassContentUseCase(
         professorReader;
     private UserType? _userTypeOnClass = null;
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassContentCriteriaDTO> criteria
     )
@@ -50,7 +49,7 @@ public sealed class QueryClassContentUseCase(
         return Unit.Value;
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     protected override UserActionDTO<ClassContentCriteriaDTO> PrevFormat(
         UserActionDTO<ClassContentCriteriaDTO> criteria
     )
@@ -66,9 +65,9 @@ public sealed class QueryClassContentUseCase(
         };
     }
 
-    ///<summary>
-    /// Obtener el tipo de usuario de un profesor sobre una clase especifica
-    ///</summary>
+    /// <summary>
+    /// Verifica el tipo de usuario de un profesor en una clase específica.
+    /// </summary>
     private async Task<UserType?> CheckProfessorClassUserType(ulong professorId, string classId)
     {
         var id = new UserClassRelationId { ClassId = classId, UserId = professorId };
@@ -84,9 +83,9 @@ public sealed class QueryClassContentUseCase(
         return null;
     }
 
-    ///<summary>
-    /// Obtener el tipo de usuario de un estudiante sobre una clase especifica
-    ///</summary>
+    /// <summary>
+    /// Verifica el tipo de usuario de un estudiante en una clase específica.
+    /// </summary>
     private async Task<UserType?> CheckStudentClassUserType(ulong studentId, string classId)
     {
         var id = new UserClassRelationId { ClassId = classId, UserId = studentId };

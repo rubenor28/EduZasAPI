@@ -7,10 +7,16 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Answers.QuestionAnswers;
 
+/// <summary>
+/// Validador para las respuestas a preguntas de selección múltiple.
+/// </summary>
 public class MultipleSelectionQuestionAnswerFluentValidator
     : FluentValidator<(MultipleSelectionQuestionAnswer, MultipleSelectionQuestion)>,
         IMultipleSelectionQuestionAnswerValidator
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="MultipleSelectionQuestionAnswerFluentValidator"/>.
+    /// </summary>
     public MultipleSelectionQuestionAnswerFluentValidator()
     {
         RuleFor(tuple => tuple.Item1.SelectedOptions)

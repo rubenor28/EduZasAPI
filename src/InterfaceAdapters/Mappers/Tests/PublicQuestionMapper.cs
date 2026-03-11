@@ -5,6 +5,11 @@ using InterfaceAdapters.Mappers.Common;
 
 namespace InterfaceAdapters.Mappers.Tests;
 
+
+/// <summary>
+/// Mapeador para convertir preguntas de dominio a su versión pública,
+/// que no contiene las respuestas correctas y presenta las opciones en orden aleatorio.
+/// </summary>
 public sealed class PublicQuestionMapper
     : IMapper<Guid, IQuestion, IPublicQuestion>,
         IMapper<Guid, ConceptRelationQuestion, PublicConceptRelationQuestion>,
@@ -13,6 +18,9 @@ public sealed class PublicQuestionMapper
         IMapper<Guid, OpenQuestion, PublicOpenQuestion>,
         IMapper<Guid, OrderingQuestion, PublicOrderingQuestion>
 {
+    /// <summary>
+    /// Mapea una pregunta de relación de conceptos a su versión pública.
+    /// </summary>
     public PublicConceptRelationQuestion Map(Guid id, ConceptRelationQuestion q)
     {
         var count = q.Concepts.Count;
@@ -39,6 +47,9 @@ public sealed class PublicQuestionMapper
         };
     }
 
+    /// <summary>
+    /// Mapea una pregunta de opción múltiple a su versión pública.
+    /// </summary>
     public PublicMultipleChoiseQuestion Map(Guid id, MultipleChoiseQuestion input)
     {
         var options = input
@@ -56,6 +67,9 @@ public sealed class PublicQuestionMapper
         };
     }
 
+    /// <summary>
+    /// Mapea una pregunta de selección múltiple a su versión pública.
+    /// </summary>
     public PublicMultipleSelectionQuestion Map(Guid id, MultipleSelectionQuestion input)
     {
         var options = input
@@ -73,6 +87,9 @@ public sealed class PublicQuestionMapper
         };
     }
 
+    /// <summary>
+    /// Mapea una pregunta abierta a su versión pública.
+    /// </summary>
     public PublicOpenQuestion Map(Guid id, OpenQuestion input) =>
         new()
         {
@@ -81,6 +98,9 @@ public sealed class PublicQuestionMapper
             ImageUrl = input.ImageUrl,
         };
 
+    /// <summary>
+    /// Mapea una pregunta de ordenamiento a su versión pública.
+    /// </summary>
     public PublicOrderingQuestion Map(Guid id, OrderingQuestion input)
     {
         Random.Shared.Shuffle(CollectionsMarshal.AsSpan(input.Sequence));
@@ -94,6 +114,9 @@ public sealed class PublicQuestionMapper
         };
     }
 
+    /// <summary>
+    /// Mapea una pregunta genérica a su versión pública correspondiente.
+    /// </summary>
     public IPublicQuestion Map(Guid id, IQuestion input) =>
         input switch
         {

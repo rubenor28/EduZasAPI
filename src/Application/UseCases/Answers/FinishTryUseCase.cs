@@ -5,6 +5,11 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.ValueObjects;
 
+namespace Application.UseCases.Answers;
+
+/// <summary>
+/// Caso de uso para finalizar un intento de evaluación de un estudiante.
+/// </summary>
 public class FinishTryUseCase(
     IUpdaterAsync<AnswerDomain, AnswerUpdateDTO> updater,
     IReaderAsync<AnswerIdDTO, AnswerDomain> reader

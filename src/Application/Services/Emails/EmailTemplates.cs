@@ -1,5 +1,18 @@
+/// <summary>
+/// Proporciona plantillas de correo electrónico con formato HTML.
+/// </summary>
 public static class EmailTemplates
 {
+    /// <summary>
+    /// Genera una plantilla de correo electrónico genérica con un título, mensaje y un botón de acción.
+    /// </summary>
+    /// <param name="title">El título del correo electrónico.</param>
+    /// <param name="mainMessage">El mensaje principal del cuerpo del correo.</param>
+    /// <param name="detailLabel">La etiqueta para el campo de detalle (por ejemplo, "Código de Verificación").</param>
+    /// <param name="detailValue">El valor del campo de detalle.</param>
+    /// <param name="actionText">El texto que se mostrará en el botón de acción.</param>
+    /// <param name="actionUrl">La URL a la que redirigirá el botón de acción.</param>
+    /// <returns>Una cadena con el contenido HTML del correo electrónico.</returns>
     public static string GetGenericTemplate(
         string title,
         string mainMessage,

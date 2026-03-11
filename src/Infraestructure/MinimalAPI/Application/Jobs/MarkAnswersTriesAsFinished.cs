@@ -5,6 +5,14 @@ using global::Application.DAOs;
 using global::Application.DTOs.Answers;
 using Quartz;
 
+
+/// <summary>
+/// Job de Quartz para marcar los intentos de respuesta como finalizados.
+/// </summary>
+/// <param name="logger">Logger.</param>
+/// <param name="classTestUpdater">Actualizador de exámenes de clase.</param>
+/// <param name="updater">Actualizador de respuestas.</param>
+/// <param name="querier">Consultor de respuestas.</param>
 public class MarkAnswersTriesAsFinished(
     ILogger<MarkAnswersTriesAsFinished> logger,
     IUpdaterAsync<ClassTestDomain, ClassTestUpdateDTO> classTestUpdater,
@@ -18,6 +26,10 @@ public class MarkAnswersTriesAsFinished(
     private readonly IUpdaterAsync<ClassTestDomain, ClassTestUpdateDTO> _classTestUpdater =
         classTestUpdater;
 
+    /// <summary>
+    /// Ejecuta el job para marcar los intentos de respuesta como finalizados.
+    /// </summary>
+    /// <param name="context">Contexto de ejecución del job.</param>
     public async Task Execute(IJobExecutionContext context)
     {
         // Recuperar parámetros pasados desde el endpoint

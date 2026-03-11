@@ -3,7 +3,7 @@ namespace Application.DTOs.Tests;
 /// <summary>
 /// Resumen ligero de una evaluación para listados.
 /// </summary>
-public sealed record TestSummary
+public sealed record TestSummaryDTO
 {
     /// <summary>
     /// Identificador único de la evaluación.

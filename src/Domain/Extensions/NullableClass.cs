@@ -35,6 +35,13 @@ public static class NullableClass
         return value;
     }
 
+    /// <summary>
+    /// Ejecuta una acción asíncrona si el valor no es nulo.
+    /// </summary>
+    /// <typeparam name="T">El tipo del objeto (clase).</typeparam>
+    /// <param name="value">El objeto que puede ser nulo.</param>
+    /// <param name="action">La acción asíncrona a ejecutar con el valor no nulo.</param>
+    /// <returns>El valor original.</returns>
     public static async Task<T?> IfSomeAsync<T>(this T? value, Func<T, Task> action)
         where T : class
     {
@@ -44,6 +51,13 @@ public static class NullableClass
         return value;
     }
 
+    /// <summary>
+    /// Ejecuta una acción asíncrona si el valor es nulo.
+    /// </summary>
+    /// <typeparam name="T">El tipo del objeto (clase).</typeparam>
+    /// <param name="value">El objeto que puede ser nulo.</param>
+    /// <param name="action">La acción asíncrona a ejecutar.</param>
+    /// <returns>El valor original.</returns>
     public static async Task<T?> IfNullAsync<T>(this T? value, Func<Task> action)
         where T : class
     {

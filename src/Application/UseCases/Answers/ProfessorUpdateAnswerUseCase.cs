@@ -12,6 +12,9 @@ using IAnswerProfessorUpdater = IUpdaterAsync<AnswerDomain, AnswerUpdateProfesso
 using IAnswerReader = IReaderAsync<AnswerIdDTO, AnswerDomain>;
 using IProfessorReader = IReaderAsync<UserClassRelationId, ClassProfessorDomain>;
 
+/// <summary>
+/// Caso de uso para que un profesor actualice una respuesta de un estudiante.
+/// </summary>
 public class ProfessorUpdateAnswerUseCase(
     IProfessorReader professorReader,
     IAnswerProfessorUpdater updater,

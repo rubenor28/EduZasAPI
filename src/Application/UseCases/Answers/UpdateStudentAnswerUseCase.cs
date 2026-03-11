@@ -14,6 +14,9 @@ using ClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using StudentAnswerUpdater = IUpdaterAsync<AnswerDomain, AnswerUpdateStudentDTO>;
 using TestReader = IReaderAsync<Guid, TestDomain>;
 
+/// <summary>
+/// Caso de uso para actualizar las respuestas de un estudiante en una evaluación.
+/// </summary>
 public sealed class UpdateStudentAnswerUseCase(
     StudentAnswerUpdater updater,
     AnswerReader reader,

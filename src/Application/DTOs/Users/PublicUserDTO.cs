@@ -16,6 +16,12 @@ public sealed record PublicUserDTO
     /// <value>Identificador numérico del usuario. Campo obligatorio.</value>
     public required ulong Id { get; init; }
 
+    /// <summary>
+    /// Obtiene o establece el estado de activación del usuario.
+    /// </summary>
+    /// <value>
+    /// true si el usuario está activo; false si está inactivo.
+    /// </value>
     public required bool Active { get; init; }
 
     /// <summary>

@@ -66,7 +66,10 @@ public class UserDomain
     /// </summary>
     public string? MotherLastname { get; set; }
 
-public string FullName => string.Join(" ", 
+    /// <summary>
+    /// Obtiene el nombre completo del usuario, concatenando apellidos y nombres.
+    /// </summary>
+    public string FullName => string.Join(" ", 
     new[] { FatherLastname, MotherLastname, FirstName, MidName }
     .Where(s => !string.IsNullOrWhiteSpace(s)));
 }

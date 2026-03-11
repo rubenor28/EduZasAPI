@@ -4,8 +4,14 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Resources;
 
+/// <summary>
+/// Validador para la creación de nuevos recursos.
+/// </summary>
 public class NewResourceFluentValidator : FluentValidator<NewResourceDTO>
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="NewResourceFluentValidator"/>.
+    /// </summary>
     public NewResourceFluentValidator()
     {
         RuleFor(r => r.Title)

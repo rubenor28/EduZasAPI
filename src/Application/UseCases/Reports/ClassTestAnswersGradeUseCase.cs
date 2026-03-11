@@ -16,6 +16,9 @@ using IClassTestReader = IReaderAsync<ClassTestIdDTO, ClassTestDomain>;
 using ITestReader = IReaderAsync<Guid, TestDomain>;
 using IUserReader = IReaderAsync<ulong, UserDomain>;
 
+/// <summary>
+/// Caso de uso para generar un reporte de calificaciones para un examen específico dentro de una clase.
+/// </summary>
 public class ClassTestAnswersGradeUseCase(
     IClassTestReader classTestReader,
     IAnswerQuerier answerQuerier,

@@ -7,6 +7,12 @@ using Quartz;
 
 namespace MinimalAPI.Application.Services;
 
+
+/// <summary>
+/// Implementación de <see cref="ITaskScheduler"/> que utiliza Quartz.NET para programar tareas.
+/// </summary>
+/// <param name="schedulerFactory">Fábrica de planificadores de Quartz.</param>
+/// <param name="logger">Logger.</param>
 public class QuartzTaskScheduler(
     ISchedulerFactory schedulerFactory,
     ILogger<QuartzTaskScheduler> logger
@@ -15,6 +21,7 @@ public class QuartzTaskScheduler(
     private readonly ISchedulerFactory _schedulerFactory = schedulerFactory;
     private readonly ILogger<QuartzTaskScheduler> _logger = logger;
 
+    /// <inheritdoc />
     public async Task BulkSendEmail(IEnumerable<EmailMessage> messages)
     {
         var scheduler = await _schedulerFactory.GetScheduler();
@@ -35,6 +42,7 @@ public class QuartzTaskScheduler(
         await scheduler.ScheduleJob(jobDetail, trigger);
     }
 
+    /// <inheritdoc />
     public async Task CreateNotification(
         NewNotificationDTO notification,
         IEnumerable<ulong> usersIds
@@ -66,6 +74,7 @@ public class QuartzTaskScheduler(
         await scheduler.ScheduleJob(jobDetail, trigger);
     }
 
+    /// <inheritdoc />
     public async Task ScheduleMarkAnswersAsFinished(
         string classId,
         Guid testId,

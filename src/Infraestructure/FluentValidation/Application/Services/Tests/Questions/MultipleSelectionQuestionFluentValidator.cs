@@ -4,9 +4,15 @@ using FluentValidation.Results;
 
 namespace FluentValidationProj.Application.Services.Tests.Questions;
 
+/// <summary>
+/// Validador para preguntas de selección múltiple.
+/// </summary>
 public class MultipleSelectionQuestionFluentValidator
     : QuestionFluentValidator<MultipleSelectionQuestion>
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="MultipleSelectionQuestionFluentValidator"/>.
+    /// </summary>
     public MultipleSelectionQuestionFluentValidator()
     {
         RuleFor(q => q.Options)

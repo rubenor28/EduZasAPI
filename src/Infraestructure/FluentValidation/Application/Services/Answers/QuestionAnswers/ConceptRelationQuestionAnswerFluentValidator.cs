@@ -7,10 +7,16 @@ using FluentValidationProj.Application.Services.Common;
 
 namespace FluentValidationProj.Application.Services.Answers.QuestionAnswers;
 
+/// <summary>
+/// Validador para las respuestas a preguntas de relación de conceptos.
+/// </summary>
 public class ConceptRelationQuestionAnswerFluentValidator
     : FluentValidator<(ConceptRelationQuestionAnswer, ConceptRelationQuestion)>,
         IConceptRelationQuestionAnswerValidator
 {
+    /// <summary>
+    /// Inicializa una nueva instancia de la clase <see cref="ConceptRelationQuestionAnswerFluentValidator"/>.
+    /// </summary>
     public ConceptRelationQuestionAnswerFluentValidator()
     {
         RuleFor(answer => answer.Item1.AnsweredPairs)

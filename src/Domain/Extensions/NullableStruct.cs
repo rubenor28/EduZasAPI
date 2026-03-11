@@ -35,6 +35,13 @@ public static class NullableStruct
         return value;
     }
 
+    /// <summary>
+    /// Ejecuta una acción asíncrona si el <see cref="Nullable{T}"/> tiene un valor.
+    /// </summary>
+    /// <typeparam name="T">El tipo del struct.</typeparam>
+    /// <param name="value">El valor <see cref="Nullable{T}"/>.</param>
+    /// <param name="action">La acción asíncrona a ejecutar con el valor.</param>
+    /// <returns>El valor original.</returns>
     public static async Task<T?> IfSomeAsync<T>(this T? value, Func<T, Task> action)
         where T : struct
     {
@@ -44,6 +51,13 @@ public static class NullableStruct
         return value;
     }
 
+    /// <summary>
+    /// Ejecuta una acción asíncrona si el <see cref="Nullable{T}"/> es nulo.
+    /// </summary>
+    /// <typeparam name="T">El tipo del struct.</typeparam>
+    /// <param name="value">El valor <see cref="Nullable{T}"/>.</param>
+    /// <param name="action">La acción asíncrona a ejecutar.</param>
+    /// <returns>El valor original.</returns>
     public static async Task<T?> IfNullAsync<T>(this T? value, Func<Task> action)
         where T : struct
     {

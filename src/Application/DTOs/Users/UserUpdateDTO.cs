@@ -39,12 +39,12 @@ public sealed record UserUpdateDTO
     /// <summary>
     /// Obtiene o establece la contraseña del usuario (generalmente hasheada).
     /// </summary>
-    /// <value>Contraseña del usuario. Campo obligatorio.</value>
+    /// <value>Contraseña del usuario. Puede ser null si no se desea cambiar.</value>
     /// <remarks>
     /// Este campo debe contener la contraseña hasheada, no en texto plano.
     /// Para operaciones de cambio de contraseña, considera usar un campo separado.
     /// </remarks>
-    public required string? Password { get; init; }
+    public string? Password { get; init; }
 
     /// <summary>
     /// Obtiene o establece el estado de activación del usuario.
@@ -55,25 +55,25 @@ public sealed record UserUpdateDTO
     /// </value>
     public required bool Active { get; init; }
 
+    /// <summary>
+    /// Obtiene o establece el rol del usuario en el sistema.
+    /// </summary>
+    /// <value>El tipo de rol del usuario. Campo obligatorio.</value>
     public required UserType Role { get; init; }
 
     /// <summary>
     /// Obtiene o establece el segundo nombre del usuario (opcional).
     /// </summary>
     /// <value>
-    /// Optional que contiene el segundo nombre si está presente,
-    /// o None si no se desea modificar este campo.
-    /// Valor por defecto: None.
+    /// El segundo nombre del usuario, o null si no se especifica.
     /// </value>
-    public string? MidName { get; init; } 
+    public string? MidName { get; init; }
 
     /// <summary>
     /// Obtiene o establece el apellido materno del usuario (opcional).
     /// </summary>
     /// <value>
-    /// Optional que contiene el apellido materno si está presente,
-    /// o None si no se desea modificar este campo.
-    /// Valor por defecto: None.
+    /// El apellido materno del usuario, o null si no se especifica.
     /// </value>
-    public string? MotherLastname { get; init; } 
+    public string? MotherLastname { get; init; }
 }

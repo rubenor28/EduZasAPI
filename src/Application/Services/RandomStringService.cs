@@ -2,21 +2,33 @@ using System.Text;
 
 namespace Application.Services;
 
+/// <summary>
+/// Define los argumentos opcionales para la generación de cadenas aleatorias.
+/// </summary>
 public sealed record RandomStringGeneratorArgs
 {
+    /// <summary>
+    /// Obtiene o inicializa el conjunto de caracteres permitidos para la generación.
+    /// </summary>
     public char[]? AllowedChars { get; init; }
+    /// <summary>
+    /// Obtiene o inicializa la longitud máxima de la cadena a generar.
+    /// </summary>
     public ulong? MaxStrLenght { get; init; }
 }
 
 /// <summary>
 /// Implementación de servicio para generar cadenas aleatorias.
 /// </summary>
+/// <param name="chars">El conjunto de caracteres por defecto a utilizar.</param>
+/// <param name="strLength">La longitud por defecto de la cadena a generar.</param>
 public class RandomStringGeneratorService(char[] chars, uint strLength)
     : IRandomStringGeneratorService,
         IRandomStringGeneratorService<RandomStringGeneratorArgs?>
 {
     private readonly Random _rdm = new();
 
+    /// <inheritdoc/>
     public string Generate()
     {
         var builder = new StringBuilder();
@@ -33,6 +45,7 @@ public class RandomStringGeneratorService(char[] chars, uint strLength)
     /// <summary>
     /// Genera una cadena aleatoria con opciones específicas.
     /// </summary>
+    /// <param name="opts">Argumentos opcionales para personalizar la generación.</param>
     /// <returns>Cadena generada.</returns>
     public string Generate(RandomStringGeneratorArgs? opts = null)
     {

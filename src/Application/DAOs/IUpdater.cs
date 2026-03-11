@@ -16,5 +16,13 @@ public interface IUpdaterAsync<E, UE>
     /// <returns>La entidad actualizada de tipo <typeparamref name="E"/>.</returns>
     Task<E> UpdateAsync(UE updateData);
 
+    /// <summary>
+    /// Actualiza de forma masiva una colección de entidades usando los datos proporcionados.
+    /// </summary>
+    /// <param name="updates">Colección de objetos de datos necesarios para la actualización de las entidades.</param>
+    /// <returns>
+    /// Una tarea que representa la operación asíncrona. El resultado de la tarea es una colección
+    /// de las entidades actualizadas de tipo <typeparamref name="E"/>.
+    /// </returns>
     Task<IEnumerable<E>> BulkUpdateAsync(IEnumerable<UE> updates);
 }
