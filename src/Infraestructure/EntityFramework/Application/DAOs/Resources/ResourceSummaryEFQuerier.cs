@@ -17,8 +17,12 @@ public class ResourceSummaryEFQuerier(
     int pageSize
 ) : EFQuerier<ResourceSummary, ResourceCriteriaDTO, Resource>(ctx, projector, pageSize)
 {
-    /// <inheritdoc/>
-    public override IQueryable<Resource> BuildQuery(ResourceCriteriaDTO criteria) =>
+    /// <summary>
+    /// Construye la consulta de resúmenes de recursos a partir de los criterios de búsqueda.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de recursos.</returns>
+    public override IQueryable<Resource> BuildQuery(ResourceCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

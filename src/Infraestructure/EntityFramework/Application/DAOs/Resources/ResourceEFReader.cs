@@ -14,7 +14,10 @@ public sealed class ResourceEFReader(
     IMapper<Resource, ResourceDomain> mapper
 ) : EFReader<Guid, ResourceDomain, Resource>(ctx, mapper)
 {
-    /// <inheritdoc/>
-    protected override Expression<Func<Resource, bool>> GetIdPredicate(Guid id) =>
-        r => r.ResourceId == id;
+    /// <summary>
+    /// Obtiene el predicado para filtrar recursos por su GUID.
+    /// </summary>
+    /// <param name="id">GUID del recurso.</param>
+    /// <returns>Expresión de predicado.</returns>
+    protected override Expression<Func<Resource, bool>> GetIdPredicate(Guid id) => r => r.ResourceId == id;
 }

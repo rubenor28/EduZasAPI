@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Contacts;
 /// </summary>
 public class UpdateContactEFMapper : IUpdateMapper<ContactUpdateDTO, AgendaContact>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Actualiza una entidad de contacto con los datos del DTO.
+    /// </summary>
+    /// <param name="source">DTO de actualización.</param>
+    /// <param name="destination">Entidad de base de datos.</param>
     public void Map(ContactUpdateDTO source, AgendaContact destination)
     {
         destination.Alias = source.Alias;

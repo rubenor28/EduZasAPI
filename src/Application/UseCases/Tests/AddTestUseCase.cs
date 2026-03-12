@@ -19,7 +19,11 @@ public sealed class AddTestUseCase(
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor sea el propietario del examen y que el profesor exista.
+    /// </summary>
+    /// <param name="value">Datos del nuevo examen.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewTestDTO> value
     )

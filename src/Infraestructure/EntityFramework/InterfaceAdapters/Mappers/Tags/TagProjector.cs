@@ -11,7 +11,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Tags;
 /// </summary>
 public class TagProjector : IEFProjector<Tag, TagDomain, TagCriteriaDTO>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de etiqueta a un objeto de dominio.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección.</returns>
     public Expression<Func<Tag, TagDomain>> GetProjection(TagCriteriaDTO criteria) =>
         input =>
             new()

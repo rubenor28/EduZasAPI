@@ -3,8 +3,15 @@ using System.Text.Json.Serialization;
 using Domain.Entities.QuestionAnswers;
 using Domain.Entities.Questions;
 
+/// <summary>
+/// Convertidor JSON personalizado para la interfaz <see cref="IQuestionAnswer"/>.
+/// Permite la serialización y deserialización polimórfica de los distintos tipos de respuestas de preguntas.
+/// </summary>
 public class IQuestionAnswerJsonConverter : JsonConverter<IQuestionAnswer>
 {
+    /// <summary>
+    /// Lee y convierte el JSON a un tipo derivado de <see cref="IQuestionAnswer"/>.
+    /// </summary>
     public override IQuestionAnswer? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
@@ -57,6 +64,9 @@ public class IQuestionAnswerJsonConverter : JsonConverter<IQuestionAnswer>
         return answer;
     }
 
+    /// <summary>
+    /// Escribe un objeto derivado de <see cref="IQuestionAnswer"/> como JSON.
+    /// </summary>
     public override void Write(
         Utf8JsonWriter writer,
         IQuestionAnswer value,

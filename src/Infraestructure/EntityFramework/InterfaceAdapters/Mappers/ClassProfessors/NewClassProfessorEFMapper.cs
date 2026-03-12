@@ -9,8 +9,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 /// </summary>
 public class NewClassProfessorEFMapper : IMapper<NewClassProfessorDTO, ClassProfessor>
 {
-    /// <inheritdoc/>
-    public ClassProfessor Map(NewClassProfessorDTO r) =>
+    /// <summary>
+    /// Mapea un DTO de nueva relación profesor-clase a una entidad de base de datos.
+    /// </summary>
+    /// <param name="source">DTO de creación.</param>
+    /// <returns>Entidad de base de datos.</returns>
+    public ClassProfessor Map(NewClassProfessorDTO source) =>
         new()
         {
             ClassId = r.ClassId,

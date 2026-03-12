@@ -11,8 +11,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Contacts;
 /// </summary>
 public class ContactProjector : IEFProjector<AgendaContact, ContactDomain, ContactCriteriaDTO>
 {
-    /// <inheritdoc/>
-    public Expression<Func<AgendaContact, ContactDomain>> GetProjection(ContactCriteriaDTO _) =>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de contacto a un objeto de dominio.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección.</returns>
+    public Expression<Func<AgendaContact, ContactDomain>> GetProjection(ContactCriteriaDTO criteria) =>
         input =>
             new()
             {

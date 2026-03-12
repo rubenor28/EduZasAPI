@@ -21,7 +21,11 @@ public class ProfessorClassesEFQuerier(
         maxPageSize
     )
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Construye la consulta para obtener el resumen de las clases de un profesor.
+    /// </summary>
+    /// <param name="cr">Criterios de consulta.</param>
+    /// <returns>IQueryable de clases.</returns>
     public override IQueryable<Class> BuildQuery(ProfessorClassesSummaryCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()

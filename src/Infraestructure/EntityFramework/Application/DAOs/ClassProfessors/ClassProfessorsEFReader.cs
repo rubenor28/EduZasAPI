@@ -14,8 +14,10 @@ public class ClassProfessorsEFReader(
     IMapper<ClassProfessor, ClassProfessorDomain> mapper
 ) : EFReader<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(ctx, mapper)
 {
-    /// <inheritdoc/>
-    protected override Expression<Func<ClassProfessor, bool>> GetIdPredicate(
-        UserClassRelationId id
-    ) => cs => cs.ProfessorId == id.UserId && cs.ClassId == id.ClassId;
+    /// <summary>
+    /// Obtiene el predicado para filtrar la relación profesor-clase por su ID compuesto.
+    /// </summary>
+    /// <param name="id">ID compuesto de la relación.</param>
+    /// <returns>Expresión de predicado.</returns>
+    protected override Expression<Func<ClassProfessor, bool>> GetIdPredicate(UserClassRelationId id) => cs => cs.ProfessorId == id.UserId && cs.ClassId == id.ClassId;
 }

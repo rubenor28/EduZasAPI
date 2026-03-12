@@ -9,8 +9,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 /// </summary>
 public class TestMapper : IMapper<Test, TestDomain>
 {
-    /// <inheritdoc/>
-    public TestDomain Map(Test t) =>
+    /// <summary>
+    /// Mapea una entidad de examen de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="input">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio de examen.</returns>
+    public TestDomain Map(Test input) =>
         new()
         {
             Id = t.TestId,

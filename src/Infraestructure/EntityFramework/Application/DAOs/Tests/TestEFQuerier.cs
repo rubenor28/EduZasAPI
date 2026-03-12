@@ -17,8 +17,12 @@ public sealed class TestEFQuerier(
     int pageSize
 ) : EFQuerier<TestDomain, TestCriteriaDTO, Test>(ctx, projector, pageSize)
 {
-    /// <inheritdoc/>
-    public override IQueryable<Test> BuildQuery(TestCriteriaDTO criteria) =>
+    /// <summary>
+    /// Construye la consulta de exámenes a partir de los criterios de búsqueda.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de exámenes.</returns>
+    public override IQueryable<Test> BuildQuery(TestCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

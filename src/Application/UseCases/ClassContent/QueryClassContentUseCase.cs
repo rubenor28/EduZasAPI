@@ -22,7 +22,11 @@ public sealed class QueryClassContentUseCase(
         professorReader;
     private UserType? _userTypeOnClass = null;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Valida asíncronamente la autorización del usuario para consultar el contenido de la clase específica.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta que incluyen el ID de la clase.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassContentCriteriaDTO> criteria
     )
@@ -49,7 +53,11 @@ public sealed class QueryClassContentUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Ajusta los criterios de consulta según el rol del usuario en la clase (ej. filtrar solo contenido visible para estudiantes).
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta originales.</param>
+    /// <returns>Criterios de consulta formateados según el rol.</returns>
     protected override UserActionDTO<ClassContentCriteriaDTO> PrevFormat(
         UserActionDTO<ClassContentCriteriaDTO> criteria
     )

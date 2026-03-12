@@ -26,7 +26,11 @@ public abstract class AddUseCase<NE, E>(
     /// </summary>
     protected readonly IBusinessValidationService<NE>? _validator = validator;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Ejecuta la lógica para agregar una nueva entidad.
+    /// </summary>
+    /// <param name="action">Datos de la acción y el ejecutor.</param>
+    /// <returns>Resultado con la entidad creada o error de caso de uso.</returns>
     public async virtual Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<NE> request)
     {
         var formattedRequest = PreValidationFormat(request);

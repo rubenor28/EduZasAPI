@@ -17,8 +17,12 @@ public sealed class ContactEFUpdater(
     IUpdateMapper<ContactUpdateDTO, AgendaContact> updateMapper
 ) : EFUpdater<ContactDomain, ContactUpdateDTO, AgendaContact>(ctx, domainMapper, updateMapper)
 {
-    /// <inheritdoc/>
-    protected override async Task<AgendaContact?> GetTrackedByDTO(ContactUpdateDTO value) =>
+    /// <summary>
+    /// Obtiene la entidad de contacto rastreada a partir del DTO.
+    /// </summary>
+    /// <param name="value">DTO de actualización.</param>
+    /// <returns>Entidad rastreada o null.</returns>
+    protected override Task<AgendaContact?> GetTrackedByDTO(ContactUpdateDTO value) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

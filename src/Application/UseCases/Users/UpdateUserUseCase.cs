@@ -25,7 +25,11 @@ public sealed class UpdateUserUseCase(
 {
     private readonly IHashService _hasher = hasher;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Formatea los nombres del usuario a mayúsculas antes de la validación.
+    /// </summary>
+    /// <param name="value">Datos de la actualización.</param>
+    /// <returns>Acción con los datos formateados.</returns>
     protected override UserActionDTO<UserUpdateDTO> PreValidationFormat(
         UserActionDTO<UserUpdateDTO> value
     ) =>
@@ -41,7 +45,12 @@ public sealed class UpdateUserUseCase(
             Executor = value.Executor,
         };
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor esté autorizado y que la contraseña no sea idéntica a la anterior.
+    /// </summary>
+    /// <param name="value">Datos de la actualización.</param>
+    /// <param name="record">Entidad de usuario original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserUpdateDTO> value,
         UserDomain record
@@ -65,7 +74,12 @@ public sealed class UpdateUserUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Hashea la nueva contraseña y asegura que el email original no sea modificado.
+    /// </summary>
+    /// <param name="value">Datos de la actualización.</param>
+    /// <param name="original">Entidad de usuario original.</param>
+    /// <returns>Acción con los datos procesados.</returns>
     protected override UserActionDTO<UserUpdateDTO> PostValidationFormat(
         UserActionDTO<UserUpdateDTO> value,
         UserDomain original
@@ -86,6 +100,10 @@ public sealed class UpdateUserUseCase(
         };
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador del usuario desde el DTO de actualización.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>ID del usuario.</returns>
     protected override ulong GetId(UserUpdateDTO dto) => dto.Id;
 }

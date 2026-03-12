@@ -11,7 +11,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Resources;
 /// </summary>
 public class ResourceProjector : IEFProjector<Resource, ResourceDomain, ResourceCriteriaDTO>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de recurso de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección.</returns>
     public Expression<Func<Resource, ResourceDomain>> GetProjection(ResourceCriteriaDTO criteria) =>
         input =>
             new()
@@ -32,10 +36,12 @@ public class ResourceProjector : IEFProjector<Resource, ResourceDomain, Resource
 /// </summary>
 public class ResourceSummaryProjector : IEFProjector<Resource, ResourceSummary, ResourceCriteriaDTO>
 {
-    /// <inheritdoc/>
-    public Expression<Func<Resource, ResourceSummary>> GetProjection(
-        ResourceCriteriaDTO criteria
-    ) =>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de recurso a un resumen de recurso.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección para el resumen.</returns>
+    public Expression<Func<Resource, ResourceSummary>> GetProjection(ResourceCriteriaDTO criteria) =>
         input =>
             new()
             {

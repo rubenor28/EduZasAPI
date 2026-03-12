@@ -14,8 +14,12 @@ public sealed class ContactTagEFDeleter(
     IMapper<ContactTag, ContactTagDomain> domainMapper
 ) : EFDeleter<ContactTagIdDTO, ContactTagDomain, ContactTag>(ctx, domainMapper)
 {
-    /// <inheritdoc/>
-    public override async Task<ContactTag?> GetTrackedById(ContactTagIdDTO id) =>
+    /// <summary>
+    /// Obtiene la entidad de etiqueta de contacto rastreada por su ID compuesto para eliminación.
+    /// </summary>
+    /// <param name="id">ID compuesto.</param>
+    /// <returns>Entidad rastreada o null.</returns>
+    public override Task<ContactTag?> GetTrackedById(ContactTagIdDTO id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

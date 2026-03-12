@@ -20,7 +20,11 @@ public class UserProjector : IEFProjector<User, UserDomain, UserCriteriaDTO>
             _ => UserType.STUDENT,
         };
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de usuario de la base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección.</returns>
     public Expression<Func<User, UserDomain>> GetProjection(UserCriteriaDTO criteria) =>
         source =>
             new()

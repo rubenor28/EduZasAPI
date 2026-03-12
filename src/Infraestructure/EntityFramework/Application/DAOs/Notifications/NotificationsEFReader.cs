@@ -14,7 +14,10 @@ public class NotificationEFReader(
     IMapper<Notification, NotificationDomain> mapper
 ) : EFReader<ulong, NotificationDomain, Notification>(ctx, mapper)
 {
-    /// <inheritdoc/>
-    protected override Expression<Func<Notification, bool>> GetIdPredicate(ulong id) =>
-        n => n.NotificationId == id;
+    /// <summary>
+    /// Obtiene el predicado para filtrar notificaciones por su ID numérico.
+    /// </summary>
+    /// <param name="id">ID numérico de la notificación.</param>
+    /// <returns>Expresión de predicado.</returns>
+    protected override Expression<Func<Notification, bool>> GetIdPredicate(ulong id) => n => n.NotificationId == id;
 }

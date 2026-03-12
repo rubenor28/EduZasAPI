@@ -11,7 +11,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 /// </summary>
 public class TestProjector : IEFProjector<Test, TestDomain, TestCriteriaDTO>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de examen de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección.</returns>
     public Expression<Func<Test, TestDomain>> GetProjection(TestCriteriaDTO criteria) =>
         t =>
             new()

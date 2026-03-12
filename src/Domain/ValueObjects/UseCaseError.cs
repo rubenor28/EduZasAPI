@@ -43,6 +43,12 @@ public class UseCaseErrors
     /// <returns>Una instancia de error de tipo <see cref="Conflict"/>.</returns>
     public static Conflict Conflict(string msg) => new(msg);
 
+    /// <summary>
+    /// Crea un error de conflicto con información detallada adicional.
+    /// </summary>
+    /// <param name="msg">Mensaje descriptivo del conflicto.</param>
+    /// <param name="detail">Detalles adicionales del error.</param>
+    /// <returns>Una instancia de error de tipo <see cref="Conflict{T}"/>.</returns>
     public static Conflict<T> Conflict<T>(string msg, T detail) => new(msg, detail);
 }
 

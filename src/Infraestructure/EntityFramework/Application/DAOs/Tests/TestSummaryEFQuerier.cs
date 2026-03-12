@@ -16,8 +16,12 @@ public sealed class TestSummaryEFQuerier(
     int maxPageSize
 ) : EFQuerier<TestSummary, TestCriteriaDTO, Test>(ctx, projector, maxPageSize)
 {
-    /// <inheritdoc/>
-    public override IQueryable<Test> BuildQuery(TestCriteriaDTO criteria) =>
+    /// <summary>
+    /// Construye la consulta para obtener resúmenes de exámenes a partir de los criterios.
+    /// </summary>
+    /// <param name="cr">Criterios de consulta.</param>
+    /// <returns>IQueryable de exámenes.</returns>
+    public override IQueryable<Test> BuildQuery(TestCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

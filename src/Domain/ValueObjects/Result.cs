@@ -148,87 +148,139 @@ public abstract class Result<T, E>
     private sealed class OkResult(T value) : Result<T, E>
     {
         private readonly T _value = value;
-        /// <inheritdoc />
+        /// <summary>
+        /// Indica si el resultado es exitoso.
+        /// </summary>
         public override bool IsOk => true;
-        /// <inheritdoc />
+        /// <summary>
+        /// Indica si el resultado es un error.
+        /// </summary>
         public override bool IsErr => false;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Obtiene el valor contenido.
+        /// </summary>
         public override T Unwrap() => _value;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Lanza una excepción ya que no hay error en un resultado Ok.
+        /// </summary>
         public override E UnwrapErr() =>
             throw new InvalidOperationException($"Tried to UnwrapErr from Ok: {_value}");
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Devuelve el valor contenido.
+        /// </summary>
         public override T UnwrapOr(T defaultValue) => _value;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Ejecuta la acción de éxito.
+        /// </summary>
         public override void Match(Action<T> fnOk, Action<E> fnErr) => fnOk(_value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Aplica la función de éxito.
+        /// </summary>
         public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnOk(_value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Transforma el valor contenido.
+        /// </summary>
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Ok(fn(_value));
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retorna el mismo resultado ya que no hay error que transformar.
+        /// </summary>
         public override Result<T, F> MapErr<F>(Func<E, F> fn) => Result<T, F>.Ok(_value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Encadena una operación de éxito.
+        /// </summary>
         public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) => fn(_value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retorna el mismo resultado ya que no hay error.
+        /// </summary>
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => Result<T, F>.Ok(_value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Ejecuta la acción si es Ok.
+        /// </summary>
         public override void IfOk(Action<T> action) => action(_value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// No hace nada ya que el resultado es Ok.
+        /// </summary>
         public override void IfErr(Action<E> action) { }
     }
 
     private sealed class ErrResult(E error) : Result<T, E>
     {
         private readonly E _error = error;
-        /// <inheritdoc />
+        /// <summary>
+        /// Indica si el resultado es exitoso.
+        /// </summary>
         public override bool IsOk => false;
-        /// <inheritdoc />
+        /// <summary>
+        /// Indica si el resultado es un error.
+        /// </summary>
         public override bool IsErr => true;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Lanza una excepción ya que no hay valor en un resultado de error.
+        /// </summary>
         public override T Unwrap() =>
             throw new InvalidOperationException($"Tried to Unwrap from Err: {_error}");
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Obtiene el error contenido.
+        /// </summary>
         public override E UnwrapErr() => _error;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Devuelve el valor por defecto.
+        /// </summary>
         public override T UnwrapOr(T defaultValue) => defaultValue;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Ejecuta la acción de error.
+        /// </summary>
         public override void Match(Action<T> fnOk, Action<E> fnErr) => fnErr(_error);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Aplica la función de error.
+        /// </summary>
         public override U Match<U>(Func<T, U> fnOk, Func<E, U> fnErr) => fnErr(_error);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retorna el mismo error ya que no hay valor que transformar.
+        /// </summary>
         public override Result<U, E> Map<U>(Func<T, U> fn) => Result<U, E>.Err(_error);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Transforma el error contenido.
+        /// </summary>
         public override Result<T, F> MapErr<F>(Func<E, F> fn) => Result<T, F>.Err(fn(_error));
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retorna el mismo error.
+        /// </summary>
         public override Result<U, E> AndThen<U>(Func<T, Result<U, E>> fn) =>
             Result<U, E>.Err(_error);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Encadena una operación de recuperación.
+        /// </summary>
         public override Result<T, F> OrElse<F>(Func<E, Result<T, F>> fn) => fn(_error);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// No hace nada ya que el resultado es un error.
+        /// </summary>
         public override void IfOk(Action<T> action) { }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Ejecuta la acción de error.
+        /// </summary>
         public override void IfErr(Action<E> action) => action(_error);
     }
 }

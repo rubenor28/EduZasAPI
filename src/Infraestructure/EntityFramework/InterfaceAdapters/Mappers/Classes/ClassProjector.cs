@@ -11,8 +11,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 /// </summary>
 public class ClassProjector : IEFProjector<Class, ClassDomain, ClassCriteriaDTO>
 {
-    /// <inheritdoc/>
-    public Expression<Func<Class, ClassDomain>> GetProjection(ClassCriteriaDTO _) =>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de clase de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección.</returns>
+    public Expression<Func<Class, ClassDomain>> GetProjection(ClassCriteriaDTO criteria) =>
         ef =>
             new()
             {

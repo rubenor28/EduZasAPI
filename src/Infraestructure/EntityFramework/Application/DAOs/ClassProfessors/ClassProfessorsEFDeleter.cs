@@ -14,8 +14,12 @@ public class ClassProfessorsEFDeleter(
     IMapper<ClassProfessor, ClassProfessorDomain> domainMapper
 ) : EFDeleter<UserClassRelationId, ClassProfessorDomain, ClassProfessor>(ctx, domainMapper)
 {
-    /// <inheritdoc/>
-    public override async Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
+    /// <summary>
+    /// Obtiene la entidad de relación profesor-clase rastreada por su ID compuesto para eliminación.
+    /// </summary>
+    /// <param name="id">ID compuesto de la relación.</param>
+    /// <returns>Entidad rastreada o null.</returns>
+    public override Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

@@ -22,8 +22,12 @@ public class ClassProfessorsEFUpdater(
         updateMapper
     )
 {
-    /// <inheritdoc/>
-    protected override async Task<ClassProfessor?> GetTrackedByDTO(ClassProfessorUpdateDTO value) =>
+    /// <summary>
+    /// Obtiene la entidad de relación profesor-clase rastreada a partir del DTO.
+    /// </summary>
+    /// <param name="value">DTO de actualización.</param>
+    /// <returns>Entidad rastreada o null.</returns>
+    protected override Task<ClassProfessor?> GetTrackedByDTO(ClassProfessorUpdateDTO value) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

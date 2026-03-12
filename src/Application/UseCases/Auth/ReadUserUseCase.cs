@@ -19,7 +19,11 @@ public sealed class ReadUserUseCase(
     IBusinessValidationService<ulong> validator
 ) : ReadUseCase<ulong, UserDomain>(reader, validator)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Ejecuta la lógica para leer la información del usuario actual.
+    /// </summary>
+    /// <param name="request">Datos de la acción y el ejecutor.</param>
+    /// <returns>Resultado con la información del usuario o error de caso de uso.</returns>
     protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<ulong> value)
     {
         var authorized = value.Executor.Role switch

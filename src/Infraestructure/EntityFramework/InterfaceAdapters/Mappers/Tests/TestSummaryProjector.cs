@@ -10,7 +10,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Tests;
 /// </summary>
 public class TestSummaryProjector : IEFProjector<Test, TestSummary, TestCriteriaDTO>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de examen en un resumen de examen.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección para el resumen.</returns>
     public Expression<Func<Test, TestSummary>> GetProjection(TestCriteriaDTO criteria) =>
         t =>
             new()

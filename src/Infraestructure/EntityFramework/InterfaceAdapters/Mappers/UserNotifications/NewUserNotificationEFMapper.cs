@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 /// </summary>
 public class NewUserNotificationEFMapper : IMapper<NewUserNotificationDTO, NotificationPerUser>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea un DTO de nueva notificación de usuario a una entidad de base de datos.
+    /// </summary>
+    /// <param name="s">DTO de creación.</param>
+    /// <returns>Entidad de base de datos.</returns>
     public NotificationPerUser Map(NewUserNotificationDTO s) =>
         new()
         {

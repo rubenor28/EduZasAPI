@@ -11,7 +11,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassTests;
 public class ClassTestAssociationProjector
     : IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una clase en un DTO de asociación de examen.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta que incluyen el ID del examen.</param>
+    /// <returns>Expresión de proyección.</returns>
     public Expression<Func<Class, ClassTestAssociationDTO>> GetProjection(
         ClassTestAssociationCriteriaDTO criteria
     ) =>

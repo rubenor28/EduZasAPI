@@ -287,6 +287,9 @@ public static class AuthRoutes
         });
     }
 
+    /// <summary>
+    /// Obtiene los datos del usuario actualmente autenticado a partir de su sesión.
+    /// </summary>
     public static async Task<IResult> UserData(
         HttpContext ctx,
         [FromServices] RoutesUtils utils,

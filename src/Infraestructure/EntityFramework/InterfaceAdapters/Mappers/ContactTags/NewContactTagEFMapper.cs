@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ContactTags;
 /// </summary>
 public class NewContactTagEFMapper : IMapper<NewContactTagDTO, ContactTag>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea un DTO de nueva etiqueta de contacto a una entidad de base de datos.
+    /// </summary>
+    /// <param name="input">DTO de creación.</param>
+    /// <returns>Entidad de base de datos.</returns>
     public ContactTag Map(NewContactTagDTO input) =>
         new()
         {

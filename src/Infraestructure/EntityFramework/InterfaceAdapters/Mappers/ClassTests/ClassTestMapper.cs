@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassTests;
 /// </summary>
 public class ClassTestMapper : IMapper<TestPerClass, ClassTestDomain>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea una entidad de examen de clase a un objeto de dominio.
+    /// </summary>
+    /// <param name="source">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio.</returns>
     public ClassTestDomain Map(TestPerClass source) =>
         new()
         {

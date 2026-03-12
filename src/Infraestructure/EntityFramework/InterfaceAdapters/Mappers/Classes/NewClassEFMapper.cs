@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 /// </summary>
 public class NewClassEFMapper : IMapper<NewClassDTO, Class>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea un DTO de nueva clase a una entidad de base de datos.
+    /// </summary>
+    /// <param name="nc">DTO de creación.</param>
+    /// <returns>Entidad de base de datos.</returns>
     public Class Map(NewClassDTO nc) =>
         new()
         {

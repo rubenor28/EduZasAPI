@@ -25,7 +25,12 @@ public sealed class DeleteClassResourceUseCase(
 {
     private readonly IReaderAsync<Guid, ResourceDomain> _resourceReader = resourceReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el recurso exista y que el ejecutor sea el propietario o un administrador antes de eliminar la asociación.
+    /// </summary>
+    /// <param name="value">Datos de la acción de eliminación.</param>
+    /// <param name="record">Entidad de asociación recurso-clase original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassResourceIdDTO> value,
         ClassResourceDomain record

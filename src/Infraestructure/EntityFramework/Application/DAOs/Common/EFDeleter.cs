@@ -20,7 +20,9 @@ public abstract class EFDeleter<I, DomainEntity, EFEntity>(
 {
     private readonly IMapper<EFEntity, DomainEntity> _domainMapper = domainMapper;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Elimina múltiples entidades por sus identificadores de forma asíncrona.
+    /// </summary>
     public async Task<IEnumerable<DomainEntity>> BulkDelete(IEnumerable<I> ids)
     {
         var findTasks = ids.Select(async id =>
@@ -35,7 +37,9 @@ public abstract class EFDeleter<I, DomainEntity, EFEntity>(
         return records.Select(_domainMapper.Map);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Elimina una entidad por su identificador de forma asíncrona.
+    /// </summary>
     public async Task<DomainEntity> DeleteAsync(I id)
     {
         var record =

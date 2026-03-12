@@ -36,7 +36,12 @@ public sealed class DeleteClassTestUseCase(
             : test.ProfessorId == executor.Id;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor tenga permisos para eliminar la asociación del examen con la clase.
+    /// </summary>
+    /// <param name="value">Datos de la acción de eliminación.</param>
+    /// <param name="record">Entidad de asociación examen-clase original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassTestIdDTO> value,
         ClassTestDomain record
@@ -56,7 +61,12 @@ public sealed class DeleteClassTestUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Realiza la tarea adicional de eliminar todas las respuestas asociadas al examen en esa clase tras eliminar la asociación.
+    /// </summary>
+    /// <param name="dto">Datos de la acción de eliminación.</param>
+    /// <param name="deleted">Entidad de asociación eliminada.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
     protected override async Task ExtraTaskAsync(
         UserActionDTO<ClassTestIdDTO> dto,
         ClassTestDomain deleted

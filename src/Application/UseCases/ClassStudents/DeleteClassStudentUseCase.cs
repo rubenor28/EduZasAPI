@@ -21,7 +21,12 @@ public class DeleteClassStudentUseCase(
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que la clase y el usuario existan, y que el ejecutor tenga permisos para eliminar al estudiante de la clase.
+    /// </summary>
+    /// <param name="value">Datos de la acción de eliminación.</param>
+    /// <param name="record">Entidad de relación estudiante-clase original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserClassRelationId> value,
         ClassStudentDomain record

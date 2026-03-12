@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Resources;
 /// </summary>
 public class UpdateResourceEFMapper : IUpdateMapper<ResourceUpdateDTO, Resource>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Actualiza una entidad de recurso con los datos del DTO.
+    /// </summary>
+    /// <param name="s">DTO de actualización.</param>
+    /// <param name="d">Entidad de base de datos.</param>
     public void Map(ResourceUpdateDTO s, Resource d)
     {
         d.Active = s.Active;

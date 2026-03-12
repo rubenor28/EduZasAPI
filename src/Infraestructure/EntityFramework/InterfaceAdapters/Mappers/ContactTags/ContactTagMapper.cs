@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ContactTags;
 /// </summary>
 public class ContactTagMapper : IMapper<ContactTag, ContactTagDomain>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea una entidad de etiqueta de contacto a un objeto de dominio.
+    /// </summary>
+    /// <param name="input">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio.</returns>
     public ContactTagDomain Map(ContactTag input) =>
         new()
         {

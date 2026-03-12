@@ -12,7 +12,11 @@ namespace EntityFramework.Application.DAOs.Users;
 public class UserEFDeleter(EduZasDotnetContext ctx, IMapper<User, UserDomain> domainMapper)
     : EFDeleter<ulong, UserDomain, User>(ctx, domainMapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la entidad de usuario rastreada por su ID para eliminación.
+    /// </summary>
+    /// <param name="id">ID del usuario.</param>
+    /// <returns>Entidad rastreada o null.</returns>
     public override Task<User?> GetTrackedById(ulong id) =>
         _dbSet.AsTracking().AsQueryable().Where(u => u.UserId == id).FirstOrDefaultAsync();
 }

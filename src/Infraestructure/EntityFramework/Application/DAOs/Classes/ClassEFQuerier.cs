@@ -17,8 +17,12 @@ public class ClassEFQuerier(
     int maxPageSize
 ) : EFQuerier<ClassDomain, ClassCriteriaDTO, Class>(ctx, projector, maxPageSize)
 {
-    /// <inheritdoc/>
-    public override IQueryable<Class> BuildQuery(ClassCriteriaDTO cr) =>
+    /// <summary>
+    /// Construye la consulta de clases a partir de los criterios de búsqueda.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de clases.</returns>
+    public override IQueryable<Class> BuildQuery(ClassCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()
             .WhereStringQuery(cr.Subject, c => c.Subject)

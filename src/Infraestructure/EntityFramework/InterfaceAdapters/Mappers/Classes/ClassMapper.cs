@@ -9,8 +9,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Classes;
 /// </summary>
 public class ClassMapper : IMapper<Class, ClassDomain>
 {
-    /// <inheritdoc/>
-    public ClassDomain Map(Class ef) =>
+    /// <summary>
+    /// Mapea una entidad de clase de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="input">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio de clase.</returns>
+    public ClassDomain Map(Class input) =>
         new()
         {
             Id = ef.ClassId,

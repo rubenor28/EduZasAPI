@@ -45,7 +45,9 @@ public abstract class EFUpdater<DomainEntity, UpdateEntity, EFEntity>(
         return entities.Select(_domainMapper.Map);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Actualiza una entidad de forma asíncrona.
+    /// </summary>
     public async Task<DomainEntity> UpdateAsync(UpdateEntity updateData)
     {
         var tracked =

@@ -19,7 +19,11 @@ public sealed class AddResourceUseCase(
 {
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida que el ejecutor tenga permisos de administrador o sea el profesor propietario del recurso.
+    /// </summary>
+    /// <param name="value">Datos del nuevo recurso.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<NewResourceDTO> value)
     {
         var authorized = value.Executor.Role switch
@@ -36,7 +40,11 @@ public sealed class AddResourceUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el profesor especificado exista en el sistema.
+    /// </summary>
+    /// <param name="value">Datos del nuevo recurso.</param>
+    /// <returns>Resultado exitoso o error de validación de entrada.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewResourceDTO> value
     )

@@ -12,7 +12,11 @@ namespace EntityFramework.Application.DAOs.Classes;
 public class ClassEFDeleter(EduZasDotnetContext ctx, IMapper<Class, ClassDomain> domainMapper)
     : EFDeleter<string, ClassDomain, Class>(ctx, domainMapper)
 {
-    /// <inheritdoc/>
-    public override async Task<Class?> GetTrackedById(string id) =>
+    /// <summary>
+    /// Obtiene la entidad de clase rastreada por su ID para eliminación.
+    /// </summary>
+    /// <param name="id">ID de la clase.</param>
+    /// <returns>Entidad rastreada o null.</returns>
+    public override Task<Class?> GetTrackedById(string id) =>
         await _dbSet.AsTracking().AsQueryable().Where(c => c.ClassId == id).FirstOrDefaultAsync();
 }

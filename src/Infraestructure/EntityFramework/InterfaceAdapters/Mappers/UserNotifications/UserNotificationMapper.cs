@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 /// </summary>
 public class UserNotificationMapper : IMapper<NotificationPerUser, UserNotificationDomain>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea una entidad de notificación por usuario a un objeto de dominio.
+    /// </summary>
+    /// <param name="s">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio.</returns>
     public UserNotificationDomain Map(NotificationPerUser s) =>
         new()
         {

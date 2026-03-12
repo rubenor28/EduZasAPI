@@ -5,10 +5,16 @@ namespace Domain.Entities.Questions;
 /// </summary>
 public record OpenQuestion : IQuestion
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Título o enunciado de la pregunta.
+    /// </summary>
     public required string Title { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// URL de la imagen asociada (opcional).
+    /// </summary>
     public string? ImageUrl { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Indica si la pregunta requiere calificación manual.
+    /// </summary>
     public bool RequiresManualGrade => true;
 }

@@ -9,8 +9,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Notifications;
 /// </summary>
 public class NotificationMapper : IMapper<Notification, NotificationDomain>
 {
-    /// <inheritdoc/>
-    public NotificationDomain Map(Notification s) =>
+    /// <summary>
+    /// Mapea una entidad de notificación de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="source">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio de notificación.</returns>
+    public NotificationDomain Map(Notification source) =>
         new()
         {
             Id = s.NotificationId,

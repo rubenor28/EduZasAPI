@@ -24,7 +24,11 @@ public class AddClassProfessorUseCase(
     private readonly IReaderAsync<ulong, UserDomain> _userReader = userReader;
     private readonly IReaderAsync<string, ClassDomain> _classReader = classReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente la autorización del ejecutor y la existencia del usuario y la clase, evitando duplicados.
+    /// </summary>
+    /// <param name="value">Datos del nuevo profesor para la clase.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewClassProfessorDTO> value
     )

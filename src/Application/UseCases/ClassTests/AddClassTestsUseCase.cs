@@ -43,7 +43,11 @@ public sealed class AddClassTestUseCase(
 
     private TestDomain _test = null!;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente la existencia de la clase y el examen, verificando la autorización del ejecutor para realizar la asociación.
+    /// </summary>
+    /// <param name="value">Datos de la asociación examen-clase.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassTestIdDTO> value
     )

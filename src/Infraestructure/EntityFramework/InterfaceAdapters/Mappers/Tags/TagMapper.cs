@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Tags;
 /// </summary>
 public class TagMapper : IMapper<Tag, TagDomain>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea una entidad de etiqueta de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="input">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio de etiqueta.</returns>
     public TagDomain Map(Tag input) =>
         new()
         {

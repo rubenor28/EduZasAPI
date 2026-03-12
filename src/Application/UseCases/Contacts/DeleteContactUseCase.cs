@@ -18,7 +18,12 @@ public sealed class DeleteContactUseCase(
     ContactReader reader
 ) : DeleteUseCase<ContactIdDTO, ContactDomain>(deleter, reader, null)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor tenga permisos para eliminar el contacto de la agenda.
+    /// </summary>
+    /// <param name="value">Datos de la acción.</param>
+    /// <param name="record">Entidad de contacto original.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ContactIdDTO> value,
         ContactDomain record

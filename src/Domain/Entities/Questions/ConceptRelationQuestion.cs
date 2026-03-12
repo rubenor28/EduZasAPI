@@ -12,14 +12,20 @@ public record ConceptPair(string ConceptA, string ConceptB);
 /// </summary>
 public record ConceptRelationQuestion : IQuestion
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Título o enunciado de la pregunta.
+    /// </summary>
     public required string Title { get; init; }
-    /// <inheritdoc />
+    /// <summary>
+    /// URL de la imagen asociada (opcional).
+    /// </summary>
     public string? ImageUrl { get; init; }
     /// <summary>
-    /// Obtiene el conjunto de pares de conceptos correctos.
+    /// Conjunto de pares de conceptos correctos.
     /// </summary>
     public required ISet<ConceptPair> Concepts { get; init; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Indica si la pregunta requiere calificación manual.
+    /// </summary>
     public bool RequiresManualGrade => false;
 }

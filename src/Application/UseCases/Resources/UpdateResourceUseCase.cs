@@ -15,6 +15,10 @@ public sealed class UpdateResourceUseCase(
     IBusinessValidationService<ResourceUpdateDTO> validator
 ) : UpdateUseCase<Guid, ResourceUpdateDTO, ResourceDomain>(updater, reader, validator)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador del recurso desde el DTO de actualización.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>ID del recurso.</returns>
     protected override Guid GetId(ResourceUpdateDTO dto) => dto.Id;
 }

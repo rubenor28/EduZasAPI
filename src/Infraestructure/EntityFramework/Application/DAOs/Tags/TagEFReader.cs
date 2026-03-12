@@ -12,6 +12,10 @@ namespace EntityFramework.Application.DAOs.Tags;
 public sealed class TagEFReader(EduZasDotnetContext ctx, IMapper<Tag, TagDomain> mapper)
     : EFReader<ulong, TagDomain, Tag>(ctx, mapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el predicado para filtrar etiquetas por su ID numérico.
+    /// </summary>
+    /// <param name="id">ID numérico de la etiqueta.</param>
+    /// <returns>Expresión de predicado.</returns>
     protected override Expression<Func<Tag, bool>> GetIdPredicate(ulong id) => t => t.TagId == id;
 }

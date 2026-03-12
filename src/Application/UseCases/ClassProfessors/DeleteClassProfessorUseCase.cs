@@ -16,7 +16,12 @@ public sealed class DeleteClassProfessorUseCase(
     IBusinessValidationService<UserClassRelationId>? validator = null
 ) : DeleteUseCase<UserClassRelationId, ClassProfessorDomain>(deleter, reader, validator)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor tenga permisos para eliminar al profesor de la clase.
+    /// </summary>
+    /// <param name="value">Datos de la acción de eliminación.</param>
+    /// <param name="professor">Entidad de relación profesor-clase original.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserClassRelationId> value,
         ClassProfessorDomain professor

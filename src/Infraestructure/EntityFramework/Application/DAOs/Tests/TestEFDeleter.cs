@@ -12,7 +12,11 @@ namespace EntityFramework.Application.DAOs.Tests;
 public sealed class TestEFDeleter(EduZasDotnetContext ctx, IMapper<Test, TestDomain> domainMapper)
     : EFDeleter<Guid, TestDomain, Test>(ctx, domainMapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la entidad de examen rastreada por su ID para eliminación.
+    /// </summary>
+    /// <param name="id">ID del examen.</param>
+    /// <returns>Entidad rastreada o null.</returns>
     public override Task<Test?> GetTrackedById(Guid id) =>
         _dbSet.AsTracking().AsQueryable().Where(t => t.TestId == id).FirstOrDefaultAsync();
 }

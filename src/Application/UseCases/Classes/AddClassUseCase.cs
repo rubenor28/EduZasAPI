@@ -49,7 +49,11 @@ public class AddClassUseCase(
         NewClassProfessorDTO
     > _professorRelationCreator = professorRelationCreator;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida que el ejecutor tenga permisos de administrador o sea el propietario de la nueva clase.
+    /// </summary>
+    /// <param name="value">Datos de la nueva clase.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override Result<Unit, UseCaseError> ExtraValidation(UserActionDTO<NewClassDTO> value)
     {
         var authorized = value.Executor.Role switch
@@ -66,7 +70,11 @@ public class AddClassUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el propietario exista y que todos los profesores asignados sean válidos.
+    /// </summary>
+    /// <param name="value">Datos de la nueva clase.</param>
+    /// <returns>Resultado exitoso o error de validación de entrada.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewClassDTO> value
     )
@@ -111,7 +119,11 @@ public class AddClassUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Genera un ID único para la clase antes de la persistencia.
+    /// </summary>
+    /// <param name="value">Datos de la nueva clase.</param>
+    /// <returns>Tarea con el DTO actualizado con el nuevo ID.</returns>
     protected override async Task<UserActionDTO<NewClassDTO>> PostValidationFormatAsync(UserActionDTO<NewClassDTO> value)
     {
         for (int i = 0; i < _maxIdGenerationTries; i++)
@@ -130,7 +142,12 @@ public class AddClassUseCase(
         );
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Realiza la tarea adicional de crear las relaciones entre la clase y sus profesores asignados.
+    /// </summary>
+    /// <param name="newEntity">Datos de la nueva clase.</param>
+    /// <param name="createdEntity">Entidad de clase recién creada.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
     protected override async Task ExtraTaskAsync(
         UserActionDTO<NewClassDTO> newEntity,
         ClassDomain createdEntity

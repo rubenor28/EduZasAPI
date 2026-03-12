@@ -26,7 +26,11 @@ public abstract class ReadUseCase<I, E>(
     /// </summary>
     protected readonly IBusinessValidationService<I>? _validator = validator;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Ejecuta la lógica para leer una entidad por su identificador.
+    /// </summary>
+    /// <param name="id">Identificador de la entidad.</param>
+    /// <returns>Resultado con la entidad encontrada o error de caso de uso.</returns>
     public async Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<I> request)
     {
         if (_validator is not null)

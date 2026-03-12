@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
 /// </summary>
 public class ClassStudentMapper : IMapper<ClassStudent, ClassStudentDomain>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea una entidad de estudiante de clase a un objeto de dominio.
+    /// </summary>
+    /// <param name="efEntity">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio.</returns>
     public ClassStudentDomain Map(ClassStudent efEntity) =>
         new()
         {

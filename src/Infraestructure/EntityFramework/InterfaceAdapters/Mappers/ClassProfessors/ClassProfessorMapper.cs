@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 /// </summary>
 public class ClassProfessorMapper : IMapper<ClassProfessor, ClassProfessorDomain>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea una entidad de profesor de clase a un objeto de dominio.
+    /// </summary>
+    /// <param name="efEntity">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio.</returns>
     public ClassProfessorDomain Map(ClassProfessor efEntity) =>
         new()
         {

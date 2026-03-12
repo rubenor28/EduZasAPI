@@ -31,7 +31,12 @@ public sealed class DeleteContactTagUseCase(
     private readonly TagDeleter _tagDeleter = tagDeleter;
     private readonly TagReader _tagReader = tagReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor tenga permisos para eliminar la etiqueta del contacto.
+    /// </summary>
+    /// <param name="value">Datos de la acción.</param>
+    /// <param name="record">Entidad de relación contacto-etiqueta original.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ContactTagIdDTO> value,
         ContactTagDomain record
@@ -51,7 +56,12 @@ public sealed class DeleteContactTagUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Realiza la tarea adicional de eliminar la etiqueta física si ya no está siendo utilizada por ningún otro contacto.
+    /// </summary>
+    /// <param name="deleteDTO">Datos de la acción de eliminación.</param>
+    /// <param name="deletedEntity">Entidad de relación eliminada.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
     protected override async Task ExtraTaskAsync(
         UserActionDTO<ContactTagIdDTO> deleteDTO,
         ContactTagDomain deletedEntity

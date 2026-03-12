@@ -19,7 +19,12 @@ public class DeleteClassUseCase(
     IReaderAsync<UserClassRelationId, ClassProfessorDomain> relationReader
 ) : DeleteUseCase<string, ClassDomain>(deleter, reader)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente la autorización del ejecutor y la existencia de la clase antes de eliminarla.
+    /// </summary>
+    /// <param name="value">Datos de la acción de eliminación.</param>
+    /// <param name="record">Entidad de la clase original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<string> value,
         ClassDomain record

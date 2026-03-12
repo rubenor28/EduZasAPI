@@ -14,7 +14,11 @@ public class UpdateUserEFMapper(IMapper<UserType, uint> usrtMapper)
 {
     private readonly IMapper<UserType, uint> _usrtMapper = usrtMapper;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Actualiza una entidad de usuario existente con los datos proporcionados en el DTO.
+    /// </summary>
+    /// <param name="source">DTO con los datos de actualización.</param>
+    /// <param name="destination">Entidad de base de datos a actualizar.</param>
     public void Map(UserUpdateDTO source, User destination)
     {
         destination.UserId = source.Id;

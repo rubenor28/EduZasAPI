@@ -26,7 +26,12 @@ public sealed class UpdateClassProfessorUseCase(
     private readonly IQuerierAsync<ClassProfessorDomain, ClassProfessorCriteriaDTO> _querier =
         querier;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente la autorización y asegura que no se deje la clase sin al menos un propietario.
+    /// </summary>
+    /// <param name="current">Datos de la actualización.</param>
+    /// <param name="prev">Entidad de relación profesor-clase original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassProfessorUpdateDTO> current,
         ClassProfessorDomain prev
@@ -57,7 +62,11 @@ public sealed class UpdateClassProfessorUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador compuesto de la relación profesor-clase desde el DTO.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>Identificador compuesto de la relación.</returns>
     protected override UserClassRelationId GetId(ClassProfessorUpdateDTO dto) =>
         new() { UserId = dto.UserId, ClassId = dto.ClassId };
 

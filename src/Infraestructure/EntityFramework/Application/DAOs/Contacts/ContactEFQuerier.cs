@@ -18,8 +18,12 @@ public sealed class ContactEFQuerier(
     int pageSize
 ) : EFQuerier<ContactDomain, ContactCriteriaDTO, AgendaContact>(ctx, projector, pageSize)
 {
-    /// <inheritdoc/>
-    public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO criteria)
+    /// <summary>
+    /// Construye la consulta de contactos a partir de los criterios.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de contactos.</returns>
+    public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO c) =>
     {
         var query = _dbSet
             .AsNoTracking()

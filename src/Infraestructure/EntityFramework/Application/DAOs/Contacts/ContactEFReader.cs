@@ -13,7 +13,11 @@ namespace EntityFramework.Application.DAOs.Contacts;
 public class ContactEFReader(EduZasDotnetContext ctx, IMapper<AgendaContact, ContactDomain> mapper)
     : EFReader<ContactIdDTO, ContactDomain, AgendaContact>(ctx, mapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el predicado para filtrar contactos por su ID compuesto.
+    /// </summary>
+    /// <param name="id">ID compuesto del contacto.</param>
+    /// <returns>Expresión de predicado.</returns>
     protected override Expression<Func<AgendaContact, bool>> GetIdPredicate(ContactIdDTO id) =>
         c => c.UserId == id.UserId && c.AgendaOwnerId == id.AgendaOwnerId;
 }

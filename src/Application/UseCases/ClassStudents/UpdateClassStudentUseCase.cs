@@ -22,7 +22,12 @@ public sealed class UpdateClassStudentUseCase(
         validator
     )
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida que el ejecutor sea un administrador o el propio estudiante antes de actualizar la relación.
+    /// </summary>
+    /// <param name="value">Datos de la actualización.</param>
+    /// <param name="record">Entidad de relación estudiante-clase original.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<ClassStudentUpdateDTO> value,
         ClassStudentDomain record
@@ -40,7 +45,11 @@ public sealed class UpdateClassStudentUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador compuesto de la relación estudiante-clase desde el DTO.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>Identificador compuesto de la relación.</returns>
     protected override UserClassRelationId GetId(ClassStudentUpdateDTO dto) =>
         new() { UserId = dto.UserId, ClassId = dto.ClassId };
 }

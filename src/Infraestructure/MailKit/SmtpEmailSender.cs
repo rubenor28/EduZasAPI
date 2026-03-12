@@ -35,6 +35,12 @@ public class SmtpEmailSender(IOptions<SmtpSettings> smtpSettings) : IEmailSender
         await client.DisconnectAsync(true, cancellationToken);
     }
 
+    /// <summary>
+    /// Envía múltiples correos electrónicos de forma asíncrona.
+    /// </summary>
+    /// <param name="messages">Colección de mensajes a enviar.</param>
+    /// <param name="cancellationToken">Token de cancelación.</param>
+    /// <returns>Tarea asíncrona.</returns>
     public async Task SendBulkAsync(
         IEnumerable<EmailMessage> messages,
         CancellationToken cancellationToken = default

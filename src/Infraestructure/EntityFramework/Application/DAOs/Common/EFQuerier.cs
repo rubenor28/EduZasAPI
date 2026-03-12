@@ -26,20 +26,14 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
     protected readonly int _maxPageSize = maxPageSize;
     private readonly IEFProjector<EFEntity, DomainEntity, EntityCriteria> _projector = projector;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Tamaño máximo de página permitido.
+    /// </summary>
     public int PageSize => _maxPageSize;
 
     /// <summary>
-    /// Calcula el offset para la paginación.
+    /// Realiza una consulta paginada a partir de los criterios de búsqueda.
     /// </summary>
-    protected int CalcOffset(int pageNumber)
-    {
-        if (pageNumber < 1)
-            pageNumber = 1;
-        return (pageNumber - 1) * _maxPageSize;
-    }
-
-    /// <inheritdoc/>
     public async Task<PaginatedQuery<DomainEntity, EntityCriteria>> GetByAsync(
         EntityCriteria criteria
     )
@@ -74,10 +68,14 @@ public abstract class EFQuerier<DomainEntity, EntityCriteria, EFEntity>(
         };
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Cuenta el número total de entidades que coinciden con los criterios.
+    /// </summary>
     public Task<int> CountAsync(EntityCriteria criteria) => BuildQuery(criteria).AsNoTracking().CountAsync();
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Verifica si existe alguna entidad que coincida con los criterios.
+    /// </summary>
     public Task<bool> AnyAsync(EntityCriteria criteria) => BuildQuery(criteria).AsNoTracking().AnyAsync();
 
     /// <summary>

@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Resources;
 /// </summary>
 public class NewResourceEFMapper : IMapper<NewResourceDTO, Resource>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea un DTO de nuevo recurso a una entidad de base de datos.
+    /// </summary>
+    /// <param name="input">DTO con los datos del nuevo recurso.</param>
+    /// <returns>Entidad de recurso para persistencia.</returns>
     public Resource Map(NewResourceDTO input) =>
         new()
         {

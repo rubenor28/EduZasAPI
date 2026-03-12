@@ -64,7 +64,7 @@ public record ClassTestReport
     /// </summary>
     public required double MedianPercentage { get; init; }
     /// <summary>
-    * Porcentaje de estudiantes que aprobaron.
+    /// Porcentaje de estudiantes que aprobaron.
     /// </summary>
     public required double PassPercentage { get; init; }
     /// <summary>

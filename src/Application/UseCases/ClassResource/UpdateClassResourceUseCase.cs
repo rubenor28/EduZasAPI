@@ -36,7 +36,11 @@ public sealed class UpdateClassResourceUseCase(
     private readonly ITaskScheduler _scheduler = scheduler;
     private readonly IConfiguration _configuration = configuration;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador compuesto de la asociación recurso-clase desde el DTO.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>Identificador compuesto de la asociación.</returns>
     protected override ClassResourceIdDTO GetId(ClassResourceDTO dto) =>
         new() { ClassId = dto.ClassId, ResourceId = dto.ResourceId };
 

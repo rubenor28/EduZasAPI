@@ -10,7 +10,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.UserNotifications;
 public class UpdateUserNotificationEFMapper
     : IUpdateMapper<UserNotificationUpdateDTO, NotificationPerUser>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Actualiza una entidad de notificación de usuario con los datos del DTO.
+    /// </summary>
+    /// <param name="s">DTO de actualización.</param>
+    /// <param name="d">Entidad de base de datos.</param>
     public void Map(UserNotificationUpdateDTO s, NotificationPerUser d)
     {
         d.UserId = s.UserId;

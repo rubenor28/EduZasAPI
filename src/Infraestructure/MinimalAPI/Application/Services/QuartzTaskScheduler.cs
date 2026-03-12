@@ -21,7 +21,10 @@ public class QuartzTaskScheduler(
     private readonly ISchedulerFactory _schedulerFactory = schedulerFactory;
     private readonly ILogger<QuartzTaskScheduler> _logger = logger;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Programa el envío masivo de correos electrónicos.
+    /// </summary>
+    /// <param name="messages">Colección de mensajes a enviar.</param>
     public async Task BulkSendEmail(IEnumerable<EmailMessage> messages)
     {
         var scheduler = await _schedulerFactory.GetScheduler();
@@ -42,7 +45,11 @@ public class QuartzTaskScheduler(
         await scheduler.ScheduleJob(jobDetail, trigger);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Programa la creación de una notificación para un grupo de usuarios.
+    /// </summary>
+    /// <param name="notification">Datos de la nueva notificación.</param>
+    /// <param name="usersIds">IDs de los usuarios destinatarios.</param>
     public async Task CreateNotification(
         NewNotificationDTO notification,
         IEnumerable<ulong> usersIds
@@ -74,7 +81,12 @@ public class QuartzTaskScheduler(
         await scheduler.ScheduleJob(jobDetail, trigger);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Programa una tarea para marcar las respuestas de un examen como finalizadas al alcanzar la fecha límite.
+    /// </summary>
+    /// <param name="classId">ID de la clase.</param>
+    /// <param name="testId">ID del examen.</param>
+    /// <param name="deadline">Fecha y hora límite.</param>
     public async Task ScheduleMarkAnswersAsFinished(
         string classId,
         Guid testId,

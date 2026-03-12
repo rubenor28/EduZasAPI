@@ -15,7 +15,11 @@ public sealed class UpdateContactUseCase(
     IBusinessValidationService<ContactUpdateDTO>? validator = null
 ) : UpdateUseCase<ContactIdDTO, ContactUpdateDTO, ContactDomain>(updater, reader, validator)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador compuesto del contacto desde el DTO de actualización.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>ID compuesto del contacto.</returns>
     protected override ContactIdDTO GetId(ContactUpdateDTO dto) =>
         new() { UserId = dto.UserId, AgendaOwnerId = dto.AgendaOwnerId };
 }

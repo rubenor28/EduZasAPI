@@ -19,7 +19,11 @@ public class QueryUseCase<C, E>(
     protected readonly IQuerierAsync<E, C> _querier = querier;
     protected readonly IBusinessValidationService<C>? _validator = validator;
 
-    ///<inheritdoc/>
+    /// <summary>
+    /// Ejecuta la lógica para consultar entidades bajo ciertos criterios.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta y paginación.</param>
+    /// <returns>Resultado con la lista paginada de entidades o error de caso de uso.</returns>
     public async Task<Result<PaginatedQuery<E, C>, UseCaseError>> ExecuteAsync(
         UserActionDTO<C> request
     )

@@ -25,7 +25,11 @@ public class AddClassStudentUseCase(
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor esté autorizado y que tanto la clase como el usuario existan, evitando duplicados.
+    /// </summary>
+    /// <param name="value">Datos de la nueva relación estudiante-clase.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<UserClassRelationId> value
     )

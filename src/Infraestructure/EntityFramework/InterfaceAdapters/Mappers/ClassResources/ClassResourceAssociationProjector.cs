@@ -10,7 +10,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassResources;
 /// </summary>
 public class ClassResourceAssociationProjector : IEFProjector<Class, ClassResourceAssociationDTO, ClassResourceAssociationCriteriaDTO>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una clase en un DTO de asociación de recurso.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta que incluyen el ID del recurso.</param>
+    /// <returns>Expresión de proyección.</returns>
     public Expression<Func<Class, ClassResourceAssociationDTO>> GetProjection(ClassResourceAssociationCriteriaDTO criteria) =>
         c =>
             new()

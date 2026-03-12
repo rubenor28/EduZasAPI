@@ -40,7 +40,11 @@ public sealed class AddClassResourceUseCase(
     private readonly ITaskScheduler _scheduler = scheduler;
     private readonly IConfiguration _configuration = configuration;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente la existencia de la clase y el recurso, evitando duplicados y verificando la autorización del profesor.
+    /// </summary>
+    /// <param name="value">Datos de la nueva asociación recurso-clase.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassResourceDTO> value
     )

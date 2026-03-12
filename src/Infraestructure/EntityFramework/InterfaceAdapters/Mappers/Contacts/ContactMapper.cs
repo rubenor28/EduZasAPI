@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Contacts;
 /// </summary>
 public class ContactMapper : IMapper<AgendaContact, ContactDomain>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea una entidad de contacto de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="input">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio de contacto.</returns>
     public ContactDomain Map(AgendaContact input) =>
         new()
         {

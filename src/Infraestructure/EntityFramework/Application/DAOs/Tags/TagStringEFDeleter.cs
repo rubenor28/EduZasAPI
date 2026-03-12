@@ -12,7 +12,11 @@ namespace EntityFramework.Application.DAOs.Tags;
 public sealed class TagStringEFDeleter(EduZasDotnetContext ctx, IMapper<Tag, TagDomain> domainMapper)
     : EFDeleter<string, TagDomain, Tag>(ctx, domainMapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la entidad de etiqueta rastreada por su texto para eliminación.
+    /// </summary>
+    /// <param name="id">Texto de la etiqueta.</param>
+    /// <returns>Entidad rastreada o null.</returns>
     public override Task<Tag?> GetTrackedById(string id) =>
         _dbSet.AsTracking().AsQueryable().Where(t => t.Text == id).FirstOrDefaultAsync();
 }

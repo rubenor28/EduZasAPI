@@ -25,7 +25,9 @@ public abstract class EFCreator<DomainEntity, NewEntity, EFEntity>(
     protected readonly IMapper<NewEntity, EFEntity> _newEntityMapper = newEntityMapper;
     protected readonly IMapper<EFEntity, DomainEntity> _domainMapper = domainMapper;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Agrega una nueva entidad de forma asíncrona.
+    /// </summary>
     public async Task<DomainEntity> AddAsync(NewEntity value)
     {
         var entity = _newEntityMapper.Map(value);
@@ -34,7 +36,9 @@ public abstract class EFCreator<DomainEntity, NewEntity, EFEntity>(
         return _domainMapper.Map(entity);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Agrega un rango de entidades de forma asíncrona.
+    /// </summary>
     public async Task<IEnumerable<DomainEntity>> AddRangeAsync(IEnumerable<NewEntity> data)
     {
         var entities = data.Select(_newEntityMapper.Map);

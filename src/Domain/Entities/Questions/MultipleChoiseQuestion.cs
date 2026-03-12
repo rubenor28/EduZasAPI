@@ -5,18 +5,24 @@ namespace Domain.Entities.Questions;
 /// </summary>
 public record MultipleChoiseQuestion : IQuestion
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Título o enunciado de la pregunta.
+    /// </summary>
     public required string Title { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// URL de la imagen asociada (opcional).
+    /// </summary>
     public string? ImageUrl { get; set; }
     /// <summary>
-    /// Obtiene las opciones de respuesta, donde la clave es el ID y el valor es el texto.
+    /// Opciones de respuesta (ID y texto).
     /// </summary>
     public required IDictionary<Guid, string> Options { get; set; }
     /// <summary>
-    /// Obtiene el ID de la opción correcta.
+    /// ID de la opción correcta.
     /// </summary>
     public required Guid CorrectOption { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Indica si la pregunta requiere calificación manual.
+    /// </summary>
     public bool RequiresManualGrade => false;
 }

@@ -23,7 +23,12 @@ public sealed class DeleteUserUseCase(
 {
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _querier = querier;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida que el ejecutor tenga permisos de administrador para eliminar usuarios.
+    /// </summary>
+    /// <param name="value">Datos de la acción.</param>
+    /// <param name="record">Entidad de usuario a eliminar.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<ulong> value,
         UserDomain record
@@ -34,7 +39,12 @@ public sealed class DeleteUserUseCase(
             _ => UseCaseErrors.Unauthorized(),
         };
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que no se elimine al último administrador del sistema.
+    /// </summary>
+    /// <param name="value">Datos de la acción.</param>
+    /// <param name="record">Entidad de usuario a eliminar.</param>
+    /// <returns>Resultado exitoso o error de conflicto.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ulong> value,
         UserDomain record

@@ -20,8 +20,12 @@ public sealed class ClassResourceAssociationEFQuerier(
         maxPageSize
     )
 {
-    /// <inheritdoc/>
-    public override IQueryable<Class> BuildQuery(ClassResourceAssociationCriteriaDTO criteria) =>
+    /// <summary>
+    /// Construye la consulta para obtener las asociaciones de recursos de clase a partir de los criterios.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de clases.</returns>
+    public override IQueryable<Class> BuildQuery(ClassResourceAssociationCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()
             .Where(c => c.ClassProfessors.Any(p => p.ProfessorId == criteria.ProfessorId))

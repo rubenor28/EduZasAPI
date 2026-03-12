@@ -21,7 +21,12 @@ public class UpdateClassUseCase(
     private readonly IReaderAsync<UserClassRelationId, ClassProfessorDomain> _professorReader =
         professorReader;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el ejecutor tenga permisos de administrador o sea el profesor propietario de la clase antes de actualizarla.
+    /// </summary>
+    /// <param name="value">Datos de la actualización.</param>
+    /// <param name="record">Entidad de clase original.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected async override Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<ClassUpdateDTO> value,
         ClassDomain record
@@ -50,6 +55,10 @@ public class UpdateClassUseCase(
         return professorSearch is not null && professorSearch.IsOwner;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador de la clase desde el DTO de actualización.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>ID de la clase.</returns>
     protected override string GetId(ClassUpdateDTO dto) => dto.Id;
 }

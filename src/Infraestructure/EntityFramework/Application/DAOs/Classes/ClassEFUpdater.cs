@@ -17,7 +17,11 @@ public class ClassEFUpdater(
     IUpdateMapper<ClassUpdateDTO, Class> updateMapper
 ) : EFUpdater<ClassDomain, ClassUpdateDTO, Class>(ctx, domainMapper, updateMapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la entidad de clase rastreada a partir del DTO de actualización.
+    /// </summary>
+    /// <param name="value">DTO de actualización.</param>
+    /// <returns>Entidad rastreada o null.</returns>
     protected override async Task<Class?> GetTrackedByDTO(ClassUpdateDTO value) =>
         await _dbSet
             .AsTracking()

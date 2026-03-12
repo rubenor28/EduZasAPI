@@ -22,7 +22,11 @@ public sealed class ClassResourceEFUpdater(
         updateMapper
     )
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la entidad de asociación recurso-clase rastreada a partir del DTO.
+    /// </summary>
+    /// <param name="value">DTO de actualización.</param>
+    /// <returns>Entidad rastreada o null.</returns>
     protected override Task<ClassResource?> GetTrackedByDTO(ClassResourceDTO value) =>
         _dbSet
             .AsTracking()

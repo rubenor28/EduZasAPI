@@ -9,8 +9,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
 /// </summary>
 public class NewClassStudentEFMapper : IMapper<UserClassRelationId, ClassStudent>
 {
-    /// <inheritdoc/>
-    public ClassStudent Map(UserClassRelationId input) =>
+    /// <summary>
+    /// Mapea un DTO de nueva relación estudiante-clase a una entidad de base de datos.
+    /// </summary>
+    /// <param name="id">DTO de identificación de la relación.</param>
+    /// <returns>Entidad de base de datos.</returns>
+    public ClassStudent Map(UserClassRelationId id) =>
         new()
         {
             ClassId = input.ClassId,

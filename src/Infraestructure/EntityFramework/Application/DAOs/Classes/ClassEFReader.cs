@@ -12,7 +12,10 @@ namespace EntityFramework.Application.DAOs.Classes;
 public class ClassEFReader(EduZasDotnetContext ctx, IMapper<Class, ClassDomain> mapper)
     : EFReader<string, ClassDomain, Class>(ctx, mapper)
 {
-    /// <inheritdoc/>
-    protected override Expression<Func<Class, bool>> GetIdPredicate(string id) =>
-        c => c.ClassId == id;
+    /// <summary>
+    /// Obtiene el predicado para filtrar clases por su ID.
+    /// </summary>
+    /// <param name="id">ID de la clase.</param>
+    /// <returns>Expresión de predicado.</returns>
+    protected override Expression<Func<Class, bool>> GetIdPredicate(string id) => c => c.ClassId == id;
 }

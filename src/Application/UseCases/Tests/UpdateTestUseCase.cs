@@ -21,7 +21,12 @@ public sealed class UpdateTestUseCase(
 {
     readonly IQuerierAsync<AnswerDomain, AnswerCriteriaDTO> _answerQuerier = answerQuerier;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que no existan respuestas para el examen antes de permitir su actualización y verifica la autorización.
+    /// </summary>
+    /// <param name="value">Datos de la actualización.</param>
+    /// <param name="record">Entidad del examen original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<TestUpdateDTO> value,
         TestDomain record
@@ -46,6 +51,10 @@ public sealed class UpdateTestUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el identificador del examen desde el DTO de actualización.
+    /// </summary>
+    /// <param name="dto">DTO de actualización.</param>
+    /// <returns>ID del examen.</returns>
     protected override Guid GetId(TestUpdateDTO dto) => dto.Id;
 }

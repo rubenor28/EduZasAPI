@@ -5,11 +5,17 @@ namespace Domain.Entities.PublicQuestions;
 /// </summary>
 public record PublicMultipleChoiseQuestion : IPublicQuestion
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Identificador único de la pregunta.
+    /// </summary>
     public required Guid Id { get; init; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Título o enunciado de la pregunta.
+    /// </summary>
     public required string Title { get; init; }
-    /// <inheritdoc />
+    /// <summary>
+    /// URL de la imagen asociada (opcional).
+    /// </summary>
     public required string? ImageUrl { get; init; }
     /// <summary>
     /// Obtiene las opciones disponibles para la pregunta.

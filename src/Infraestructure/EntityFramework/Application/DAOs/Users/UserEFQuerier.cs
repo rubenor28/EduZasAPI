@@ -17,8 +17,12 @@ public class UserEFQuerier(
     int pageSize
 ) : EFQuerier<UserDomain, UserCriteriaDTO, User>(ctx, projector, pageSize)
 {
-    /// <inheritdoc/>
-    public override IQueryable<User> BuildQuery(UserCriteriaDTO c)
+    /// <summary>
+    /// Construye la consulta de usuarios a partir de los criterios de búsqueda.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>IQueryable de usuarios.</returns>
+    public override IQueryable<User> BuildQuery(UserCriteriaDTO criteria) =>
     {
         var query = _dbSet
             .AsNoTracking()

@@ -14,7 +14,12 @@ public sealed class DeleteResourceUseCase(
     IReaderAsync<Guid, ResourceDomain> reader
 ) : DeleteUseCase<Guid, ResourceDomain>(deleter, reader, null)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el recurso exista y que el ejecutor esté autorizado para eliminarlo.
+    /// </summary>
+    /// <param name="value">Datos de la acción de eliminación.</param>
+    /// <param name="record">Entidad del recurso original.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<Guid> value,
         ResourceDomain record

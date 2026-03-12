@@ -22,7 +22,9 @@ public abstract class EFReader<I, DomainEntity, EFEntity>(
 {
     private readonly IMapper<EFEntity, DomainEntity> _mapper = mapper;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene una entidad por su identificador de forma asíncrona.
+    /// </summary>
     public Task<DomainEntity?> GetAsync(I id) =>
         _dbSet
             .AsNoTracking()

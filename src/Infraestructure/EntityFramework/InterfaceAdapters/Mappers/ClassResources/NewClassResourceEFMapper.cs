@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassResources;
 /// </summary>
 public sealed class NewClassResourceEFMapper : IMapper<ClassResourceDTO, ClassResource>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea un DTO de nueva asociación recurso-clase a una entidad de base de datos.
+    /// </summary>
+    /// <param name="input">DTO de creación.</param>
+    /// <returns>Entidad de base de datos.</returns>
     public ClassResource Map(ClassResourceDTO input) =>
         new()
         {

@@ -17,7 +17,11 @@ public class TagEFQuerier(
     int maxPageSize
 ) : EFQuerier<TagDomain, TagCriteriaDTO, Tag>(ctx, projector, maxPageSize)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Construye la consulta de etiquetas a partir de los criterios de búsqueda.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de etiquetas.</returns>
     public override IQueryable<Tag> BuildQuery(TagCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()

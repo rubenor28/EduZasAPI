@@ -22,8 +22,12 @@ public class UserNotificationEFUpdater(
         NotificationPerUser
     >(ctx, domainMapper, updateMapper)
 {
-    /// <inheritdoc/>
-    protected override async Task<NotificationPerUser?> GetTrackedByDTO(UserNotificationUpdateDTO dto) =>
+    /// <summary>
+    /// Obtiene la entidad de notificación de usuario rastreada a partir del DTO.
+    /// </summary>
+    /// <param name="value">DTO de actualización.</param>
+    /// <returns>Entidad rastreada o null.</returns>
+    protected override Task<NotificationPerUser?> GetTrackedByDTO(UserNotificationUpdateDTO value) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

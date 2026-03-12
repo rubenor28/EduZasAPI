@@ -9,8 +9,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Contacts;
 /// </summary>
 public class NewContactEFMapper : IMapper<NewContactDTO, AgendaContact>
 {
-    /// <inheritdoc/>
-    public AgendaContact Map(NewContactDTO input) =>
+    /// <summary>
+    /// Mapea un DTO de nuevo contacto a una entidad de base de datos.
+    /// </summary>
+    /// <param name="source">DTO de creación.</param>
+    /// <returns>Entidad de base de datos.</returns>
+    public AgendaContact Map(NewContactDTO source) =>
         new()
         {
             Alias = input.Alias,

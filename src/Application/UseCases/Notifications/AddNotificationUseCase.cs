@@ -24,7 +24,12 @@ public sealed class AddNotificationUseCase(
 
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _userQuerier = userQuerier;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Realiza la tarea adicional de distribuir la notificación recién creada a todos los estudiantes inscritos en la clase.
+    /// </summary>
+    /// <param name="newE">Datos de la nueva notificación.</param>
+    /// <param name="created">Entidad de notificación creada.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
     protected override async Task ExtraTaskAsync(
         UserActionDTO<NewNotificationDTO> newE,
         NotificationDomain created

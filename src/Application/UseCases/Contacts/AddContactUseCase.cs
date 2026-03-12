@@ -39,7 +39,11 @@ public sealed class AddContactUseCase(
 
     private readonly ContactTagCreator _contactTagCreator = contactTagCreator;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el usuario no se agregue a sí mismo, que el propietario exista, que el contacto sea un profesor válido y que no exista ya la relación.
+    /// </summary>
+    /// <param name="request">Datos del nuevo contacto.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewContactDTO> request
     )
@@ -85,7 +89,12 @@ public sealed class AddContactUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Realiza la tarea adicional de procesar y asociar etiquetas al contacto recién creado, creándolas si no existen.
+    /// </summary>
+    /// <param name="newEntity">Datos del nuevo contacto.</param>
+    /// <param name="createdEntity">Entidad de contacto creada.</param>
+    /// <returns>Tarea que representa la operación asíncrona.</returns>
     protected override async Task ExtraTaskAsync(
         UserActionDTO<NewContactDTO> newEntity,
         ContactDomain createdEntity

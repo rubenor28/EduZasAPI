@@ -25,7 +25,11 @@ public class AddUserUseCase(
     private readonly IReaderAsync<string, UserDomain> _reader = reader;
     private readonly IHashService _hasher = hasher;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida que el ejecutor tenga permisos de administrador.
+    /// </summary>
+    /// <param name="newEntity">Datos del nuevo usuario.</param>
+    /// <returns>Resultado exitoso o error de autorización.</returns>
     protected override Result<Unit, UseCaseError> ExtraValidation(
         UserActionDTO<NewUserDTO> newEntity
     )
@@ -36,7 +40,11 @@ public class AddUserUseCase(
         return Unit.Value;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Valida asíncronamente que el email no esté registrado previamente.
+    /// </summary>
+    /// <param name="request">Datos del nuevo usuario.</param>
+    /// <returns>Resultado exitoso o error de conflicto.</returns>
     protected override async Task<Result<Unit, UseCaseError>> ExtraValidationAsync(
         UserActionDTO<NewUserDTO> request
     )
@@ -48,7 +56,11 @@ public class AddUserUseCase(
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Convierte los nombres y apellidos a mayúsculas antes de la validación.
+    /// </summary>
+    /// <param name="value">Datos del nuevo usuario.</param>
+    /// <returns>DTO con los datos formateados.</returns>
     protected override UserActionDTO<NewUserDTO> PreValidationFormat(UserActionDTO<NewUserDTO> value)
     {
         return value with
@@ -63,7 +75,11 @@ public class AddUserUseCase(
         };
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Aplica el hashing a la contraseña del usuario después de la validación.
+    /// </summary>
+    /// <param name="request">Datos del nuevo usuario.</param>
+    /// <returns>DTO con la contraseña hasheada.</returns>
     protected override UserActionDTO<NewUserDTO> PostValidationFormat(UserActionDTO<NewUserDTO> request)
     {
         return request with { Data = request.Data with { Password = _hasher.Hash(request.Data.Password) } };

@@ -22,8 +22,12 @@ public class NotificationEFQuerier(
         pageSize
     )
 {
-    /// <inheritdoc/>
-    public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO cr) =>
+    /// <summary>
+    /// Construye la consulta de notificaciones a partir de los criterios.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de notificaciones.</returns>
+    public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

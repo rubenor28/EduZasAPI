@@ -9,7 +9,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassStudents;
 /// </summary>
 public class UpdateClassStudentEFMapper : IUpdateMapper<ClassStudentUpdateDTO, ClassStudent>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Actualiza una entidad de relación estudiante-clase con los datos del DTO.
+    /// </summary>
+    /// <param name="uProps">DTO de actualización.</param>
+    /// <param name="entity">Entidad de base de datos.</param>
     public void Map(ClassStudentUpdateDTO uProps, ClassStudent entity)
     {
         entity.ClassId = uProps.ClassId;

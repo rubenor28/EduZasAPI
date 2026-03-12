@@ -158,6 +158,9 @@ public static class UserRoutes
         return group;
     }
 
+    /// <summary>
+    /// Busca usuarios de forma paginada según los criterios proporcionados.
+    /// </summary>
     public static Task<IResult> SearchUsers(
         [FromBody] UserCriteriaDTO criteria,
         [FromServices] UserQueryUseCase useCase,
@@ -174,6 +177,9 @@ public static class UserRoutes
         );
     }
 
+    /// <summary>
+    /// Actualiza la información de un usuario existente.
+    /// </summary>
     public static Task<IResult> UpdateUser(
         [FromBody] UserUpdateDTO request,
         [FromServices] UpdateUserUseCase useCase,
@@ -190,6 +196,9 @@ public static class UserRoutes
         );
     }
 
+    /// <summary>
+    /// Elimina un usuario por su identificador.
+    /// </summary>
     public static Task<IResult> DeleteUser(
         [FromRoute] ulong userId,
         [FromServices] DeleteUserUseCase useCase,
@@ -206,6 +215,9 @@ public static class UserRoutes
         );
     }
 
+    /// <summary>
+    /// Obtiene un usuario mediante su dirección de correo electrónico.
+    /// </summary>
     public static Task<IResult> GetUserByEmail(
         [FromRoute] string email,
         [FromServices] ReadUserEmailUseCase useCase,
@@ -222,6 +234,9 @@ public static class UserRoutes
         );
     }
 
+    /// <summary>
+    /// Obtiene un usuario mediante su identificador único.
+    /// </summary>
     public static Task<IResult> GetUserById(
         [FromRoute] ulong userId,
         [FromServices] ReadUserUseCase useCase,

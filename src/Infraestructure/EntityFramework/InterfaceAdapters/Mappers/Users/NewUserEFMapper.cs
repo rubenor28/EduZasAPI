@@ -12,7 +12,11 @@ public class NewUserEFMapper(IMapper<UserType, uint> usrtMapper) : IMapper<NewUs
 {
     private readonly IMapper<UserType, uint> _usrtMapper = usrtMapper;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Mapea un DTO de nuevo usuario a una entidad de base de datos.
+    /// </summary>
+    /// <param name="source">DTO con los datos del nuevo usuario.</param>
+    /// <returns>Entidad de usuario para persistencia.</returns>
     public User Map(NewUserDTO source) =>
         new()
         {

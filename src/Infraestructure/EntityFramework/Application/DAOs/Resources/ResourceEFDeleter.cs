@@ -14,8 +14,12 @@ public sealed class ResourceEFDeleter(
     IMapper<Resource, ResourceDomain> domainMapper
 ) : EFDeleter<Guid, ResourceDomain, Resource>(ctx, domainMapper)
 {
-    /// <inheritdoc/>
-    public override async Task<Resource?> GetTrackedById(Guid id) =>
+    /// <summary>
+    /// Obtiene la entidad de recurso rastreada por su ID para eliminación.
+    /// </summary>
+    /// <param name="id">ID del recurso.</param>
+    /// <returns>Entidad rastreada o null.</returns>
+    public override Task<Resource?> GetTrackedById(Guid id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

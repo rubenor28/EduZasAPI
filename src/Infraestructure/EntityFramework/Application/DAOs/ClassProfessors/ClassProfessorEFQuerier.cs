@@ -22,7 +22,11 @@ public sealed class ClassProfessorEFQuerier(
         maxPageSize
     )
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Construye la consulta de relaciones profesor-clase a partir de los criterios.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de profesores de clase.</returns>
     public override IQueryable<ClassProfessor> BuildQuery(ClassProfessorCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()

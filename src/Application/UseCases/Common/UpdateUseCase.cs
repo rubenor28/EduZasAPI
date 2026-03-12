@@ -34,7 +34,11 @@ public abstract class UpdateUseCase<I, UE, E>(
     /// </summary>
     protected readonly IBusinessValidationService<UE>? _validator = validator;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Ejecuta la lógica para actualizar una entidad existente.
+    /// </summary>
+    /// <param name="action">Datos de la actualización y el ejecutor.</param>
+    /// <returns>Resultado con la entidad actualizada o error de caso de uso.</returns>
     public async Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<UE> request)
     {
         var formatted = PreValidationFormat(request);

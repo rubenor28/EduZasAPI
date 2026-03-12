@@ -12,6 +12,10 @@ namespace EntityFramework.Application.DAOs.Users;
 public class UserEFReader(EduZasDotnetContext ctx, IMapper<User, UserDomain> mapper)
     : EFReader<ulong, UserDomain, User>(ctx, mapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el predicado para filtrar usuarios por su ID.
+    /// </summary>
+    /// <param name="id">ID del usuario.</param>
+    /// <returns>Expresión de predicado.</returns>
     protected override Expression<Func<User, bool>> GetIdPredicate(ulong id) => u => u.UserId == id;
 }

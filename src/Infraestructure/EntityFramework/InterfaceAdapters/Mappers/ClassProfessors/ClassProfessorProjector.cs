@@ -12,7 +12,11 @@ namespace EntityFramework.InterfaceAdapters.Mappers.ClassProfessors;
 public class ClassProfessorProjector
     : IEFProjector<ClassProfessor, ClassProfessorDomain, ClassProfessorCriteriaDTO>
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de relación profesor-clase a un objeto de dominio.
+    /// </summary>
+    /// <param name="_">Criterios de consulta (ignorados).</param>
+    /// <returns>Expresión de proyección.</returns>
     public Expression<Func<ClassProfessor, ClassProfessorDomain>> GetProjection(
         ClassProfessorCriteriaDTO _
     ) =>

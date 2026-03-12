@@ -15,7 +15,11 @@ public sealed class ClassTestEFReader(
     IMapper<TestPerClass, ClassTestDomain> mapper
 ) : EFReader<ClassTestIdDTO, ClassTestDomain, TestPerClass>(ctx, mapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el predicado para filtrar la asociación examen-clase por su ID compuesto.
+    /// </summary>
+    /// <param name="id">ID compuesto de la asociación.</param>
+    /// <returns>Expresión de predicado.</returns>
     protected override Expression<Func<TestPerClass, bool>> GetIdPredicate(ClassTestIdDTO id) =>
         ct => ct.ClassId == id.ClassId && ct.TestId == id.TestId;
 }

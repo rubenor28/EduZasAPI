@@ -33,7 +33,11 @@ public abstract class DeleteUseCase<I, E>(
     /// </summary>
     protected readonly IBusinessValidationService<I>? _validator = validator;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Ejecuta la lógica para eliminar una entidad.
+    /// </summary>
+    /// <param name="action">Datos de la eliminación y el ejecutor.</param>
+    /// <returns>Resultado exitoso o error de caso de uso.</returns>
     public async Task<Result<E, UseCaseError>> ExecuteAsync(UserActionDTO<I> request)
     {
         if (_validator is not null)

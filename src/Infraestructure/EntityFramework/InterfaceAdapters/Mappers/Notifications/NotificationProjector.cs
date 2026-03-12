@@ -12,10 +12,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Notifications;
 public class NotificationProjector
     : IEFProjector<Notification, NotificationDomain, NotificationCriteriaDTO>
 {
-    /// <inheritdoc/>
-    public Expression<Func<Notification, NotificationDomain>> GetProjection(
-        NotificationCriteriaDTO criteria
-    ) =>
+    /// <summary>
+    /// Obtiene la expresión de proyección para convertir una entidad de notificación a un objeto de dominio.
+    /// </summary>
+    /// <param name="criteria">Criterios de consulta.</param>
+    /// <returns>Expresión de proyección.</returns>
+    public Expression<Func<Notification, NotificationDomain>> GetProjection(NotificationCriteriaDTO criteria) =>
         s =>
             new()
             {

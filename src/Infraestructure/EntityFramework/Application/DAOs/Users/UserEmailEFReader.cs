@@ -12,7 +12,10 @@ namespace EntityFramework.Application.DAOs.Users;
 public class UserEmailEFReader(EduZasDotnetContext ctx, IMapper<User, UserDomain> mapper)
     : EFReader<string, UserDomain, User>(ctx, mapper)
 {
-    /// <inheritdoc/>
-    protected override Expression<Func<User, bool>> GetIdPredicate(string email) =>
-        u => u.Email == email;
+    /// <summary>
+    /// Obtiene el predicado para filtrar usuarios por su email.
+    /// </summary>
+    /// <param name="email">Email del usuario.</param>
+    /// <returns>Expresión de predicado.</returns>
+    protected override Expression<Func<User, bool>> GetIdPredicate(string email) => u => u.Email == email;
 }

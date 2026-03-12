@@ -16,8 +16,12 @@ public sealed class ClassTestAssociationEFQuerier(
     int maxPageSize
 ) : EFQuerier<ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO, Class>(ctx, projector, maxPageSize)
 {
-    /// <inheritdoc/>
-    public override IQueryable<Class> BuildQuery(ClassTestAssociationCriteriaDTO criteria) =>
+    /// <summary>
+    /// Construye la consulta para obtener las asociaciones de exámenes de clase a partir de los criterios.
+    /// </summary>
+    /// <param name="c">Criterios de consulta.</param>
+    /// <returns>IQueryable de clases.</returns>
+    public override IQueryable<Class> BuildQuery(ClassTestAssociationCriteriaDTO c) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

@@ -28,7 +28,11 @@ public class RandomStringGeneratorService(char[] chars, uint strLength)
 {
     private readonly Random _rdm = new();
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Genera una cadena aleatoria de la longitud especificada.
+    /// </summary>
+    /// <param name="length">Longitud de la cadena a generar.</param>
+    /// <returns>La cadena aleatoria generada.</returns>
     public string Generate()
     {
         var builder = new StringBuilder();

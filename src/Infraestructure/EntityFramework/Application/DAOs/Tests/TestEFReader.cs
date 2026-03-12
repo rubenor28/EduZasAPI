@@ -12,6 +12,10 @@ namespace EntityFramework.Application.DAOs.Tests;
 public sealed class TestEFReader(EduZasDotnetContext ctx, IMapper<Test, TestDomain> mapper)
     : EFReader<Guid, TestDomain, Test>(ctx, mapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene el predicado para filtrar exámenes por su GUID.
+    /// </summary>
+    /// <param name="id">GUID del examen.</param>
+    /// <returns>Expresión de predicado.</returns>
     protected override Expression<Func<Test, bool>> GetIdPredicate(Guid id) => t => t.TestId == id;
 }

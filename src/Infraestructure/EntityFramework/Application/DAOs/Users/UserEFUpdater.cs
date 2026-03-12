@@ -17,7 +17,11 @@ public class UserEFUpdater(
     IUpdateMapper<UserUpdateDTO, User> updateMapper
 ) : EFUpdater<UserDomain, UserUpdateDTO, User>(ctx, domainMapper, updateMapper)
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Obtiene la entidad de usuario rastreada a partir del DTO de actualización.
+    /// </summary>
+    /// <param name="value">DTO de actualización.</param>
+    /// <returns>Entidad rastreada o null.</returns>
     protected override Task<User?> GetTrackedByDTO(UserUpdateDTO value) =>
         _dbSet.AsTracking().AsQueryable().Where(u => u.UserId == value.Id).FirstOrDefaultAsync();
 }

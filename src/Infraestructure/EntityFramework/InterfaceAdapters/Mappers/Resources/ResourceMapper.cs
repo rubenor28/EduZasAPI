@@ -9,8 +9,12 @@ namespace EntityFramework.InterfaceAdapters.Mappers.Resources;
 /// </summary>
 public sealed class ResourceMapper : IMapper<Resource, ResourceDomain>
 {
-    /// <inheritdoc/>
-    public ResourceDomain Map(Resource input) =>
+    /// <summary>
+    /// Mapea una entidad de recurso de base de datos a un objeto de dominio.
+    /// </summary>
+    /// <param name="source">Entidad de base de datos.</param>
+    /// <returns>Objeto de dominio de recurso.</returns>
+    public ResourceDomain Map(Resource source) =>
         new()
         {
             Id = input.ResourceId,
