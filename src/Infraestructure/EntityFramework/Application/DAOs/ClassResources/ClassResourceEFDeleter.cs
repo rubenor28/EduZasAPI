@@ -20,7 +20,7 @@ public sealed class ClassResourceEFDeleter(
     /// </summary>
     /// <param name="id">ID compuesto de la asociación.</param>
     /// <returns>Entidad rastreada o null.</returns>
-    public override Task<ClassResource?> GetTrackedById(ClassResourceIdDTO id) =>
+    public async override Task<ClassResource?> GetTrackedById(ClassResourceIdDTO id) =>
         await _dbSet
             .AsTracking()
             .Where(r => r.ResourceId == id.ResourceId && r.ClassId == id.ClassId)

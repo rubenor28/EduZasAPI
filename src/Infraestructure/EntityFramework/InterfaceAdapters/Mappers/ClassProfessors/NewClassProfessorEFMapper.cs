@@ -17,8 +17,8 @@ public class NewClassProfessorEFMapper : IMapper<NewClassProfessorDTO, ClassProf
     public ClassProfessor Map(NewClassProfessorDTO source) =>
         new()
         {
-            ClassId = r.ClassId,
-            ProfessorId = r.UserId,
-            IsOwner = r.IsOwner,
+            ClassId = source.ClassId,
+            ProfessorId = source.UserId,
+            IsOwner = source.IsOwner,
         };
 }

@@ -23,7 +23,7 @@ public sealed class ContactEFQuerier(
     /// </summary>
     /// <param name="c">Criterios de consulta.</param>
     /// <returns>IQueryable de contactos.</returns>
-    public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO c) =>
+    public override IQueryable<AgendaContact> BuildQuery(ContactCriteriaDTO criteria)
     {
         var query = _dbSet
             .AsNoTracking()

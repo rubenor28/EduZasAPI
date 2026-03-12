@@ -12,9 +12,9 @@ public class ClassMapper : IMapper<Class, ClassDomain>
     /// <summary>
     /// Mapea una entidad de clase de base de datos a un objeto de dominio.
     /// </summary>
-    /// <param name="input">Entidad de base de datos.</param>
+    /// <param name="ef">Entidad de base de datos.</param>
     /// <returns>Objeto de dominio de clase.</returns>
-    public ClassDomain Map(Class input) =>
+    public ClassDomain Map(Class ef) =>
         new()
         {
             Id = ef.ClassId,

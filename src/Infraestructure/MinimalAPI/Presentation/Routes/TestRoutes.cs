@@ -93,7 +93,7 @@ public static class TestRoutes
             .WithName("Buscar tests")
             .RequireAuthorization("ProfessorOrAdmin")
             .AddEndpointFilter<ExecutorFilter>()
-            .Produces<PaginatedQuery<TestSummary, TestCriteriaDTO>>(StatusCodes.Status200OK)
+            .Produces<PaginatedQuery<TestSummaryDTO, TestCriteriaDTO>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status403Forbidden)
             .Produces(StatusCodes.Status404NotFound)

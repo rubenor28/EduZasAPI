@@ -12,9 +12,9 @@ public class NewContactEFMapper : IMapper<NewContactDTO, AgendaContact>
     /// <summary>
     /// Mapea un DTO de nuevo contacto a una entidad de base de datos.
     /// </summary>
-    /// <param name="source">DTO de creación.</param>
+    /// <param name="input">DTO de creación.</param>
     /// <returns>Entidad de base de datos.</returns>
-    public AgendaContact Map(NewContactDTO source) =>
+    public AgendaContact Map(NewContactDTO input) =>
         new()
         {
             Alias = input.Alias,

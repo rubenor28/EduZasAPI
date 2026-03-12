@@ -17,8 +17,8 @@ public class NewClassStudentEFMapper : IMapper<UserClassRelationId, ClassStudent
     public ClassStudent Map(UserClassRelationId id) =>
         new()
         {
-            ClassId = input.ClassId,
-            StudentId = input.UserId,
+            ClassId = id.ClassId,
+            StudentId = id.UserId,
             Hidden = false,
         };
 }

@@ -22,7 +22,7 @@ public class UserEFQuerier(
     /// </summary>
     /// <param name="criteria">Criterios de consulta.</param>
     /// <returns>IQueryable de usuarios.</returns>
-    public override IQueryable<User> BuildQuery(UserCriteriaDTO criteria) =>
+    public override IQueryable<User> BuildQuery(UserCriteriaDTO c)
     {
         var query = _dbSet
             .AsNoTracking()

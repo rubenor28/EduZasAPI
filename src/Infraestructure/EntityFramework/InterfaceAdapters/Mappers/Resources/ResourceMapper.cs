@@ -12,9 +12,9 @@ public sealed class ResourceMapper : IMapper<Resource, ResourceDomain>
     /// <summary>
     /// Mapea una entidad de recurso de base de datos a un objeto de dominio.
     /// </summary>
-    /// <param name="source">Entidad de base de datos.</param>
+    /// <param name="input">Entidad de base de datos.</param>
     /// <returns>Objeto de dominio de recurso.</returns>
-    public ResourceDomain Map(Resource source) =>
+    public ResourceDomain Map(Resource input) =>
         new()
         {
             Id = input.ResourceId,

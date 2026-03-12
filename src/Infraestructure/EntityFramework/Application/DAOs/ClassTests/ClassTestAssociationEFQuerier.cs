@@ -21,7 +21,7 @@ public sealed class ClassTestAssociationEFQuerier(
     /// </summary>
     /// <param name="c">Criterios de consulta.</param>
     /// <returns>IQueryable de clases.</returns>
-    public override IQueryable<Class> BuildQuery(ClassTestAssociationCriteriaDTO c) =>
+    public override IQueryable<Class> BuildQuery(ClassTestAssociationCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

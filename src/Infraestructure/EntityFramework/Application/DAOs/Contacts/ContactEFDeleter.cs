@@ -20,7 +20,7 @@ public sealed class ContactEFDeleter(
     /// </summary>
     /// <param name="id">ID compuesto del contacto.</param>
     /// <returns>Entidad rastreada o null.</returns>
-    public override Task<AgendaContact?> GetTrackedById(ContactIdDTO id) =>
+    public async override Task<AgendaContact?> GetTrackedById(ContactIdDTO id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

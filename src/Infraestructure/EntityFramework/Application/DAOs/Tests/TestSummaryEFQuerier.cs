@@ -12,16 +12,16 @@ namespace EntityFramework.Application.DAOs.Tests;
 /// </summary>
 public sealed class TestSummaryEFQuerier(
     EduZasDotnetContext ctx,
-    IEFProjector<Test, TestSummary, TestCriteriaDTO> projector,
+    IEFProjector<Test, TestSummaryDTO, TestCriteriaDTO> projector,
     int maxPageSize
-) : EFQuerier<TestSummary, TestCriteriaDTO, Test>(ctx, projector, maxPageSize)
+) : EFQuerier<TestSummaryDTO, TestCriteriaDTO, Test>(ctx, projector, maxPageSize)
 {
     /// <summary>
     /// Construye la consulta para obtener resúmenes de exámenes a partir de los criterios.
     /// </summary>
     /// <param name="cr">Criterios de consulta.</param>
     /// <returns>IQueryable de exámenes.</returns>
-    public override IQueryable<Test> BuildQuery(TestCriteriaDTO cr) =>
+    public override IQueryable<Test> BuildQuery(TestCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

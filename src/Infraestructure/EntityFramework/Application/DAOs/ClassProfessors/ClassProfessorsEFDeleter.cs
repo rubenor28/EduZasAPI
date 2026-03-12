@@ -19,7 +19,7 @@ public class ClassProfessorsEFDeleter(
     /// </summary>
     /// <param name="id">ID compuesto de la relación.</param>
     /// <returns>Entidad rastreada o null.</returns>
-    public override Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
+    public async override Task<ClassProfessor?> GetTrackedById(UserClassRelationId id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

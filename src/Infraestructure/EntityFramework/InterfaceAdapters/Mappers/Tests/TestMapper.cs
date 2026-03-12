@@ -14,7 +14,7 @@ public class TestMapper : IMapper<Test, TestDomain>
     /// </summary>
     /// <param name="input">Entidad de base de datos.</param>
     /// <returns>Objeto de dominio de examen.</returns>
-    public TestDomain Map(Test input) =>
+    public TestDomain Map(Test t) =>
         new()
         {
             Id = t.TestId,

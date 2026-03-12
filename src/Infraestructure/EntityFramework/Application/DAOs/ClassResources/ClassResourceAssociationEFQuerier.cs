@@ -25,7 +25,7 @@ public sealed class ClassResourceAssociationEFQuerier(
     /// </summary>
     /// <param name="c">Criterios de consulta.</param>
     /// <returns>IQueryable de clases.</returns>
-    public override IQueryable<Class> BuildQuery(ClassResourceAssociationCriteriaDTO c) =>
+    public override IQueryable<Class> BuildQuery(ClassResourceAssociationCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()
             .Where(c => c.ClassProfessors.Any(p => p.ProfessorId == criteria.ProfessorId))

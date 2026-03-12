@@ -27,7 +27,7 @@ public class ClassProfessorsEFUpdater(
     /// </summary>
     /// <param name="value">DTO de actualización.</param>
     /// <returns>Entidad rastreada o null.</returns>
-    protected override Task<ClassProfessor?> GetTrackedByDTO(ClassProfessorUpdateDTO value) =>
+    protected async override Task<ClassProfessor?> GetTrackedByDTO(ClassProfessorUpdateDTO value) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

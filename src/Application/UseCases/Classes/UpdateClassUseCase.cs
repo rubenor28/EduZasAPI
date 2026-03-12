@@ -46,6 +46,9 @@ public class UpdateClassUseCase(
         return Result<Unit, UseCaseError>.Ok(Unit.Value);
     }
 
+    /// <summary>Determina si un profesor tiene permisos para ejecutar la actualización</summary>
+    /// <param name="professorId">ID del profesor que ejecuta la acción</param>
+    /// <param name="classId">ID de la clase donde se ejecuta la acción</param>
     private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
     {
         var professorSearch = await _professorReader.GetAsync(

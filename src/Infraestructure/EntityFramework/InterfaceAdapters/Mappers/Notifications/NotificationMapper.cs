@@ -14,7 +14,7 @@ public class NotificationMapper : IMapper<Notification, NotificationDomain>
     /// </summary>
     /// <param name="source">Entidad de base de datos.</param>
     /// <returns>Objeto de dominio de notificación.</returns>
-    public NotificationDomain Map(Notification source) =>
+    public NotificationDomain Map(Notification s) =>
         new()
         {
             Id = s.NotificationId,

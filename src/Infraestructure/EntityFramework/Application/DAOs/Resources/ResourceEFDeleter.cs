@@ -19,7 +19,7 @@ public sealed class ResourceEFDeleter(
     /// </summary>
     /// <param name="id">ID del recurso.</param>
     /// <returns>Entidad rastreada o null.</returns>
-    public override Task<Resource?> GetTrackedById(Guid id) =>
+    public async override Task<Resource?> GetTrackedById(Guid id) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

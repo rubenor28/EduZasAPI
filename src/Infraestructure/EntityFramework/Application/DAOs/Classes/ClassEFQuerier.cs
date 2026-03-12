@@ -22,7 +22,7 @@ public class ClassEFQuerier(
     /// </summary>
     /// <param name="c">Criterios de consulta.</param>
     /// <returns>IQueryable de clases.</returns>
-    public override IQueryable<Class> BuildQuery(ClassCriteriaDTO c) =>
+    public override IQueryable<Class> BuildQuery(ClassCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()
             .WhereStringQuery(cr.Subject, c => c.Subject)

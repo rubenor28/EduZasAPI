@@ -193,10 +193,10 @@ internal static class RepositoryServiceCollectionExtensions
                 pageSize
             )
         );
-        s.AddScoped<IQuerierAsync<TestSummary, TestCriteriaDTO>>(
+        s.AddScoped<IQuerierAsync<TestSummaryDTO, TestCriteriaDTO>>(
             sp => new TestSummaryEFQuerier(
                 sp.GetRequiredService<EduZasDotnetContext>(),
-                sp.GetRequiredService<IEFProjector<Test, TestSummary, TestCriteriaDTO>>(),
+                sp.GetRequiredService<IEFProjector<Test, TestSummaryDTO, TestCriteriaDTO>>(),
                 pageSize
             )
         );

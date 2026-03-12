@@ -49,6 +49,9 @@ public class DeleteClassUseCase(
         return Unit.Value;
     }
 
+    /// <summary>Determina si un usuario con rol profesor puede realizar la eliminación</summary>
+    /// <param name="professorId">ID del profesor que ejecuta la acción</param>
+    /// <param name="classId">ID de la clase</param>
     private async Task<bool> IsProfessorAuthorized(ulong professorId, string classId)
     {
         var professorSearch = await relationReader.GetAsync(

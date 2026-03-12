@@ -2,11 +2,11 @@ using Application.Configuration;
 using Application.DAOs;
 using Application.DTOs.Answers;
 using Application.DTOs.ClassTests;
-using Application.Services.Graders;
 using Application.UseCases.Common;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Grades;
+using Domain.ValueObjects.Reports;
 
 namespace Application.UseCases.Reports;
 

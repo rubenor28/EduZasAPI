@@ -155,7 +155,7 @@ internal static class MapperServiceCollectionExtensions
         s.AddSingleton<IUpdateMapper<TestUpdateDTO, Test>, UpdateTestEFMapper>();
         s.AddSingleton<IMapper<Test, TestDomain>, TestMapper>();
         s.AddSingleton<IEFProjector<Test, TestDomain, TestCriteriaDTO>, TestProjector>();
-        s.AddSingleton<IEFProjector<Test, TestSummary, TestCriteriaDTO>, TestSummaryProjector>();
+        s.AddSingleton<IEFProjector<Test, TestSummaryDTO, TestCriteriaDTO>, TestSummaryProjector>();
         s.AddSingleton<IEFProjector<Class, ClassTestAssociationDTO, ClassTestAssociationCriteriaDTO>, ClassTestAssociationProjector>();
         
         // Class Tests

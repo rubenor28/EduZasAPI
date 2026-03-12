@@ -17,6 +17,6 @@ public class ClassEFDeleter(EduZasDotnetContext ctx, IMapper<Class, ClassDomain>
     /// </summary>
     /// <param name="id">ID de la clase.</param>
     /// <returns>Entidad rastreada o null.</returns>
-    public override Task<Class?> GetTrackedById(string id) =>
+    public async override Task<Class?> GetTrackedById(string id) =>
         await _dbSet.AsTracking().AsQueryable().Where(c => c.ClassId == id).FirstOrDefaultAsync();
 }

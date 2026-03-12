@@ -18,7 +18,7 @@ public class NewNotificationEFMapper : IMapper<NewNotificationDTO, Notification>
         new()
         {
             Active = true,
-            Title = s.Title,
-            ClassId = s.ClassId,
+            Title = source.Title,
+            ClassId = source.ClassId,
         };
 }

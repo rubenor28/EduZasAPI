@@ -22,7 +22,7 @@ public class ResourceSummaryEFQuerier(
     /// </summary>
     /// <param name="c">Criterios de consulta.</param>
     /// <returns>IQueryable de recursos.</returns>
-    public override IQueryable<Resource> BuildQuery(ResourceCriteriaDTO c) =>
+    public override IQueryable<Resource> BuildQuery(ResourceCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

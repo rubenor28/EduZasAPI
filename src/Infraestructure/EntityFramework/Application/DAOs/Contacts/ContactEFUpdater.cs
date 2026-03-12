@@ -22,7 +22,7 @@ public sealed class ContactEFUpdater(
     /// </summary>
     /// <param name="value">DTO de actualización.</param>
     /// <returns>Entidad rastreada o null.</returns>
-    protected override Task<AgendaContact?> GetTrackedByDTO(ContactUpdateDTO value) =>
+    protected async override Task<AgendaContact?> GetTrackedByDTO(ContactUpdateDTO value) =>
         await _dbSet
             .AsTracking()
             .AsQueryable()

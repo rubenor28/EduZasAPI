@@ -21,9 +21,9 @@ public class UserMapper : IMapper<User, UserDomain>
     /// <summary>
     /// Mapea una entidad de base de datos a un objeto de dominio de usuario.
     /// </summary>
-    /// <param name="input">Entidad de usuario de la base de datos.</param>
+    /// <param name="source">Entidad de usuario de la base de datos.</param>
     /// <returns>Objeto de dominio del usuario.</returns>
-    public UserDomain Map(User input) =>
+    public UserDomain Map(User source) =>
         new()
         {
             Id = source.UserId,

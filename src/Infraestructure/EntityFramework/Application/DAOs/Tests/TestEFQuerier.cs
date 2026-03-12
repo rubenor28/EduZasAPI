@@ -22,7 +22,7 @@ public sealed class TestEFQuerier(
     /// </summary>
     /// <param name="c">Criterios de consulta.</param>
     /// <returns>IQueryable de exámenes.</returns>
-    public override IQueryable<Test> BuildQuery(TestCriteriaDTO c) =>
+    public override IQueryable<Test> BuildQuery(TestCriteriaDTO criteria) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

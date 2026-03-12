@@ -27,7 +27,7 @@ public class NotificationEFQuerier(
     /// </summary>
     /// <param name="c">Criterios de consulta.</param>
     /// <returns>IQueryable de notificaciones.</returns>
-    public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO c) =>
+    public override IQueryable<Notification> BuildQuery(NotificationCriteriaDTO cr) =>
         _dbSet
             .AsNoTracking()
             .AsQueryable()

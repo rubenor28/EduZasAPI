@@ -28,6 +28,11 @@ public sealed class AddFirstAdminUserUseCase(
     private readonly IQuerierAsync<UserDomain, UserCriteriaDTO> _querier = querier;
     private readonly IBusinessValidationService<NewUserDTO> _validator = validator;
 
+    /// <summary>
+    /// Ejecuta la creación del primer usuario administrador
+    /// </summary>
+    /// <param name="request">Datos obligatorios y opcionales para crear un usuario</param>
+    /// <returns>Usuario creado o error de campos inválidos</returns>
     public async Task<Result<UserDomain, UseCaseError>> ExecuteAsync(NewUserDTO request)
     {
         var haveUsers = await _querier.AnyAsync(new() { });
